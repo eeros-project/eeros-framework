@@ -9,6 +9,7 @@
 
 Signal::Signal()
 {
+    length = 1;
 	dat = new datum[1];
 	dat[0].value = 0;
 	dat[0].timestamp = 0;
@@ -24,6 +25,7 @@ Signal::Signal(std::string signalName, std::string unit, std::string coordinateS
 
 Signal::Signal(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length)
 {
+    this->length = length;
 	dat = new datum[length];
 	for (int i = 0; i < length; i++)
 	{
@@ -46,6 +48,23 @@ Signal::Signal(std::string signalName[], std::string unit[], std::string coordin
 
 void Signal::setValue(double newValue) {
 
+}
+
+void Signal::setValue(double newValue[]) {
+
+}
+
+double Signal::getValue() {
+    return dat[0].value;
+}
+
+double Signal::getValue(int index) {
+    if(index < length) return dat[index].value;
+    return 0;
+}
+
+int Signal::getLength() {
+    return length;
 }
 
 Signal::~Signal()

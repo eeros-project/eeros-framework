@@ -15,3 +15,8 @@ Block::Block() {
 Block::~Block() {
 	// TODO Auto-generated destructor stub
 }
+
+
+void Block::run() {
+    // nothing to do...
+}

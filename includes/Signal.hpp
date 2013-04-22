@@ -15,8 +15,8 @@ struct datum {
 class Signal {
 public:
 	Signal();
-	Signal(std::string signalName = "", std::string unit = "", std::string coordinateSystem = "");
-	Signal(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length = 1);
+	Signal(std::string signalName, std::string unit, std::string coordinateSystem = "");
+	Signal(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length);
 	virtual ~Signal();
 
 	virtual double getValue();
@@ -27,6 +27,7 @@ public:
 
 private:
 	datum* dat;
+    int length;
 };
 
 #endif /* ORG_EEROS_CONTROL_SIGNAL_HPP_ */
