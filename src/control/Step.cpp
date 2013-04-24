@@ -14,9 +14,9 @@ Step::Step()
 
 }
 
-Step::Step(double initValue, double stepHeight, double delayTime)
+Step::Step(AnSignal* signal, double initValue, double stepHeight, double delayTime)
 {
-	this->out = new Output();
+	this->out = new Output(signal);
 	this->initValue = initValue;
 	this->stepHeight = stepHeight;
 	this->stepTime = delayTime;

@@ -2,24 +2,24 @@
  * Output.hpp
  *
  *  Created on: 11.04.2013
- *      Author: zueger1
+ *      Author: Martin Zueger
  */
 
 #ifndef OUTPUT_HPP_
 #define OUTPUT_HPP_
 
-#include "Signal.hpp"
+#include "AnSignal.hpp"
 
 class Output
 {
 public:
-	Output();
+	Output(AnSignal* signal);
 	virtual ~Output();
 
-	virtual Signal* getSignal();
+	virtual AnSignal* getSignal();
 
 private:
-	Signal* signal;
+	AnSignal* signal;
 };
 
 #endif /* OUTPUT_HPP_ */

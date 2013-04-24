@@ -8,6 +8,7 @@
 #ifndef STEP_HPP_
 #define STEP_HPP_
 
+#include "AnSignal.hpp"
 #include "Block1o.hpp"
 #include "System.hpp"
 
@@ -15,7 +16,7 @@ class Step: public Block1o
 {
 public:
 	Step();
-	Step(double initValue = 0, double stepHeight = 1, double delayTime = 0);
+	Step(AnSignal* sigal, double initValue = 0, double stepHeight = 1, double delayTime = 0);
 	virtual ~Step();
 
 	virtual void run();

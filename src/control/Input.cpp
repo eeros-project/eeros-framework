@@ -2,22 +2,22 @@
  * Input.cpp
  *
  *  Created on: 11.04.2013
- *      Author: zueger1
+ *      Author: Martin Zueger
  */
 
 #include "Input.hpp"
 
 Input::Input()
 {
-	// TODO Auto-generated constructor stub
+	// nothing to do
 }
 
 Input::~Input()
 {
-	// TODO Auto-generated destructor stub
+	// nothing to do
 }
 
-Signal* Input::getSignal()
+AnSignal* Input::getSignal()
 {
 	if (this->isConnected())
 	{
