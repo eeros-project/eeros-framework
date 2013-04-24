@@ -7,15 +7,23 @@
 
 #include "Output.hpp"
 
-Output::Output(AnSignal* signal) {
+Output::Output(AnSignal signal)
+{
 	this->signal = signal;
 
 }
 
-Output::~Output() {
-	delete this->signal;
+Output::~Output()
+{
+	// nothing to do
 }
 
-AnSignal* Output::getSignal() {
-	return signal;
+AnSignal* Output::getSignal()
+{
+	return &signal;
+}
+
+void Output::setSignal(AnSignal newSignal)
+{
+	this->signal = newSignal;
 }

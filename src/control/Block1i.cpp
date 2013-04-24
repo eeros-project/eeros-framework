@@ -2,18 +2,17 @@
  * Block1i.cpp
  *
  *  Created on: 15.04.2013
- *      Author: zueger1
+ *      Author: Martin Zueger
  */
 
 #include "Block1i.hpp"
 
 Block1i::Block1i()
 {
-	// TODO Auto-generated constructor stub
-
+	// nothing to do
 }
 
 Block1i::~Block1i()
 {
-	// TODO Auto-generated destructor stub
+	// nothing to do
 }

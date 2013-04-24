@@ -2,11 +2,11 @@
  * Block.hpp
  *
  *  Created on: 11.04.2013
- *      Author: zueger1
+ *      Author: Martin Zueger
  */
 
-#ifndef BLOCK_HPP_
-#define BLOCK_HPP_
+#ifndef ORG_EEROS_CONTROL_BLOCK_HPP_
+#define ORG_EEROS_CONTROL_BLOCK_HPP_
 
 class Block {
 public:
@@ -15,4 +15,4 @@ public:
 	virtual void run();
 };
 
-#endif /* BLOCK_HPP_ */
+#endif /* ORG_EEROS_CONTROL_BLOCK_HPP_ */

@@ -2,15 +2,14 @@
  * Block1o.hpp
  *
  *  Created on: 15.04.2013
- *      Author: zueger1
+ *      Author: Martin Zueger
  */
 
-#ifndef BLOCK1O_HPP_
-#define BLOCK1O_HPP_
+#ifndef ORG_EEROS_CONTROL_BLOCK1O_HPP_
+#define ORG_EEROS_CONTROL_BLOCK1O_HPP_
 
 #include "Block.hpp"
 #include "Output.hpp"
-
 
 class Block1o: public Block
 {
@@ -21,4 +20,4 @@ public:
 	Output* out;
 };
 
-#endif /* BLOCK1O_HPP_ */
+#endif /* ORG_EEROS_CONTROL_BLOCK1O_HPP_ */

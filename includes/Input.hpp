@@ -5,8 +5,8 @@
  *      Author: Martin Zueger
  */
 
-#ifndef INPUT_HPP_
-#define INPUT_HPP_
+#ifndef ORG_EEROS_CONTROL_INPUT_HPP_
+#define ORG_EEROS_CONTROL_INPUT_HPP_
 
 #include "AnSignal.hpp"
 #include "Output.hpp"
@@ -26,4 +26,4 @@ private:
 	Output* connectedOutput;
 };
 
-#endif /* INPUT_HPP_ */
+#endif /* ORG_EEROS_CONTROL_INPUT_HPP_ */

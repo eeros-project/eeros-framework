@@ -2,11 +2,11 @@
  * Block1i.hpp
  *
  *  Created on: 15.04.2013
- *      Author: zueger1
+ *      Author: Martin Zueger
  */
 
-#ifndef BLOCK1I_HPP_
-#define BLOCK1I_HPP_
+#ifndef ORG_EEROS_CONTROL_BLOCK1I_HPP_
+#define ORG_EEROS_CONTROL_BLOCK1I_HPP_
 
 #include "Block.hpp"
 #include "Input.hpp"
@@ -20,4 +20,4 @@ public:
 	Input in;
 };
 
-#endif /* BLOCK1I_HPP_ */
+#endif /* ORG_EEROS_CONTROL_BLOCK1I_HPP_ */

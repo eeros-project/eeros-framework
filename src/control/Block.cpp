@@ -2,18 +2,18 @@
  * Block.cpp
  *
  *  Created on: 11.04.2013
- *      Author: zueger1
+ *      Author: Martin Zueger
  */
 
 #include "Block.hpp"
 
 Block::Block() {
-	// TODO Auto-generated constructor stub
+	// noting to do
 
 }
 
 Block::~Block() {
-	// TODO Auto-generated destructor stub
+	// noting to do
 }
 
 

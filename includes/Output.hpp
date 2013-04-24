@@ -5,21 +5,22 @@
  *      Author: Martin Zueger
  */
 
-#ifndef OUTPUT_HPP_
-#define OUTPUT_HPP_
+#ifndef ORG_EEROS_CONTROL_OUTPUT_HPP_
+#define ORG_EEROS_CONTROL_OUTPUT_HPP_
 
 #include "AnSignal.hpp"
 
 class Output
 {
 public:
-	Output(AnSignal* signal);
+	Output(AnSignal signal);
 	virtual ~Output();
 
 	virtual AnSignal* getSignal();
+	virtual void setSignal(AnSignal newSignal);
 
 private:
-	AnSignal* signal;
+	AnSignal signal;
 };
 
-#endif /* OUTPUT_HPP_ */
+#endif /* ORG_EEROS_CONTROL_OUTPUT_HPP_ */
