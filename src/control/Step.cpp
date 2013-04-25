@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "Step.hpp"
+#include "control/Step.hpp"
 
 
 Step::Step()

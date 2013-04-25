@@ -8,9 +8,9 @@
 #ifndef ORG_EEROS_CONTROL_STEP_HPP_
 #define ORG_EEROS_CONTROL_STEP_HPP_
 
-#include "AnSignal.hpp"
-#include "Block1o.hpp"
-#include "System.hpp"
+#include "control/AnSignal.hpp"
+#include "control/Block1o.hpp"
+#include "core/System.hpp"
 
 class Step: public Block1o
 {

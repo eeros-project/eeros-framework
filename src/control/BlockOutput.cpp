@@ -6,7 +6,7 @@
  */
 
 
-#include "BlockOutput.hpp"
+#include "control/BlockOutput.hpp"
 
 BlockOutput::BlockOutput()
 {

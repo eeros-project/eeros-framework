@@ -10,7 +10,7 @@
 
 #include <list>
 #include <string>
-#include "Block.hpp"
+#include "control/Block.hpp"
 
 class TimeDomain
 {

@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "Input.hpp"
+#include "control/Input.hpp"
 
 Input::Input()
 {

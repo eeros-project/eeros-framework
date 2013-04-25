@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "Output.hpp"
+#include "control/Output.hpp"
 
 Output::Output(AnSignal signal)
 {

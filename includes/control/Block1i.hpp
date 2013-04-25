@@ -8,8 +8,8 @@
 #ifndef ORG_EEROS_CONTROL_BLOCK1I_HPP_
 #define ORG_EEROS_CONTROL_BLOCK1I_HPP_
 
-#include "Block.hpp"
-#include "Input.hpp"
+#include "control/Block.hpp"
+#include "control/Input.hpp"
 
 class Block1i: public Block
 {

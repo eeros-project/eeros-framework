@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "Block1o.hpp"
+#include "control/Block1o.hpp"
 
 Block1o::Block1o()
 {

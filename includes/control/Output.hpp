@@ -8,7 +8,7 @@
 #ifndef ORG_EEROS_CONTROL_OUTPUT_HPP_
 #define ORG_EEROS_CONTROL_OUTPUT_HPP_
 
-#include "AnSignal.hpp"
+#include "control/AnSignal.hpp"
 
 class Output
 {

@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "TimeDomain.hpp"
+#include "control/TimeDomain.hpp"
 
 void TimeDomain::run()
 {

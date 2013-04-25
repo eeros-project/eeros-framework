@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "AnSignal.hpp"
+#include "control/AnSignal.hpp"
 
 AnSignal::AnSignal()
 {

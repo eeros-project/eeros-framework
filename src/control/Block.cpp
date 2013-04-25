@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "Block.hpp"
+#include "control/Block.hpp"
 
 Block::Block() {
 	// noting to do
