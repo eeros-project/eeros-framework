@@ -54,7 +54,7 @@ AnSignal::AnSignal(std::string signalName[], std::string unit[], std::string coo
 
 AnSignal::~AnSignal()
 {
-	delete dat;
+//	delete dat; // TODO why is this wrong???
 }
 
 double AnSignal::getValue()

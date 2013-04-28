@@ -4,6 +4,7 @@
 Executor::Executor(double period)
 {
 	this->period = period;
+	this->status = kStopped;
 }
 
 int Executor::getThreadId()
@@ -21,9 +22,9 @@ int Executor::getStatus()
 	return this->status;
 }
 
-void Executor::addRunMethod(void (*run)())
+void Executor::addRunnable(Runnable* runnable)
 {
-	runMethods.push_back(run);
+	runnables.push_back(runnable);
 }
 
 void Executor::start()
@@ -42,8 +43,8 @@ void Executor::stop()
 
 void Executor::run()
 {
-	for(std::list<void (*)()>::iterator i = runMethods.begin(); i != runMethods.end(); i++)
+	for(std::list<Runnable*>::iterator i = runnables.begin(); i != runnables.end(); i++)
 	{
-		(*i)();
+		(*i)->run();
 	}
 }

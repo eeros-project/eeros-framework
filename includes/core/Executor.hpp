@@ -2,6 +2,7 @@
 #define ORG_EEROS_CORE_EXECUTOR_HPP_
 
 #include <list>
+#include "core/Runnable.hpp"
 
 class Executor
 {
@@ -12,21 +13,21 @@ public:
 	virtual int getThreadId();
 	virtual double getPeriod();
 	virtual int getStatus();
-	virtual void addRunMethod(void (*run)());
+	virtual void addRunnable(Runnable* runnable);
 	virtual void start();
 	virtual bool isTerminated();
 	virtual void stop();
-	
-	virtual void run(); // TODO make private???
-	
+
 	static const int kRunning = 0;
 	static const int kStop = 1;
 	static const int kStopped = 2;
 	
 private:
+	virtual void run();
+	
 	int status;
 	double period;
-	std::list<void (*)()> runMethods;
+	std::list<Runnable*> runnables;
 	int threadId;
 };
 

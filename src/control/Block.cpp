@@ -6,7 +6,7 @@
  */
 
 #include "control/Block.hpp"
-
+/*
 Block::Block() {
 	// noting to do
 
@@ -20,3 +20,4 @@ Block::~Block() {
 void Block::run() {
     // nothing to do...
 }
+*/

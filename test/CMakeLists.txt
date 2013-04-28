@@ -10,3 +10,6 @@ target_link_libraries(test eeros cppunit)
 
 add_executable(martinTest1 MartinTest1.cpp)
 target_link_libraries(martinTest1 eeros)
+
+add_executable(martinTest2 MartinTest2.cpp)
+target_link_libraries(martinTest2 eeros)

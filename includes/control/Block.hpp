@@ -8,11 +8,17 @@
 #ifndef ORG_EEROS_CONTROL_BLOCK_HPP_
 #define ORG_EEROS_CONTROL_BLOCK_HPP_
 
-class Block {
+#include <string>
+#include "core/Runnable.hpp"
+
+class Block : public Runnable {
 public:
-	Block();
-	virtual ~Block();
-	virtual void run();
+//	Block();
+//	virtual ~Block();
+//	virtual void run()  = 0;
+
+private:
+	std::string name;
 };
 
 #endif /* ORG_EEROS_CONTROL_BLOCK_HPP_ */

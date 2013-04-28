@@ -19,6 +19,7 @@ class BlockOutput : public Block1i
 public:
 	BlockOutput();
 	virtual ~BlockOutput();
+	virtual void run();
 
 private:
 	std::string identifier;

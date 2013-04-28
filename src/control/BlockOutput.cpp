@@ -18,3 +18,7 @@ BlockOutput::~BlockOutput()
 
 }
 
+void BlockOutput::run()
+{
+	// nothing to do
+}
