@@ -25,3 +25,9 @@ link_directories (${EEROS_BINARY_DIR}/src/control)
 link_directories (${EEROS_BINARY_DIR}/src/hal)
 
 add_library(eeros SHARED ${EEROS_SRCS})
+# TODO insert conditions here...
+target_link_libraries(eeros -lrt)
+
+#if(UNIX AND NOT APPLE)
+#    target_link_libraries(eeros rt)
+#endif()
