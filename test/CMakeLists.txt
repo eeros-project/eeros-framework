@@ -7,3 +7,6 @@ include_directories(${EEROS_SOURCE_DIR}/includes)
 
 add_executable(test SuiteBaseTests.cpp SignalTest.cpp)
 target_link_libraries(test eeros cppunit)
+
+add_executable(martinTest1 MartinTest1.cpp)
+target_link_libraries(martinTest1 eeros)

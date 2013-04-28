@@ -5,6 +5,8 @@
 
 class Executor
 {
+	friend class ExecutorService;
+
 public:
 	Executor(double period);
 	virtual int getThreadId();
@@ -15,7 +17,7 @@ public:
 	virtual bool isTerminated();
 	virtual void stop();
 	
-	virtual void run();
+	virtual void run(); // TODO make private???
 	
 	static const int kRunning = 0;
 	static const int kStop = 1;
