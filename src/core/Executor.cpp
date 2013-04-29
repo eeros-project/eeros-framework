@@ -1,5 +1,4 @@
 #include "core/Executor.hpp"
-#include "core/ExecutorService.hpp"
 
 Executor::Executor(double period)
 {

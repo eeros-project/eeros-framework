@@ -1,7 +1,6 @@
 #include <iostream>
 #include <ostream>
 
-#include <unistd.h>
 #include <core/Executor.hpp>
 #include <core/Runnable.hpp>
 

@@ -3,7 +3,7 @@
 
 #include "core/Executor.hpp"
 
-#if defined(WINDOWS)
+#if defined(_WIN32)
 #include <windows.h>
 #else
 #include <pthread.h>
@@ -15,13 +15,15 @@
 class ExecutorService {
 
 public:
-	static int createNewThread(Executor*);
+	static int createNewThread(Executor* e);
 
 private:
 	static void stack_prefault(void);
 	static int nofThreads;
-#if defined(POSIX)
-	// TODO
+#if defined(_WIN32)
+	static DWORD WINAPI threadAction(LPVOID ptr);
+	static DWORD dwThreads[];
+	static HANDLE hThreads[];
 #else
 	static void* threadAction(void*);
 	static pthread_t threads[];
