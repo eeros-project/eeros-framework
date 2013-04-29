@@ -12,6 +12,8 @@
 #define RUNNING 1
 #define MAX_NOF_THREADS 8
 
+class Executor;
+
 class ExecutorService {
 
 public:
