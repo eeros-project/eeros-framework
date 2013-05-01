@@ -1,11 +1,14 @@
 #ifndef ORG_EEROS_CORE_EXECUTORSERVICE_HPP_
 #define ORG_EEROS_CORE_EXECUTORSERVICE_HPP_
 
-#include "core/Executor.hpp"
+#include <config.hpp>
+#include <eeros/core/Executor.hpp>
 
-#if defined(_WIN32)
+#if defined(WINDOWS)
 #include <windows.h>
-#else
+#endif
+
+#if defined(LINUX) || defined(PREEMPT_RT) || defined(FREEBSD)
 #include <pthread.h>
 #endif
 
@@ -20,15 +23,25 @@ public:
 	static int createNewThread(Executor* e);
 
 private:
-	static void stack_prefault(void);
 	static int nofThreads;
-#if defined(_WIN32)
+#if defined(WINDOWS)
 	static DWORD WINAPI threadAction(LPVOID ptr);
 	static DWORD dwThreads[];
 	static HANDLE hThreads[];
-#else
+#endif
+#if defined(LINUX) || defined(PREEMPT_RT) || defined(FREEBSD)
 	static void* threadAction(void*);
 	static pthread_t threads[];
+#endif
+#if defined(PREEMPT_RT)
+	static void stack_prefault(void);
+#endif
+#if defined(XENOMAI)
+	// TODO
+#endif
+
+#if defined(QNX)
+	// TODO
 #endif
 };
 

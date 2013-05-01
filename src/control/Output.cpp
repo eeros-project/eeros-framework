@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "control/Output.hpp"
+#include <eeros/control/Output.hpp>
 
 Output::Output(AnSignal signal)
 {

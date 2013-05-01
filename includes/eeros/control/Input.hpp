@@ -8,8 +8,8 @@
 #ifndef ORG_EEROS_CONTROL_INPUT_HPP_
 #define ORG_EEROS_CONTROL_INPUT_HPP_
 
-#include "control/AnSignal.hpp"
-#include "control/Output.hpp"
+#include <eeros/control/AnSignal.hpp>
+#include <eeros/control/Output.hpp>
 
 class Input {
 public:

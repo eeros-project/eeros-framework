@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "control/Input.hpp"
+#include <eeros/control/Input.hpp>
 
 Input::Input()
 {

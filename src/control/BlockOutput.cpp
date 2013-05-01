@@ -6,7 +6,7 @@
  */
 
 
-#include "control/BlockOutput.hpp"
+#include <eeros/control/BlockOutput.hpp>
 
 BlockOutput::BlockOutput()
 {

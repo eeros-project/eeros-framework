@@ -1,8 +1,8 @@
 #include <iostream>
 #include <ostream>
 
-#include <core/Executor.hpp>
-#include <core/Runnable.hpp>
+#include <eeros/core/Executor.hpp>
+#include <eeros/core/Runnable.hpp>
 
 #define TIMETOWAIT 3
 

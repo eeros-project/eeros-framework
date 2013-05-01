@@ -1,11 +1,9 @@
 #include <iostream>
 #include <ostream>
 
-#include <unistd.h>
-#include <core/Executor.hpp>
-
-#include <control/Step.hpp>
-#include <control/BlockOutput.hpp>
+#include <eeros/core/Executor.hpp>
+#include <eeros/control/Step.hpp>
+#include <eeros/control/BlockOutput.hpp>
 
 #define TIMETOWAIT 1
 
@@ -13,6 +11,8 @@ int main()
 {
 	std::cout << "Test 2 started..." << std::endl;
 	Executor e(0.01); // 10 ms period time
+	
+	
 	
 	Step step;
 	BlockOutput output;

@@ -1,0 +1,20 @@
+/*
+ * config.hpp
+ *
+ *  Created on: 30.04.2013
+ *      Author: Martin Zueger
+ */
+
+#ifndef ORG_EEROS_CONFIG_HPP
+#define ORG_EEROS_CONFIG_HPP
+
+#cmakedefine WINDOWS
+#cmakedefine LINUX
+#cmakedefine PREEMPT_RT
+#cmakedefine XENOMAI
+#cmakedefine FRREBSD
+#cmakedefine MACOSX
+#cmakedefine QNX
+
+
+#endif // ORG_EEROS_CONFIG_HPP

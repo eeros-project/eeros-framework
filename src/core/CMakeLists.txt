@@ -1,7 +1,9 @@
-if(UNIX AND NOT APPLE)
+# Platform specific source files
+if(LINUX)
 add_eeros_sources(ExecutorService_Linux.cpp)
-elseif(WIN32)
+elseif(WINDOWS)
 add_eeros_sources(ExecutorService_Windows.cpp)
 endif()
 
-add_eeros_sources(Executor.cpp)
+# Platform independent source files 
+add_eeros_sources(Executor.cpp System.cpp)

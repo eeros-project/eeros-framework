@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "control/Block.hpp"
+#include <eeros/control/Block.hpp>
 /*
 Block::Block() {
 	// noting to do

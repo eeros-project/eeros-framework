@@ -2,8 +2,8 @@
 #define ORG_EEROS_CORE_EXECUTOR_HPP_
 
 #include <list>
-#include "core/Runnable.hpp"
-#include "core/ExecutorService.hpp"
+#include <eeros/core/Runnable.hpp>
+#include <eeros/core/ExecutorService.hpp>
 
 class Executor
 {

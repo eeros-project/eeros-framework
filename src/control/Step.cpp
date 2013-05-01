@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "control/Step.hpp"
+#include <eeros/control/Step.hpp>
 
 
 Step::Step()

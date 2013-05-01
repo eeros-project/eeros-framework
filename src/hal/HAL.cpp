@@ -5,5 +5,5 @@
  *      Author: Martin Zueger
  */
 
-#include "hal/HAL.hpp"
+#include <eeros/hal/HAL.hpp>
 

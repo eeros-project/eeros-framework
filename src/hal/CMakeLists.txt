@@ -1,1 +1,1 @@
-add_eeros_sources(HAL.cpp System.cpp)
+add_eeros_sources(HAL.cpp)

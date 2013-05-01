@@ -1,3 +1,5 @@
+#include <eeros/core/ExecutorService.hpp>
+
 #include <cstdlib>
 #include <iostream>
 #include <ostream>
@@ -6,7 +8,6 @@
 #include <sched.h>
 #include <sys/mman.h>
 #include <string.h>
-#include "core/ExecutorService.hpp"
 
 #define RT_PRIORITY (49) /* we use 49 as the PRREMPT_RT use 50 as the priority of kernel tasklets and interrupt handler by default */
 #define MAX_SAFE_STACK (8*1024) /* The maximum stack size which is guaranteed safe to access without faulting */
@@ -18,7 +19,7 @@ pthread_t ExecutorService::threads[MAX_NOF_THREADS] = {0, 0, 0, 0, 0, 0, 0, 0};
 int ExecutorService::createNewThread(Executor* e) {
 	int threadId = nofThreads;
 	int ret;
-	ret = pthread_create(&ExecutorService::threads[ExecutorService::nofThreads++], NULL, threadAction, (void*)e);
+	ret = pthread_create(&ExecutorService::threads[ExecutorService::nofThreads++], NULL, ExecutorService::threadAction, (void*)e);
 	std::cout << "Thread[" << threadId << "] created with return value " << ret << std::endl;
 	return threadId;
 }
@@ -44,10 +45,4 @@ void* ExecutorService::threadAction(void* ptr) {
 	}
 	std::cout << "Thread finished" << std::endl;
 	e->status = Executor::kStopped;
-}
-
-void ExecutorService::stack_prefault(void) {
-	unsigned char dummy[MAX_SAFE_STACK];
-	memset(dummy, 0, MAX_SAFE_STACK);
-	return;
 }

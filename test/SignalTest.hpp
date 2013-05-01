@@ -1,6 +1,6 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "control/AnSignal.hpp"
+#include <eeros/control/AnSignal.hpp>
 
 class SignalTest : public CppUnit::TestFixture
 {

@@ -5,7 +5,7 @@
  *      Author: zueger1
  */
 
-#include "core/System.hpp"
+#include <eeros/core/System.hpp>
 
 System::System()
 {

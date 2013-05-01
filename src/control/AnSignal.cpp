@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "control/AnSignal.hpp"
+#include <eeros/control/AnSignal.hpp>
 
 AnSignal::AnSignal()
 {

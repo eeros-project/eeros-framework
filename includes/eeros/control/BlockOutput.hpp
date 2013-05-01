@@ -10,7 +10,7 @@
 #ifndef ORG_EEROS_CONTROL_BLOCKOUTPUT_HPP
 #define ORG_EEROS_CONTROL_BLOCKOUTPUT_HPP
 
-#include "control/Block1i.hpp"
+#include <eeros/control/Block1i.hpp>
 
 
 class BlockOutput : public Block1i

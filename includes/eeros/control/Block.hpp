@@ -9,7 +9,7 @@
 #define ORG_EEROS_CONTROL_BLOCK_HPP_
 
 #include <string>
-#include "core/Runnable.hpp"
+#include <eeros/core/Runnable.hpp>
 
 class Block : public Runnable {
 public:

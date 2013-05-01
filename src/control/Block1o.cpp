@@ -5,7 +5,7 @@
  *      Author: Martin Zueger
  */
 
-#include "control/Block1o.hpp"
+#include <eeros/control/Block1o.hpp>
 
 Block1o::Block1o()
 {
