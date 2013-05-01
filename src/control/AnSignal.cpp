@@ -54,7 +54,10 @@ AnSignal::AnSignal(std::string signalName[], std::string unit[], std::string coo
 
 AnSignal::~AnSignal()
 {
-//	delete dat; // TODO why is this wrong???
+	for (int i = 0; i < length; i++)
+	{
+		//delete &(dat[i]);
+	}
 }
 
 double AnSignal::getValue()

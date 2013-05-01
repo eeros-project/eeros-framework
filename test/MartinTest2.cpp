@@ -8,13 +8,15 @@
 #define TIMETOWAIT 1
 
 int main()
-{
+{	
 	std::cout << "Test 2 started..." << std::endl;
+	
 	Executor e(0.01); // 10 ms period time
 	
+	AnSignal sig("dist", "m");
 	
-	
-	Step step;
+	Step step(sig, 1, 5, 0.5);
+	//Step step;
 	BlockOutput output;
 	output.in.connect(step.out);
 	

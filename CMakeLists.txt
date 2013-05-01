@@ -19,6 +19,7 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 	if(WIN32 AND NOT CYGWIN) # Windows (native)
 		set(WINDOWS TRUE)
 	elseif(UNIX) # Linux, BSD, Mac OS X, ...
+		set(POSIX TRUE)
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Linux") # Linux
 			set(LINUX TRUE) # TODO check for Preempt_RT and Xenomai!
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") # FreeBSD

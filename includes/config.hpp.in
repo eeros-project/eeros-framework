@@ -16,5 +16,7 @@
 #cmakedefine MACOSX
 #cmakedefine QNX
 
+#cmakedefine POSIX
+
 
 #endif // ORG_EEROS_CONFIG_HPP

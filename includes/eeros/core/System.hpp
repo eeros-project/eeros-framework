@@ -8,6 +8,8 @@
 #ifndef SYSTEM_HPP_
 #define SYSTEM_HPP_
 
+#include <stdint.h>
+
 class System
 {
 public:
@@ -15,6 +17,9 @@ public:
 	virtual ~System();
 
 	static double getTime();
+	
+private:
+	static uint64_t timeoffset;
 };
 
 #endif /* SYSTEM_HPP_ */
