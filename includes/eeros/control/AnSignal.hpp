@@ -13,7 +13,7 @@
 
 struct anDatum {
 	double value;
-	uint32_t timestamp;
+	uint64_t timestamp;
 	std::string name;
 	std::string unit;
 	std::string coordinateSystem;
