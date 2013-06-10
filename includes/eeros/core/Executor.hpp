@@ -23,7 +23,9 @@ public:
 	static const int kStop = 1;
 	static const int kStopped = 2;
 	
-private:
+#ifndef WINDOWS
+	private:
+#endif
 	virtual void run();
 	
 	int status;

@@ -23,7 +23,11 @@ int main()
 	e.addRunnable(&test);
 	e.start();
 	std::cout << "waiting for " << TIMETOWAIT << " seconds while executor is counting" << std::endl;
+#if defined(WINDOWS)
+	Sleep(TIMETOWAIT * 1000);
+#else
 	sleep(TIMETOWAIT);
+#endif
 	e.stop();
 	std::cout << "waiting for executor to terminate..." << std::endl;
 	while(!e.isTerminated());
