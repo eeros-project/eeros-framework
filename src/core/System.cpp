@@ -1,10 +1,3 @@
-/*
- * System.cpp
- *
- *  Created on: 22.04.2013
- *      Author: zueger1
- */
-
 #include <config.hpp>
 #include <eeros/core/System.hpp>
 
@@ -18,14 +11,12 @@
 
 uint64_t System::timeoffset = 0;
 
-System::System()
-{
+System::System() {
 	// TODO Auto-generated constructor stub
 
 }
 
-System::~System()
-{
+System::~System() {
 	// TODO Auto-generated destructor stub
 }
 
@@ -42,8 +33,21 @@ double System::getTime() {
 	time += tval.tv_nsec / 1000000000.0;
 #endif 
 #if defined(WINDOWS)
-	// TODO
-	time = 0;
+	static bool initialized = false;
+	static LARGE_INTEGER offset;
+	static double frequencyToNanoseconds;
+	if (!initialized) {
+        LARGE_INTEGER performanceFrequency;
+        initialized = true;
+        QueryPerformanceFrequency(&performanceFrequency);
+        QueryPerformanceCounter(&offset);
+        frequencyToNanoseconds = (double)performanceFrequency.QuadPart / 1000000000.0;
+	}
+	LARGE_INTEGER t;
+	QueryPerformanceCounter(&t);
+	t.QuadPart -= offset.QuadPart;
+    double nanoseconds = (double)t.QuadPart / frequencyToNanoseconds;
+	time = nanoseconds / 1000000000.0;
 #endif
 	return time;
 }
