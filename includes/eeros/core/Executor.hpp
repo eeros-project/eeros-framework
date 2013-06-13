@@ -5,6 +5,8 @@
 #include <eeros/core/Runnable.hpp>
 #include <eeros/core/ExecutorService.hpp>
 
+enum { kRunning = 0, kStop = 1, kStopped = 2 };
+
 class Executor
 {
 	friend class ExecutorService;
@@ -18,12 +20,8 @@ public:
 	virtual void start();
 	virtual bool isTerminated();
 	virtual void stop();
-
-	static const int kRunning = 0;
-	static const int kStop = 1;
-	static const int kStopped = 2;
 	
-#ifndef WINDOWS
+#ifndef WINDOWS		// TODO Check why the visual studio compiler the friend declaration above not understands. Remove this pre processor macro.
 	private:
 #endif
 	virtual void run();

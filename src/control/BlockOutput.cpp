@@ -1,15 +1,15 @@
-/*
- * BlockOutput.cpp
- *
- *  Created on: 24.04.2013
- *      Author: Martin Zueger
- */
-
-
 #include <eeros/control/BlockOutput.hpp>
+
+enum { kSharedMemoryBufLength = 16 };
+
+
 
 BlockOutput::BlockOutput()
 {
+	const char shmPath[] = "/tmp/eeros.shm";
+	//std::ofstream shmFileStream(shmPath);
+		
+	//SharedMemoryWriter writer = SharedMemoryWriter(shmPath, 1, kSharedMemoryBufLength);
 
 }
 
@@ -20,5 +20,8 @@ BlockOutput::~BlockOutput()
 
 void BlockOutput::run()
 {
-	// nothing to do
+	dat.timestamp = in.getSignal()->getTimestamp();
+	dat.value = in.getSignal()->getValue();
+	
+	//writer.write(&dat, sizeof(dat));
 }

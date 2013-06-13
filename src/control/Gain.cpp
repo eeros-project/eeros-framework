@@ -1,19 +1,12 @@
-/*
- * Gain.cpp
- *
- *  Created on: 01.05.2013
- *      Author: Martin Zueger
- */
-
 #include <eeros/control/Gain.hpp>
 
 
-Gain::Gain()
+Gain::Gain(double gain)
 {
 	this->out = new Output(AnSignal());
 	this->gain = new double[1];
 	
-	this->gain[0] = 1;
+	this->gain[0] = gain;
 	this->enabled = true;
 }
 

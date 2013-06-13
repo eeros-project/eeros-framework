@@ -8,15 +8,15 @@
 #include <eeros/control/Step.hpp>
 
 
-Step::Step()
+Step::Step(double initValue, double stepHeight, double delayTime)
 {
 	this->out = new Output(AnSignal());
 	this->initValue = new double[1];
 	this->stepHeight = new double[1];
 	
-	this->initValue[0] = 0;
-	this->stepHeight[0] = 1;
-	this->stepTime = 0;
+	this->initValue[0] = initValue;
+	this->stepHeight[0] = stepHeight;
+	this->stepTime = delayTime;
 	this->stepDone = false;
 	this->first = true;
 }

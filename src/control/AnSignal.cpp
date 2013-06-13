@@ -7,8 +7,11 @@
 
 #include <eeros/control/AnSignal.hpp>
 
+uint32_t AnSignal::signalCounter = 0;
+
 AnSignal::AnSignal()
 {
+	this->id = signalCounter++;
 	this->length = 1;
 	this->dat = new anDatum[1];
 	this->dat[0].value = 0;
@@ -20,6 +23,7 @@ AnSignal::AnSignal()
 
 AnSignal::AnSignal(std::string signalName, std::string unit, std::string coordinateSystem)
 {
+	this->id = signalCounter++;
 	this->length = 1;
 	this->dat = new anDatum[1];
 	this->dat[0].value = 0;
@@ -31,6 +35,7 @@ AnSignal::AnSignal(std::string signalName, std::string unit, std::string coordin
 
 AnSignal::AnSignal(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length)
 {
+	this->id = signalCounter++;
     this->length = length;
 	this->dat = new anDatum[length];
 	for (int i = 0; i < length; i++)
@@ -68,6 +73,17 @@ double AnSignal::getValue()
 double AnSignal::getValue(int index)
 {
     if(index < this->length) return this->dat[index].value;
+    return 0;
+}
+
+uint64_t AnSignal::getTimestamp()
+{
+    return this->dat[0].timestamp;
+}
+
+uint64_t AnSignal::getTimestamp(int index)
+{
+    if(index < this->length) return this->dat[index].timestamp;
     return 0;
 }
 

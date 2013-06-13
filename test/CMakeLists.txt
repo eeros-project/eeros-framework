@@ -13,3 +13,8 @@ target_link_libraries(martinTest1 eeros)
 
 add_executable(martinTest2 MartinTest2.cpp)
 target_link_libraries(martinTest2 eeros)
+
+if(NOT WINDOWS)
+	add_executable(martinTest3 MartinTest3.cpp)
+	target_link_libraries(martinTest3 eeros)
+endif()

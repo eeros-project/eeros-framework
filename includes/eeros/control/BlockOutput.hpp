@@ -1,17 +1,12 @@
-/*
- * BlockOutput.hpp
- *
- *  Created on: 24.04.2013
- *      Author: Martin Zueger
- */
-
-
-
 #ifndef ORG_EEROS_CONTROL_BLOCKOUTPUT_HPP
 #define ORG_EEROS_CONTROL_BLOCKOUTPUT_HPP
 
 #include <eeros/control/Block1i.hpp>
 
+struct signalData {
+	double value;
+	uint64_t timestamp;
+};
 
 class BlockOutput : public Block1i
 {
@@ -27,6 +22,8 @@ private:
 	double offset;
 	double min;
 	double max;
+	
+	signalData dat;
 };
 
 #endif // ORG_EEROS_CONTROL_BLOCKOUTPUT_HPP

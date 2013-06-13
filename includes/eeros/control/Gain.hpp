@@ -1,10 +1,3 @@
-/*
- * Gain.hpp
- *
- *  Created on: 01.05.2013
- *      Author: Martin Zueger
- */
-
 #ifndef ORG_EEROS_CONTROL_GAIN_HPP_
 #define ORG_EEROS_CONTROL_GAIN_HPP_
 
@@ -14,7 +7,7 @@
 class Gain: public Block1i1o
 {
 public:
-	Gain();
+	Gain(double gain = 1);
 	Gain(AnSignal sigal, double gain = 1);
 	Gain(AnSignal sigal, double gain[]);
 	virtual ~Gain();

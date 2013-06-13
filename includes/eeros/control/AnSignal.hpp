@@ -28,6 +28,8 @@ public:
 
 	virtual double getValue();
 	virtual double getValue(int index);
+	virtual uint64_t getTimestamp();
+	virtual uint64_t getTimestamp(int index);	
 	virtual int getLength();
 	virtual std::string getName();
 	virtual std::string getName(int index);
@@ -45,6 +47,9 @@ public:
 private:
 	anDatum* dat;
 	int length;
+	uint32_t id;
+	
+	static uint32_t signalCounter;
 };
 
 #endif /* ORG_EEROS_CONTROL_ANSIGNAL_HPP_ */

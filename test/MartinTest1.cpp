@@ -17,7 +17,7 @@ public:
 
 int main()
 {
-	std::cout << "Test 1 started..." << std::endl;
+	std::cout << "Martin Test 1 started..." << std::endl;
 	Test test;
 	Executor e(0.1); // 100 ms period time
 	e.addRunnable(&test);

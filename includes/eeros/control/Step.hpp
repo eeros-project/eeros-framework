@@ -1,10 +1,3 @@
-/*
- * Step.hpp
- *
- *  Created on: 15.04.2013
- *      Author: Martin Zueger
- */
-
 #ifndef ORG_EEROS_CONTROL_STEP_HPP_
 #define ORG_EEROS_CONTROL_STEP_HPP_
 
@@ -15,7 +8,7 @@
 class Step: public Block1o
 {
 public:
-	Step();
+	Step(double initValue = 0, double stepHeight = 1, double delayTime = 0);
 	Step(AnSignal sigal, double initValue = 0, double stepHeight = 1, double delayTime = 0);
 	Step(AnSignal sigal, double initValue[], double stepHeight[], double delayTime = 0);
 	virtual ~Step();

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ostream>
+#include <fstream>
 
 #include <eeros/core/Executor.hpp>
 #include <eeros/control/Step.hpp>
@@ -10,15 +11,12 @@
 
 int main()
 {	
-	std::cout << "Martin Test 2 started..." << std::endl;
+	std::cout << "Martin Test 3 started..." << std::endl;
 	
 	Executor e(0.01); // 10 ms period time
-	
-	AnSignal sig1("s1", "m");
-	AnSignal sig2("s2", "m");
-	
-	Step step(sig1, 1, 5, 0.5);
-	Gain gain(sig2, 10);
+		
+	Step step(1, 5, 0.5);
+	Gain gain(10);
 	BlockOutput output;
 	gain.in.connect(step.out);
 	output.in.connect(gain.out);
@@ -28,11 +26,9 @@ int main()
 	e.addRunnable(&output);
 	e.start();
 	std::cout << "waiting for " << TIMETOWAIT << " seconds while executor is running" << std::endl;
-#if defined(WINDOWS)
-	Sleep(TIMETOWAIT * 1000);
-#else
+
 	sleep(TIMETOWAIT);
-#endif
+
 	e.stop();
 	std::cout << "waiting for executor to terminate..." << std::endl;
 	while(!e.isTerminated());
