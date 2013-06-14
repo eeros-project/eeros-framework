@@ -15,13 +15,13 @@ DWORD WINAPI ExecutorService::threadAction(LPVOID ptr) {
 	
 	int interval = (int)(e->period * NSEC_PER_SEC); /* s -> ns */
 
-	while(e->status != Executor::kStop) {
+	while(e->status != kStop) {
 		// TODO wait for timer
 		e->run();
 		// TODO calculate next shot
 	}
 	std::cout << "Thread finished" << std::endl;
-	e->status = Executor::kStopped;
+	e->status = kStopped;
 	return 0;
 }
 
