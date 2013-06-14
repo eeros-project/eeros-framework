@@ -15,7 +15,7 @@ public:
 	Transitions();
 	//Destruktor muss virtual sein, damit er automatisch aufgerufen wird.
 	virtual ~Transitions(void);
-	void addSequencerStepName(string name);
+	void addAllowedTransitionName(string name);
 	bool isTransitionAllowed(string name);
 };
 

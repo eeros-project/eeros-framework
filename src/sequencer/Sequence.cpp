@@ -1,8 +1,6 @@
-#include "StdAfx.h"
 
-//TODO Pfad anpassen
-#include "Sequence.hpp"
-#include "Init.hpp"
+#include <eeros/sequencer/Sequence.hpp>
+#include <eeros/sequencer/Init.hpp>
 
 
 Sequence::Sequence(double period, string name) :
@@ -10,7 +8,7 @@ Sequence::Sequence(double period, string name) :
 	sequenceName(name)
 {
 	Transitions* trans = new Transitions();
-	trans->addSequencerStepName("Initialising");
+	trans->addAllowedTransitionName("Initialising");
 	Init* init = new Init(trans, "Init", this);
 	sequencerSteps.push_back(init);
 	currentStep = init;

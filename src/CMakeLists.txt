@@ -19,10 +19,12 @@ include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR})
 add_subdirectory(core)
 add_subdirectory(control)
 add_subdirectory(hal)
+add_subdirectory(sequencer)
 
 link_directories (${EEROS_BINARY_DIR}/src/core)
 link_directories (${EEROS_BINARY_DIR}/src/control)
 link_directories (${EEROS_BINARY_DIR}/src/hal)
+link_directories (${EEROS_BINARY_DIR}/src/sequencer)
 
 if(WINDOWS)
 	add_library(eeros ${EEROS_SRCS})

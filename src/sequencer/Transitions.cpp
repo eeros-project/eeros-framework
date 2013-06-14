@@ -1,7 +1,6 @@
-#include "StdAfx.h"
 
-#include "Transitions.hpp"
-#include "SequencerStep.hpp"
+#include <eeros/sequencer/Transitions.hpp>
+#include <eeros/sequencer/SequencerStep.hpp>
 
 Transitions::Transitions() 
 {
@@ -13,7 +12,7 @@ Transitions::~Transitions(void)
 	deleteSequencerStepsName();
 }
 
-void Transitions::addSequencerStepName(string name){
+void Transitions::addAllowedTransitionName(string name){
 	allowedSteps.push_back(name);
 }
 

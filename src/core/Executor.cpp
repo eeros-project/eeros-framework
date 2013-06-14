@@ -28,6 +28,7 @@ void Executor::addRunnable(Runnable* runnable)
 
 void Executor::start()
 {
+	status = kRunning;
 	threadId = ExecutorService::createNewThread(this);
 }
 

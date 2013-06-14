@@ -1,9 +1,10 @@
-#include "StdAfx.h"
 
-//TODO Pfad anpassen
-#include "Sequence.hpp"
-#include "Stopping.hpp"
 
+#include <eeros/sequencer/Sequence.hpp>
+#include <eeros/sequencer/Stopping.hpp>
+
+//TODELETE
+#include <iostream>
 
 Stopping::Stopping(Transitions* p_trans, string name, Sequence* owner) :
 SequencerStep(p_trans, name, owner)

@@ -1,13 +1,11 @@
-#include "StdAfx.h"
 
-#include "eeros/core/Runnable.hpp"
+#include <eeros/core/Runnable.hpp>
 
 using namespace std;
 #include <string>
 
-//TODO Pfad anpassen
-#include "Sequence.hpp"
-#include "SequencerStep.hpp"
+#include <eeros/sequencer/Sequence.hpp>
+#include <eeros/sequencer/SequencerStep.hpp>
 
 
 

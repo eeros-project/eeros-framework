@@ -64,3 +64,6 @@ add_subdirectory(src)
 
 # Unit tests source code
 add_subdirectory(test)
+
+# Unit tests source code
+add_subdirectory(examples)

@@ -1,9 +1,7 @@
 #pragma once
 
-#include "eeros/core/Runnable.hpp"
-//TODO Pfad anpassen
-#include "Transitions.hpp"
-//#include "Sequence.hpp"
+#include <eeros/core/Runnable.hpp>
+#include <eeros\sequencer\Transitions.hpp>
 
 //Forward Declarations
 class Sequence;

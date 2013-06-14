@@ -1,8 +1,8 @@
-#include "StdAfx.h"
+//TODO
+#include <iostream>
 
-//TODO Pfad anpassen
-#include "Sequence.hpp"
-#include "Homed.hpp"
+#include <eeros/sequencer/Sequence.hpp>
+#include <eeros/sequencer/Homed.hpp>
 
 
 Homed::Homed(Transitions* p_trans, string name, Sequence* owner) :

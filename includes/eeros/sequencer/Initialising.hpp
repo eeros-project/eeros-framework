@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SequencerStep.hpp"
-#include "Initialising.hpp"
+#include <eeros\sequencer\SequencerStep.hpp>
+#include <eeros\sequencer\Initialising.hpp>
 
 class Initialising : public SequencerStep
 {

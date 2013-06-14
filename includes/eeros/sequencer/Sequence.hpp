@@ -1,11 +1,9 @@
 #pragma once
 
-#include "eeros/core/Executor_PARV.hpp"
-#include "eeros/control/Block.hpp"
-
-//TODO Pfad anpassen
-#include "Transitions.hpp"
-#include "SequencerStep.hpp"
+#include <eeros/core/Executor.hpp>
+#include <eeros/control/Block.hpp>
+#include <eeros\sequencer\Transitions.hpp>
+#include <eeros\sequencer\SequencerStep.hpp>
 
 
 using namespace std;

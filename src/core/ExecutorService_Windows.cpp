@@ -10,7 +10,7 @@
 #define NSEC_PER_SEC (1000000000) /* The number of nsecs per sec. */
 #define MAX_SAFE_STACK (8*1024) /* The maximum stack size which is guaranteed safe to access without faulting */
 
-DWORD WINAPI threadAction(LPVOID ptr) {
+DWORD WINAPI ExecutorService::threadAction(LPVOID ptr) {
 	Executor* e = (Executor*) ptr;
 	
 	int interval = (int)(e->period * NSEC_PER_SEC); /* s -> ns */
@@ -25,15 +25,17 @@ DWORD WINAPI threadAction(LPVOID ptr) {
 	return 0;
 }
 
-DWORD dwThreads[MAX_NOF_THREADS] = {0, 0, 0, 0, 0, 0, 0, 0};
-HANDLE hThreads[MAX_NOF_THREADS];
-
-
+DWORD ExecutorService::dwThreads[MAX_NOF_THREADS] = {0, 0, 0, 0, 0, 0, 0, 0};
+HANDLE ExecutorService::hThreads[MAX_NOF_THREADS];
 int ExecutorService::nofThreads = 0;
 
 int ExecutorService::createNewThread(Executor* e) {
-	int threadId = nofThreads;
+	int threadId = nofThreads++;
 	hThreads[threadId] = CreateThread(NULL, MAX_SAFE_STACK, threadAction, (LPVOID)e, 0, &dwThreads[threadId]);
 	std::cout << "Thread[" << threadId << "] created with thread identifier " << dwThreads[threadId] << std::endl;
 	return threadId;
+}
+
+HANDLE ExecutorService::getHandle(int i){
+	return ExecutorService::hThreads[i]; 
 }

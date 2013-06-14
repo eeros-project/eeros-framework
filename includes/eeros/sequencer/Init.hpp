@@ -1,7 +1,7 @@
 #pragma once
 
-//TODO Pfad anpassen
-#include "SequencerStep.hpp"
+
+#include <eeros/sequencer/SequencerStep.hpp>
 
 class Init : public SequencerStep
 {

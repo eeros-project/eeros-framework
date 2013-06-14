@@ -1,8 +1,9 @@
-#include "StdAfx.h"
 
-//TODO Pfad anpassen
-#include "Sequence.hpp"
-#include "Init.hpp"
+#include <eeros/sequencer/Sequence.hpp>
+#include <eeros/sequencer/Init.hpp>
+
+//TODELETE
+#include <iostream>
 
 
 Init::Init(Transitions* p_trans, string name, Sequence* owner) :
