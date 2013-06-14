@@ -1,0 +1,1 @@
+add_eeros_sources(Homed.cpp Init.cpp Initialised.cpp Initialising.cpp Sequence.cpp SequencerStep.cpp Stopping.cpp Transitions.cpp)
