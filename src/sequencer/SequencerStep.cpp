@@ -41,9 +41,9 @@ void SequencerStep::startSubSequence(Sequence* p_subSequence, bool waitForTermin
 void SequencerStep::run(){
 	//Als Beispiel für run warten auf SubSequence
 	if(callingSubSequence && waitForSequenceStop){
-		if(callingSubSequence->getStatus() == Executor::kRunning && waitForSequenceStop){
+		if(callingSubSequence->getStatus() == kRunning && waitForSequenceStop){
 			return;
-		}else if(callingSubSequence->getStatus() == Executor::kStopped){
+		}else if(callingSubSequence->getStatus() == kStopped){
 			callingSubSequence = 0;
 			waitForSequenceStop = false;
 		}
