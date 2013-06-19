@@ -2,8 +2,8 @@
 
 #include <eeros/core/Executor.hpp>
 #include <eeros/control/Block.hpp>
-#include <eeros\sequencer\Transitions.hpp>
-#include <eeros\sequencer\SequencerStep.hpp>
+#include <eeros/sequencer/Transitions.hpp>
+#include <eeros/sequencer/SequencerStep.hpp>
 
 
 using namespace std;

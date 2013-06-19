@@ -1,6 +1,6 @@
 #pragma once
 
-#include <eeros\sequencer\SequencerStep.hpp>
+#include <eeros/sequencer/SequencerStep.hpp>
 
 class Initialised : public SequencerStep
 {

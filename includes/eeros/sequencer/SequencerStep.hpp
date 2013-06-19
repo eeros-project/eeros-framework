@@ -1,7 +1,7 @@
 #pragma once
 
 #include <eeros/core/Runnable.hpp>
-#include <eeros\sequencer\Transitions.hpp>
+#include <eeros/sequencer/Transitions.hpp>
 
 //Forward Declarations
 class Sequence;
