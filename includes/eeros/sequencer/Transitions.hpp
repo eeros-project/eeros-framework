@@ -7,6 +7,7 @@ class SequencerStep;
 
 class Transitions
 {
+	friend class SequencerStep;
 private:
 	list<string> allowedSteps;
 	void deleteSequencerStepsName();

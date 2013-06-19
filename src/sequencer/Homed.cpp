@@ -1,6 +1,3 @@
-//TODO
-#include <iostream>
-
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Homed.hpp>
 
@@ -17,7 +14,5 @@ Homed::~Homed(void)
 
 void Homed::run(){
 	//TODO
-	ownerSequence->safeTransition("Stopping");
-	//für TEst
-	cout << "Going to Initialising" << endl;
+	SequencerStep::run();
 }

@@ -46,6 +46,7 @@ public:
 	void addSubSequence(Sequence* subSequence);
 	void addSequencerStep(SequencerStep* sequencerStep);
 	Sequence* findSequence(string name);
+	void deleteSequence(string name);
 	string getName();
 	virtual void fillSequencerSteps() = 0;
 };

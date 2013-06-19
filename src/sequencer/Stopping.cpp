@@ -19,6 +19,8 @@ Stopping::~Stopping(void)
 void Stopping::run(){
 	//TODO
 	ownerSequence->safeTransition("");
-	ownerSequence->stop();
+	if(ownerSequence->getStatus() == kRunning){
+		ownerSequence->stop();
+	}
 	cout << "Stopping" << endl;
 }

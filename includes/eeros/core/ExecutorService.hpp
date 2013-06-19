@@ -4,7 +4,7 @@
 #include <config.hpp>
 #include <eeros/core/Executor.hpp>
 
-#if defined(_WINDOWS)
+#if defined(WINDOWS)
 #include <windows.h>
 #endif
 
@@ -21,12 +21,13 @@ class ExecutorService {
 
 public:
 	static int createNewThread(Executor* e);
-#if defined(_WINDOWS)
+#if defined(WINDOWS)
 	static HANDLE getHandle(int i);
+	static void waitForSequenceEnd(Executor* waitExecutor);
 #endif
 private:
 	static int nofThreads;
-#if defined(_WINDOWS)
+#if defined(WINDOWS)
 	static DWORD WINAPI threadAction(LPVOID ptr);
 	static DWORD dwThreads[];
 	static HANDLE hThreads[];

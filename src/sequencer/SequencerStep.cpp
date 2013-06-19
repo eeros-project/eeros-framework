@@ -4,18 +4,20 @@
 using namespace std;
 #include <string>
 
+//TODELETE
+#include <iostream>
+
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/SequencerStep.hpp>
 
 
 
 SequencerStep::SequencerStep(Transitions* p_trans, string name, Sequence* owner) :
-	callingSubSequence(0),
 	ownerSequence(owner),
 	trans(p_trans),
-	nameOfStep(name),
-	waitForSequenceStop(false)
+	nameOfStep(name)
 {
+	ownerSequence->addSequencerStep(this);
 }
 
 
@@ -28,34 +30,21 @@ Transitions* SequencerStep::getTransitons(){
 	return trans;
 }
 
+list<string>& SequencerStep::getAllowedTransitions(){
+	return trans->allowedSteps;
+}
+
 string SequencerStep::getName(){
 	return nameOfStep;
 }
 
-void SequencerStep::startSubSequence(Sequence* p_subSequence, bool waitForTermination){
-	p_subSequence->start();
-	waitForSequenceStop = waitForTermination;
-	callingSubSequence = p_subSequence;
-}
-
 void SequencerStep::run(){
-	//Als Beispiel für run warten auf SubSequence
-	if(callingSubSequence && waitForSequenceStop){
-		if(callingSubSequence->getStatus() == kRunning && waitForSequenceStop){
-			return;
-		}else if(callingSubSequence->getStatus() == kStopped){
-			callingSubSequence = 0;
-			waitForSequenceStop = false;
-		}
-	}else if(callingSubSequence){
-		ownerSequence->addSubSequence(callingSubSequence);
-	}
-	//go on run
+	//TODO
+	string nextTrans;
+	list<string>& allowedTrans = getAllowedTransitions();
+	list<string>::iterator iter = allowedTrans.begin();
+	nextTrans = *iter;
+	ownerSequence->safeTransition(nextTrans);
+	cout << "Going to " << nextTrans << endl;
 }
 
-void SequencerStep::waitForSequenceEnd(string name){
-	Sequence* waitSequence = ownerSequence->findSequence(name);
-	if(waitSequence){
-		WaitForSingleObject( ExecutorService::getHandle(ownerSequence->getThreadId()), INFINITE);
-	}
-}

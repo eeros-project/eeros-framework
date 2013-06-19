@@ -10,7 +10,6 @@ Sequence::Sequence(double period, string name) :
 	Transitions* trans = new Transitions();
 	trans->addAllowedTransitionName("Initialising");
 	Init* init = new Init(trans, "Init", this);
-	sequencerSteps.push_back(init);
 	currentStep = init;
 }
 
@@ -23,20 +22,22 @@ Sequence::~Sequence(void)
 
 
 /*void Sequence::deleteBlockList(){
-	list<Block*>::reverse_iterator rev_iter = blockes.rbegin();
-	while(rev_iter != blockes.rend()){
-		delete (*rev_iter);
-		rev_iter++;
+	list<Block*>::iterator iter = blockes.begin();
+	while(iter != blockes.end()){
+		delete (*iter);
+		iter++;
 	}
 	blockes.clear();
 }
 */
 
 void Sequence::deleteSequencerStepList(){
-	list<SequencerStep*>::reverse_iterator rev_iter = sequencerSteps.rbegin();
-	while(rev_iter != sequencerSteps.rend()){
-		delete (*rev_iter);
-		rev_iter++;
+	list<SequencerStep*>::iterator iter = sequencerSteps.begin();
+	SequencerStep* step = 0;
+	while(iter != sequencerSteps.end()){
+		step = *iter;
+		delete step;
+		iter++;
 	}
 	sequencerSteps.clear();
 }
@@ -48,7 +49,9 @@ void Sequence::deleteSequencerStepList(){
 
 void Sequence::safeTransition(string nameOfDesiredSequenceStep){
 	if(nameOfDesiredSequenceStep.compare("") == 0){
-		currentStep = 0;
+		//wird von Stopping aufgerufen
+		//Achtung: currentStep muss erhalten bleiben, bis der Thread wirklich beendet wurde.
+		//currentStep = 0;
 		return;
 	}
 	if( currentStep->getTransitons()->isTransitionAllowed(nameOfDesiredSequenceStep) ){
@@ -73,10 +76,12 @@ void Sequence::run(){
 }
 
 void Sequence::deleteSubSequences(){
-	list<Sequence*>::reverse_iterator rev_iter = subSequences.rbegin();
-	while(rev_iter != subSequences.rend()){
-		delete (*rev_iter);
-		rev_iter++;
+	list<Sequence*>::iterator iter = subSequences.begin();
+	Sequence* sequence = 0;
+	while(iter != subSequences.end()){
+		sequence = *iter;
+		delete sequence;
+		iter++;
 	}
 	subSequences.clear();
 }
@@ -94,6 +99,17 @@ Sequence* Sequence::findSequence(string name){
 			iter++;
 		}
 		return 0;
+}
+
+void Sequence::deleteSequence(string name){
+	list<Sequence*>::iterator iter = subSequences.begin();
+		while(iter != subSequences.end()){
+			if((*iter)->getName().compare(name) == 0){
+				subSequences.erase(iter);
+				return;
+			}
+			iter++;
+		}
 }
 
 string Sequence::getName(){
