@@ -6,7 +6,7 @@
 class Initialising : public SequencerStep
 {
 public:
-	Initialising(Transitions* p_trans, string name, Sequence* owner);
+	Initialising(Transitions* p_trans, std::string name, Sequence* owner);
 	virtual ~Initialising(void);
 	void fillBlocks();
 	void connectBlocks();

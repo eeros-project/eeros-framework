@@ -10,7 +10,7 @@
 
 Step::Step(double initValue, double stepHeight, double delayTime)
 {
-	this->out = new Output(AnSignal());
+	this->out = new Output(new AnSignal());
 	this->initValue = new double[1];
 	this->stepHeight = new double[1];
 	
@@ -21,7 +21,7 @@ Step::Step(double initValue, double stepHeight, double delayTime)
 	this->first = true;
 }
 
-Step::Step(AnSignal signal, double initValue, double stepHeight, double delayTime)
+Step::Step(AnSignal* signal, double initValue, double stepHeight, double delayTime)
 {
 	this->out = new Output(signal);
 	this->initValue = new double[1];
@@ -34,9 +34,9 @@ Step::Step(AnSignal signal, double initValue, double stepHeight, double delayTim
 	this->first = true;
 }
 
-Step::Step(AnSignal signal, double initValue[], double stepHeight[], double delayTime)
+Step::Step(AnSignal* signal, double initValue[], double stepHeight[], double delayTime)
 {
-	int length = signal.getLength();
+	int length = signal->getLength();
 	this->out = new Output(signal);
 	this->initValue = new double[length];
 	this->stepHeight = new double[length];

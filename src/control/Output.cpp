@@ -7,11 +7,7 @@
 
 #include <eeros/control/Output.hpp>
 
-Output::Output(AnSignal signal)
-{
-	this->signal = signal;
-
-}
+Output::Output(AnSignal* signal) : signal(signal) { }
 
 Output::~Output()
 {
@@ -20,10 +16,10 @@ Output::~Output()
 
 AnSignal* Output::getSignal()
 {
-	return &signal;
+	return signal;
 }
 
-void Output::setSignal(AnSignal newSignal)
+void Output::setSignal(AnSignal* newSignal)
 {
 	this->signal = newSignal;
 }

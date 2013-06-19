@@ -5,7 +5,7 @@
 class Homed : public SequencerStep
 {
 public:
-	Homed(Transitions* p_trans, string name, Sequence* owner);
+	Homed(Transitions* p_trans, std::string name, Sequence* owner);
 	virtual ~Homed(void);
 	virtual void run();
 };

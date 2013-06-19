@@ -21,10 +21,11 @@ class ExecutorService {
 
 public:
 	static int createNewThread(Executor* e);
+	static void waitForSequenceEnd(Executor* waitExecutor);
 #if defined(WINDOWS)
 	static HANDLE getHandle(int i);
-	static void waitForSequenceEnd(Executor* waitExecutor);
 #endif
+
 private:
 	static int nofThreads;
 #if defined(WINDOWS)

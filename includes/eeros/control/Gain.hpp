@@ -8,8 +8,8 @@ class Gain: public Block1i1o
 {
 public:
 	Gain(double gain = 1);
-	Gain(AnSignal sigal, double gain = 1);
-	Gain(AnSignal sigal, double gain[]);
+	Gain(AnSignal* sigal, double gain = 1);
+	Gain(AnSignal* sigal, double gain[]);
 	virtual ~Gain();
 
 	virtual void run();

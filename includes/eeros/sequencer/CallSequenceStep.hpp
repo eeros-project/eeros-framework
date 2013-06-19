@@ -11,7 +11,7 @@ private:
 	// Soll in diesem STep gewartet werden?
 	bool waitForSequenceStop;
 public:
-	CallSequenceStep(Transitions* p_trans, string name, Sequence* owner, bool waiting, Sequence* calling);
+	CallSequenceStep(Transitions* p_trans, std::string name, Sequence* owner, bool waiting, Sequence* calling);
 	//Destruktor muss virtual sein, damit er automatisch aufgerufen wird.
 	virtual ~CallSequenceStep(void);
 	virtual void run();

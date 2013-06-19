@@ -9,8 +9,8 @@ class Step: public Block1o
 {
 public:
 	Step(double initValue = 0, double stepHeight = 1, double delayTime = 0);
-	Step(AnSignal sigal, double initValue = 0, double stepHeight = 1, double delayTime = 0);
-	Step(AnSignal sigal, double initValue[], double stepHeight[], double delayTime = 0);
+	Step(AnSignal* sigal, double initValue = 0, double stepHeight = 1, double delayTime = 0);
+	Step(AnSignal* sigal, double initValue[], double stepHeight[], double delayTime = 0);
 	virtual ~Step();
 
 	virtual void run();

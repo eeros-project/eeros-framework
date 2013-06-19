@@ -3,14 +3,14 @@
 
 Gain::Gain(double gain)
 {
-	this->out = new Output(AnSignal());
+	this->out = new Output(new AnSignal());
 	this->gain = new double[1];
 	
 	this->gain[0] = gain;
 	this->enabled = true;
 }
 
-Gain::Gain(AnSignal signal, double gain)
+Gain::Gain(AnSignal* signal, double gain)
 {
 	this->out = new Output(signal);
 	this->gain = new double[1];
@@ -19,9 +19,9 @@ Gain::Gain(AnSignal signal, double gain)
 	this->enabled = true;
 }
 
-Gain::Gain(AnSignal signal, double gain[])
+Gain::Gain(AnSignal* signal, double gain[])
 {
-	int length = signal.getLength();
+	int length = signal->getLength();
 	this->out = new Output(signal);
 	this->gain = new double[length];
 		

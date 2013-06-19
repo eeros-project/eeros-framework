@@ -17,8 +17,8 @@ int main()
 	AnSignal sig1("s1", "m");
 	AnSignal sig2("s2", "m");
 	
-	Step step(sig1, 1, 5, 0.5);
-	Gain gain(sig2, 10);
+	Step step(&sig1, 1, 5, 0.5);
+	Gain gain(&sig2, 10);
 	BlockOutput output;
 	gain.in.connect(step.out);
 	output.in.connect(gain.out);

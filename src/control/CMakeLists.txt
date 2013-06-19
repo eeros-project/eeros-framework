@@ -1,1 +1,1 @@
-add_eeros_sources(Block.cpp AnSignal.cpp Block1i.cpp Block1i1o.cpp Block1o.cpp BlockOutput.cpp Gain.cpp Input.cpp Output.cpp Step.cpp TimeDomain.cpp)
+add_eeros_sources(Block.cpp Signal.cpp AnSignal.cpp Block1i.cpp Block1i1o.cpp Block1o.cpp BlockOutput.cpp Gain.cpp Input.cpp Output.cpp Step.cpp TimeDomain.cpp)

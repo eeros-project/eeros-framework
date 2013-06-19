@@ -12,7 +12,7 @@ Transitions::~Transitions(void)
 	deleteSequencerStepsName();
 }
 
-void Transitions::addAllowedTransitionName(string name){
+void Transitions::addAllowedTransitionName(std::string name){
 	allowedSteps.push_back(name);
 }
 
@@ -20,8 +20,8 @@ void Transitions::deleteSequencerStepsName(){
 	allowedSteps.clear();
 }
 
-bool Transitions::isTransitionAllowed(string name){
-	list<string>::iterator iter = allowedSteps.begin();
+bool Transitions::isTransitionAllowed(std::string name){
+	std::list<std::string>::iterator iter = allowedSteps.begin();
 	while(iter != allowedSteps.end()){
 		if((*iter).compare(name) == 0){
 			return true;

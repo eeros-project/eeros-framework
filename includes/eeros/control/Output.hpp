@@ -13,14 +13,14 @@
 class Output
 {
 public:
-	Output(AnSignal signal);
+	Output(AnSignal* signal);
 	virtual ~Output();
 
 	virtual AnSignal* getSignal();
-	virtual void setSignal(AnSignal newSignal);
+	virtual void setSignal(AnSignal* newSignal);
 
 private:
-	AnSignal signal;
+	AnSignal* signal;
 };
 
 #endif /* ORG_EEROS_CONTROL_OUTPUT_HPP_ */

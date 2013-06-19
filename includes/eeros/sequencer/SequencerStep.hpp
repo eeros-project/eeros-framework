@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <list>
+
 #include <eeros/core/Runnable.hpp>
 #include <eeros/sequencer/Transitions.hpp>
 
@@ -10,18 +13,18 @@ class SequencerStep : public Runnable
 {
 protected:
 	Transitions* trans;
-	string nameOfStep;
+	std::string nameOfStep;
 
 	//Sequence zu der dieser Step gehört
 	Sequence* ownerSequence;
 public:
-	SequencerStep(Transitions* p_trans, string name, Sequence* owner);
+	SequencerStep(Transitions* p_trans, std::string name, Sequence* owner);
 	//Destruktor muss virtual sein, damit er automatisch aufgerufen wird.
 	virtual ~SequencerStep(void);
 	Transitions* getTransitons();
-	list<string>& getAllowedTransitions();
-	string getName();
-	void fillAllowedStepName(string name);
+	std::list<std::string>& getAllowedTransitions();
+	std::string getName();
+	void fillAllowedStepName(std::string name);
 	virtual void run();
 };
 

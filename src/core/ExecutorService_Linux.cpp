@@ -34,7 +34,7 @@ void* ExecutorService::threadAction(void* ptr) {
 
 	clock_gettime(CLOCK_MONOTONIC ,&t);
 
-	while(e->status != Executor::kStop) {
+	while(e->status != kStop) {
 		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t, NULL);
 		e->run();
 		t.tv_nsec += interval;
@@ -44,5 +44,9 @@ void* ExecutorService::threadAction(void* ptr) {
 		}
 	}
 	std::cout << "Thread finished" << std::endl;
-	e->status = Executor::kStopped;
+	e->status = kStopped;
+}
+
+void ExecutorService::waitForSequenceEnd(Executor* waitExecutor) {
+	// TODO
 }

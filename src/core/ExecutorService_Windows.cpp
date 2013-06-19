@@ -40,10 +40,8 @@ HANDLE ExecutorService::getHandle(int i){
 	return ExecutorService::hThreads[i]; 
 }
 
-#ifdef WINDOWS
 void ExecutorService::waitForSequenceEnd(Executor* waitExecutor){
 	if(waitExecutor && waitExecutor->getStatus() == kRunning){
 		WaitForSingleObject( ExecutorService::getHandle(waitExecutor->getThreadId()), INFINITE);
 	}
 }
-#endif

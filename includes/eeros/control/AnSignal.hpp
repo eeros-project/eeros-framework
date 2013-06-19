@@ -1,15 +1,10 @@
-/*
- * AnSignal.hpp
- *
- *  Created on: 11.04.2013
- *      Author: Martin Zueger
- */
-
 #ifndef ORG_EEROS_CONTROL_ANSIGNAL_HPP_
 #define ORG_EEROS_CONTROL_ANSIGNAL_HPP_
 
 #include <string>
-#include <stdint.h>
+
+#include <eeros/types.hpp>
+#include <eeros/control/Signal.hpp>
 
 struct anDatum {
 	double value;
@@ -19,18 +14,19 @@ struct anDatum {
 	std::string coordinateSystem;
 };
 
-class AnSignal {
+class AnSignal : public Signal {
 public:
 	AnSignal();
 	AnSignal(std::string signalName, std::string unit, std::string coordinateSystem = "");
 	AnSignal(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length);
 	virtual ~AnSignal();
 
+	virtual std::string getLabel();
+	virtual std::string getLabel(int index);
 	virtual double getValue();
 	virtual double getValue(int index);
 	virtual uint64_t getTimestamp();
 	virtual uint64_t getTimestamp(int index);	
-	virtual int getLength();
 	virtual std::string getName();
 	virtual std::string getName(int index);
 	virtual std::string getUnit();
@@ -46,10 +42,6 @@ public:
 
 private:
 	anDatum* dat;
-	int length;
-	uint32_t id;
-	
-	static uint32_t signalCounter;
 };
 
 #endif /* ORG_EEROS_CONTROL_ANSIGNAL_HPP_ */

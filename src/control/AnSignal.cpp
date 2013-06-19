@@ -1,17 +1,9 @@
-/*
- * AnSignal.cpp
- *
- *  Created on: 11.04.2013
- *      Author: Martin Zueger
- */
-
 #include <eeros/control/AnSignal.hpp>
 
-uint32_t AnSignal::signalCounter = 0;
+#include <sstream>
 
 AnSignal::AnSignal()
 {
-	this->id = signalCounter++;
 	this->length = 1;
 	this->dat = new anDatum[1];
 	this->dat[0].value = 0;
@@ -23,7 +15,6 @@ AnSignal::AnSignal()
 
 AnSignal::AnSignal(std::string signalName, std::string unit, std::string coordinateSystem)
 {
-	this->id = signalCounter++;
 	this->length = 1;
 	this->dat = new anDatum[1];
 	this->dat[0].value = 0;
@@ -35,7 +26,6 @@ AnSignal::AnSignal(std::string signalName, std::string unit, std::string coordin
 
 AnSignal::AnSignal(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length)
 {
-	this->id = signalCounter++;
     this->length = length;
 	this->dat = new anDatum[length];
 	for (int i = 0; i < length; i++)
@@ -63,6 +53,17 @@ AnSignal::~AnSignal()
 	{
 		//delete &(dat[i]);
 	}
+	signalList.remove(this);
+}
+
+std::string AnSignal::getLabel() {
+	return getLabel(0);
+}
+
+std::string AnSignal::getLabel(int index) {
+	std::stringstream label;
+	label << '#' << id << '/' << index << ": " << getName(index) << " [" << getUnit(index) << ']';
+	return label.str();
 }
 
 double AnSignal::getValue()
@@ -85,11 +86,6 @@ uint64_t AnSignal::getTimestamp(int index)
 {
     if(index < this->length) return this->dat[index].timestamp;
     return 0;
-}
-
-int AnSignal::getLength()
-{
-    return this->length;
 }
 
 std::string AnSignal::getName()
