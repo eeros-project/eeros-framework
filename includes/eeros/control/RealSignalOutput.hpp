@@ -18,8 +18,6 @@ struct anDatum {
 class RealSignalOutput : virtual public Signal, virtual public Output {
 public:
 	RealSignalOutput(sigdim_t dim = 1);
-//	RealSignalOutput(std::string signalName, std::string unit, std::string coordinateSystem = "");
-//	RealSignalOutput(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length);
 	virtual ~RealSignalOutput();
 
 	virtual std::string getLabel();
@@ -34,10 +32,18 @@ public:
 	virtual std::string getUnit(int index);
 	virtual std::string getCoordinateSystem();
 	virtual std::string getCoordinateSystem(int index);
-	// TODO setter ergänzen
+	
 	virtual void setValue(double newValue);
 	virtual void setValue(double newValue, int index);
 	virtual void setValue(double newValue[]);
+	virtual void setTimeStamp(uint64_t timestamp);
+	virtual void setTimeStamp(uint64_t timestamp, int index);
+	virtual void setName(std::string signalName);
+	virtual void setName(std::string signalName, int index);
+	virtual void setUnit(std::string unit);
+	virtual void setUnit(std::string unit, int index);
+	virtual void setCoordinateSystem(std::string coordinateSystem);
+	virtual void setCoordinateSystem(std::string coordinateSystem, int index);
 
 private:
 	anDatum* dat;

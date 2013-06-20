@@ -124,9 +124,34 @@ void RealSignalOutput::setValue(double newValue[]) { // TODO check if array leng
 	}
 }
 
-// bool RealSignalOutput::isCompatible(RealSignalOutput* signal) {
-// 	return false; // TODO implement this
-// }
+void RealSignalOutput::setTimeStamp(uint64_t timestamp) {
+	setTimeStamp(timestamp, 0);
+}
 
+void RealSignalOutput::setTimeStamp(uint64_t timestamp, int index) {
+	if(index < length) dat[index].timestamp = timestamp;
+}
 
+void RealSignalOutput::setName(std::string signalName) {
+	setName(signalName, 0);
+}
 
+void RealSignalOutput::setName(std::string signalName, int index) {
+	if(index < length) dat[index].name = signalName;
+}
+
+void RealSignalOutput::setUnit(std::string unit) {
+	setUnit(unit, 0);
+}
+
+void RealSignalOutput::setUnit(std::string unit, int index) {
+	if(index < length) dat[index].unit = unit;
+}
+
+void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem) {
+	setCoordinateSystem(coordinateSystem, 0);
+}
+
+void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem, int index) {
+	if(index < length) dat[index].coordinateSystem = coordinateSystem;
+}

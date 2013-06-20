@@ -17,6 +17,7 @@ public:
 	virtual double getPeriod();
 	virtual int getStatus();
 	virtual void addRunnable(Runnable* runnable);
+	virtual void addRunnable(Runnable& runnable);
 	virtual void start();
 	virtual bool isTerminated();
 	virtual void stop();

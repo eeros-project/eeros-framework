@@ -26,6 +26,11 @@ void Executor::addRunnable(Runnable* runnable)
 	runnables.push_back(runnable);
 }
 
+void Executor::addRunnable(Runnable& runnable)
+{
+	runnables.push_back(&runnable);
+}
+
 void Executor::start()
 {
 	status = kRunning;
