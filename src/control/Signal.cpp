@@ -4,7 +4,7 @@
 uint32_t Signal::signalCounter = 0;
 std::list<Signal*> Signal::signalList;
 
-Signal::Signal() {
+Signal::Signal(sigdim_t dim) : length(dim) {
 	id = signalCounter++;
 	signalList.push_back(this);
 }
@@ -23,7 +23,7 @@ uint32_t Signal::getSignalId() {
 
 uint32_t Signal::getLength()
 {
-    return this->length;
+    return length;
 }
 
 std::string Signal::getLabel() {

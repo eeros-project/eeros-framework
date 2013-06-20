@@ -14,14 +14,11 @@ int main()
 	
 	Executor e(0.01); // 10 ms period time
 	
-	AnSignal sig1("s1", "m");
-	AnSignal sig2("s2", "m");
-	
-	Step step(&sig1, 1, 5, 0.5);
-	Gain gain(&sig2, 10);
+	Step step(1.0, 5.0, 0);
+	Gain gain(10);
 	BlockOutput output;
-	gain.in.connect(step.out);
-	output.in.connect(gain.out);
+	gain.getIn().connect(step.getOut());
+	output.getIn().connect(gain.getOut());
 	
 	e.addRunnable(&step);
 	e.addRunnable(&gain);
@@ -36,6 +33,8 @@ int main()
 	e.stop();
 	std::cout << "waiting for executor to terminate..." << std::endl;
 	while(!e.isTerminated());
-	std::cout << "output value = " << output.in.getSignal()->getValue() << std::endl;
+	std::cout << "step output value = " << step.getOut().getValue() << std::endl;
+	std::cout << "gain output value = " << gain.getOut().getValue() << std::endl;
+	std::cout << "output value = " << output.getIn().getValue() << std::endl;
 	std::cout << "Test 2 done..." << std::endl;
 }

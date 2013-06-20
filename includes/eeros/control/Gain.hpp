@@ -1,15 +1,13 @@
 #ifndef ORG_EEROS_CONTROL_GAIN_HPP_
 #define ORG_EEROS_CONTROL_GAIN_HPP_
 
-#include <eeros/control/AnSignal.hpp>
+#include <eeros/control/RealSignalOutput.hpp>
 #include <eeros/control/Block1i1o.hpp>
 
-class Gain: public Block1i1o
-{
+class Gain: public Block1i1o {
 public:
 	Gain(double gain = 1);
-	Gain(AnSignal* sigal, double gain = 1);
-	Gain(AnSignal* sigal, double gain[]);
+	Gain(sigdim_t dim, double gain[]);
 	virtual ~Gain();
 
 	virtual void run();

@@ -20,8 +20,8 @@ BlockOutput::~BlockOutput()
 
 void BlockOutput::run()
 {
-	dat.timestamp = in.getSignal()->getTimestamp();
-	dat.value = in.getSignal()->getValue();
+	dat.timestamp = in.getTimestamp();
+	dat.value = in.getValue();
 	
 	//writer.write(&dat, sizeof(dat));
 }

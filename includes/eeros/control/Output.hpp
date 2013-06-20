@@ -1,26 +1,13 @@
-/*
- * Output.hpp
- *
- *  Created on: 11.04.2013
- *      Author: Martin Zueger
- */
-
 #ifndef ORG_EEROS_CONTROL_OUTPUT_HPP_
 #define ORG_EEROS_CONTROL_OUTPUT_HPP_
 
-#include <eeros/control/AnSignal.hpp>
+#include <eeros/types.hpp>
 
-class Output
-{
+class Output {
 public:
-	Output(AnSignal* signal);
-	virtual ~Output();
-
-	virtual AnSignal* getSignal();
-	virtual void setSignal(AnSignal* newSignal);
-
+	virtual void dummy();
 private:
-	AnSignal* signal;
+	
 };
 
 #endif /* ORG_EEROS_CONTROL_OUTPUT_HPP_ */

@@ -1,7 +1,6 @@
 #ifndef ORG_EEROS_CONTROL_STEP_HPP_
 #define ORG_EEROS_CONTROL_STEP_HPP_
 
-#include <eeros/control/AnSignal.hpp>
 #include <eeros/control/Block1o.hpp>
 #include <eeros/core/System.hpp>
 
@@ -9,8 +8,8 @@ class Step: public Block1o
 {
 public:
 	Step(double initValue = 0, double stepHeight = 1, double delayTime = 0);
-	Step(AnSignal* sigal, double initValue = 0, double stepHeight = 1, double delayTime = 0);
-	Step(AnSignal* sigal, double initValue[], double stepHeight[], double delayTime = 0);
+	Step(sigdim_t dim, double initValue = 0, double stepHeight = 1, double delayTime = 0);
+	Step(sigdim_t dim, double initValue[], double stepHeight[], double delayTime = 0);
 	virtual ~Step();
 
 	virtual void run();

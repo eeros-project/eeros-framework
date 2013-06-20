@@ -5,14 +5,12 @@
 #include <string>
 #include <eeros/types.hpp>
 
-//Forward Declarations
-class Signal;
-
 class Signal {
 public:
-	Signal();
+	Signal(sigdim_t dim);
 	virtual ~Signal();
-	uint32_t getSignalId();
+	
+	virtual uint32_t getSignalId();
 	virtual uint32_t getLength();
 	virtual std::string getLabel();
 	virtual std::string getLabel(int index);
@@ -22,7 +20,7 @@ public:
 protected:
 	uint32_t id; /**< unique signal id */
 	uint32_t length; /**< number of elements in this signal */
-	
+
 	static std::list<Signal*> signalList;
 	static uint32_t signalCounter;
 };

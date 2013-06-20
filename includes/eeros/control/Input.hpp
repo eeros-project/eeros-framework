@@ -1,28 +1,15 @@
-/*
- * Input.hpp
- *
- *  Created on: 11.04.2013
- *      Author: Martin Zueger
- */
-
 #ifndef ORG_EEROS_CONTROL_INPUT_HPP_
 #define ORG_EEROS_CONTROL_INPUT_HPP_
 
-#include <eeros/control/AnSignal.hpp>
-#include <eeros/control/Output.hpp>
+class Output;
 
 class Input {
 public:
-	Input();
-	virtual ~Input();
-
-	virtual AnSignal* getSignal();
-
-	virtual bool connect(Output* output);
+	virtual bool connect(Output& output);
 	virtual void disconnect();
 	virtual bool isConnected();
 
-private:
+protected:
 	Output* connectedOutput;
 };
 

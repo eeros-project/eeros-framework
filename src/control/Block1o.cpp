@@ -1,19 +1,7 @@
-/*
- * Block1o.cpp
- *
- *  Created on: 15.04.2013
- *      Author: Martin Zueger
- */
-
 #include <eeros/control/Block1o.hpp>
 
-Block1o::Block1o()
-{
-	// nothing to do
+Block1o::Block1o(sigdim_t dim) : out(dim) { }
 
-}
-
-Block1o::~Block1o()
-{
-	// nothing to do
+RealSignalOutput& Block1o::getOut() {
+	return out;
 }

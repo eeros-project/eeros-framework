@@ -1,23 +1,17 @@
-/*
- * Block1o.hpp
- *
- *  Created on: 15.04.2013
- *      Author: Martin Zueger
- */
-
 #ifndef ORG_EEROS_CONTROL_BLOCK1O_HPP_
 #define ORG_EEROS_CONTROL_BLOCK1O_HPP_
 
 #include <eeros/control/Block.hpp>
-#include <eeros/control/Output.hpp>
+#include <eeros/control/RealSignalOutput.hpp>
 
-class Block1o: public Block
-{
+class Block1o: public Block {
 public:
-	Block1o();
-	virtual ~Block1o();
-
-	Output* out;
+	Block1o(sigdim_t dim);
+	
+	RealSignalOutput& getOut();
+	
+protected:
+	RealSignalOutput out;
 };
 
 #endif /* ORG_EEROS_CONTROL_BLOCK1O_HPP_ */

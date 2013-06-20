@@ -1,9 +1,10 @@
-#ifndef ORG_EEROS_CONTROL_ANSIGNAL_HPP_
-#define ORG_EEROS_CONTROL_ANSIGNAL_HPP_
+#ifndef ORG_EEROS_CONTROL_REALSIGNALOUTPUT_HPP_
+#define ORG_EEROS_CONTROL_REALSIGNALOUTPUT_HPP_
 
 #include <string>
 
 #include <eeros/types.hpp>
+#include <eeros/control/Output.hpp>
 #include <eeros/control/Signal.hpp>
 
 struct anDatum {
@@ -14,12 +15,12 @@ struct anDatum {
 	std::string coordinateSystem;
 };
 
-class AnSignal : public Signal {
+class RealSignalOutput : virtual public Signal, virtual public Output {
 public:
-	AnSignal();
-	AnSignal(std::string signalName, std::string unit, std::string coordinateSystem = "");
-	AnSignal(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length);
-	virtual ~AnSignal();
+	RealSignalOutput(sigdim_t dim = 1);
+//	RealSignalOutput(std::string signalName, std::string unit, std::string coordinateSystem = "");
+//	RealSignalOutput(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length);
+	virtual ~RealSignalOutput();
 
 	virtual std::string getLabel();
 	virtual std::string getLabel(int index);
@@ -33,16 +34,14 @@ public:
 	virtual std::string getUnit(int index);
 	virtual std::string getCoordinateSystem();
 	virtual std::string getCoordinateSystem(int index);
-	
+	// TODO setter ergänzen
 	virtual void setValue(double newValue);
 	virtual void setValue(double newValue, int index);
 	virtual void setValue(double newValue[]);
-	
-	virtual bool isCompatible(AnSignal* signal);
 
 private:
 	anDatum* dat;
 };
 
-#endif /* ORG_EEROS_CONTROL_ANSIGNAL_HPP_ */
+#endif /* ORG_EEROS_CONTROL_REALSIGNALOUTPUT_HPP_ */
 

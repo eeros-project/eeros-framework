@@ -1,16 +1,9 @@
 #include <eeros/control/Block.hpp>
-/*
-Block::Block() {
-	// noting to do
 
+void Block::setName(std::string name) {
+	this->name = name;
 }
 
-Block::~Block() {
-	// noting to do
+std::string Block::getName() {
+	return name;
 }
-
-
-void Block::run() {
-    // nothing to do...
-}
-*/

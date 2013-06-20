@@ -1,10 +1,3 @@
-/*
- * Block.hpp
- *
- *  Created on: 11.04.2013
- *      Author: Martin Zueger
- */
-
 #ifndef ORG_EEROS_CONTROL_BLOCK_HPP_
 #define ORG_EEROS_CONTROL_BLOCK_HPP_
 
@@ -13,10 +6,9 @@
 
 class Block : public Runnable {
 public:
-//	Block();
-//	virtual ~Block();
-//	virtual void run()  = 0;
-
+	virtual void setName(std::string name);
+	virtual std::string getName();
+	
 private:
 	std::string name;
 };

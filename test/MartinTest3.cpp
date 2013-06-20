@@ -14,11 +14,11 @@ int main() {
 	
 	Executor e(0.01); // 10 ms period time
 	
-	Step step(1, 5, 0.5);
+	Step step(1.0, 5.0, 0.5);
 	Gain gain(10);
 	BlockOutput output;
-	gain.in.connect(step.out);
-	output.in.connect(gain.out);
+	gain.in.connect(&step.out);
+	output.in.connect(&gain.out);
 	
 	std::cout << "Available signals:" << std::endl;
 	for(std::list<Signal*>::iterator i = Signal::getSignalList()->begin(); i != Signal::getSignalList()->end(); i++) {
@@ -39,6 +39,6 @@ int main() {
  	e.stop();
  	std::cout << "waiting for executor to terminate..." << std::endl;
  	while(!e.isTerminated());
- 	std::cout << "output value = " << output.in.getSignal()->getValue() << std::endl;
+ 	std::cout << "output value = " << output.in.getValue() << std::endl;
  	std::cout << "Test 3 done..." << std::endl;
 }
