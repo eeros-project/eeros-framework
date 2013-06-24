@@ -68,27 +68,55 @@ void MySequence::Homed(){
 
 /** Move
 */
+//For examples execution variants:
+//#define WAITING
+#undef WAITING
+
 void MySequence::Move(){
 	std::cout << "Move" << std::endl;
-	//Version: Waiting until the SubSequence has finished
+
+#ifdef WAITING
+	//variant: waits until the subsequence has finished
 	if(!currentSubSequence){
 		currentSubSequence = new MySubSequence("SubSequence", timeDomain);
 		currentSubSequence->start();
 	}
-	
-	//waits until the subsequence has finished
 	if(currentSubSequence && currentSubSequence->getStatus() == kStopped){
 		currentSubSequence = 0;
 		std::cout << "Going to Moving" << std::endl;
 		next((eeros::sequencer::Sequence::method)(&MySequence::Moving));
 	}
-	//wait in an other step for example in Stopped
+
+#else if
+
+	//variant: wait in an other step for example in Step Waiting for termination
+	if(!currentSubSequence){
+		currentSubSequence = new MySubSequence("SubSequence", timeDomain);
+		currentSubSequence->start();
+		addSubSequence(currentSubSequence);
+		currentSubSequence = 0;
+		std::cout << "Going to Moving" << std::endl;
+		next((eeros::sequencer::Sequence::method)(&MySequence::Moving));
+	}
+#endif
 }
 
 /** Moving waits until the Move is completed
 */
 void MySequence::Moving(){
 	std::cout << "Moving" << std::endl;
+	std::cout << "Going to Stopping" << std::endl;
+	next((eeros::sequencer::Sequence::method)(&MySequence::Waiting));
+}
+
+/** Moving waits until the Move is completed
+*/
+void MySequence::Waiting(){
+	std::cout << "Waiting for SubSequence" << std::endl;
+	//Waiting for SubSequence to terminate
+	//get SubSequende in list
+	Sequence* waitForSeq = findSequence("SubSequence");
+	ExecutorService::waitForSequenceEnd(waitForSeq);
 	std::cout << "Going to Stopping" << std::endl;
 	next((eeros::sequencer::Sequence::method)(&MySequence::Stopping));
 }

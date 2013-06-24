@@ -17,11 +17,13 @@ namespace eeros{
 			void addSubSequence(Sequence* seq);
 			void deleteAllSubSequences();
 			virtual void run();
+			std::string getName();
 
 		protected:
 			TimeDomain* timeDomain;
 			void next(method step);
 			void run_state();
+			Sequence* findSequence(std::string name);
 		private:
 			std::list<Sequence*> subSequences;
 			std::string sequenceName;

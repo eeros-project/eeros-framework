@@ -38,6 +38,8 @@ private:
 	*/
 	void Moving();
 
+	void Waiting();
+
 	/** Stopping
 	*/
 	void Stopping();

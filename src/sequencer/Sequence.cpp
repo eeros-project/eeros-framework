@@ -31,3 +31,18 @@ void eeros::sequencer::Sequence::next(method step){
 void eeros::sequencer::Sequence::run_state(){
 	(this->*fun)();
 }
+
+std::string eeros::sequencer::Sequence::getName(){
+	return sequenceName;
+}
+
+eeros::sequencer::Sequence* eeros::sequencer::Sequence::findSequence(std::string name){
+	std::list<Sequence*>::iterator iter = subSequences.begin();
+		while(iter != subSequences.end()){
+			if((*iter)->getName().compare(name) == 0){
+				return *iter;
+			}
+			iter++;
+		}
+		return 0;
+}
