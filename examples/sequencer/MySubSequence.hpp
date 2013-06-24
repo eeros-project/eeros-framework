@@ -2,20 +2,18 @@
 
 #include <eeros/sequencer/Sequence.hpp>
 
-/** Dies ist eine Beispielklasse für den Anwender. Damit wird gezeigt, wie dieser Sequnecer verwendet wird
+/** This examples shows how you can use a subsequence, if the main sequence will wait in a step of the terminaton of it
   *
   */
-class MySubSequence : public Sequence
+class MySubSequence : public eeros::sequencer::Sequence
 {
 public:
-	MySubSequence(double period, string name);
-
-	//Destruktor muss virtual sein, damit er automatisch aufgerufen wird.
+	MySubSequence(std::string name, TimeDomain* ptimeDomain);
 	virtual ~MySubSequence(void);
-
-	/**eigene Steps füllen, Init wird automatisch immer hinzugefügt von Sequence
-	 * der nächste sollte Initialising sein, Rest spielt keine Rolle
-	 */
-	void fillSequencerSteps();
+private:
+	void MoveToA();
+	void MoveToB();
+	void MoveToC();
+	void Stopping();
 };
 

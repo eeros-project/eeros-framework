@@ -7,6 +7,9 @@
 
 #include <eeros/control/TimeDomain.hpp>
 
+TimeDomain::TimeDomain(){
+}
+
 void TimeDomain::run()
 {
 	for(std::list<Block*>::iterator i = blocks.begin(); i != blocks.end(); i++)

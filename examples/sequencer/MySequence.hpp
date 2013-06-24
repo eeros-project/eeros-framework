@@ -1,21 +1,45 @@
 #pragma once
 
-#include <eeros/sequencer/Sequence.hpp>
+#include <string>
 
-/** Dies ist eine Beispielklasse für den Anwender. Damit wird gezeigt, wie dieser Sequnecer verwendet wird
+class MySubSequence;
+
+/** This is a example, how the user should work with this sequence.
   *
   */
-class MySequence : public Sequence
+class MySequence : public eeros::sequencer::Sequence
 {
 public:
-	MySequence(double period, string name);
-
-	//Destruktor muss virtual sein, damit er automatisch aufgerufen wird.
+	MySequence(std::string name, TimeDomain* ptimeDomain);
 	virtual ~MySequence(void);
+private:		
+	MySubSequence* currentSubSequence;
+	/** Initialisation
+	*/
+	void Init();
 
-	/**eigene Steps füllen, Init wird automatisch immer hinzugefügt von Sequence
-	 * der nächste sollte Initialising sein, Rest spielt keine Rolle
-	 */
-	void fillSequencerSteps();
+	/** Initialising
+	*/
+	void Initialising();
+
+	/** Initialised
+	*/
+	void Initialised();
+
+	/** Homed
+	*/
+	void Homed();
+
+	/** Move
+	*/
+	void Move();
+
+	/** Moving waits until the Move is completed
+	*/
+	void Moving();
+
+	/** Stopping
+	*/
+	void Stopping();
 };
 

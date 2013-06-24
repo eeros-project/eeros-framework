@@ -2,7 +2,8 @@
 //
 
 #include <eeros/core/Executor.hpp>
-
+#include <eeros/control/TimeDomain.hpp>
+#include <eeros/sequencer/Sequence.hpp>
 #include "MySequence.hpp"
 
 using namespace std;
@@ -12,9 +13,8 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	//TODO: sollte ohne Periode sein
-	MySequence mainSequence(1.0, "MainSequence");
-	mainSequence.fillSequencerSteps();
+	TimeDomain timeDomain;
+	MySequence mainSequence("MainSequence", &timeDomain);
 
 
 	//Thread erzeugen:
@@ -26,7 +26,6 @@ int main(int argc, char* argv[])
 	while(!mainSequence.isTerminated()){
 		cout << "waiting for executor to terminate..." << std::endl;
 	}
-
 
 	return 0;
 }

@@ -1,15 +1,13 @@
+#include <eeros/control/TimeDomain.hpp>
+
 #include "MySubSequence.hpp"
 
-#include <eeros/sequencer/Initialising.hpp>
-#include <eeros/sequencer/Initialised.hpp>
-#include <eeros/sequencer/Homed.hpp>
-#include <eeros/sequencer/Stopping.hpp>
+//TODELETE
+#include <iostream>
 
-
-MySubSequence::MySubSequence(double period, string name) : 
-Sequence(period, name)
-{
-	fillSequencerSteps();
+MySubSequence::MySubSequence(std::string name, TimeDomain* ptimeDomain):
+eeros::sequencer::Sequence(name, ptimeDomain){
+	next((eeros::sequencer::Sequence::method)(&MySubSequence::MoveToA));
 }
 
 
@@ -17,22 +15,27 @@ MySubSequence::~MySubSequence(void)
 {
 }
 
-void MySubSequence::fillSequencerSteps(){
-	//Init wird immer hinzugefügt und wechselt zu Intialising
-	//Step Initialising darf nur nach Initialised übergehen.
-	Transitions* trans = new Transitions();
-	trans->addAllowedTransitionName("Initialised");
-	SequencerStep* step = new Initialising(trans, "Initialising", this);
+void MySubSequence::MoveToA(){
+	std::cout << "MoveToA" << std::endl;
+	std::cout << "Going to MoveToB" << std::endl;
+	timeDomain->run();
+	next((eeros::sequencer::Sequence::method)(&MySubSequence::MoveToB));
+}
 
-	trans = new Transitions();
-	trans->addAllowedTransitionName("Homed");
-	step = new Initialised(trans, "Initialised", this);
+void MySubSequence::MoveToB(){
+	std::cout << "MoveToA" << std::endl;
+	std::cout << "Going to MoveToC" << std::endl;
+	next((eeros::sequencer::Sequence::method)(&MySubSequence::MoveToC));
+}
 
-	trans = new Transitions();
-	trans->addAllowedTransitionName("Stopping");
-	step = new Homed(trans, "Homed", this);
+void MySubSequence::MoveToC(){
+	std::cout << "MoveToA" << std::endl;
+	std::cout << "Going to Stopping" << std::endl;
+	next((eeros::sequencer::Sequence::method)(&MySubSequence::Stopping));
+}
 
-	trans = new Transitions();
-	trans->addAllowedTransitionName("");
-	step = new Stopping(trans, "Stopping", this);
+void MySubSequence::Stopping(){
+	std::cout << "Stopping" << std::endl;
+	std::cout << "End of Sequence!" << std::endl;
+	stop();
 }
