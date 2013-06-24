@@ -1,5 +1,5 @@
 #include <eeros/control/TimeDomain.hpp>
-#include <eeros/control/AnSignal.hpp>
+#include <eeros/control/Signal.hpp>
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/BlockOutput.hpp>
 #include <eeros/control/Step.hpp>
@@ -36,14 +36,12 @@ void MySequence::Initialising(){
 	std::cout << "Initialising" << std::endl;
 	std::cout << "Going to Initialised" << std::endl;
 	//Create blocks for control
-	AnSignal* sig1 = new AnSignal("s1", "m");
-	AnSignal* sig2 = new AnSignal("s2", "m");
-	
-	Step* step = new Step(*sig1, 1, 5, 0.5);
-	Gain* gain = new Gain(*sig2, 10);
+	Step* step = new Step(1.0, 5.0, 0.0);
+	Gain* gain = new Gain(10);
 	BlockOutput* output = new BlockOutput();
-	gain->in.connect(step->out);
-	output->in.connect(gain->out);
+	gain->getIn().connect(step->getOut());
+	output->getIn().connect(gain->getOut());
+
 	//add the blocks to the time domain
 	timeDomain->addBlock(step);
 	timeDomain->addBlock(gain);
