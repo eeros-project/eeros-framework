@@ -5,6 +5,7 @@
 #include <eeros/control/Step.hpp>
 
 #include <eeros/sequencer/Sequence.hpp>
+#include <eeros/sequencer/SequenceException.hpp>
 
 //TODELETE
 #include <iostream>
@@ -13,8 +14,8 @@
 #include "MySubSequence.hpp"
 
 MySequence::MySequence(std::string name, TimeDomain* ptimeDomain):
-eeros::sequencer::Sequence(name, ptimeDomain),
-currentSubSequence(0){
+  eeros::sequencer::Sequence(name, ptimeDomain),
+  currentSubSequence(0){
 	//next( (static_cast<eeros::sequencer::Sequence::method>(&MySequence::Init) ));
 	next( (eeros::sequencer::Sequence::method)(&MySequence::Init) );
 }
@@ -106,7 +107,11 @@ void MySequence::Move(){
 void MySequence::Moving(){
 	std::cout << "Moving" << std::endl;
 	std::cout << "Going to Stopping" << std::endl;
+#ifdef WAITING
+	next((eeros::sequencer::Sequence::method)(&MySequence::Stopping));
+#else if
 	next((eeros::sequencer::Sequence::method)(&MySequence::Waiting));
+#endif
 }
 
 /** Moving waits until the Move is completed
@@ -116,7 +121,13 @@ void MySequence::Waiting(){
 	//Waiting for SubSequence to terminate
 	//get SubSequende in list
 	Sequence* waitForSeq = findSequence("SubSequence");
-	ExecutorService::waitForSequenceEnd(waitForSeq);
+	if(waitForSeq->getStatus() != kStopped){
+		ExecutorService::waitForSequenceEnd(waitForSeq);
+	}/*else{
+		throw new eeros::sequencer::SequenceException((eeros::sequencer::Sequence::method)(&MySequence::Waiting), 
+			                                          (eeros::sequencer::Sequence::method)(&MySequence::Stopping));
+	}*/
+	deleteSequence("SubSequence");
 	std::cout << "Going to Stopping" << std::endl;
 	next((eeros::sequencer::Sequence::method)(&MySequence::Stopping));
 }

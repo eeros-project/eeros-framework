@@ -1,1 +1,1 @@
-add_eeros_sources(Sequence.cpp)
+add_eeros_sources(Sequence.cpp SequenceException.cpp)

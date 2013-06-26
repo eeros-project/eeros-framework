@@ -18,12 +18,13 @@ namespace eeros{
 			void deleteAllSubSequences();
 			virtual void run();
 			std::string getName();
-
+			Sequence* findSequence(std::string name);
+			void deleteSequence(std::string name);
 		protected:
 			TimeDomain* timeDomain;
 			void next(method step);
 			void run_state();
-			Sequence* findSequence(std::string name);
+			
 		private:
 			std::list<Sequence*> subSequences;
 			std::string sequenceName;
@@ -32,4 +33,5 @@ namespace eeros{
 
 	};//namespace sequencer
 };//namespace eeros
-#endif
+
+#endif //ORG_EEROS_SEQUENCER_SEQUENCE_HPP_

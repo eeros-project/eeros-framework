@@ -1,4 +1,5 @@
 #include <eeros/sequencer/Sequence.hpp>
+#include <eeros/sequencer/SequenceException.hpp>
 
 eeros::sequencer::Sequence::Sequence(std::string name, TimeDomain* ptimeDomain):
 Executor(0),
@@ -22,7 +23,11 @@ void eeros::sequencer::Sequence::deleteAllSubSequences(){
 }
 
 void eeros::sequencer::Sequence::run(){
-	run_state();
+	try{
+		run_state();
+	}catch(SequenceException* e){
+		next(e->nextMethod);
+	}
 }
 
 void eeros::sequencer::Sequence::next(method step){
@@ -45,4 +50,15 @@ eeros::sequencer::Sequence* eeros::sequencer::Sequence::findSequence(std::string
 			iter++;
 		}
 		return 0;
+}
+
+void eeros::sequencer::Sequence::deleteSequence(std::string name){
+	std::list<Sequence*>::iterator iter = subSequences.begin();
+		while(iter != subSequences.end()){
+			if((*iter)->getName().compare(name) == 0){
+				subSequences.erase(iter);
+				return;
+			}
+			iter++;
+		}
 }
