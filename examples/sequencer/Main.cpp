@@ -1,29 +1,30 @@
 // Sequencer.cpp : Defines the entry point for the console application.
 //
+//TODELETE
+#include <iostream>
 
 #include <eeros/core/Executor.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/sequencer/Sequence.hpp>
+
+#include "MySequencer.hpp"
 #include "MySequence.hpp"
 
 using namespace std;
 
-//TODELETE
-#include <iostream>
-
 int main(int argc, char* argv[])
 {
-	TimeDomain timeDomain;
-	MySequence mainSequence("MainSequence", &timeDomain);
-
+	//The first allocation of a sequencer is automatically the Main-Sequencer!!
+	MySequencer mainSequencer("MainSequencer");
+	MySequence sequence("MySequence", mainSequencer);
 
 	//Thread erzeugen:
-	mainSequence.start();
+	mainSequencer.start();
 
 	//Thread stoppen wird in Step Stopping gemacht
 	//mainSequence.stop();
 	
-	while(!mainSequence.isTerminated()){
+	while(!mainSequencer.isTerminated()){
 		cout << "waiting for executor to terminate..." << std::endl;
 	}
 

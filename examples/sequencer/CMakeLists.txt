@@ -1,2 +1,2 @@
-add_executable(sequencer MySequence.cpp MySubSequence.cpp Sequencer.cpp)
+add_executable(sequencer MySequence.cpp MyBlockingSubSequence.cpp MySequencer.cpp Main.cpp MyNonBlockingSubSequence.cpp MySubSequencer.cpp)
 target_link_libraries(sequencer eeros )

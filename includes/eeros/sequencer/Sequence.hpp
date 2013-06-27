@@ -1,34 +1,30 @@
 #ifndef ORG_EEROS_SEQUENCER_SEQUENCE_HPP_
 #define ORG_EEROS_SEQUENCER_SEQUENCE_HPP_
 
-#include <eeros/core/Executor.hpp>
+#include <string>
+#include <list>
 
-class TimeDomain;
+#include <eeros/core/Runnable.hpp>
 
 namespace eeros{
 	namespace sequencer{
 
-		class Sequence : public Executor
+		class Sequencer;
+		
+		class Sequence : public Runnable
 		{
 		public:
 			typedef void (Sequence::*method)();
-
-			Sequence(std::string name, TimeDomain* ptimeDomain);
-			void addSubSequence(Sequence* seq);
-			void deleteAllSubSequences();
-			virtual void run();
+			Sequence(std::string name, Sequencer& caller);
 			std::string getName();
-			Sequence* findSequence(std::string name);
-			void deleteSequence(std::string name);
+			void addCallBack(method callback);
+			virtual void run();
+			virtual void fillCallBacks() = 0;
 		protected:
-			TimeDomain* timeDomain;
-			void next(method step);
-			void run_state();
-			
+			Sequencer& callerThread;
 		private:
-			std::list<Sequence*> subSequences;
 			std::string sequenceName;
-			method fun;
+			std::list<method> callBacks;
 		};//class Sequence
 
 	};//namespace sequencer
