@@ -10,7 +10,7 @@ namespace eeros{
 	namespace sequencer{
 
 		class Sequencer;
-		
+				
 		class Sequence : public Runnable
 		{
 		public:
@@ -20,11 +20,14 @@ namespace eeros{
 			void addCallBack(method callback);
 			virtual void run();
 			virtual void fillCallBacks() = 0;
+			static Sequence* getSequence(std::string name);
 		protected:
 			Sequencer& callerThread;
 		private:
 			std::string sequenceName;
 			std::list<method> callBacks;
+			static std::list<Sequence*> allSequences;
+
 		};//class Sequence
 
 	};//namespace sequencer

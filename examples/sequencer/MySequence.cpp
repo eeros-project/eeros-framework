@@ -76,6 +76,14 @@ void MySequence::Initialised(){
 */
 void MySequence::Homed(){
 	std::cout << "Homed" << std::endl;
+	//if the sequence exist use it.
+	MyBlockingSubSequence* subSequence = dynamic_cast<MyBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("BlockingSubSequence"));
+	if(!subSequence){
+		//callerThread for Blocking Sub Sequence is the same as is in this Sequence.
+		subSequence = new MyBlockingSubSequence("BlockingSubSequence", callerThread);
+	}
+	//In this case we will wait for the returning of the subSequence.run() method
+	subSequence->run();
 	std::cout << "Going to Move" << std::endl;
 }
 
@@ -86,10 +94,15 @@ void MySequence::Move(){
 
 void MySequence::MoveBlocking(){
 	std::cout << "MoveBlocking" << std::endl;
-	//callerThread for Blocking Sub Sequence is the same as is in this Sequence.
-	MyBlockingSubSequence subSequence("BlockingSubSequence", callerThread);
+	//if the sequence exist use it.
+	MyBlockingSubSequence* subSequence = dynamic_cast<MyBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("BlockingSubSequence"));
+	if(!subSequence){
+		//callerThread for Blocking Sub Sequence is the same as is in this Sequence.
+		subSequence = new MyBlockingSubSequence("BlockingSubSequence", callerThread);
+	}
+	//MyBlockingSubSequence subSequence("BlockingSubSequence", callerThread);
 	//In this case we will wait for the returning of the subSequence.run() method
-	subSequence.run();
+	subSequence->run();
 	std::cout << "Going to Next" << std::endl;
 }
 
@@ -129,4 +142,8 @@ void MySequence::WaitingForNonBlocking(){
 	if(seq && seq->getStatus() != kStopped){
 		ExecutorService::waitForSequenceEnd(seq);
 	}
+}
+
+eeros::sequencer::Sequence* MySequence::createSequence(std::string name, eeros::sequencer::Sequencer& caller){
+	return new MySequence(name, caller);
 }
