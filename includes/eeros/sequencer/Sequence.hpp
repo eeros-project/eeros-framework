@@ -10,6 +10,10 @@ namespace eeros{
 	namespace sequencer{
 
 		class Sequencer;
+		class SequenceException;
+
+		enum { kSequenceRunning = 0, kSequenceFinished = 1, kSequenceNotStarted = 2};
+
 				
 		class Sequence : public Runnable
 		{
@@ -18,14 +22,19 @@ namespace eeros{
 			Sequence(std::string name, Sequencer& caller);
 			std::string getName();
 			void addCallBack(method callback);
+			std::list<Sequence::method>::iterator findCallBack(method callback, bool setCurrent) throw (...);
+			void setCurrentCallBack(std::list<Sequence::method>::iterator iter);
 			virtual void run();
 			virtual void fillCallBacks() = 0;
 			static Sequence* getSequence(std::string name);
+			int getState();
 		protected:
 			Sequencer& callerThread;
 		private:
+			int state;
 			std::string sequenceName;
 			std::list<method> callBacks;
+			std::list<Sequence::method>::iterator currentCallBackIterator;
 			static std::list<Sequence*> allSequences;
 
 		};//class Sequence

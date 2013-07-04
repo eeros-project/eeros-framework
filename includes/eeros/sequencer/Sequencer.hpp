@@ -6,8 +6,10 @@
 
 class TimeDomain;
 
+
 namespace eeros{
 	namespace sequencer{
+		class SequenceException;
 
 		class Sequencer : public Executor
 		{
@@ -20,7 +22,7 @@ namespace eeros{
 			void addSubSequencer(Sequencer* seq);
 			void deleteAllSubSequencers();
 			std::string getName();
-			Sequencer* findSequencer(std::string name);
+			Sequencer* findSequencer(std::string name) throw (...);
 			void deleteSequencer(std::string name);
 		protected:
 			

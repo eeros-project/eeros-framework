@@ -1,30 +1,31 @@
+#include <eeros/sequencer/Sequencer.hpp>
+
 #include <eeros/control/TimeDomain.hpp>
 
-#include <eeros/sequencer/Sequencer.hpp>
-#include <eeros/sequencer/SequenceException.hpp>
+using namespace eeros::sequencer;
 
-eeros::sequencer::Sequencer* eeros::sequencer::Sequencer::mainSequencer = 0;
+Sequencer* Sequencer::mainSequencer = 0;
 
-eeros::sequencer::Sequencer* eeros::sequencer::Sequencer::getMainSequencer(){
+Sequencer* Sequencer::getMainSequencer(){
 	return mainSequencer;
 }
 
-eeros::sequencer::Sequencer::Sequencer(std::string name)
+Sequencer::Sequencer(std::string name)
 	: Executor(0),
       sequenceName(name) {
-		  if(!mainSequencer){
-			  eeros::sequencer::Sequencer::mainSequencer = this;
-		  }
+	if(!mainSequencer){
+		  Sequencer::mainSequencer = this;
+	}
 }
 
-eeros::sequencer::Sequencer::~Sequencer(){
+Sequencer::~Sequencer(){
 }
 
-void eeros::sequencer::Sequencer::addSubSequencer(Sequencer* seq){
-	eeros::sequencer::Sequencer::getMainSequencer()->subSequencers.push_back(seq);
+void Sequencer::addSubSequencer(Sequencer* seq){
+	Sequencer::getMainSequencer()->subSequencers.push_back(seq);
 }
 
-void eeros::sequencer::Sequencer::deleteAllSubSequencers(){
+void Sequencer::deleteAllSubSequencers(){
 	std::list<Sequencer*>::iterator iter = subSequencers.begin();
 	Sequencer* sequencer;
 	while(iter != subSequencers.end()){
@@ -35,11 +36,11 @@ void eeros::sequencer::Sequencer::deleteAllSubSequencers(){
 	subSequencers.clear();
 }
 
-void eeros::sequencer::Sequencer::addTimeDomain(TimeDomain* tDomain){
-	eeros::sequencer::Sequencer::getMainSequencer()->timeDomains.push_back(tDomain);
+void Sequencer::addTimeDomain(TimeDomain* tDomain){
+	Sequencer::getMainSequencer()->timeDomains.push_back(tDomain);
 }
 
-void eeros::sequencer::Sequencer::deleteAllTimeDomains(){
+void Sequencer::deleteAllTimeDomains(){
 	std::list<TimeDomain*>::iterator iter = timeDomains.begin();
 	TimeDomain* tDomain = 0;
 	while(iter != timeDomains.end()){
@@ -50,11 +51,11 @@ void eeros::sequencer::Sequencer::deleteAllTimeDomains(){
 	timeDomains.clear();
 }
 
-std::string eeros::sequencer::Sequencer::getName(){
+std::string Sequencer::getName(){
 	return sequenceName;
 }
 
-eeros::sequencer::Sequencer* eeros::sequencer::Sequencer::findSequencer(std::string name){
+Sequencer* Sequencer::findSequencer(std::string name) throw (...) {
 	std::list<Sequencer*>::iterator iter = subSequencers.begin();
 		while(iter != subSequencers.end()){
 			if((*iter)->getName().compare(name) == 0){
@@ -62,11 +63,11 @@ eeros::sequencer::Sequencer* eeros::sequencer::Sequencer::findSequencer(std::str
 			}
 			iter++;
 		}
-		//throw new SequenceException();
+		throw "no SubSequencer found";
 		return 0;
 }
 
-void eeros::sequencer::Sequencer::deleteSequencer(std::string name){
+void Sequencer::deleteSequencer(std::string name){
 	std::list<Sequencer*>::iterator iter = subSequencers.begin();
 		while(iter != subSequencers.end()){
 			if((*iter)->getName().compare(name) == 0){

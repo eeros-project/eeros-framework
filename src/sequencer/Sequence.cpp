@@ -1,40 +1,87 @@
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/SequenceException.hpp>
+#include <eeros/sequencer/ErrorHandler.hpp>
 
-std::list<eeros::sequencer::Sequence*> eeros::sequencer::Sequence::allSequences;
+using namespace eeros::sequencer;
 
-eeros::sequencer::Sequence::Sequence(std::string name, Sequencer& caller)
+std::list<eeros::sequencer::Sequence*> Sequence::allSequences;
+
+Sequence::Sequence(std::string name, Sequencer& caller)
 	: sequenceName(name),
-      callerThread(caller){
-		if(&callerThread != eeros::sequencer::Sequencer::getMainSequencer()){
-			eeros::sequencer::Sequencer::getMainSequencer()->addSubSequencer(&caller);
-		}
-		eeros::sequencer::Sequence::allSequences.push_back(this);
+      callerThread(caller),
+	  state(kSequenceNotStarted){
+	if(&callerThread != Sequencer::getMainSequencer()){
+		Sequencer::getMainSequencer()->addSubSequencer(&caller);
+	}
+	Sequence::allSequences.push_back(this);
+	currentCallBackIterator = callBacks.end();
 }
 
-std::string eeros::sequencer::Sequence::getName(){
+std::string Sequence::getName(){
 	return sequenceName;
 }
 
-void eeros::sequencer::Sequence::addCallBack(eeros::sequencer::Sequence::method callback){
+void Sequence::addCallBack(eeros::sequencer::Sequence::method callback){
 	callBacks.push_back(callback);
 }
 
-void eeros::sequencer::Sequence::run(){
-	if(callBacks.empty()){
-		fillCallBacks();
-	}
+std::list<Sequence::method>::iterator Sequence::findCallBack(method callback, bool setCurrent) throw (...){
 	std::list<Sequence::method>::iterator iter = callBacks.begin();
-	method fun;
 	while(iter != callBacks.end()){
-		fun = *iter;
-		(this->*fun)();
+		if(*iter == callback){
+			if(setCurrent){
+				currentCallBackIterator = iter;
+			}
+			return iter;
+		}
 		iter++;
+	}
+	throw "no Method found!";
+	return iter;
+}
+
+void Sequence::setCurrentCallBack(std::list<eeros::sequencer::Sequence::method>::iterator iter){
+	currentCallBackIterator = iter;
+}
+
+void Sequence::run(){
+	try{
+		if(callBacks.empty()){
+			fillCallBacks();
+		}
+		//std::list<Sequence::method>::iterator iter = callBacks.begin();
+		if(currentCallBackIterator == callBacks.end()){
+			currentCallBackIterator = callBacks.begin();
+			state = kSequenceRunning;
+
+		}
+		method fun;
+		while(currentCallBackIterator != callBacks.end()){
+			fun = *currentCallBackIterator;
+			(this->*fun)();
+			currentCallBackIterator++;
+		}
+		state = kSequenceFinished;
+	}catch(SequenceException* e){
+		//ErrorHandling 
+		try{
+			if(e->errorHandler){
+				if(e->returnToBegin){
+					currentCallBackIterator = callBacks.begin();
+				}else if (e->goToNext){
+					findCallBack(e->nextMethod, true);
+				}
+				//continue after Error Handling with the same Method
+				e->errorHandler->run();
+			}
+		}catch(...){
+			callerThread.stop();
+		}
 	}
 }
 
-eeros::sequencer::Sequence* eeros::sequencer::Sequence::getSequence(std::string name){
+Sequence* Sequence::getSequence(std::string name){
 	std::list<Sequence*>::iterator iter = eeros::sequencer::Sequence::allSequences.begin();
 		while(iter != eeros::sequencer::Sequence::allSequences.end()){
 			if((*iter)->getName().compare(name) == 0){
@@ -42,6 +89,9 @@ eeros::sequencer::Sequence* eeros::sequencer::Sequence::getSequence(std::string 
 			}
 			iter++;
 		}
-		//throw new SequenceException();
 		return 0;
+}
+
+int Sequence::getState(){
+	return state;
 }

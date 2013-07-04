@@ -3,16 +3,27 @@
 
 #include <eeros/sequencer/Sequence.hpp>
 
+#include <string>
+
 namespace eeros{
 	namespace sequencer{
+		class ErrorHandler;
+
 		class SequenceException{
 			friend class Sequence;
 		public:
-			SequenceException(Sequence::method causingMethod, Sequence::method nextMethod);
+			SequenceException(std::string reason);
+			SequenceException(Sequence* seqCause, Sequence::method cause, Sequence::method next,
+				              ErrorHandler* error, bool toBegin, bool goToNext, std::string reason);
+			~SequenceException();
 		private:
+			Sequence* seqenceCausing;
 			Sequence::method causingMethod;
 			Sequence::method nextMethod;
-			std::string reason;
+			ErrorHandler* errorHandler;
+			std::string message;
+			bool returnToBegin;
+			bool goToNext;
 
 		};
 

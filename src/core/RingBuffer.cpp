@@ -45,6 +45,7 @@ uint32_t RingBuffer::read(void* pDest, uint32_t size) {
 			pRead += sizeToCopy;
 		}
 	}
+	return available;
 }
 
 uint32_t RingBuffer::write(void* pSrc, uint32_t size) {

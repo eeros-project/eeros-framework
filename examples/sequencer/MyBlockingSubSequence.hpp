@@ -12,10 +12,14 @@ public:
 	MyBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller);
 	virtual ~MyBlockingSubSequence(void);
 	virtual void fillCallBacks();
+	void fillVersion1();
+	void fillVersion2();
+
 private:
 	void MoveToA();
 	void MoveToB();
 	void MoveToC();
+	void MoveToException();
 	void Stopping();
 };
 
