@@ -7,6 +7,8 @@
 #include <eeros/control/Output.hpp>
 #include <eeros/control/Signal.hpp>
 
+enum { kSignalTypeReal = 42 };
+
 struct anDatum {
 	double value;
 	uint64_t timestamp;
@@ -20,18 +22,19 @@ public:
 	RealSignalOutput(sigdim_t dim = 1);
 	virtual ~RealSignalOutput();
 
-	virtual std::string getLabel();
-	virtual std::string getLabel(int index);
-	virtual double getValue();
-	virtual double getValue(int index);
-	virtual uint64_t getTimestamp();
-	virtual uint64_t getTimestamp(int index);	
-	virtual std::string getName();
-	virtual std::string getName(int index);
-	virtual std::string getUnit();
-	virtual std::string getUnit(int index);
-	virtual std::string getCoordinateSystem();
-	virtual std::string getCoordinateSystem(int index);
+	virtual sigtype_t getType() const;
+	virtual std::string getLabel() const;
+	virtual std::string getLabel(int index) const;
+	virtual double getValue() const;
+	virtual double getValue(int index) const;
+	virtual uint64_t getTimestamp() const;
+	virtual uint64_t getTimestamp(int index) const;
+	virtual std::string getName() const;
+	virtual std::string getName(int index) const;
+	virtual std::string getUnit() const;
+	virtual std::string getUnit(int index) const;
+	virtual std::string getCoordinateSystem() const;
+	virtual std::string getCoordinateSystem(int index) const;
 	
 	virtual void setValue(double newValue);
 	virtual void setValue(double newValue, int index);

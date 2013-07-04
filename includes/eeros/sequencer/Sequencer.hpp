@@ -1,6 +1,7 @@
 #ifndef ORG_EEROS_SEQUENCER_SEQUENCER_HPP_
 #define ORG_EEROS_SEQUENCER_SEQUENCER_HPP_
 
+#include <string>
 #include <eeros/core/Executor.hpp>
 
 class TimeDomain;

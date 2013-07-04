@@ -51,59 +51,63 @@ RealSignalOutput::~RealSignalOutput() {
 	signalList.remove(this);
 }
 
-std::string RealSignalOutput::getLabel() {
+sigtype_t RealSignalOutput::getType() const {
+	return kSignalTypeReal;
+}
+
+std::string RealSignalOutput::getLabel() const {
 	return getLabel(0);
 }
 
-std::string RealSignalOutput::getLabel(int index) {
+std::string RealSignalOutput::getLabel(int index) const {
 	std::stringstream label;
 	label << '#' << id << '/' << index << ": " << getName(index) << " [" << getUnit(index) << ']';
 	return label.str();
 }
 
-double RealSignalOutput::getValue() {
+double RealSignalOutput::getValue() const {
 	return getValue(0);
 }
 
-double RealSignalOutput::getValue(int index) {
+double RealSignalOutput::getValue(int index) const {
 	if(index < length) return dat[index].value;
 	return 0;
 }
 
-uint64_t RealSignalOutput::getTimestamp() {
+uint64_t RealSignalOutput::getTimestamp() const {
 	return getTimestamp(0);
 }
 
-uint64_t RealSignalOutput::getTimestamp(int index) {
+uint64_t RealSignalOutput::getTimestamp(int index) const {
 	if(index < length) return dat[index].timestamp;
 	return 0;
 }
 
-std::string RealSignalOutput::getName() {
+std::string RealSignalOutput::getName() const {
 	return getName(0);
 }
 
-std::string RealSignalOutput::getName(int index) {
+std::string RealSignalOutput::getName(int index) const {
 	if(index < length) return dat[index].name;
     std::string empty;
 	return empty;
 }
 
-std::string RealSignalOutput::getUnit() {
+std::string RealSignalOutput::getUnit() const {
 	return getUnit(0);
 }
 
-std::string RealSignalOutput::getUnit(int index) {
+std::string RealSignalOutput::getUnit(int index) const {
 	if(index < length) return dat[index].unit;
     std::string empty;
 	return empty;
 }
 
-std::string RealSignalOutput::getCoordinateSystem() {
+std::string RealSignalOutput::getCoordinateSystem() const {
 	return getCoordinateSystem(0);
 }
 
-std::string RealSignalOutput::getCoordinateSystem(int index) {
+std::string RealSignalOutput::getCoordinateSystem(int index) const {
 	if(index < length) return dat[index].coordinateSystem;
     std::string empty;
 	return empty;

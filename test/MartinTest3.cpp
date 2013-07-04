@@ -1,20 +1,48 @@
 #include <iostream>
 #include <ostream>
 #include <fstream>
+#include <stdlib.h>
 
 #include <eeros/core/Executor.hpp>
 #include <eeros/control/Step.hpp>
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/BlockOutput.hpp>
+#include <eeros/control/GlobalScope.hpp>
+#include <eeros/control/SignalBufferReader.hpp>
 
-#define TIMETOWAIT 1
+#define TIMETOWAIT 5
+#define MEM_SIZE 1000000
+
+class Reader : public Runnable {
+public:
+	Reader(void* memory, uint32_t size) : r(memory, size) {}
+	
+	void run() {
+		if(r.signalTypeAvailableToRead() == kSignalTypeReal) {
+			r.readRealSignal(&id, &ts, &val);
+			std::cout << '#' << id << ' ' << ts << ':' << val << std::endl;
+		}
+	}
+
+private:
+	SignalBufferReader r;
+	sigid_t id;
+	uint64_t ts;
+	double val;
+};
 
 int main() {
 	std::cout << "Martin Test 3 started..." << std::endl;
 	
-	Executor e(0.01); // 10 ms period time
+	std::cout << "Allocating memory (" << MEM_SIZE << " bytes)..." << std::endl;
+	void* memory = malloc(MEM_SIZE);
 	
-	Step step(1.0, 5.0, 0);
+	std::cout << "Creating executors..." << std::endl;
+	Executor e1(0.1); // 100 ms period time
+	Executor e2(0.01); // 10 ms period time
+	
+	std::cout << "Creating and connecting control system elements..." << std::endl;
+	Step step(1.0, 5.0, 1.0);
 	step.getOut().setName("M");
 	step.getOut().setUnit("Nm");
 	
@@ -23,6 +51,7 @@ int main() {
 	gain.getOut().setUnit("A");
 	
 	BlockOutput output;
+	GlobalScope globalScope(memory, MEM_SIZE);
 	
 	gain.getIn().connect(step.getOut());
 	output.getIn().connect(gain.getOut());
@@ -35,17 +64,33 @@ int main() {
 		}
 	}
 	
-	e.addRunnable(step);
- 	e.addRunnable(gain);
- 	e.addRunnable(output);
- 	e.start();
- 	std::cout << "waiting for " << TIMETOWAIT << " seconds while executor is running" << std::endl;
- 
+	e1.addRunnable(step);
+ 	e1.addRunnable(gain);
+ 	e1.addRunnable(output);
+	e1.addRunnable(globalScope);
+	
+	std::cout << "Creating reader..." << std::endl;
+	Reader r(memory, MEM_SIZE);
+	e2.addRunnable(r);
+	
+	std::cout << "Starting executors..." << std::endl;
+ 	e1.start();
+	e2.start();
+	
+ 	std::cout << "Waiting for " << TIMETOWAIT << " seconds while executors are running" << std::endl;
  	sleep(TIMETOWAIT);
  
- 	e.stop();
- 	std::cout << "waiting for executor to terminate..." << std::endl;
- 	while(!e.isTerminated());
- 	std::cout << "output value = " << output.getIn().getValue() << std::endl;
+	std::cout << "Stopping executors..." << std::endl;
+ 	e1.stop();
+ 	e2.stop();
+	
+	std::cout << "Waiting for executors to terminate..." << std::endl;
+ 	while(!e1.isTerminated() && !e2.isTerminated());
+	
+ 	std::cout << "Output value = " << output.getIn().getValue() << std::endl;
+	
+	std::cout << "Freeing memory (" << MEM_SIZE << " bytes)..." << std::endl;
+	free(memory);
+	
  	std::cout << "Test 3 done..." << std::endl;
 }
