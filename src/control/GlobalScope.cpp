@@ -1,29 +1,25 @@
 #include <eeros/control/GlobalScope.hpp>
-#include <eeros/control/Signal.hpp>
-#include <eeros/control/SignalBufferWriter.hpp>
+
 #include <list>
 #include <stdlib.h>
+#include <eeros/control/Signal.hpp>
+#include <eeros/control/SignalBufferWriter.hpp>
+#include <eeros/core/SharedMemory.hpp>
 
-enum {
-	kSharedMemorySize = 1048576, // 1MB
-	kAnSignalValueSize = 8,
-	kSignalTimestampSize = 8,
-};
-
-// struct realSignalDatum {
-// 	realSignalDatum(uint32_t signalId, uint64_t timestamp, double value) : signalId(signalId), timestamp(timestamp), value(value) {}
-// 	uint32_t signalId;
-// 	uint64_t timestamp;
-// 	double value;
-// };
-
-GlobalScope::GlobalScope(void* memory, uint32_t size) {
-	//void* memory = malloc(kSharedMemorySize);
-	writer = new SignalBufferWriter(memory, size);
-	
-	std::list<Signal*>* signalList = Signal::getSignalList();
-	for(std::list<Signal*>::iterator i = signalList->begin(); i != signalList->end(); i++) {
-		writer->addSignal(*i);
+GlobalScope::GlobalScope() {
+	/* create shared memory and signal writer */
+	shm = new SharedMemory("/eeros.shm", kSharedMemorySize);
+	if(shm) {
+		if(!shm->initialize()) {
+			writer = new SignalBufferWriter(shm->getMemoryPointer(), kSharedMemorySize);
+			if(writer) {
+				/* at the moment were observing all signals */
+				std::list<Signal*>* signalList = Signal::getSignalList();
+				for(std::list<Signal*>::iterator i = signalList->begin(); i != signalList->end(); i++) {
+					writer->addSignal(*i);
+				}
+			}
+		}
 	}
 	
 //	int shmInfoExchangeSize = maxNofSignals * (2 * kSignalIdSIze + kMaxLabelSize) + 2 * kLengthSize;
@@ -33,21 +29,16 @@ GlobalScope::GlobalScope(void* memory, uint32_t size) {
 
 GlobalScope::~GlobalScope() {
 	delete writer;
+	delete shm;
 }
 
 void GlobalScope::run() {
 	if(writer) {
 		writer->appendData();
-		
-// 		std::list<Signal*>* signalList = Signal::getSignalList();
-// 		RealSignalOutput* sig;
-// 		realSignalDatum* sigDat;
-// 		for(std::list<Signal*>::iterator i = signalList->begin(); i != signalList->end(); i++) {
-// 			sig = dynamic_cast<RealSignalOutput*>(*i);
-// 			if(sig) {
-// 				sigDat = new realSignalDatum(sig->getSignalId(), sig->getTimestamp(), sig->getValue());
-// 				writer->write<realSignalDatum>(sigDat);
-// 			}
-// 		}
 	}
+}
+
+void* GlobalScope::getSharedMemory() {
+	if(shm) return shm->getMemoryPointer();
+	return 0;
 }

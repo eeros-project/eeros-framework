@@ -22,9 +22,6 @@ class ExecutorService {
 public:
 	static int createNewThread(Executor* e);
 	static void waitForSequenceEnd(Executor* waitExecutor);
-#if defined(WINDOWS)
-	static HANDLE getHandle(int i);
-#endif
 
 private:
 	static int nofThreads;
