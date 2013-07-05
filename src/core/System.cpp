@@ -9,6 +9,8 @@
 #include <time.h>
 #endif
 
+#define NS_PER_SEC 1000000000
+
 uint64_t System::timeoffset = 0;
 
 System::System() {
@@ -25,8 +27,7 @@ double System::getTime() {
 #if defined(POSIX)
 	timespec tval;
 	clock_gettime(CLOCK_REALTIME, &tval); // TODO use clock_getres()...
-	if(System::timeoffset == 0)
-	{
+	if(System::timeoffset == 0) {
 		timeoffset = tval.tv_sec;
 	}
 	time = tval.tv_sec - timeoffset;
@@ -48,6 +49,23 @@ double System::getTime() {
 	t.QuadPart -= offset.QuadPart;
     double nanoseconds = (double)t.QuadPart / frequencyToNanoseconds;
 	time = nanoseconds / 1000000000.0;
+#endif
+	return time;
+}
+
+uint64_t System::getTimeNs() {
+	uint64_t time;
+#if defined(POSIX)
+	timespec tval;
+	clock_gettime(CLOCK_REALTIME, &tval); // TODO use clock_getres()...
+	if(System::timeoffset == 0) {
+		timeoffset = tval.tv_sec;
+	}
+	time = tval.tv_sec - (timeoffset * NS_PER_SEC);
+	time += tval.tv_nsec;
+#endif 
+#if defined(WINDOWS)
+	// TODO
 #endif
 	return time;
 }

@@ -36,8 +36,7 @@ int main() {
 	std::cout << "Martin Test 3 started..." << std::endl;
 	
 	std::cout << "Allocating memory (" << MEM_SIZE << " bytes)..." << std::endl;
-	//void* memory = malloc(MEM_SIZE);
-	SharedMemory shm("/eerosSHM", MEM_SIZE);
+	SharedMemory shm("/eeros.shm", MEM_SIZE);
 	int error = shm.initialize();
 	if(error) return error;
 	void* memory = shm.getMemoryPointer();
@@ -70,8 +69,8 @@ int main() {
 	}
 	
 	e1.addRunnable(step);
- 	e1.addRunnable(gain);
- 	e1.addRunnable(output);
+	e1.addRunnable(gain);
+	e1.addRunnable(output);
 	e1.addRunnable(globalScope);
 	
 	std::cout << "Creating reader..." << std::endl;
@@ -79,24 +78,24 @@ int main() {
 	e2.addRunnable(r);
 	
 	std::cout << "Starting executors..." << std::endl;
- 	e1.start();
+	e1.start();
 	e2.start();
 	
- 	std::cout << "Waiting for " << TIMETOWAIT << " seconds while executors are running" << std::endl;
- 	sleep(TIMETOWAIT);
+	std::cout << "Waiting for " << TIMETOWAIT << " seconds while executors are running" << std::endl;
+	sleep(TIMETOWAIT);
  
 	std::cout << "Stopping executors..." << std::endl;
- 	e1.stop();
- 	e2.stop();
+	e1.stop();
+	e2.stop();
 	
 	std::cout << "Waiting for executors to terminate..." << std::endl;
- 	while(!e1.isTerminated() && !e2.isTerminated());
+	while(!e1.isTerminated() && !e2.isTerminated());
+	while(!e1.isTerminated());
 	
- 	std::cout << "Output value = " << output.getIn().getValue() << std::endl;
+	std::cout << "Output value = " << output.getIn().getValue() << std::endl;
 	
 	std::cout << "Freeing memory (" << MEM_SIZE << " bytes)..." << std::endl;
-	//free(memory);
 	shm.destroy();
 	
- 	std::cout << "Test 3 done..." << std::endl;
+	std::cout << "Test 3 done..." << std::endl;
 }

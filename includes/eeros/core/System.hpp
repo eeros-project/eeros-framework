@@ -17,6 +17,7 @@ public:
 	virtual ~System();
 
 	static double getTime();
+	static uint64_t getTimeNs();
 	
 private:
 	static uint64_t timeoffset;

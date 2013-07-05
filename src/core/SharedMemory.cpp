@@ -22,11 +22,11 @@ uint32_t SharedMemory::getSize() const {
 }
 
 int SharedMemory::initialize() {
-	fd = shm_open(virtualPath.c_str(), (O_CREAT | O_RDWR | O_TRUNC), 0600);
+	fd = shm_open(virtualPath.c_str(), (O_CREAT | O_RDWR), 0600);
 	if(fd == -1) return kShmFileOpenError;
-	long pageSize = sysconf(_SC_PAGE_SIZE);
-	while(pageSize < size) pageSize += pageSize;
-	size = pageSize;
+//	long pageSize = sysconf(_SC_PAGE_SIZE);
+//	while(pageSize < size) pageSize += pageSize;
+//	size = pageSize;
 	if(ftruncate(fd, (off_t)size)) {
 		std::cout << errno;
 		return kShmTrucateError;
