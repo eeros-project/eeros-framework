@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include <eeros/core/Executor.hpp>
+#include <eeros/core/SharedMemory.hpp>
 #include <eeros/control/Step.hpp>
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/BlockOutput.hpp>
@@ -35,7 +36,11 @@ int main() {
 	std::cout << "Martin Test 3 started..." << std::endl;
 	
 	std::cout << "Allocating memory (" << MEM_SIZE << " bytes)..." << std::endl;
-	void* memory = malloc(MEM_SIZE);
+	//void* memory = malloc(MEM_SIZE);
+	SharedMemory shm("/eerosSHM", MEM_SIZE);
+	int error = shm.initialize();
+	if(error) return error;
+	void* memory = shm.getMemoryPointer();
 	
 	std::cout << "Creating executors..." << std::endl;
 	Executor e1(0.1); // 100 ms period time
@@ -90,7 +95,8 @@ int main() {
  	std::cout << "Output value = " << output.getIn().getValue() << std::endl;
 	
 	std::cout << "Freeing memory (" << MEM_SIZE << " bytes)..." << std::endl;
-	free(memory);
+	//free(memory);
+	shm.destroy();
 	
  	std::cout << "Test 3 done..." << std::endl;
 }
