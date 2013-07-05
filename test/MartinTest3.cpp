@@ -11,7 +11,7 @@
 #include <eeros/control/GlobalScope.hpp>
 #include <eeros/control/SignalBufferReader.hpp>
 
-#define TIMETOWAIT 5
+#define TIMETOWAIT 20
 
 class Reader : public Runnable {
 public:

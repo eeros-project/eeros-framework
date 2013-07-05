@@ -22,7 +22,7 @@ namespace eeros{
 			Sequence(std::string name, Sequencer& caller);
 			std::string getName();
 			void addCallBack(method callback);
-			std::list<Sequence::method>::iterator findCallBack(method callback, bool setCurrent) throw (...);
+			std::list<Sequence::method>::iterator findCallBack(method callback, bool setCurrent);
 			void setCurrentCallBack(std::list<Sequence::method>::iterator iter);
 			virtual void run();
 			virtual void fillCallBacks() = 0;

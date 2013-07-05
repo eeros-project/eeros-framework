@@ -55,7 +55,7 @@ std::string Sequencer::getName(){
 	return sequenceName;
 }
 
-Sequencer* Sequencer::findSequencer(std::string name) throw (...) {
+Sequencer* Sequencer::findSequencer(std::string name) {
 	std::list<Sequencer*>::iterator iter = subSequencers.begin();
 		while(iter != subSequencers.end()){
 			if((*iter)->getName().compare(name) == 0){

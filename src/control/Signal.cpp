@@ -13,10 +13,6 @@ Signal::~Signal() {
 	signalList.remove(this);
 }
 
-std::list<Signal*>* Signal::getSignalList() {
-	return &signalList;
-}
-
 uint32_t Signal::getSignalId() const {
 	return id;
 }
@@ -37,4 +33,14 @@ std::string Signal::getLabel(int index) const {
 
 sigtype_t Signal::getType() const {
 	return kSignalTypeUnknown;
+}
+
+std::list<Signal*>* Signal::getSignalList() {
+	return &signalList;
+}
+
+Signal* Signal::getSignalById(uint32_t id) {
+	std::list<Signal*>::iterator i = signalList.begin();
+	while((*i)->id != id && i != signalList.end()) i++;
+	return (*i);
 }

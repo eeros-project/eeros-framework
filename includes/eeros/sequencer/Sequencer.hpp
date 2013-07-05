@@ -22,7 +22,7 @@ namespace eeros{
 			void addSubSequencer(Sequencer* seq);
 			void deleteAllSubSequencers();
 			std::string getName();
-			Sequencer* findSequencer(std::string name) throw (...);
+			Sequencer* findSequencer(std::string name);
 			void deleteSequencer(std::string name);
 		protected:
 			

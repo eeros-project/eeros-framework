@@ -19,6 +19,7 @@ public:
 	virtual std::string getLabel(int index) const;
 	
 	static std::list<Signal*>* getSignalList();
+	static Signal* getSignalById(uint32_t id);
 
 protected:
 	sigid_t id; /**< unique signal id */

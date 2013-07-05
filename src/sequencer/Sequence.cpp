@@ -26,7 +26,7 @@ void Sequence::addCallBack(eeros::sequencer::Sequence::method callback){
 	callBacks.push_back(callback);
 }
 
-std::list<Sequence::method>::iterator Sequence::findCallBack(method callback, bool setCurrent) throw (...){
+std::list<Sequence::method>::iterator Sequence::findCallBack(method callback, bool setCurrent) {
 	std::list<Sequence::method>::iterator iter = callBacks.begin();
 	while(iter != callBacks.end()){
 		if(*iter == callback){
