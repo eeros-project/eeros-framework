@@ -83,6 +83,7 @@ int main() {
 	
 	std::cout << "Waiting for executors to terminate..." << std::endl;
 	while(!e1.isTerminated() && !e2.isTerminated());
+//	while(!e1.isTerminated());
 	
 	std::cout << "Output value = " << output.getIn().getValue() << std::endl;
 	

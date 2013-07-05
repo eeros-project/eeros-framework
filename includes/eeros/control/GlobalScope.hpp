@@ -28,7 +28,8 @@ public:
 	virtual void* getSharedMemory();
 
 private:
-	mqd_t msqDescriptor;
+	mqd_t inMsqDescriptor;
+	mqd_t outMsqDescriptor;
 	struct mq_attr msqStatBuffer;
 	char* pMsg;
 	

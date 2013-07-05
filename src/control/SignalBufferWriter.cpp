@@ -2,12 +2,15 @@
 #include <eeros/core/RingBuffer.hpp>
 #include <eeros/control/RealSignalOutput.hpp>
 
+#include <iostream>
+
 SignalBufferWriter::SignalBufferWriter(void* memory, uint32_t size) : SignalBuffer(memory, size) {
 	// nothing to do
 }
 
 void SignalBufferWriter::addSignal(Signal* signal) {
 	observedSignals.push_back(signal);
+	observedSignals.unique(); // remove dublicate elements
 	updateHeader();
 }
 
@@ -32,7 +35,6 @@ void SignalBufferWriter::appendData() {
 }
 
 void SignalBufferWriter::updateHeader() {
-	header->version++;
 	header->nofObservedSignals = 0;
 	int j = 0;
 	for(std::list<Signal*>::iterator i = observedSignals.begin(); i != observedSignals.end(); i++) {
@@ -42,4 +44,5 @@ void SignalBufferWriter::updateHeader() {
 			header->nofObservedSignals++;
 		}
 	}
+	header->version++;
 }
