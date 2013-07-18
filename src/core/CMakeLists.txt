@@ -1,8 +1,13 @@
 # Platform specific source files
 if(LINUX)
-add_eeros_sources(ExecutorService_Linux.cpp SharedMemory.cpp)
+	add_eeros_sources(SharedMemory.cpp)
+	if(XENOMAI)
+		add_eeros_sources(ExecutorService_Xenomai.cpp) 
+	else()
+		add_eeros_sources(ExecutorService_Linux.cpp)
+	endif()
 elseif(WINDOWS)
-add_eeros_sources(ExecutorService_Windows.cpp)
+	add_eeros_sources(ExecutorService_Windows.cpp)
 endif()
 
 # Platform independent source files 
