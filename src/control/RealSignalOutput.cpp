@@ -10,6 +10,7 @@ RealSignalOutput::RealSignalOutput(sigdim_t dim) : Signal(dim) {
 		this->dat[i].name = "unnamed";
 		this->dat[i].unit = "";
 		this->dat[i].coordinateSystem = "";
+		this->dat[i].sendingDirection = "ServerToClient";
 	}
 }
 
@@ -113,6 +114,16 @@ std::string RealSignalOutput::getCoordinateSystem(int index) const {
 	return empty;
 }
 
+std::string RealSignalOutput::getSendingDirection() const {
+	return getSendingDirection(0);
+}
+
+std::string RealSignalOutput::getSendingDirection(int index) const {
+	if(index < length) return dat[index].sendingDirection;
+    std::string empty;
+	return empty;
+}
+
 void RealSignalOutput::setValue(double newValue) {
 	setValue(newValue, 0);
 }
@@ -158,4 +169,12 @@ void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem) {
 
 void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem, int index) {
 	if(index < length) dat[index].coordinateSystem = coordinateSystem;
+}
+
+void RealSignalOutput::setSendingDirection(std::string sendingDirection) {
+	setSendingDirection(sendingDirection, 0);
+}
+
+void RealSignalOutput::setSendingDirection(std::string sendingDirection, int index) {
+	if(index < length) dat[index].sendingDirection = sendingDirection;
 }

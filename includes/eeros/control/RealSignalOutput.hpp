@@ -15,6 +15,7 @@ struct anDatum {
 	std::string name;
 	std::string unit;
 	std::string coordinateSystem;
+	std::string sendingDirection;
 };
 
 class RealSignalOutput : virtual public Signal, virtual public Output {
@@ -35,6 +36,8 @@ public:
 	virtual std::string getUnit(int index) const;
 	virtual std::string getCoordinateSystem() const;
 	virtual std::string getCoordinateSystem(int index) const;
+	virtual std::string getSendingDirection() const;
+	virtual std::string getSendingDirection(int index) const;
 	
 	virtual void setValue(double newValue);
 	virtual void setValue(double newValue, int index);
@@ -47,6 +50,8 @@ public:
 	virtual void setUnit(std::string unit, int index);
 	virtual void setCoordinateSystem(std::string coordinateSystem);
 	virtual void setCoordinateSystem(std::string coordinateSystem, int index);
+	virtual void setSendingDirection(std::string sendingDirection);
+	virtual void setSendingDirection(std::string sendingDirection, int index);
 
 private:
 	anDatum* dat;

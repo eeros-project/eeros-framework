@@ -1,7 +1,7 @@
 #include <eeros/control/Signal.hpp>
 #include <sstream>
 
-uint32_t Signal::signalCounter = 0;
+uint32_t Signal::signalCounter = 1;
 std::list<Signal*> Signal::signalList;
 
 Signal::Signal(sigdim_t dim) : length(dim) {

@@ -8,6 +8,7 @@
 
 //Forward Declarations
 class Signal;
+class RealSignalOutput;
 class SignalBufferWriter;
 class SharedMemory;
 
