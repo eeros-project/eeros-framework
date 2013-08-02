@@ -7,6 +7,7 @@
 
 class RealSignalInput : public Input {
 public:
+	virtual sigdim_t getDimension() const;
 	virtual double getValue();
 	virtual double getValue(int index);
 	virtual uint64_t getTimestamp();

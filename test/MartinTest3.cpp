@@ -55,7 +55,7 @@ int main() {
 	
 	std::cout << "Available signals:" << std::endl;
 	for(std::list<Signal*>::iterator i = Signal::getSignalList()->begin(); i != Signal::getSignalList()->end(); i++) {
-		uint32_t length = (*i)->getLength();
+		uint32_t length = (*i)->getDimension();
 		for(uint32_t j = 0; j < length; j++) {
 			std::cout << "  " << (*i)->getLabel(j) << std::endl;
 		}

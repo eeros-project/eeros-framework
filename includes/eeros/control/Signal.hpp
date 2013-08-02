@@ -13,7 +13,7 @@ public:
 	virtual ~Signal();
 	
 	virtual sigid_t getSignalId() const;
-	virtual sigdim_t getLength() const;
+	virtual sigdim_t getDimension() const;
 	virtual sigtype_t getType() const;
 	virtual std::string getLabel() const;
 	virtual std::string getLabel(int index) const;
@@ -23,7 +23,7 @@ public:
 
 protected:
 	sigid_t id; /**< unique signal id */
-	sigdim_t length; /**< number of elements in this signal */
+	sigdim_t dimension; /**< number of elements in this signal */
 
 	static std::list<Signal*> signalList;
 	static uint32_t signalCounter;
