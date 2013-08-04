@@ -43,20 +43,20 @@ void Step::run() {
 	if (first) {
 		stepTime += System::getTime();
 		first = false;
-		for(int i = 0; i < out.getDimension(); i++) {
+		for(int i = 0; i < out.getLength(); i++) {
 			out.setValue(initValue[i], i);
 		}
 		
 	}
 	if(!stepDone && System::getTime() >= stepTime) {
-		for(int i = 0; i < out.getDimension(); i++) {
+		for(int i = 0; i < out.getLength(); i++) {
 			out.setTimeStamp((uint64_t)(System::getTime() * 1000000000));
 			out.setValue(initValue[i] + stepHeight[i], i);
 		}
 		stepDone = true;
 	}
 	else {
-		for(int i = 0; i < out.getDimension(); i++) {
+		for(int i = 0; i < out.getLength(); i++) {
 			out.setTimeStamp((uint64_t)(System::getTime() * 1000000000));
 		}
 	}

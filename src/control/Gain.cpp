@@ -24,7 +24,7 @@ Gain::~Gain() {
 
 void Gain::run()
 {
-	for(int i = 0; i < out.getDimension(); i++)
+	for(int i = 0; i < out.getLength(); i++)
 	{
 		if(enabled) out.setValue(in.getValue(i) * gain[i], i);
 		else out.setValue(in.getValue(i), i);

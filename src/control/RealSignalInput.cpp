@@ -1,13 +1,6 @@
 #include <eeros/control/RealSignalInput.hpp>
 #include <eeros/control/RealSignalOutput.hpp>
 
-sigdim_t RealSignalInput::getDimension() const {
-	if(connectedOutput) {
-		return dynamic_cast<RealSignalOutput*>(connectedOutput)->getDimension();
-	}
-	return 0;
-}
-
 double RealSignalInput::getValue() {
 	return getValue(0);
 }

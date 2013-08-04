@@ -2,6 +2,7 @@
 #include <sstream>
 
 RealSignalOutput::RealSignalOutput(sigdim_t dim) : Signal(dim) {
+	this->length = dim;
 	this->dat = new anDatum[dim];
 	for(sigdim_t i = 0; i < dim; i++) {
 		this->dat[i].value = 0;
@@ -45,7 +46,7 @@ RealSignalOutput::RealSignalOutput(sigdim_t dim) : Signal(dim) {
 // }
 
 RealSignalOutput::~RealSignalOutput() {
-	for (int i = 0; i < dimension; i++) {
+	for (int i = 0; i < length; i++) {
 		//delete &(dat[i]);
 	}
 	signalList.remove(this);
@@ -70,7 +71,7 @@ double RealSignalOutput::getValue() const {
 }
 
 double RealSignalOutput::getValue(int index) const {
-	if(index < dimension) return dat[index].value;
+	if(index < length) return dat[index].value;
 	return 0;
 }
 
@@ -79,7 +80,7 @@ uint64_t RealSignalOutput::getTimestamp() const {
 }
 
 uint64_t RealSignalOutput::getTimestamp(int index) const {
-	if(index < dimension) return dat[index].timestamp;
+	if(index < length) return dat[index].timestamp;
 	return 0;
 }
 
@@ -88,7 +89,7 @@ std::string RealSignalOutput::getName() const {
 }
 
 std::string RealSignalOutput::getName(int index) const {
-	if(index < dimension) return dat[index].name;
+	if(index < length) return dat[index].name;
     std::string empty;
 	return empty;
 }
@@ -98,7 +99,7 @@ std::string RealSignalOutput::getUnit() const {
 }
 
 std::string RealSignalOutput::getUnit(int index) const {
-	if(index < dimension) return dat[index].unit;
+	if(index < length) return dat[index].unit;
     std::string empty;
 	return empty;
 }
@@ -108,7 +109,7 @@ std::string RealSignalOutput::getCoordinateSystem() const {
 }
 
 std::string RealSignalOutput::getCoordinateSystem(int index) const {
-	if(index < dimension) return dat[index].coordinateSystem;
+	if(index < length) return dat[index].coordinateSystem;
     std::string empty;
 	return empty;
 }
@@ -118,7 +119,7 @@ std::string RealSignalOutput::getSendingDirection() const {
 }
 
 std::string RealSignalOutput::getSendingDirection(int index) const {
-	if(index < dimension) return dat[index].sendingDirection;
+	if(index < length) return dat[index].sendingDirection;
     std::string empty;
 	return empty;
 }
@@ -132,7 +133,7 @@ void RealSignalOutput::setValue(double newValue, int index) {
 }
 
 void RealSignalOutput::setValue(double newValue[]) { // TODO check if array lenght > length
-	for(int i = 0; i < dimension; i++)
+	for(int i = 0; i < length; i++)
 	{
 		dat[i].value = newValue[i];
 	}
@@ -143,7 +144,7 @@ void RealSignalOutput::setTimeStamp(uint64_t timestamp) {
 }
 
 void RealSignalOutput::setTimeStamp(uint64_t timestamp, int index) {
-	if(index < dimension) dat[index].timestamp = timestamp;
+	if(index < length) dat[index].timestamp = timestamp;
 }
 
 void RealSignalOutput::setName(std::string signalName) {
@@ -151,7 +152,7 @@ void RealSignalOutput::setName(std::string signalName) {
 }
 
 void RealSignalOutput::setName(std::string signalName, int index) {
-	if(index < dimension) dat[index].name = signalName;
+	if(index < length) dat[index].name = signalName;
 }
 
 void RealSignalOutput::setUnit(std::string unit) {
@@ -159,7 +160,7 @@ void RealSignalOutput::setUnit(std::string unit) {
 }
 
 void RealSignalOutput::setUnit(std::string unit, int index) {
-	if(index < dimension) dat[index].unit = unit;
+	if(index < length) dat[index].unit = unit;
 }
 
 void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem) {
@@ -167,7 +168,7 @@ void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem) {
 }
 
 void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem, int index) {
-	if(index < dimension) dat[index].coordinateSystem = coordinateSystem;
+	if(index < length) dat[index].coordinateSystem = coordinateSystem;
 }
 
 void RealSignalOutput::setSendingDirection(std::string sendingDirection) {
@@ -175,5 +176,5 @@ void RealSignalOutput::setSendingDirection(std::string sendingDirection) {
 }
 
 void RealSignalOutput::setSendingDirection(std::string sendingDirection, int index) {
-	if(index < dimension) dat[index].sendingDirection = sendingDirection;
+	if(index < length) dat[index].sendingDirection = sendingDirection;
 }
