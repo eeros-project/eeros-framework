@@ -13,7 +13,7 @@ public:
 	virtual ~Signal();
 	
 	virtual sigid_t getSignalId() const;
-	virtual sigdim_t getLength() const;
+	virtual sigdim_t getDimension() const;
 	virtual sigtype_t getType() const;
 	virtual std::string getLabel() const;
 	virtual std::string getLabel(int index) const;

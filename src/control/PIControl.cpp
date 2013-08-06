@@ -44,7 +44,7 @@ void PIControl::setAntiWindupLimits(double lowerLimit, double upperLimit) {
 }
 
 void PIControl::setAntiWindupLimits(double lowerLimits[], double upperLimits[]) {
-	for (uint32_t i = 0; i < out.getLength(); i++) {
+	for (uint32_t i = 0; i < out.getDimension(); i++) {
 		antiWindupLowerLimits[i] = lowerLimits[i];
 		antiWindupUpperLimits[i] = upperLimits[i];
 	}
@@ -56,7 +56,7 @@ void PIControl::run() {
     	previousTime = time;
     	firstRun = false;
     }
-	for(int i = 0; i < out.getLength(); i++) {
+	for(int i = 0; i < out.getDimension(); i++) {
         double ep = in2.getValue(i) - in1.getValue(i);
         integrals[i] += ep * ((time - previousTime) * 1e-12);
         double ei = kis[i] * integrals[i];

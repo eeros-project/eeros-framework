@@ -17,7 +17,7 @@ uint32_t Signal::getSignalId() const {
 	return id;
 }
 
-uint32_t Signal::getLength() const {
+uint32_t Signal::getDimension() const {
     return length;
 }
 
