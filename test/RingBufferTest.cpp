@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ostream>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <eeros/core/RingBuffer.hpp>
 #include <eeros/core/Runnable.hpp>
