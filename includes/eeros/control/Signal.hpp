@@ -23,7 +23,7 @@ public:
 
 protected:
 	sigid_t id; /**< unique signal id */
-	sigdim_t length; /**< number of elements in this signal */
+	sigdim_t dimension; /**< number of elements in this signal */
 
 	static std::list<Signal*> signalList;
 	static uint32_t signalCounter;

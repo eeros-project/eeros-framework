@@ -64,7 +64,7 @@ void GlobalScope::run() {
 			for(std::list<Signal*>::iterator i = signalList->begin(); i != signalList->end(); i++) {
 				std::stringstream ss;
 				RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(*i);
-				ss << realSignal->getSignalId() << '\x1D' << realSignal->getLabel() << '\x1D' <<  realSignal->getUnit() << '\x1D' << realSignal->getCoordinateSystem() << '\x1D' << realSignal->getSendingDirection();
+				ss << realSignal->getSignalId() << '\x1D' << realSignal->getLabel() << '\x1D' << realSignal->getSendingDirection();
 				if(mq_send(outMsqDescriptor, ss.str().c_str(), ss.str().length() + 1, 0)) {
 					std::cout << "ERROR while sending signal info...";
 					break;

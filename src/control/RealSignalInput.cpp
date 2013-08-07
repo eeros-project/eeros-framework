@@ -12,7 +12,7 @@ double RealSignalInput::getValue(int index) {
 	return 0;
 }
 
-double RealSignalInput::getDimension() {
+sigdim_t RealSignalInput::getDimension() {
 	if(connectedOutput) {
 		return dynamic_cast<RealSignalOutput*>(connectedOutput)->getDimension();
 	}

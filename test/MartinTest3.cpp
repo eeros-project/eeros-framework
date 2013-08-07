@@ -2,7 +2,6 @@
 #include <ostream>
 #include <fstream>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include <eeros/core/Executor.hpp>
 #include <eeros/core/SharedMemory.hpp>
@@ -43,10 +42,12 @@ int main() {
 	Step step(1.0, 5.0, 1.0);
 	step.getOut().setName("M");
 	step.getOut().setUnit("Nm");
+	step.getOut().setCoordinateSystem("ddx");
 	
 	Gain gain(10);
 	gain.getOut().setName("I");
 	gain.getOut().setUnit("A");
+	gain.getOut().setCoordinateSystem("ddy");
 	
 	BlockOutput output;
 	GlobalScope globalScope;
