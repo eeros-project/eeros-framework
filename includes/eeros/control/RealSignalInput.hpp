@@ -9,6 +9,7 @@ class RealSignalInput : public Input {
 public:
 	virtual double getValue();
 	virtual double getValue(int index);
+	virtual double getDimension();
 	virtual uint64_t getTimestamp();
 	virtual uint64_t getTimestamp(int index);	
 	virtual std::string getName();

@@ -12,6 +12,13 @@ double RealSignalInput::getValue(int index) {
 	return 0;
 }
 
+double RealSignalInput::getDimension() {
+	if(connectedOutput) {
+		return dynamic_cast<RealSignalOutput*>(connectedOutput)->getDimension();
+	}
+	return 0;
+}
+
 uint64_t RealSignalInput::getTimestamp() {
 	return getTimestamp(0);
 }
