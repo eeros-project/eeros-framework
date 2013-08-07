@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ostream>
+#include <unistd.h>
 
 #include <eeros/core/Executor.hpp>
 #include <eeros/core/Runnable.hpp>
