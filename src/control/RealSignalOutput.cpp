@@ -62,7 +62,13 @@ std::string RealSignalOutput::getLabel() const {
 
 std::string RealSignalOutput::getLabel(int index) const {
 	std::stringstream label;
-	label << '#' << id << '/' << index << ": " << getName(index) << '_' << getCoordinateSystem(index) << " [" << getUnit(index) << ']';
+	label << '#' << id << '/' << index << ": " << getName(index);
+	if (getCoordinateSystem(index) != "") {
+		label << '_' << getCoordinateSystem(index);
+	}
+	if (getUnit(index) != "") {
+		label << " [" << getUnit(index) << ']';
+	}
 	return label.str();
 }
 
