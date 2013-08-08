@@ -8,27 +8,26 @@ SignalBufferWriter::SignalBufferWriter(void* memory, uint32_t size) : SignalBuff
 	// nothing to do
 }
 
-void SignalBufferWriter::addSignal(Signal* signal) {
-	observedSignals.push_back(signal);
-	observedSignals.unique(); // remove dublicate elements
+void SignalBufferWriter::addSignal(sigid_t id) {
+	observedSignalIds.push_back(id);
+	// Remove duplicates
+	observedSignalIds.unique();
 	updateHeader();
 }
 
-void SignalBufferWriter::removeSignal(Signal* signal) {
-	observedSignals.remove(signal);
+void SignalBufferWriter::removeSignal(sigid_t id) {
+	observedSignalIds.remove(id);
 	updateHeader();
 }
 
 void SignalBufferWriter::appendData() {
-	RealSignalOutput* sig; // TODO change to RealSignal
-	uint64_t timestamp;
-	double value;
-	for(std::list<Signal*>::iterator i = observedSignals.begin(); i != observedSignals.end(); i++) {
-		sig = dynamic_cast<RealSignalOutput*>(*i);
-		if(sig) {
-			timestamp = sig->getTimestamp();
+	for(std::list<sigid_t>::iterator i = observedSignalIds.begin(); i != observedSignalIds.end(); i++) {
+		Signal* signal = Signal::getSignalById(*i);
+		RealSignalOutput* realSignalOutput = dynamic_cast<RealSignalOutput*>(signal);
+		if(realSignalOutput) {
+			uint64_t timestamp = realSignalOutput->getTimestamp();
 			buffer->write(&timestamp, sizeof(timestamp));
-			value = sig->getValue();
+			double value = realSignalOutput->getValue();
 			buffer->write(&value, sizeof(value));
 		}
 	}
@@ -37,10 +36,11 @@ void SignalBufferWriter::appendData() {
 void SignalBufferWriter::updateHeader() {
 	header->nofObservedSignals = 0;
 	int j = 0;
-	for(std::list<Signal*>::iterator i = observedSignals.begin(); i != observedSignals.end(); i++) {
+	for(std::list<uint32_t>::iterator i = observedSignalIds.begin(); i != observedSignalIds.end(); i++) {
 		if(j < kMaxNofObservableSignals * 2) {
-			header->signalInfo[j++] = (*i)->getSignalId();
-			header->signalInfo[j++] = (*i)->getType();
+			Signal* signal = Signal::getSignalById(*i);
+			header->signalInfo[j++] = signal->getSignalId();
+			header->signalInfo[j++] = signal->getType();
 			header->nofObservedSignals++;
 		}
 	}

@@ -13,6 +13,7 @@ public:
 	virtual ~Signal();
 	
 	virtual sigid_t getSignalId() const;
+	virtual sigid_t getSignalId(sigindex_t index) const;
 	virtual sigdim_t getDimension() const;
 	virtual sigtype_t getType() const;
 	virtual std::string getLabel() const;
@@ -22,11 +23,11 @@ public:
 	static Signal* getSignalById(uint32_t id);
 
 protected:
-	sigid_t id; /**< unique signal id */
+	sigmajorid_t majorId; /**< unique signal id */
 	sigdim_t dimension; /**< number of elements in this signal */
 
 	static std::list<Signal*> signalList;
-	static uint32_t signalCounter;
+	static uint16_t signalCounter;
 };
 
 #endif /* ORG_EEROS_CONTROL_SIGNAL_HPP_ */

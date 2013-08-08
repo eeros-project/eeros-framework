@@ -62,7 +62,7 @@ std::string RealSignalOutput::getLabel() const {
 
 std::string RealSignalOutput::getLabel(int index) const {
 	std::stringstream label;
-	label << '#' << id << '/' << index << ": " << getName(index);
+	label << '#' << majorId << '/' << index << ": " << getName(index);
 	if (getCoordinateSystem(index) != "") {
 		label << '_' << getCoordinateSystem(index);
 	}
@@ -139,14 +139,15 @@ void RealSignalOutput::setValue(double newValue, int index) {
 }
 
 void RealSignalOutput::setValue(double newValue[]) { // TODO check if array lenght > length
-	for(int i = 0; i < dimension; i++)
-	{
+	for(int i = 0; i < dimension; i++) {
 		dat[i].value = newValue[i];
 	}
 }
 
 void RealSignalOutput::setTimeStamp(uint64_t timestamp) {
-	setTimeStamp(timestamp, 0);
+	for(int i = 0; i < dimension; i++) {
+		dat[i].timestamp = timestamp;
+	}
 }
 
 void RealSignalOutput::setTimeStamp(uint64_t timestamp, int index) {
@@ -154,7 +155,9 @@ void RealSignalOutput::setTimeStamp(uint64_t timestamp, int index) {
 }
 
 void RealSignalOutput::setName(std::string signalName) {
-	setName(signalName, 0);
+	for(int i = 0; i < dimension; i++) {
+		dat[i].name = signalName;
+	}
 }
 
 void RealSignalOutput::setName(std::string signalName, int index) {
@@ -162,7 +165,9 @@ void RealSignalOutput::setName(std::string signalName, int index) {
 }
 
 void RealSignalOutput::setUnit(std::string unit) {
-	setUnit(unit, 0);
+	for(int i = 0; i < dimension; i++) {
+		dat[i].unit = unit;
+	}
 }
 
 void RealSignalOutput::setUnit(std::string unit, int index) {
@@ -170,7 +175,9 @@ void RealSignalOutput::setUnit(std::string unit, int index) {
 }
 
 void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem) {
-	setCoordinateSystem(coordinateSystem, 0);
+	for(int i = 0; i < dimension; i++) {
+		dat[i].coordinateSystem = coordinateSystem;
+	}
 }
 
 void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem, int index) {
@@ -178,7 +185,9 @@ void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem, int ind
 }
 
 void RealSignalOutput::setSendingDirection(std::string sendingDirection) {
-	setSendingDirection(sendingDirection, 0);
+	for(int i = 0; i < dimension; i++) {
+		dat[i].sendingDirection = sendingDirection;
+	}
 }
 
 void RealSignalOutput::setSendingDirection(std::string sendingDirection, int index) {

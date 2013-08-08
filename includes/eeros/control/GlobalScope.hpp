@@ -13,8 +13,10 @@ class SignalBufferWriter;
 class SharedMemory;
 
 enum { 
-	kMsqMsgSize = 1024, 
+	kMsqMsgSize = 1024,
 	kMsqMaxMsgs = 10 // has to be smaller or equal to /proc/sys/fs/mqueue/msg_max
+	// IMPORTANT: kMsqMsgSize * kMsqMaxMsgs must not be bigger than RLIMIT_MSGQUEUE.
+	// You can get RLIMIT_MSGQUEUE with command "ulimit -q".
 };
 
 enum { kSharedMemorySize = 1048576 }; // 1 MB

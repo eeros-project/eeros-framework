@@ -10,14 +10,14 @@ class Signal;
 class SignalBufferWriter : public SignalBuffer {
 public:
     SignalBufferWriter(void* memory, uint32_t size);
-	void addSignal(Signal* signal);
-	void removeSignal(Signal* signal);
+	void addSignal(sigid_t id);
+	void removeSignal(sigid_t id);
 	void appendData();
 	
 private:
 	void updateHeader();
 	
-	std::list<Signal*> observedSignals;
+	std::list<sigid_t> observedSignalIds;
 };
 
 #endif // ORG_EEROS_CONTROL_SIGNALBUFFERWRITER_HPP_
