@@ -60,7 +60,7 @@ std::string RealSignalOutput::getLabel() const {
 	return getLabel(0);
 }
 
-std::string RealSignalOutput::getLabel(int index) const {
+std::string RealSignalOutput::getLabel(sigindex_t index) const {
 	std::stringstream label;
 	label << '#' << majorId << '/' << index << ": " << getName(index);
 	if (getCoordinateSystem(index) != "") {
@@ -76,7 +76,7 @@ double RealSignalOutput::getValue() const {
 	return getValue(0);
 }
 
-double RealSignalOutput::getValue(int index) const {
+double RealSignalOutput::getValue(sigindex_t index) const {
 	if(index < dimension) return dat[index].value;
 	return 0;
 }
@@ -85,7 +85,7 @@ uint64_t RealSignalOutput::getTimestamp() const {
 	return getTimestamp(0);
 }
 
-uint64_t RealSignalOutput::getTimestamp(int index) const {
+uint64_t RealSignalOutput::getTimestamp(sigindex_t index) const {
 	if(index < dimension) return dat[index].timestamp;
 	return 0;
 }
@@ -94,7 +94,7 @@ std::string RealSignalOutput::getName() const {
 	return getName(0);
 }
 
-std::string RealSignalOutput::getName(int index) const {
+std::string RealSignalOutput::getName(sigindex_t index) const {
 	if(index < dimension) return dat[index].name;
     std::string empty;
 	return empty;
@@ -104,7 +104,7 @@ std::string RealSignalOutput::getUnit() const {
 	return getUnit(0);
 }
 
-std::string RealSignalOutput::getUnit(int index) const {
+std::string RealSignalOutput::getUnit(sigindex_t index) const {
 	if(index < dimension) return dat[index].unit;
     std::string empty;
 	return empty;
@@ -114,7 +114,7 @@ std::string RealSignalOutput::getCoordinateSystem() const {
 	return getCoordinateSystem(0);
 }
 
-std::string RealSignalOutput::getCoordinateSystem(int index) const {
+std::string RealSignalOutput::getCoordinateSystem(sigindex_t index) const {
 	if(index < dimension) return dat[index].coordinateSystem;
     std::string empty;
 	return empty;
@@ -124,7 +124,7 @@ std::string RealSignalOutput::getSendingDirection() const {
 	return getSendingDirection(0);
 }
 
-std::string RealSignalOutput::getSendingDirection(int index) const {
+std::string RealSignalOutput::getSendingDirection(sigindex_t index) const {
 	if(index < dimension) return dat[index].sendingDirection;
     std::string empty;
 	return empty;
@@ -134,7 +134,7 @@ void RealSignalOutput::setValue(double newValue) {
 	setValue(newValue, 0);
 }
 
-void RealSignalOutput::setValue(double newValue, int index) {
+void RealSignalOutput::setValue(double newValue, sigindex_t index) {
 	dat[index].value = newValue;
 }
 
@@ -150,7 +150,7 @@ void RealSignalOutput::setTimeStamp(uint64_t timestamp) {
 	}
 }
 
-void RealSignalOutput::setTimeStamp(uint64_t timestamp, int index) {
+void RealSignalOutput::setTimeStamp(uint64_t timestamp, sigindex_t index) {
 	if(index < dimension) dat[index].timestamp = timestamp;
 }
 
@@ -160,7 +160,7 @@ void RealSignalOutput::setName(std::string signalName) {
 	}
 }
 
-void RealSignalOutput::setName(std::string signalName, int index) {
+void RealSignalOutput::setName(std::string signalName, sigindex_t index) {
 	if(index < dimension) dat[index].name = signalName;
 }
 
@@ -170,7 +170,7 @@ void RealSignalOutput::setUnit(std::string unit) {
 	}
 }
 
-void RealSignalOutput::setUnit(std::string unit, int index) {
+void RealSignalOutput::setUnit(std::string unit, sigindex_t index) {
 	if(index < dimension) dat[index].unit = unit;
 }
 
@@ -180,7 +180,7 @@ void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem) {
 	}
 }
 
-void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem, int index) {
+void RealSignalOutput::setCoordinateSystem(std::string coordinateSystem, sigindex_t index) {
 	if(index < dimension) dat[index].coordinateSystem = coordinateSystem;
 }
 
@@ -190,6 +190,6 @@ void RealSignalOutput::setSendingDirection(std::string sendingDirection) {
 	}
 }
 
-void RealSignalOutput::setSendingDirection(std::string sendingDirection, int index) {
+void RealSignalOutput::setSendingDirection(std::string sendingDirection, sigindex_t index) {
 	if(index < dimension) dat[index].sendingDirection = sendingDirection;
 }

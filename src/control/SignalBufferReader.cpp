@@ -19,7 +19,7 @@ uint32_t SignalBufferReader::signalTypeAvailableToRead() {
 	return kSignalTypeUnknown;
 }
 
-bool SignalBufferReader::readRealSignal(uint32_t* id, uint64_t* timestamp, double* value) {
+bool SignalBufferReader::readRealSignal(sigid_t* id, uint64_t* timestamp, double* value) {
 	if(signalTypeAvailableToRead() == kSignalTypeReal) {
 		*id = getSignalId(readIndex);
 		buffer->read(timestamp, sizeof(*timestamp));
@@ -30,16 +30,16 @@ bool SignalBufferReader::readRealSignal(uint32_t* id, uint64_t* timestamp, doubl
 	return false;
 }
 
-sigtype_t SignalBufferReader::getSignalType(int index) {
-	if(index >= 0 && index < nofObservedSignals()) {
-		return header->signalInfo[index * 2 + 1];
+sigtype_t SignalBufferReader::getSignalType(int readIndex) {
+	if(readIndex >= 0 && readIndex < nofObservedSignals()) {
+		return header->signalInfo[readIndex * 2 + 1];
 	}
 	return kSignalTypeUnknown;
 }
 
-sigid_t SignalBufferReader::getSignalId(int index) {
-	if(index >= 0 && index < nofObservedSignals()) {
-		return header->signalInfo[index * 2];
+sigid_t SignalBufferReader::getSignalId(int readIndex) {
+	if(readIndex >= 0 && readIndex < nofObservedSignals()) {
+		return header->signalInfo[readIndex * 2];
 	}
 	return kSignalIdInvalid;
 }

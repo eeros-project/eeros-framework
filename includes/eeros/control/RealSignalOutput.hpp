@@ -25,33 +25,33 @@ public:
 
 	virtual sigtype_t getType() const;
 	virtual std::string getLabel() const;
-	virtual std::string getLabel(int index) const;
+	virtual std::string getLabel(sigindex_t index) const;
 	virtual double getValue() const;
-	virtual double getValue(int index) const;
+	virtual double getValue(sigindex_t index) const;
 	virtual uint64_t getTimestamp() const;
-	virtual uint64_t getTimestamp(int index) const;
+	virtual uint64_t getTimestamp(sigindex_t index) const;
 	virtual std::string getName() const;
-	virtual std::string getName(int index) const;
+	virtual std::string getName(sigindex_t index) const;
 	virtual std::string getUnit() const;
-	virtual std::string getUnit(int index) const;
+	virtual std::string getUnit(sigindex_t index) const;
 	virtual std::string getCoordinateSystem() const;
-	virtual std::string getCoordinateSystem(int index) const;
+	virtual std::string getCoordinateSystem(sigindex_t index) const;
 	virtual std::string getSendingDirection() const;
-	virtual std::string getSendingDirection(int index) const;
+	virtual std::string getSendingDirection(sigindex_t index) const;
 	
 	virtual void setValue(double newValue);
-	virtual void setValue(double newValue, int index);
+	virtual void setValue(double newValue, sigindex_t index);
 	virtual void setValue(double newValue[]);
 	virtual void setTimeStamp(uint64_t timestamp);
-	virtual void setTimeStamp(uint64_t timestamp, int index);
+	virtual void setTimeStamp(uint64_t timestamp, sigindex_t index);
 	virtual void setName(std::string signalName);
-	virtual void setName(std::string signalName, int index);
+	virtual void setName(std::string signalName, sigindex_t index);
 	virtual void setUnit(std::string unit);
-	virtual void setUnit(std::string unit, int index);
+	virtual void setUnit(std::string unit, sigindex_t index);
 	virtual void setCoordinateSystem(std::string coordinateSystem);
-	virtual void setCoordinateSystem(std::string coordinateSystem, int index);
+	virtual void setCoordinateSystem(std::string coordinateSystem, sigindex_t index);
 	virtual void setSendingDirection(std::string sendingDirection);
-	virtual void setSendingDirection(std::string sendingDirection, int index);
+	virtual void setSendingDirection(std::string sendingDirection, sigindex_t index);
 
 private:
 	anDatum* dat;

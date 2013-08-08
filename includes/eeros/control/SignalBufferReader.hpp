@@ -20,11 +20,11 @@ public:
 	SignalBufferReader(void* memory, uint32_t size);
 	uint32_t nofObservedSignals();
 	uint32_t signalTypeAvailableToRead();
-	bool readRealSignal(uint32_t* id, uint64_t* timestamp, double* value);
+	bool readRealSignal(sigid_t* id, uint64_t* timestamp, double* value);
 	
 private:
-	sigtype_t getSignalType(int index);
-	sigid_t getSignalId(int index);
+	sigtype_t getSignalType(int readIndex);
+	sigid_t getSignalId(int readIndex);
 	uint32_t getSignalDataSize(sigtype_t signalType);
 	void incrementReadIndex();
 	

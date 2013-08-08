@@ -12,7 +12,7 @@ public:
 	Signal(sigdim_t dim);
 	virtual ~Signal();
 	
-	virtual sigid_t getSignalId() const;
+	virtual sigmajorid_t getMajorId() const;
 	virtual sigid_t getSignalId(sigindex_t index) const;
 	virtual sigdim_t getDimension() const;
 	virtual sigtype_t getType() const;

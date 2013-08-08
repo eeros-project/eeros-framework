@@ -13,12 +13,14 @@ Signal::~Signal() {
 	signalList.remove(this);
 }
 
-sigid_t Signal::getSignalId() const {
-	return ((sigid_t) majorId) << 16;
+sigmajorid_t Signal::getMajorId() const {
+	return majorId;
 }
 
 sigid_t Signal::getSignalId(sigindex_t index) const {
-	return (((sigid_t) majorId) << 16) || index;
+	sigid_t id = ((sigid_t) majorId) << 16;
+	id |= index;
+	return id;
 }
 
 sigdim_t Signal::getDimension() const {
@@ -45,8 +47,12 @@ std::list<Signal*>* Signal::getSignalList() {
 
 Signal* Signal::getSignalById(sigid_t id) {
 	std::list<Signal*>::iterator i = signalList.begin();
-	while ((*i)->getSignalId() != id && i != signalList.end()) {
+	while (i != signalList.end()) {
+		id >>= 16;
+		if ((*i)->getMajorId() == id) {
+			return (*i);
+		}
 		i++;
 	}
-	return (*i);
+	return NULL;
 }

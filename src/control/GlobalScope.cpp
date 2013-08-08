@@ -50,40 +50,42 @@ GlobalScope::~GlobalScope() {
 void GlobalScope::run() {
 	/* check for messages */
 	uint32_t msgPrio;
-	int ret = mq_receive(inMsqDescriptor, pMsg, kMsqMsgSize, &msgPrio);
-	if (ret == -1) {
-		// No message received
-		return;
-	}
-	if (pMsg[0] == 'a' || pMsg[0] == 'r') {
-		sigid_t signalId = *(reinterpret_cast<uint32_t*>(pMsg + 1));
-		if (signalId != 0 && writer) {
-			if (pMsg[0] == 'a') {
-				std::cout << "add: " << signalId << std::endl;
-				writer->addSignal(signalId);
-			} else if (pMsg[0] == 'r') {
-				std::cout << "remove: " << signalId << std::endl;
-				writer->removeSignal(signalId);
+	int32_t ret = mq_receive(inMsqDescriptor, pMsg, kMsqMsgSize, &msgPrio);
+	if (ret > 0) {
+		if (pMsg[0] == 'a' || pMsg[0] == 'r') {
+			sigid_t signalId = *(reinterpret_cast<sigid_t*>(pMsg + 1));
+			if (signalId != 0 && writer) {
+				if (pMsg[0] == 'a') {
+					std::cout << "add: " << signalId << std::endl;
+					writer->addSignal(signalId);
+				} else if (pMsg[0] == 'r') {
+					std::cout << "remove: " << signalId << std::endl;
+					writer->removeSignal(signalId);
+				}
 			}
-		}
-	} else if (pMsg[0] == 'l') {
-		std::list<Signal*>* signalList = Signal::getSignalList();
-		for (std::list<Signal*>::iterator i = signalList->begin(); i != signalList->end(); i++) {
-			std::stringstream ss;
-			RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(*i);
-			ss << realSignal->getSignalId() << '\x1D' << realSignal->getLabel() << '\x1D' << realSignal->getSendingDirection();
-			if (mq_send(outMsqDescriptor, ss.str().c_str(), ss.str().length() + 1, 0)) {
-				std::cout << "ERROR while sending signal info...";
-				break;
+		} else if (pMsg[0] == 'l') {
+			std::list<Signal*>* signalList = Signal::getSignalList();
+			for (std::list<Signal*>::iterator it = signalList->begin(); it != signalList->end(); it++) {
+				RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(*it);
+				for (int32_t i = 0; i < realSignal->getDimension(); i++) {
+					std::stringstream ss;
+					// clear the steam
+					ss.str(std::string());
+					ss << realSignal->getSignalId(i) << '\x1D' << realSignal->getLabel(i) << '\x1D' << realSignal->getSendingDirection(i);
+					if (mq_send(outMsqDescriptor, ss.str().c_str(), ss.str().length() + 1, 0)) {
+						std::cout << "ERROR while sending signal info...";
+						break;
+					}
+				}
 			}
+			pMsg[0] = 'e';
+			pMsg[1] = 0;
+			if (mq_send(outMsqDescriptor, pMsg, 2, 0)) { // send end of list
+				std::cout << "ERROR while sending end of list...";
+			}
+		} else {
+			// nothing to do...
 		}
-		pMsg[0] = 'e';
-		pMsg[1] = 0;
-		if (mq_send(outMsqDescriptor, pMsg, 2, 0)) { // send end of list
-			std::cout << "ERROR while sending end of list...";
-		}
-	} else {
-		// nothing to do...
 	}
 	
 	/* copy observed signals to shared memory */
