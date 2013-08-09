@@ -39,6 +39,9 @@ void SignalBufferWriter::updateHeader() {
 	for(std::list<sigid_t>::iterator i = observedSignalIds.begin(); i != observedSignalIds.end(); i++) {
 		if(j < kMaxNofObservableSignals * 2) {
 			Signal* signal = Signal::getSignalById(*i);
+			if (signal == NULL) {
+				throw 13;
+			}
 			header->signalInfo[j++] = signal->getSignalId((sigindex_t)*i);
 			header->signalInfo[j++] = signal->getType();
 			header->nofObservedSignals++;

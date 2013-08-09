@@ -17,10 +17,10 @@ public:
 	virtual sigdim_t getDimension() const;
 	virtual sigtype_t getType() const;
 	virtual std::string getLabel() const;
-	virtual std::string getLabel(int index) const;
+	virtual std::string getLabel(sigindex_t index) const;
 	
 	static std::list<Signal*>* getSignalList();
-	static Signal* getSignalById(uint32_t id);
+	static Signal* getSignalById(sigid_t id);
 
 protected:
 	sigmajorid_t majorId; /**< unique signal id */

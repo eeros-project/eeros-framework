@@ -31,7 +31,7 @@ std::string Signal::getLabel() const {
 	return getLabel(0);
 }
 
-std::string Signal::getLabel(int index) const {
+std::string Signal::getLabel(sigindex_t index) const {
 	std::stringstream label;
 	label << '#' << majorId << '/' << index;
 	return label.str();
@@ -44,11 +44,10 @@ sigtype_t Signal::getType() const {
 std::list<Signal*>* Signal::getSignalList() {
 	return &signalList;
 }
-
 Signal* Signal::getSignalById(sigid_t id) {
 	std::list<Signal*>::iterator i = signalList.begin();
+	id >>= 16;
 	while (i != signalList.end()) {
-		id >>= 16;
 		if ((*i)->getMajorId() == id) {
 			return (*i);
 		}

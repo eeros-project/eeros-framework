@@ -67,7 +67,7 @@ void GlobalScope::run() {
 			std::list<Signal*>* signalList = Signal::getSignalList();
 			for (std::list<Signal*>::iterator it = signalList->begin(); it != signalList->end(); it++) {
 				RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(*it);
-				for (int32_t i = 0; i < realSignal->getDimension(); i++) {
+				for (sigindex_t i = 0; i < realSignal->getDimension(); i++) {
 					std::stringstream ss;
 					// clear the steam
 					ss.str(std::string());
