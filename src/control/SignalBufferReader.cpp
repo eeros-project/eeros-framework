@@ -21,6 +21,7 @@ uint32_t SignalBufferReader::signalTypeAvailableToRead() {
 
 bool SignalBufferReader::readRealSignal(sigid_t* id, uint64_t* timestamp, double* value) {
 	if(signalTypeAvailableToRead() == kSignalTypeReal) {
+		correctHeaderVersion();
 		*id = getSignalId(readIndex);
 		buffer->read(timestamp, sizeof(*timestamp));
 		buffer->read(value, sizeof(*value));
@@ -53,14 +54,18 @@ uint32_t SignalBufferReader::getSignalDataSize(sigtype_t signalType) {
 	}
 }
 
-void SignalBufferReader::incrementReadIndex() {
+void SignalBufferReader::correctHeaderVersion() {
 	if(headerVersion != header->version) { // header has changed -> all data in buffer are invalid
 		readIndex = 0;
 		headerVersion = header->version;
 	}
-	else {
-		uint32_t n = nofObservedSignals();
-		if(n > 0 && readIndex < n - 1) readIndex++;
-		else readIndex = 0;
+}
+
+void SignalBufferReader::incrementReadIndex() {
+	uint32_t n = nofObservedSignals();
+	if(n > 0 && readIndex < n - 1) {
+		readIndex++;
+	} else {
+		readIndex = 0;
 	}
 }

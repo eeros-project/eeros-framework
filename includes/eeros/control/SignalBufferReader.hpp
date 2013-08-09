@@ -26,6 +26,7 @@ private:
 	sigtype_t getSignalType(int readIndex);
 	sigid_t getSignalId(int readIndex);
 	uint32_t getSignalDataSize(sigtype_t signalType);
+	void correctHeaderVersion();
 	void incrementReadIndex();
 	
 	int readIndex;

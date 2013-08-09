@@ -42,7 +42,8 @@ void SignalBufferWriter::updateHeader() {
 			if (signal == NULL) {
 				throw 13;
 			}
-			header->signalInfo[j++] = signal->getSignalId((sigindex_t)*i);
+			sigid_t id = signal->getSignalId((sigindex_t)*i);
+			header->signalInfo[j++] = id;
 			header->signalInfo[j++] = signal->getType();
 			header->nofObservedSignals++;
 		}
