@@ -26,6 +26,7 @@ public:
 private:
 	static int nofThreads;
 #if defined(WINDOWS)
+	static HANDLE getHandle(int i);
 	static DWORD WINAPI threadAction(LPVOID ptr);
 	static DWORD dwThreads[];
 	static HANDLE hThreads[];

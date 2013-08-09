@@ -10,9 +10,13 @@ std::list<eeros::sequencer::Sequence*> Sequence::allSequences;
 Sequence::Sequence(std::string name, Sequencer& caller)
 	: sequenceName(name),
       callerThread(caller),
-	  state(kSequenceNotStarted){
+	  state(kSequenceNotStarted) {
 	if(&callerThread != Sequencer::getMainSequencer()){
 		Sequencer::getMainSequencer()->addSubSequencer(&caller);
+	}
+	Sequence* seq = getSequence(name);
+	if(seq){
+		 throw "Sequence allready exists!";
 	}
 	Sequence::allSequences.push_back(this);
 	currentCallBackIterator = callBacks.end();
@@ -72,7 +76,7 @@ void Sequence::run(){
 				}else if (e->goToNext){
 					findCallBack(e->nextMethod, true);
 				}
-				//continue after Error Handling with the same Method
+				//else continue after Error Handling with the same Method
 				e->errorHandler->run();
 			}
 		}catch(...){

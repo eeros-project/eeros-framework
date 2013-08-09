@@ -28,7 +28,7 @@ MySequence::~MySequence(void){
 }
 
 void MySequence::fillCallBacks(){
-	fillVersion2();
+	fillVersion1();
 }
 
 void MySequence::fillVersion1(){
@@ -198,21 +198,22 @@ void MySequence::MoveNonBlocking(){
 	}
 
 	//warten bis SubSequencer fertig ist
-	bool sequencerWasStarted = false;
+	bool suSequencerWasStarted = false;
 	try{
 		if(!subSequencer){
 			//SubSequencer existiert schon und wurde hier nicht neu erzeugt
 			subSequencer = dynamic_cast<MySequencer*>(eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer"));
+			//For 5th case (-> note case 5 (in my Folder)).
 			//set sequencerWasStarted = false to restart the sequencer
 			//set sequencerWasStarted = true to not restart the sequencer and not waiting
 			//sequencerWasStarted = true;
-			sequencerWasStarted = false;
+			suSequencerWasStarted = false;
 		}//else{
 			//SubSequencer wurde neu erzeugt
 			//sequencerWasStarted = false;
 		//}
 	
-		if(!sequencerWasStarted && subSequencer && subSequencer->getStatus() != kStopped){
+		if(!suSequencerWasStarted && subSequencer && subSequencer->getStatus() != kStopped){
 			ExecutorService::waitForSequenceEnd(subSequencer);
 		}
 
@@ -221,7 +222,7 @@ void MySequence::MoveNonBlocking(){
 	}
 	
 	//now we start the Thread
-	if(!sequencerWasStarted){
+	if(!suSequencerWasStarted){
 		subSequencer->start();
 	}
 
