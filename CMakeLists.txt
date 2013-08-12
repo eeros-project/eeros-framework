@@ -1,6 +1,4 @@
 # Main CMake file for the EEROS Framework
-# Created on: 22.04.2013
-# Author: Martin Zueger
 
 # We need CMake 2.8 or newer
 cmake_minimum_required(VERSION 2.8)
@@ -21,41 +19,40 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 	elseif(UNIX) # Linux, BSD, Mac OS X, ...
 		set(POSIX TRUE)
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Linux") # Linux
-			set(LINUX TRUE) # TODO check for Preempt_RT and Xenomai!
+			set(LINUX TRUE) # Linux operating system
+
+			# Check for Xenomai
+			set(XENOMAI_SEARCH_PATH /usr/xenomai /usr) # set the search path
+			find_path(XENOMAI_DIR include/xeno_config.h ${XENOMAI_SEARCH_PATH}) # find xeno-config.h
+			if(XENOMAI_DIR) # Xenomai available
+				set(XENOMAI_INCLUDE_DIR ${XENOMAI_DIR}/include) 
+				set(XENOMAI_INCLUDE_POSIX_DIR ${XENOMAI_DIR}/include/posix)
+				find_library(XENOMAI_LIBRARY_NATIVE  native  ${XENOMAI_DIR}/lib ) 
+				find_library(XENOMAI_LIBRARY_XENOMAI xenomai ${XENOMAI_DIR}/lib ) 
+				find_library(XENOMAI_LIBRARY_PTHREAD_RT pthread_rt rtdm ${XENOMAI_DIR}/lib ) 
+				find_library(XENOMAI_LIBRARY_RTDM    rtdm    ${XENOMAI_DIR}/lib ) 
+				find_file(XENOMAI_POSIX_WRAPPERS lib/posix.wrappers ${XENOMAI_SEARCH_PATH} ) # find the posix wrappers 
+				set( XENOMAI_EXE_LINKER_FLAGS "-Wl,@${XENOMAI_POSIX_WRAPPERS}" ) # set the linker flags 
+				set(XENOMAI_DEFINITIONS "-D_GNU_SOURCE -D_REENTRANT -Wall -pipe -D__XENO__") # add compile/preprocess options 
+				include_directories(${XENOMAI_INCLUDE_DIR})
+				LINK_LIBRARIES(native ${XENOMAI_LIBRARY_NATIVE})
+				LINK_LIBRARIES(xenomai ${XENOMAI_LIBRARY_XENOMAI})
+				LINK_LIBRARIES(pthread_rt ${XENOMAI_LIBRARY_PTHREAD_RT})
+				LINK_LIBRARIES(rtdm ${XENOMAI_LIBRARY_RTDM})
+				set(XENOMAI TRUE)
+			endif(XENOMAI_DIR)
+
+			# Check for Preempt_RT
+			# TODO
+			# set(PREEMPT_RT TRUE)
 			
-			# set the search path
-			set( XENOMAI_SEARCH_PATH /usr/xenomai /usr )
-			# find xeno-config.h
-			find_path( XENOMAI_DIR include/xeno_config.h ${XENOMAI_SEARCH_PATH} )
-			if( XENOMAI_DIR )  
-				set( XENOMAI_INCLUDE_DIR ${XENOMAI_DIR}/include ) 
-     		    set( XENOMAI_INCLUDE_POSIX_DIR ${XENOMAI_DIR}/include/posix )
-     		    
-     		    find_library( XENOMAI_LIBRARY_NATIVE  native  ${XENOMAI_DIR}/lib ) 
-   				find_library( XENOMAI_LIBRARY_XENOMAI xenomai ${XENOMAI_DIR}/lib ) 
-    			find_library( XENOMAI_LIBRARY_PTHREAD_RT pthread_rt rtdm ${XENOMAI_DIR}/lib ) 
-    			find_library( XENOMAI_LIBRARY_RTDM    rtdm    ${XENOMAI_DIR}/lib ) 
-   				# find the posix wrappers 
-    			find_file(XENOMAI_POSIX_WRAPPERS lib/posix.wrappers ${XENOMAI_SEARCH_PATH} ) 
-    			# set the linker flags 
-  				set( XENOMAI_EXE_LINKER_FLAGS "-Wl,@${XENOMAI_POSIX_WRAPPERS}" ) 
-    			# add compile/preprocess options 
-    			set(XENOMAI_DEFINITIONS "-D_GNU_SOURCE -D_REENTRANT -Wall -pipe -D__XENO__") 
-    			include_directories(${XENOMAI_INCLUDE_DIR})
-    			
-    			LINK_LIBRARIES(native ${XENOMAI_LIBRARY_NATIVE})
-    			LINK_LIBRARIES(xenomai ${XENOMAI_LIBRARY_XENOMAI})
-    			LINK_LIBRARIES(pthread_rt ${XENOMAI_LIBRARY_PTHREAD_RT})
-    			LINK_LIBRARIES(rtdm ${XENOMAI_LIBRARY_RTDM})
-    			set( XENOMAI TRUE) 
-			endif( XENOMAI_DIR )
-   		
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") # FreeBSD
 			set(FREEBSD TRUE)
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") # Mac OS X
 			set(MACOSX TRUE)
 		else()
 			 # Unkown UNIX
+			 # TODO
 		endif()
 	else()
 		 # Unkown OS

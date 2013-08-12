@@ -9,8 +9,8 @@
 class Block1i1o: public Block {
 public:
 	Block1i1o(sigdim_t dim = 1);
-	RealSignalInput& getIn();
-	RealSignalOutput& getOut();
+	virtual RealSignalInput& getIn();
+	virtual RealSignalOutput& getOut();
 	
 protected:
 	RealSignalInput in;

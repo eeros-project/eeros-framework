@@ -6,6 +6,7 @@
 #include <eeros/core/Executor.hpp>
 #include <eeros/core/SharedMemory.hpp>
 #include <eeros/control/Step.hpp>
+#include <eeros/control/Sum.hpp>
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/BlockOutput.hpp>
 #include <eeros/control/GlobalScope.hpp>
@@ -39,20 +40,29 @@ int main() {
 	Executor e2(0.01); // 10 ms period time
 	
 	std::cout << "Creating and connecting control system elements..." << std::endl;
-	Step step(1.0, 5.0, 1.0);
-	step.getOut().setName("M");
-	step.getOut().setUnit("Nm");
-	step.getOut().setCoordinateSystem("ddx");
+	Step step1(1.0, 5.0, 10.0);
+	step1.getOut().setName("M_1");
+	step1.getOut().setUnit("Nm");
 	
-	Gain gain(10);
+	Step step2(0.0, 8.0, 15.0);
+	step2.getOut().setName("M_2");
+	step2.getOut().setUnit("Nm");
+	
+	Sum sum;
+	sum.getOut().setName("M");
+	sum.getOut().setUnit("Nm");
+	
+	Gain gain(2); // A/N
 	gain.getOut().setName("I");
 	gain.getOut().setUnit("A");
-	gain.getOut().setCoordinateSystem("ddy");
 	
 	BlockOutput output;
 	GlobalScope globalScope;
 	
-	gain.getIn().connect(step.getOut());
+	
+	sum.getIn(0).connect(step1.getOut());
+	sum.getIn(1).connect(step2.getOut());
+	gain.getIn().connect(sum.getOut());
 	output.getIn().connect(gain.getOut());
 	
 	std::cout << "Available signals:" << std::endl;
@@ -63,7 +73,9 @@ int main() {
 		}
 	}
 	
-	e1.addRunnable(step);
+	e1.addRunnable(step1);
+	e1.addRunnable(step2);
+	e1.addRunnable(sum);
 	e1.addRunnable(gain);
 	e1.addRunnable(output);
 	e1.addRunnable(globalScope);
