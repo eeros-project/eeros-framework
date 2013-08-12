@@ -2,6 +2,7 @@
 #include <ostream>
 #include <fstream>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <eeros/core/Executor.hpp>
 #include <eeros/core/SharedMemory.hpp>

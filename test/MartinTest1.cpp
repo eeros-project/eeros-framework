@@ -4,6 +4,8 @@
 #include <eeros/core/Executor.hpp>
 #include <eeros/core/Runnable.hpp>
 
+#include <unistd.h>
+
 #define TIMETOWAIT 3
 
 class Test : public Runnable

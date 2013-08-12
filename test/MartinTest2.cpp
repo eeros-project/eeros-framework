@@ -6,6 +6,8 @@
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/BlockOutput.hpp>
 
+#include <unistd.h>
+
 #define TIMETOWAIT 1
 
 int main()
