@@ -9,13 +9,13 @@
 
 enum { kSignalTypeReal = 42 };
 
-struct anDatum {
+struct realSignalDatum {
 	double value;
 	uint64_t timestamp;
 	std::string name;
 	std::string unit;
 	std::string coordinateSystem;
-	std::string sendingDirection;
+	std::string sendingDirection; // TODO remove this from realSignalDatum
 };
 
 class RealSignalOutput : virtual public Signal, virtual public Output {
@@ -54,7 +54,7 @@ public:
 	virtual void setSendingDirection(std::string sendingDirection, sigindex_t index);
 
 private:
-	anDatum* dat;
+	realSignalDatum* dat;
 };
 
 #endif /* ORG_EEROS_CONTROL_REALSIGNALOUTPUT_HPP_ */

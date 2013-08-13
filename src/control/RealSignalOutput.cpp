@@ -3,7 +3,7 @@
 
 RealSignalOutput::RealSignalOutput(sigdim_t dim) : Signal(dim) {
 	this->dimension = dim;
-	this->dat = new anDatum[dim];
+	this->dat = new realSignalDatum[dim];
 	for(sigdim_t i = 0; i < dim; i++) {
 		this->dat[i].value = 0;
 		this->dat[i].timestamp = 0;
@@ -16,7 +16,7 @@ RealSignalOutput::RealSignalOutput(sigdim_t dim) : Signal(dim) {
 
 // RealSignalOutput::RealSignalOutput(std::string signalName, std::string unit, std::string coordinateSystem) {
 // 	this->length = 1;
-// 	this->dat = new anDatum[1];
+// 	this->dat = new realSignalDatum[1];
 // 	this->dat[0].value = 0;
 // 	this->dat[0].timestamp = 0;
 // 	this->dat[0].name = signalName;
@@ -26,7 +26,7 @@ RealSignalOutput::RealSignalOutput(sigdim_t dim) : Signal(dim) {
 // 
 // RealSignalOutput::RealSignalOutput(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length) {
 //     this->length = length;
-// 	this->dat = new anDatum[length];
+// 	this->dat = new realSignalDatum[length];
 // 	for (int i = 0; i < length; i++) {
 // 		dat[i].value = 0;
 // 		dat[i].timestamp = 0;
