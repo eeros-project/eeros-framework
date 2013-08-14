@@ -1,4 +1,4 @@
-#include <eeros/control/GlobalScope.hpp>
+#include <eeros/control/GlobalSignalProvider.hpp>
 
 #include <list>
 #include <stdlib.h>
@@ -11,17 +11,17 @@
 #include <iostream>
 #include <sstream>
 
-GlobalScope::GlobalScope() {
+GlobalSignalProvider::GlobalSignalProvider() {
 	/* create message queues */
 	msqStatBuffer.mq_msgsize = kMsqMsgSize;
 	msqStatBuffer.mq_maxmsg = kMsqMaxMsgs;
 	inMsqDescriptor = mq_open("/eeros.csin.msq", (O_RDWR | O_CREAT | O_NONBLOCK), 0600, &msqStatBuffer);
 	if (inMsqDescriptor == -1) {
-		std::cout << "ERROR in GlobalScope while opening inMsqDescriptor" << std::endl;
+		std::cout << "ERROR in GlobalSignalProvider while opening inMsqDescriptor" << std::endl;
 	}
 	outMsqDescriptor = mq_open("/eeros.csout.msq", (O_RDWR | O_CREAT | O_NONBLOCK), 0600, &msqStatBuffer);
 	if (outMsqDescriptor == -1) {
-		std::cout << "ERROR in GlobalScope while opening outMsqDescriptor" << std::endl;
+		std::cout << "ERROR in GlobalSignalProvider while opening outMsqDescriptor" << std::endl;
 	}
 	pMsg = new char[kMsqMsgSize];
 	
@@ -41,18 +41,29 @@ GlobalScope::GlobalScope() {
 	}
 }
 
-GlobalScope::~GlobalScope() {
+GlobalSignalProvider::~GlobalSignalProvider() {
 	delete writer;
 	delete shm;
 	delete pMsg;
 }
 
-void GlobalScope::run() {
+void GlobalSignalProvider::run() {
 	/* check for messages */
 	uint32_t msgPrio;
 	int32_t ret = mq_receive(inMsqDescriptor, pMsg, kMsqMsgSize, &msgPrio);
 	if (ret > 0) {
-		if (pMsg[0] == 'a' || pMsg[0] == 'r') {
+		processIPCMessages();
+	}
+	/* copy observed signals to shared memory */
+	if (writer) {
+		writer->appendData();
+	}
+}
+
+void GlobalSignalProvider::processIPCMessages() {
+	switch(pMsg[0]) {
+		case 'a': // Fall trough
+		case 'r': {
 			sigid_t signalId = *(reinterpret_cast<sigid_t*>(pMsg + 1));
 			if (signalId != 0 && writer) {
 				if (pMsg[0] == 'a') {
@@ -63,7 +74,9 @@ void GlobalScope::run() {
 					writer->removeSignal(signalId);
 				}
 			}
-		} else if (pMsg[0] == 'l') {
+			break;
+		}
+		case 'l': {
 			std::list<Signal*>* signalList = Signal::getSignalList();
 			for (std::list<Signal*>::iterator it = signalList->begin(); it != signalList->end(); it++) {
 				RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(*it);
@@ -83,18 +96,30 @@ void GlobalScope::run() {
 			if (mq_send(outMsqDescriptor, pMsg, 2, 0)) { // send end of list
 				std::cout << "ERROR while sending end of list...";
 			}
-		} else {
-			// nothing to do...
+			break;
 		}
-	}
-	
-	/* copy observed signals to shared memory */
-	if (writer) {
-		writer->appendData();
+		case 's': {
+			int32_t index = 1;
+			int32_t nofSignals = *(reinterpret_cast<int32_t*>(pMsg + index));
+			index += sizeof(int32_t);
+			for (int32_t i = 0; i < nofSignals; i++) {
+				uint32_t signalId = *(reinterpret_cast<uint32_t*>(pMsg + index));
+				index += sizeof(uint32_t);
+				double value = *(reinterpret_cast<double*>(pMsg + index));
+				index += sizeof(double);
+				Signal* signal = Signal::getSignalById(signalId);
+				RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(signal);
+				realSignal->setValue(value, (sigindex_t) signalId);
+			}
+			break;
+		}
+		default:
+			// Nothing to do...
+			break;
 	}
 }
 
-void* GlobalScope::getSharedMemory() {
+void* GlobalSignalProvider::getSharedMemory() {
 	if(shm) return shm->getMemoryPointer();
 	return 0;
 }

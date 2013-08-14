@@ -10,7 +10,7 @@
 #include <eeros/control/Sum.hpp>
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/BlockOutput.hpp>
-#include <eeros/control/GlobalScope.hpp>
+#include <eeros/control/GlobalSignalProvider.hpp>
 #include <eeros/control/SignalBufferReader.hpp>
 
 #define TIMETOWAIT 20
@@ -58,7 +58,7 @@ int main() {
 	gain.getOut().setUnit("A");
 	
 	BlockOutput output;
-	GlobalScope globalScope;
+	GlobalSignalProvider globalSignalProvider;
 	
 	
 	sum.getIn(0).connect(step1.getOut());
@@ -79,10 +79,10 @@ int main() {
 	e1.addRunnable(sum);
 	e1.addRunnable(gain);
 	e1.addRunnable(output);
-	e1.addRunnable(globalScope);
+	e1.addRunnable(globalSignalProvider);
 	
 	std::cout << "Creating reader..." << std::endl;
-	Reader r(globalScope.getSharedMemory(), kSharedMemorySize);
+	Reader r(globalSignalProvider.getSharedMemory(), kSharedMemorySize);
 	e2.addRunnable(r);
 	
 	std::cout << "Starting executors..." << std::endl;

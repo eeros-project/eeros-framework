@@ -1,7 +1,10 @@
 #include <eeros/control/RealSignalOutput.hpp>
 #include <sstream>
 
-RealSignalOutput::RealSignalOutput(sigdim_t dim) : Signal(dim) {
+const std::string RealSignalOutput::SENDING_DIRECTION_SERVER_TO_CLIENT = "ServerToClient";
+const std::string RealSignalOutput::SENDING_DIRECTION_CLIENT_TO_SERVER = "ClientToServer";
+
+RealSignalOutput::RealSignalOutput(sigdim_t dim, std::string sendingDirection) : Signal(dim) {
 	this->dimension = dim;
 	this->dat = new realSignalDatum[dim];
 	for(sigdim_t i = 0; i < dim; i++) {
@@ -10,13 +13,13 @@ RealSignalOutput::RealSignalOutput(sigdim_t dim) : Signal(dim) {
 		this->dat[i].name = "unnamed";
 		this->dat[i].unit = "";
 		this->dat[i].coordinateSystem = "";
-		this->dat[i].sendingDirection = "ServerToClient";
+		this->dat[i].sendingDirection = sendingDirection;
 	}
 }
 
 // RealSignalOutput::RealSignalOutput(std::string signalName, std::string unit, std::string coordinateSystem) {
 // 	this->length = 1;
-// 	this->dat = new realSignalDatum[1];
+// 	this->dat = new anDatum[1];
 // 	this->dat[0].value = 0;
 // 	this->dat[0].timestamp = 0;
 // 	this->dat[0].name = signalName;
@@ -26,7 +29,7 @@ RealSignalOutput::RealSignalOutput(sigdim_t dim) : Signal(dim) {
 // 
 // RealSignalOutput::RealSignalOutput(std::string signalName[], std::string unit[], std::string coordinateSystem[], int length) {
 //     this->length = length;
-// 	this->dat = new realSignalDatum[length];
+// 	this->dat = new anDatum[length];
 // 	for (int i = 0; i < length; i++) {
 // 		dat[i].value = 0;
 // 		dat[i].timestamp = 0;

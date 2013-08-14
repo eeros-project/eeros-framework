@@ -20,7 +20,10 @@ struct realSignalDatum {
 
 class RealSignalOutput : virtual public Signal, virtual public Output {
 public:
-	RealSignalOutput(sigdim_t dim = 1);
+	static const std::string SENDING_DIRECTION_SERVER_TO_CLIENT;
+	static const std::string SENDING_DIRECTION_CLIENT_TO_SERVER;
+
+	RealSignalOutput(sigdim_t dim = 1, std::string sendingDirection = SENDING_DIRECTION_SERVER_TO_CLIENT);
 	virtual ~RealSignalOutput();
 
 	virtual sigtype_t getType() const;

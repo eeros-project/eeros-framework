@@ -1,5 +1,5 @@
-#ifndef ORG_EEROS_CONTROL_GLOBALSCOPE_HPP
-#define ORG_EEROS_CONTROL_GLOBALSCOPE_HPP
+#ifndef ORG_EEROS_CONTROL_GLOBALSIGNALPROVIDER_HPP
+#define ORG_EEROS_CONTROL_GLOBALSIGNALPROVIDER_HPP
 
 #include <list>
 #include <stdint.h>
@@ -21,14 +21,17 @@ enum {
 
 enum { kSharedMemorySize = 1048576 }; // 1 MB
 
-class GlobalScope : public Runnable {
+class GlobalSignalProvider : public Runnable {
 
 public:
-	GlobalScope();
-	virtual ~GlobalScope();
+	GlobalSignalProvider();
+	virtual ~GlobalSignalProvider();
 	virtual void run();
 	
 	virtual void* getSharedMemory();
+
+private:
+	void processIPCMessages();
 
 private:
 	mqd_t inMsqDescriptor;
@@ -40,4 +43,4 @@ private:
 	SharedMemory* shm;
 };
 
-#endif // ORG_EEROS_CONTROL_GLOBALSCOPE_HPP
+#endif // ORG_EEROS_CONTROL_GLOBALSIGNALPROVIDER_HPP

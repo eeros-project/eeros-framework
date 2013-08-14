@@ -2,5 +2,5 @@ add_eeros_sources(Block.cpp Signal.cpp RealSignalInput.cpp RealSignalOutput.cpp 
 
 # TODO remove this after implementing a version for windows...
 if(LINUX)
-add_eeros_sources(SignalBuffer.cpp SignalBufferWriter.cpp SignalBufferReader.cpp GlobalScope.cpp)
+add_eeros_sources(SignalBuffer.cpp SignalBufferWriter.cpp SignalBufferReader.cpp GlobalSignalProvider.cpp)
 endif()
