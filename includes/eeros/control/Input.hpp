@@ -5,6 +5,8 @@ class Output;
 
 class Input {
 public:
+	Input();
+
 	virtual bool connect(Output& output);
 	virtual void disconnect();
 	virtual bool isConnected();

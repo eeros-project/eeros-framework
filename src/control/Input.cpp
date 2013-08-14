@@ -1,5 +1,9 @@
 #include <eeros/control/Input.hpp>
 
+Input::Input() : connectedOutput(0) {
+
+}
+
 bool Input::connect(Output& output) {
 // 	if(output) {
 		connectedOutput = &output;
