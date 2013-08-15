@@ -4,6 +4,7 @@
 #include <list>
 #include <stdint.h>
 #include <mqueue.h>
+#include <sstream>
 #include <eeros/core/Runnable.hpp>
 
 //Forward Declarations
@@ -32,6 +33,7 @@ public:
 
 private:
 	void processIPCMessages();
+	void sendIPCMessage(std::stringstream& ss);
 
 private:
 	mqd_t inMsqDescriptor;

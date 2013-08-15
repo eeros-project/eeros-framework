@@ -9,7 +9,7 @@
 #include <eeros/core/SharedMemory.hpp>
 
 #include <iostream>
-#include <sstream>
+#include <cerrno>
 
 GlobalSignalProvider::GlobalSignalProvider() {
 	/* create message queues */
@@ -78,23 +78,30 @@ void GlobalSignalProvider::processIPCMessages() {
 		}
 		case 'l': {
 			std::list<Signal*>* signalList = Signal::getSignalList();
+			int32_t collectedSignals = 0;
+			std::stringstream ss;
 			for (std::list<Signal*>::iterator it = signalList->begin(); it != signalList->end(); it++) {
 				RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(*it);
 				for (sigindex_t i = 0; i < realSignal->getDimension(); i++) {
-					std::stringstream ss;
-					// clear the steam
-					ss.str(std::string());
-					ss << realSignal->getSignalId(i) << '\x1D' << realSignal->getLabel(i) << '\x1D' << realSignal->getSendingDirection(i);
-					if (mq_send(outMsqDescriptor, ss.str().c_str(), ss.str().length() + 1, 0)) {
-						std::cout << "ERROR while sending signal info...";
-						break;
+					// Collect signals to reduce the number of IPC messages and send them batched
+					ss << realSignal->getSignalId(i) << '\x1D' << realSignal->getLabel(i) << '\x1D' << realSignal->getSendingDirection(i) << '\x1E';
+					collectedSignals++;
+					const int32_t NUMBER_OF_SIGNAL_TO_COLLECT = 10;
+					if (collectedSignals >= NUMBER_OF_SIGNAL_TO_COLLECT) {
+						collectedSignals = 0;
+						sendIPCMessage(ss);
 					}
 				}
+			}
+			// Check if there are still some collected and not yet sended signals available
+			if (collectedSignals >= 1) {
+				collectedSignals = 0;
+				sendIPCMessage(ss);
 			}
 			pMsg[0] = 'e';
 			pMsg[1] = 0;
 			if (mq_send(outMsqDescriptor, pMsg, 2, 0)) { // send end of list
-				std::cout << "ERROR while sending end of list...";
+				std::cout << "ERROR while sending end of list..." << std::endl;
 			}
 			break;
 		}
@@ -117,6 +124,28 @@ void GlobalSignalProvider::processIPCMessages() {
 			// Nothing to do...
 			break;
 	}
+}
+
+void GlobalSignalProvider::sendIPCMessage(std::stringstream& ss) {
+	int32_t tryCounter = 0;
+	const int32_t MAX_TRIES = 1;
+	while (tryCounter < MAX_TRIES) {
+		if (mq_send(outMsqDescriptor, ss.str().c_str(), ss.str().length() + 1, 0)) {
+			if (errno == EAGAIN) {
+				tryCounter++;
+			} else {
+				std::cout << "ERROR while sending signal info. errno: " << errno << std::endl;
+				break;
+			}
+		} else {
+			break;
+		}
+	}
+	if (tryCounter >= MAX_TRIES) {
+		std::cout << "GlobalSignalProvider::sendIPCMessage(): Max number of tries reached." << std::endl;
+	}
+	// Clear the stream
+	ss.str(std::string());
 }
 
 void* GlobalSignalProvider::getSharedMemory() {
