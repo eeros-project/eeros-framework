@@ -13,7 +13,7 @@
 #include <eeros/control/GlobalSignalProvider.hpp>
 #include <eeros/control/SignalBufferReader.hpp>
 
-#define TIMETOWAIT 20
+#define TIMETOWAIT 30
 
 class Reader : public Runnable {
 public:
@@ -41,11 +41,11 @@ int main() {
 	Executor e2(0.01); // 10 ms period time
 	
 	std::cout << "Creating and connecting control system elements..." << std::endl;
-	Step step1(1.0, 5.0, 10.0);
+	Step step1(1.0, 5.0, 20.0);
 	step1.getOut().setName("M_1");
 	step1.getOut().setUnit("Nm");
 	
-	Step step2(0.0, 8.0, 15.0);
+	Step step2(0.0, 8.0, 25.0);
 	step2.getOut().setName("M_2");
 	step2.getOut().setUnit("Nm");
 	
