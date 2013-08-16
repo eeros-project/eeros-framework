@@ -11,7 +11,7 @@
 
 #define NS_PER_SEC 1000000000
 
-uint64_t System::timeoffset = 0;
+uint64_t System::timeoffset = 0; // [s]
 
 System::System() {
 	// TODO Auto-generated constructor stub
@@ -61,7 +61,7 @@ uint64_t System::getTimeNs() {
 	if(System::timeoffset == 0) {
 		timeoffset = tval.tv_sec;
 	}
-	time = tval.tv_sec - (timeoffset * NS_PER_SEC);
+	time = (tval.tv_sec - timeoffset) * NS_PER_SEC;
 	time += tval.tv_nsec;
 #endif 
 #if defined(WINDOWS)

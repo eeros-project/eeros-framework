@@ -50,14 +50,14 @@ void Step::run() {
 	}
 	if(!stepDone && System::getTime() >= stepTime) {
 		for(int i = 0; i < out.getDimension(); i++) {
-			out.setTimeStamp((uint64_t)(System::getTime() * 1000000000));
+			out.setTimeStamp(System::getTimeNs());
 			out.setValue(initValue[i] + stepHeight[i], i);
 		}
 		stepDone = true;
 	}
 	else {
 		for(int i = 0; i < out.getDimension(); i++) {
-			out.setTimeStamp((uint64_t)(System::getTime() * 1000000000));
+			out.setTimeStamp(System::getTimeNs());
 		}
 	}
 }
