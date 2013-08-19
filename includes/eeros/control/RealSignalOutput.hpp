@@ -10,6 +10,7 @@
 enum { kSignalTypeReal = 42 };
 
 struct realSignalDatum {
+	uint32_t id;
 	double value;
 	uint64_t timestamp;
 	std::string name;

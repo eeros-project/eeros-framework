@@ -5,6 +5,7 @@
 #include <list>
 #include <eeros/types.hpp>
 #include <eeros/control/SignalBuffer.hpp>
+#include "RealSignalOutput.hpp"
 
 class Signal;
 class RealSignalOutput;
@@ -21,6 +22,7 @@ public:
 	uint32_t nofObservedSignals();
 	uint32_t signalTypeAvailableToRead();
 	bool readRealSignal(sigid_t* id, uint64_t* timestamp, double* value);
+	realSignalDatum readRealSignal();
 	
 private:
 	sigtype_t getSignalType(int readIndex);
