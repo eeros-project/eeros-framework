@@ -9,6 +9,7 @@
 #include <eeros/control/Step.hpp>
 #include <eeros/control/Sum.hpp>
 #include <eeros/control/Gain.hpp>
+#include <eeros/control/D.hpp>
 #include <eeros/control/BlockOutput.hpp>
 #include <eeros/control/GlobalSignalProvider.hpp>
 #include <eeros/control/SignalBufferReader.hpp>
@@ -37,7 +38,7 @@ int main() {
 	std::cout << "Martin Test 3 started..." << std::endl;
 	
 	std::cout << "Creating executors..." << std::endl;
-	Executor e1(0.001); // 1 ms period time
+	Executor e1(0.01); // 1 ms period time
 	Executor e2(0.1); // 100 ms period time
 	
 	std::cout << "Creating and connecting control system elements..." << std::endl;
@@ -56,6 +57,11 @@ int main() {
 	Gain gain(2.0); // A/N
 	gain.getOut().setName("I");
 	gain.getOut().setUnit("A");
+	
+	Step step3(0.0, 1.0, 20.0);
+	D diff;
+	diff.getOut().setName("TEST");
+	diff.getIn().connect(step3.getOut());
 	
 	BlockOutput output;
 	GlobalSignalProvider globalSignalProvider;
@@ -79,6 +85,10 @@ int main() {
 	e1.addRunnable(sum);
 	e1.addRunnable(gain);
 	e1.addRunnable(output);
+	
+	e1.addRunnable(step3);
+	e1.addRunnable(diff);
+	
 	e1.addRunnable(globalSignalProvider);
 	
 	std::cout << "Creating reader..." << std::endl;
