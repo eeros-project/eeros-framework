@@ -1,14 +1,14 @@
 #include <eeros/control/Gain.hpp>
 
-Gain::Gain(sigdim_t dim) : Block1i1o(dim) {
+Gain::Gain(double c, sigdim_t dim) : Block1i1o(dim) {
 	this->gain = new double[dim];
 	for(int i = 0; i < dim; i++) {
-		this->gain[i] = 1.0;
+		this->gain[i] = c;
 	}
 	this->enabled = true;
 }
 
-Gain::Gain(sigdim_t dim, double gain[]) : Block1i1o(dim) {
+Gain::Gain(double gain[], sigdim_t dim) : Block1i1o(dim) {
 	if(sizeof(gain) / sizeof(gain[0]) == dim) { // TODO check what happens if lenght of array is 0!
 		this->gain = new double[dim];
 		for(int i = 0; i < dim; i++)

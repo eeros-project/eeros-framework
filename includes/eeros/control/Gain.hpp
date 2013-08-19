@@ -6,15 +6,15 @@
 
 class Gain: public Block1i1o {
 public:
-	Gain(sigdim_t dim = 1);
-	Gain(sigdim_t dim, double gain[]);
+	Gain(double c = 1, sigdim_t dim = 1);
+	Gain(double c[], sigdim_t dim);
 	virtual ~Gain();
 
 	virtual void run();
 	
 	virtual void enable();
     virtual void disable();
-	virtual void setGain(double gain, sigindex_t index = 0);
+	virtual void setGain(double c, sigindex_t index = 0);
 
 private:
 	double* gain;

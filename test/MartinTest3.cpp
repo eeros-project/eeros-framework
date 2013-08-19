@@ -53,8 +53,7 @@ int main() {
 	sum.getOut().setName("M");
 	sum.getOut().setUnit("Nm");
 	
-	Gain gain;
-	gain.setGain(2.0); // A/N
+	Gain gain(2.0); // A/N
 	gain.getOut().setName("I");
 	gain.getOut().setUnit("A");
 	
