@@ -20,7 +20,7 @@ int ExecutorService::createNewThread(Executor* e) {
 	int threadId = nofThreads;
 	int ret;
 	ret = pthread_create(&ExecutorService::threads[ExecutorService::nofThreads++], NULL, ExecutorService::threadAction, (void*)e);
-	std::cout << "Thread[" << threadId << "] created with return value " << ret << std::endl;
+	std::cout << "Thread (#" << threadId << ") created with return value " << ret << std::endl;
 	return threadId;
 }
 

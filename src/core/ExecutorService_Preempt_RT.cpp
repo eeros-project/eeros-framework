@@ -13,6 +13,12 @@
 #define MAX_SAFE_STACK (8*1024) /* The maximum stack size which is guaranteed safe to access without faulting */
 #define NSEC_PER_SEC (1000000000) /* The number of nsecs per sec. */
 
+void stack_prefault(void) {
+	unsigned char dummy[MAX_SAFE_STACK];
+	memset(dummy, 0, MAX_SAFE_STACK);
+	return;
+}
+
 int ExecutorService::nofThreads = 0;
 pthread_t ExecutorService::threads[MAX_NOF_THREADS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -20,7 +26,7 @@ int ExecutorService::createNewThread(Executor* e) {
 	int threadId = nofThreads;
 	int ret;
 	ret = pthread_create(&ExecutorService::threads[ExecutorService::nofThreads++], NULL, threadAction, (void*)e);
-	std::cout << "Thread created with return value " << ret << std::endl;
+	std::cout << "Real time thread (#" << threadId << ") created with return value " << ret << std::endl;
 	return threadId;
 }
 
@@ -43,12 +49,12 @@ void* ExecutorService::threadAction(void* ptr) {
 	}
     
 	/* Pre-fault our stack */
-	ExecutorService::stack_prefault();
+	stack_prefault();
 	clock_gettime(CLOCK_MONOTONIC ,&t);
 	/* start after one second */
 	//t.tv_sec++;
 
-	while(e->getStatus() != Executor::kStop) {
+	while(e->getStatus() != kStop) {
 		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t, NULL);
 		e->run();
 		t.tv_nsec += interval;
@@ -61,8 +67,6 @@ void* ExecutorService::threadAction(void* ptr) {
 	std::cout << "Thread finished" << std::endl;
 }
 
-void ExecutorService::stack_prefault(void) {
-	unsigned char dummy[MAX_SAFE_STACK];
-	memset(dummy, 0, MAX_SAFE_STACK);
-	return;
+void ExecutorService::waitForSequenceEnd(Executor* waitExecutor) {
+	// TODO
 }
