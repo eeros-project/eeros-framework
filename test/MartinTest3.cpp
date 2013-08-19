@@ -13,14 +13,14 @@
 #include <eeros/control/GlobalSignalProvider.hpp>
 #include <eeros/control/SignalBufferReader.hpp>
 
-#define TIMETOWAIT 30
+#define TIMETOWAIT 300
 
 class Reader : public Runnable {
 public:
 	Reader(void* memory, uint32_t size) : r(memory, size) {}
 	
 	void run() {
-		if(r.signalTypeAvailableToRead() == kSignalTypeReal) {
+		while(r.signalTypeAvailableToRead() == kSignalTypeReal) {
 			r.readRealSignal(&id, &ts, &val);
 			std::cout << '#' << id << ' ' << ts << ':' << val << std::endl;
 		}
@@ -37,8 +37,8 @@ int main() {
 	std::cout << "Martin Test 3 started..." << std::endl;
 	
 	std::cout << "Creating executors..." << std::endl;
-	Executor e1(0.1); // 100 ms period time
-	Executor e2(0.01); // 10 ms period time
+	Executor e1(0.001); // 1 ms period time
+	Executor e2(0.1); // 100 ms period time
 	
 	std::cout << "Creating and connecting control system elements..." << std::endl;
 	Step step1(1.0, 5.0, 20.0);

@@ -65,6 +65,7 @@ void* ExecutorService::threadAction(void* ptr) {
 	}
 	munlockall();
 	std::cout << "Thread finished" << std::endl;
+	e->status = kStopped;
 }
 
 void ExecutorService::waitForSequenceEnd(Executor* waitExecutor) {

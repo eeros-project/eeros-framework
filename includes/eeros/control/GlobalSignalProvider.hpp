@@ -20,7 +20,7 @@ enum {
 	// You can get RLIMIT_MSGQUEUE with command "ulimit -q".
 };
 
-enum { kSharedMemorySize = 1048576 }; // 1 MB
+enum { kSharedMemorySize = 1048576 * 10}; // 10 MB
 
 class GlobalSignalProvider : public Runnable {
 
