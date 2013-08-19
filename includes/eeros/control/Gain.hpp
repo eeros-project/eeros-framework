@@ -6,7 +6,7 @@
 
 class Gain: public Block1i1o {
 public:
-	Gain(double gain = 1);
+	Gain(sigdim_t dim = 1);
 	Gain(sigdim_t dim, double gain[]);
 	virtual ~Gain();
 

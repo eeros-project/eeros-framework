@@ -1,8 +1,10 @@
 #include <eeros/control/Gain.hpp>
 
-Gain::Gain(double gain) : Block1i1o(1) {
-	this->gain = new double[1];
-	this->gain[0] = gain;
+Gain::Gain(sigdim_t dim) : Block1i1o(dim) {
+	this->gain = new double[dim];
+	for(int i = 0; i < dim; i++) {
+		this->gain[i] = 1.0;
+	}
 	this->enabled = true;
 }
 
@@ -16,6 +18,8 @@ Gain::Gain(sigdim_t dim, double gain[]) : Block1i1o(dim) {
 		this->enabled = true;
 	}
 }
+
+
 
 Gain::~Gain() {
 // 	delete this->out;
