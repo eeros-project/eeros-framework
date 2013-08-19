@@ -26,8 +26,7 @@ Gain::~Gain() {
 // 	delete this->gain;
 }
 
-void Gain::run()
-{
+void Gain::run() {
 	for(int i = 0; i < out.getDimension(); i++)
 	{
 		if(enabled) out.setValue(in.getValue(i) * gain[i], i);
@@ -36,22 +35,14 @@ void Gain::run()
 	}
 }
 
-void Gain::enable()
-{
+void Gain::enable() {
 	this->enabled = true;
 }
 
-void Gain::disable()
-{
+void Gain::disable() {
 	this->enabled = true;
 }
 
-void Gain::setGain(double gain)
-{
-	setGain(0);
-}
-	
-void Gain::setGain(double gain, int index)
-{
+void Gain::setGain(double gain, sigindex_t index) {
 	this->gain[index] = gain;
 }

@@ -14,8 +14,7 @@ public:
 	
 	virtual void enable();
     virtual void disable();
-	virtual void setGain(double gain);
-	virtual void setGain(double gain, int index);
+	virtual void setGain(double gain, sigindex_t index = 0);
 
 private:
 	double* gain;

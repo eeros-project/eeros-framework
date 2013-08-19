@@ -13,7 +13,7 @@
 #include <eeros/control/GlobalSignalProvider.hpp>
 #include <eeros/control/SignalBufferReader.hpp>
 
-#define TIMETOWAIT 300
+#define TIMETOWAIT 30
 
 class Reader : public Runnable {
 public:
@@ -53,7 +53,8 @@ int main() {
 	sum.getOut().setName("M");
 	sum.getOut().setUnit("Nm");
 	
-	Gain gain(2); // A/N
+	Gain gain;
+	gain.setGain(2.0); // A/N
 	gain.getOut().setName("I");
 	gain.getOut().setUnit("A");
 	
