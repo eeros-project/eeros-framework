@@ -20,7 +20,7 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 		set(POSIX TRUE)
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Linux") # Linux
 			set(LINUX TRUE) # Linux operating system
-
+			
 			# Check for Xenomai
 			set(XENOMAI_SEARCH_PATH /usr/xenomai /usr) # set the search path
 			find_path(XENOMAI_DIR include/xeno_config.h ${XENOMAI_SEARCH_PATH}) # find xeno-config.h
@@ -45,6 +45,9 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 			# Check for Preempt_RT
 			# TODO
 			# set(PREEMPT_RT TRUE)
+			
+			# Check for libraries
+			CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
 			
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") # FreeBSD
 			set(FREEBSD TRUE)
