@@ -7,6 +7,7 @@
 #include <eeros/control/RealSignalOutput.hpp>
 #include <eeros/control/SignalBufferWriter.hpp>
 #include <eeros/core/SharedMemory.hpp>
+#include <eeros/core/System.hpp>
 
 #include <iostream>
 #include <cerrno>
@@ -111,12 +112,18 @@ void GlobalSignalProvider::processIPCMessages() {
 			index += sizeof(int32_t);
 			for (int32_t i = 0; i < nofSignals; i++) {
 				uint32_t signalId = *(reinterpret_cast<uint32_t*>(pMsg + index));
-				index += sizeof(uint32_t);
+				index += sizeof(signalId);
+
+				// We just ignore the received timestamp
+				uint64_t timestamp = System::getTimeNs();
+				index += sizeof(timestamp);
+
 				double value = *(reinterpret_cast<double*>(pMsg + index));
 				index += sizeof(double);
 				Signal* signal = Signal::getSignalById(signalId);
 				RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(signal);
 				realSignal->setValue(value, (sigindex_t) signalId);
+				realSignal->setTimeStamp(timestamp, (sigindex_t) signalId);
 			}
 			break;
 		}
