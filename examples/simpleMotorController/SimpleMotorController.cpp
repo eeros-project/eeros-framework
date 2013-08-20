@@ -52,20 +52,24 @@ int main() {
 	enc.getOut().setName("phi_actual");
 	enc.getOut().setUnit("rad");
 
-	D diff;
-	diff.getOut().setName("phi_d_actual");
-	diff.getOut().setUnit("rad/s");
+	D diff1;
+	diff1.getOut().setName("phi_d_actual");
+	diff1.getOut().setUnit("rad/s");
 
 	Sum sum1;
 	sum1.negateInput(1);
 	sum1.getOut().setName("phi_e");
 	sum1.getOut().setUnit("rad");
-
+	
 	Gain posController(174.5); // kp=174.5
 	posController.getOut().setName("phi_d_set");
 	posController.getOut().setUnit("rad/s");
 
-	Sum sum2;
+	D diff2;
+	diff1.getOut().setName("phi_d_set_ff");
+	diff1.getOut().setUnit("rad/s");
+	
+	Sum sum2(3);
 	sum2.negateInput(1);
 	sum2.getOut().setName("phi_d_e");
 	sum2.getOut().setUnit("rad/s");
@@ -85,12 +89,13 @@ int main() {
 	ComediDac dac(0);
 	GlobalSignalProvider globalSignalProvider;
 
-	diff.getIn().connect(enc.getOut());
+	diff1.getIn().connect(enc.getOut());
 	sum1.getIn(0).connect(step.getOut());
 	sum1.getIn(1).connect(enc.getOut());
 	posController.getIn().connect(sum1.getOut());
 	sum2.getIn(0).connect(posController.getOut());
-	sum2.getIn(1).connect(diff.getOut());
+	sum2.getIn(1).connect(diff1.getOut());
+	sum2.getIn(2).connect(diff2.getOut());
 	speedController.getIn().connect(sum2.getOut());
 	inertia.getIn().connect(speedController.getOut());
 	invMotConst.getIn().connect(inertia.getOut());
@@ -108,7 +113,7 @@ int main() {
 	e1.addRunnable(enc);
 	e1.addRunnable(sum1);
 	e1.addRunnable(posController);
-	e1.addRunnable(diff);
+	e1.addRunnable(diff1);
 	e1.addRunnable(sum2);
 	e1.addRunnable(speedController);
 	e1.addRunnable(inertia);
