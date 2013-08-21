@@ -35,18 +35,20 @@ void SignalBufferWriter::appendData() {
 
 void SignalBufferWriter::updateHeader() {
 	header->nofObservedSignals = 0;
-	int j = 0;
+	uint32_t signalCounter = 0;
+	int currentIndex = 0;
 	for(std::list<sigid_t>::iterator i = observedSignalIds.begin(); i != observedSignalIds.end(); i++) {
-		if(j < kMaxNofObservableSignals * 2) {
+		if(currentIndex < kMaxNofObservableSignals * 2) {
 			Signal* signal = Signal::getSignalById(*i);
 			if (signal == NULL) {
 				throw 13;
 			}
 			sigid_t id = signal->getSignalId((sigindex_t)*i);
-			header->signalInfo[j++] = id;
-			header->signalInfo[j++] = signal->getType();
-			header->nofObservedSignals++;
+			header->signalInfo[currentIndex++] = id;
+			header->signalInfo[currentIndex++] = signal->getType();
+			signalCounter++;
 		}
 	}
+	header->nofObservedSignals = signalCounter;
 	header->version++;
 }

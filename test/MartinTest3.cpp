@@ -38,7 +38,7 @@ int main() {
 	std::cout << "Martin Test 3 started..." << std::endl;
 	
 	std::cout << "Creating executors..." << std::endl;
-	Executor e1(0.01); // 1 ms period time
+	Executor e1(0.01); // 10 ms period time
 	Executor e2(0.1); // 100 ms period time
 	
 	std::cout << "Creating and connecting control system elements..." << std::endl;

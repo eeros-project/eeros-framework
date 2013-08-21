@@ -9,21 +9,19 @@
 
 class Sum : public Block {
 public:
-	Sum(uint32_t nofInputs = 2, sigdim_t dim = 1);
+	Sum(uint8_t nofInputs = 2, sigdim_t dim = 1);
 
 	virtual void run();
 	
-	virtual RealSignalInput& getIn(uint32_t input = 0);
+	virtual RealSignalInput& getIn(uint8_t input = 0);
 	virtual RealSignalOutput& getOut();
 	
 	
-	virtual void negateInput(uint32_t input);
+	virtual void negateInput(uint8_t input);
 
 protected:
 	std::vector<RealSignalInput> in;
 	RealSignalOutput out;
-	
-private:
 	std::vector<bool> negated;
 };
 

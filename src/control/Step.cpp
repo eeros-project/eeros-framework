@@ -62,13 +62,13 @@ void Step::reset() {
 	first = true;
 }
 
-void Step::setinitValue(double initValue) {
+void Step::setInitValue(double initValue) {
 	for(sigindex_t i = 0; i < this->initValue.size(); i++) {
 		this->initValue[i] = initValue;
 	}
 }
 
-void Step::setinitValue(sigindex_t index, double initValue) {
+void Step::setInitValue(sigindex_t index, double initValue) {
 	this->initValue[index] = initValue;
 }
 

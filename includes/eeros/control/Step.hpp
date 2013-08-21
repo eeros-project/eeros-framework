@@ -15,13 +15,13 @@ public:
 	virtual void run();
 	
 	virtual void reset();
-	virtual void setinitValue(double initValue);
-	virtual void setinitValue(sigindex_t index, double initValue);
+	virtual void setInitValue(double initValue);
+	virtual void setInitValue(sigindex_t index, double initValue);
 	virtual void setStepHeight(double stepHeight);
 	virtual void setStepHeight(sigindex_t index, double stepHeight);
 	virtual void setDelayTime(double delayTime);
 
-private:
+protected:
 	std::vector<double> initValue;
 	std::vector<double> stepHeight;
 	double stepTime;
