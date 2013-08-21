@@ -9,7 +9,7 @@
 class Gain: public Block1i1o {
 public:
 	Gain(double c = 1, sigdim_t dim = 1);
-	Gain(double c[], sigdim_t dim);
+	Gain(const double c[], sigdim_t dim);
 	Gain(const std::vector<double>, sigdim_t dim);
 	virtual ~Gain();
 

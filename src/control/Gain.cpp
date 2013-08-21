@@ -7,7 +7,7 @@ Gain::Gain(double c, sigdim_t dim) : Block1i1o(dim), gain(dim) {
 	this->enabled = true;
 }
 
-Gain::Gain(double gain[], sigdim_t dim) : Block1i1o(dim), gain(dim) {
+Gain::Gain(const double gain[], sigdim_t dim) : Block1i1o(dim), gain(dim) {
 	if(sizeof(gain) / sizeof(gain[0]) == dim) { // TODO check what happens if lenght of array is 0!
 		for(sigdim_t i = 0; i < dim; i++) {
 			this->gain[i] = gain[i];
