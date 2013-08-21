@@ -35,9 +35,6 @@ private:
 	static void* threadAction(void*);
 	static pthread_t threads[];
 #endif
-#if defined(PREEMPT_RT)
-	static void stack_prefault(void);
-#endif
 #if defined(XENOMAI)
 	// TODO
 #endif
