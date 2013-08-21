@@ -13,13 +13,13 @@ RingBuffer::RingBuffer(void* memory, uint32_t size) {
 	pRead = pWrite;
 }
 
-uint32_t RingBuffer::avalableToRead() const {
+uint32_t RingBuffer::availableToRead() const {
 	char* pWrite = ring + *pWriteIndex;
 	return (ringSize + pWrite - pRead) % ringSize;
 }
 
 uint32_t RingBuffer::read(void* pDest, uint32_t size) {
-	uint32_t available =  avalableToRead();
+	uint32_t available =  availableToRead();
 	pWrite = ring + *pWriteIndex;
 	if(available && size <= available) {
 		if(pRead + size < ring + ringSize) { // read in a single step
@@ -60,4 +60,9 @@ uint32_t RingBuffer::write(void* pSrc, uint32_t size) {
 
 uint32_t RingBuffer::size() const {
 	return ringSize;
+}
+
+void RingBuffer::reset() {
+	pRead = ring;
+	pWrite = ring;
 }

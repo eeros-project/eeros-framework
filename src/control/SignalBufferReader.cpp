@@ -13,7 +13,7 @@ uint32_t SignalBufferReader::nofObservedSignals() {
 }
 
 uint32_t SignalBufferReader::signalTypeAvailableToRead() {
-	if(nofObservedSignals() > 0 && buffer->avalableToRead() >= getSignalDataSize(getSignalType(readIndex))) {
+	if(nofObservedSignals() > 0 && buffer->availableToRead() >= getSignalDataSize(getSignalType(readIndex))) {
 		return getSignalType(readIndex);
 	}
 	return kSignalTypeUnknown;
@@ -70,6 +70,7 @@ void SignalBufferReader::correctHeaderVersion() {
 	if(headerVersion != header->version) { // header has changed -> all data in buffer are invalid
 		readIndex = 0;
 		headerVersion = header->version;
+		buffer->reset();
 	}
 }
 

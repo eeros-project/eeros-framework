@@ -17,7 +17,7 @@ public:
 	}
 	
 	void run() {
-		while(rb.avalableToRead()) {
+		while(rb.availableToRead()) {
 			int x;
 			rb.read(&x, 4);
 			std::cout << "R: " << x << std::endl;
