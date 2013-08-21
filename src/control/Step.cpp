@@ -1,18 +1,6 @@
 #include <eeros/control/Step.hpp>
 
-Step::Step(double initValue, double stepHeight, double delayTime) : Block1o(1) {
-	this->initValue = new double[1];
-	this->stepHeight = new double[1];
-	this->initValue[0] = initValue;
-	this->stepHeight[0] = stepHeight;
-	this->stepTime = delayTime;
-	this->stepDone = false;
-	this->first = true;
-}
-
-Step::Step(sigdim_t dim, double initValue, double stepHeight, double delayTime) : Block1o(dim) {
-	this->initValue = new double[dim];
-	this->stepHeight = new double[dim];
+Step::Step(double initValue, double stepHeight, double delayTime, sigdim_t dim) : Block1o(dim), initValue(dim), stepHeight(dim) {
 	for(sigdim_t i = 0; i < dim; i++) {
 		this->initValue[i] = initValue;
 		this->stepHeight[i] = stepHeight;
@@ -22,9 +10,17 @@ Step::Step(sigdim_t dim, double initValue, double stepHeight, double delayTime) 
 	this->first = true;
 }
 
-Step::Step(sigdim_t dim, double initValue[], double stepHeight[], double delayTime) : Block1o(dim) {
-	this->initValue = new double[dim];
-	this->stepHeight = new double[dim];
+Step::Step(const double initValue[],const  double stepHeight[], double delayTime, sigdim_t dim) : Block1o(dim), initValue(dim), stepHeight(dim) {
+	for(sigdim_t i = 0; i < dim; i++) {
+		this->initValue[i] = initValue[i];
+		this->stepHeight[i] = stepHeight[i];
+	}
+	this->stepTime = delayTime;
+	this->stepDone = false;
+	this->first = true;
+}
+
+Step::Step(const std::vector<double> initValues, const std::vector<double> stepHeight, double delayTime, sigdim_t dim) : Block1o(dim), initValue(dim), stepHeight(dim) {
 	for(sigdim_t i = 0; i < dim; i++) {
 		this->initValue[i] = initValue[i];
 		this->stepHeight[i] = stepHeight[i];
@@ -35,8 +31,7 @@ Step::Step(sigdim_t dim, double initValue[], double stepHeight[], double delayTi
 }
 
 Step::~Step() {
-	delete this->initValue;
-	delete this->stepHeight;
+	// nothing to do
 }
 
 void Step::run() {
@@ -68,22 +63,25 @@ void Step::reset() {
 }
 
 void Step::setinitValue(double initValue) {
-	this->setinitValue(initValue, 0);
+	for(sigindex_t i = 0; i < this->initValue.size(); i++) {
+		this->initValue[i] = initValue;
+	}
 }
-	
-void Step::setinitValue(double initValue, int index) {
+
+void Step::setinitValue(sigindex_t index, double initValue) {
 	this->initValue[index] = initValue;
 }
 
 void Step::setStepHeight(double stepHeight) {
-	this->setStepHeight(stepHeight, 0);
+	for(sigindex_t i = 0; i < this->stepHeight.size(); i++) {
+		this->stepHeight[i] = stepHeight;
+	}
 }
 
-void Step::setStepHeight(double stepHeight, int index) {
+void Step::setStepHeight(sigindex_t index, double stepHeight) {
 	this->stepHeight[index] = stepHeight;
 }
 
 void Step::setDelayTime(double delayTime) {
-	reset();
 	this->stepTime = delayTime;
 }

@@ -14,7 +14,7 @@
 #include <eeros/control/GlobalSignalProvider.hpp>
 #include <eeros/control/SignalBufferReader.hpp>
 
-#define TIMETOWAIT 10
+#define TIMETOWAIT 30
 
 class Reader : public Runnable {
 public:
@@ -42,27 +42,18 @@ int main() {
 	Executor e2(0.1); // 100 ms period time
 	
 	std::cout << "Creating and connecting control system elements..." << std::endl;
-	Step step1(1.0, 5.0, 20.0);
-	step1.getOut().setName("M_1");
-	step1.getOut().setUnit("Nm");
+	Step step1(0.0, 5.0, 20.0);
+	step1.getOut().setName("Step 1");
 	
-	Step step2(-0.5, 8.0, 25.0);
-	step2.getOut().setName("M_2");
-	step2.getOut().setUnit("Nm");
+	Step step2(0.0, -8.0, 25.0);
+	step2.getOut().setName("Step 2");
 	
 	Sum sum;
-	sum.getOut().setName("M");
-	sum.getOut().setUnit("Nm");
+	sum.getOut().setName("Sum");
 	sum.negateInput(1);
 	
 	Gain gain(2.0); // A/N
-	gain.getOut().setName("I");
-	gain.getOut().setUnit("A");
-	
-	Step step3(0.0, 1.0, 20.0);
-	D diff;
-	diff.getOut().setName("TEST");
-	diff.getIn().connect(step3.getOut());
+	gain.getOut().setName("Gain");
 	
 	BlockOutput output;
 	GlobalSignalProvider globalSignalProvider;
@@ -86,10 +77,6 @@ int main() {
 	e1.addRunnable(sum);
 	e1.addRunnable(gain);
 	e1.addRunnable(output);
-	
-	e1.addRunnable(step3);
-	e1.addRunnable(diff);
-	
 	e1.addRunnable(globalSignalProvider);
 	
 	std::cout << "Creating reader..." << std::endl;

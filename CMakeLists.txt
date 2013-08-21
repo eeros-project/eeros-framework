@@ -44,7 +44,7 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 
 			# Check for Preempt_RT
 			# TODO
-			# set(PREEMPT_RT TRUE)
+			set(PREEMPT_RT FALSE)
 			
 			# Check for libraries
 			CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
