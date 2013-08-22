@@ -41,7 +41,7 @@ void SignalBufferWriter::updateHeader() { // TODO implement with mutex in shm
 		if(currentIndex < kMaxNofObservableSignals * 2) {
 			Signal* signal = Signal::getSignalById(*i);
 			if (signal == NULL) {
-				throw "SignalBufferWriter::updateHeader(): Signal with ID "+ *i + "not found";
+				throw "SignalBufferWriter::updateHeader(): Signal not found";
 			}
 			sigid_t id = signal->getSignalId((sigindex_t)*i);
 			header->signalInfo[currentIndex++] = id;
