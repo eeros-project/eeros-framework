@@ -33,7 +33,7 @@ void SignalBufferWriter::appendData() {
 	}
 }
 
-void SignalBufferWriter::updateHeader() {
+void SignalBufferWriter::updateHeader() { // TODO implement with mutex in shm
 	header->nofObservedSignals = 0;
 	uint32_t signalCounter = 0;
 	int currentIndex = 0;
