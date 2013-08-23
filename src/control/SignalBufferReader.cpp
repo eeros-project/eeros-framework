@@ -20,8 +20,8 @@ uint32_t SignalBufferReader::signalTypeAvailableToRead() {
 }
 
 bool SignalBufferReader::readRealSignal(sigid_t* id, uint64_t* timestamp, double* value) {
+	correctHeaderVersion();
 	if(signalTypeAvailableToRead() == kSignalTypeReal) {
-		correctHeaderVersion();
 		*id = getSignalId(readIndex);
 		buffer->read(timestamp, sizeof(*timestamp));
 		buffer->read(value, sizeof(*value));
@@ -33,8 +33,8 @@ bool SignalBufferReader::readRealSignal(sigid_t* id, uint64_t* timestamp, double
 
 realSignalDatum SignalBufferReader::readRealSignal() {
 	realSignalDatum sig;
+	correctHeaderVersion();
 	if(signalTypeAvailableToRead() == kSignalTypeReal) {
-		correctHeaderVersion();
 		sig.id = getSignalId(readIndex);
 		buffer->read(&(sig.timestamp), sizeof(sig.timestamp));
 		buffer->read(&(sig.value), sizeof(sig.value));
@@ -70,7 +70,7 @@ void SignalBufferReader::correctHeaderVersion() {
 	if(headerVersion != header->version) { // header has changed -> all data in buffer are invalid
 		readIndex = 0;
 		headerVersion = header->version;
-		buffer->reset();
+		buffer->resetReader();
 	}
 }
 

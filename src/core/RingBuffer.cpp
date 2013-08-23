@@ -62,7 +62,6 @@ uint32_t RingBuffer::size() const {
 	return ringSize;
 }
 
-void RingBuffer::reset() {
-	pRead = ring;
-	pWrite = ring;
+void RingBuffer::resetReader() {
+	pRead = pWrite;
 }

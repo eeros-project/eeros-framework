@@ -10,7 +10,7 @@ public:
 	uint32_t write(void* pSrc, uint32_t size);
 	uint32_t availableToRead() const;
 	uint32_t size() const;
-	void reset();
+	void resetReader();
 	
 
 private:
