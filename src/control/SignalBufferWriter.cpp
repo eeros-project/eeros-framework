@@ -23,8 +23,8 @@ void SignalBufferWriter::removeSignal(sigid_t id) {
 void SignalBufferWriter::appendData() {
 	for(std::list<sigid_t>::iterator i = observedSignalIds.begin(); i != observedSignalIds.end(); i++) {
 		Signal* signal = Signal::getSignalById(*i);
-		RealSignalOutput* realSignalOutput = dynamic_cast<RealSignalOutput*>(signal);
-		if(realSignalOutput) {
+		if (signal) {
+			RealSignalOutput* realSignalOutput = dynamic_cast<RealSignalOutput*>(signal);
 			uint64_t timestamp = realSignalOutput->getTimestamp((sigindex_t)*i);
 			buffer->write(&timestamp, sizeof(timestamp));
 			double value = realSignalOutput->getValue((sigindex_t)*i);
