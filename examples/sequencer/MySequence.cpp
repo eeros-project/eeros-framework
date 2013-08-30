@@ -28,7 +28,7 @@ MySequence::~MySequence(void){
 }
 
 void MySequence::fillCallBacks(){
-	fillVersion1();
+	fillVersion5();
 }
 
 void MySequence::fillVersion1(){

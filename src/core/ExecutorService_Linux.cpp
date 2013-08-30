@@ -46,5 +46,7 @@ void* ExecutorService::threadAction(void* ptr) {
 }
 
 void ExecutorService::waitForSequenceEnd(Executor* waitExecutor) {
-	// TODO
+	if(waitExecutor && waitExecutor->getStatus() == kRunning){
+		pthread_join(threads[waitExecutor->getThreadId()], NULL);
+	}
 }

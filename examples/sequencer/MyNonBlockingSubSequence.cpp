@@ -19,7 +19,7 @@ MyNonBlockingSubSequence::~MyNonBlockingSubSequence(void){
 }
 
 void MyNonBlockingSubSequence::fillCallBacks(){
-	fillVersion2();
+	fillVersion1();
 }
 
 void MyNonBlockingSubSequence::fillVersion1(){
