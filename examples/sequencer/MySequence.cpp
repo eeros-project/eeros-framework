@@ -206,7 +206,7 @@ void MySequence::MoveNonBlocking(){
 			//For 5th case (-> note case 5 (in my Folder)).
 			//set sequencerWasStarted = false to restart the sequencer
 			//set sequencerWasStarted = true to not restart the sequencer and not waiting
-			//sequencerWasStarted = true;
+			//suSequencerWasStarted = true;
 			suSequencerWasStarted = false;
 		}//else{
 			//SubSequencer wurde neu erzeugt
