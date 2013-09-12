@@ -23,4 +23,7 @@ if(NOT WINDOWS)
 	
 #	add_executable(sharedMemoryReaderTest SharedMemoryReaderTest.cpp)
 #	target_link_libraries(sharedMemoryReaderTest eeros)
+
+	add_executable(vinciTest1 VinciTest1.cpp)
+	target_link_libraries(vinciTest1 eeros)
 endif()
