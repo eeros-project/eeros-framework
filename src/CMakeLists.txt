@@ -20,11 +20,13 @@ add_subdirectory(core)
 add_subdirectory(control)
 add_subdirectory(hal)
 add_subdirectory(sequencer)
+add_subdirectory(safety)
 
 link_directories (${EEROS_BINARY_DIR}/src/core)
 link_directories (${EEROS_BINARY_DIR}/src/control)
 link_directories (${EEROS_BINARY_DIR}/src/hal)
 link_directories (${EEROS_BINARY_DIR}/src/sequencer)
+link_directories (${EEROS_BINARY_DIR}/src/safety)
 
 if(WINDOWS)
 	add_library(eeros ${EEROS_SRCS})

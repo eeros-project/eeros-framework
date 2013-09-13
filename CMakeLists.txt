@@ -21,6 +21,11 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Linux") # Linux
 			set(LINUX TRUE) # Linux operating system
 			
+			## Compiler flags
+			if(CMAKE_COMPILER_IS_GNUCXX)
+				set(CMAKE_CXX_FLAGS "-std=c++0x")
+			endif()
+			
 			# Check for Xenomai
 			set(XENOMAI_SEARCH_PATH /usr/xenomai /usr) # set the search path
 			find_path(XENOMAI_DIR include/xeno_config.h ${XENOMAI_SEARCH_PATH}) # find xeno-config.h
