@@ -31,13 +31,20 @@ SafetyLevel& SafetySystem::operator[](unsigned levelId) {
 }
 
 void SafetySystem::addEventToAllLevelsAbove(uint32_t level, uint32_t event, uint32_t nextLevel) {
-	// TODO
+	for(auto l : levels) {
+		if(l.getId() >= level) l.addEvent(event, nextLevel);
+	}
 }
 
 void SafetySystem::run() {
+	// 1) Read inputs and throw event
 	
+	// 2) Execute level action
+	
+	// 3) Set outputs
 }
 
 SafetySystem& SafetySystem::instance() {
-	
+	static SafetySystem safetySystemInstance;
+	return safetySystemInstance;
 }

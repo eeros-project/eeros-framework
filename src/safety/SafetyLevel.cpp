@@ -9,7 +9,7 @@ uint32_t SafetyLevel::getId() {
 }
 
 void SafetyLevel::addEvent(uint32_t event, uint32_t nextLevel) {
-	//TODO
+	transitions.insert(std::make_pair(event, nextLevel));
 }
 
 void SafetyLevel::setExitEvent(uint32_t event) {
@@ -23,4 +23,3 @@ void SafetyLevel::setLevelAction(std::function<void (void)> action) {
 SafetyLevel::~SafetyLevel() {
 	
 }
-

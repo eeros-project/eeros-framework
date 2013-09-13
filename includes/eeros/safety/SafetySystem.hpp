@@ -33,8 +33,6 @@ private:
 	std::vector<SafetyLevel> levels;
 	std::list<std::string> criticalOutputs;
 	std::list<std::string> criticalInputs;
-	
-	static SafetySystem safetySystem;
 };
 
 #endif // ORG_EEROS_SAFETY_SAFETYSYSTEM_HPP_

@@ -21,6 +21,7 @@ public:
 	void setLevelAction(std::function<void (void)> action);
 	
 	uint32_t getId();
+	uint32_t getLevelForEvent(uint32_t event);
 	
 	SafetyLevel& operator<(const SafetyLevel&);
 	
