@@ -69,7 +69,7 @@ int main() {
 		hal.getLogicSystemOutput("brake2"),
 		hal.getLogicSystemOutput("brake3")
 	};
-// 	safetySys.defineCriticalOutputs({ 
+// 	safetySys.defineCriticalOutputs({ // TODO
 // 		power,
 // 		enable[0],
 // 		enable[1],
@@ -89,7 +89,7 @@ int main() {
 		hal.getRealSystemInput("q2"),
 		hal.getRealSystemInput("q3")
 	};
-// 	safetySys.defineCriticalInputs({
+// 	safetySys.defineCriticalInputs({ // TODO
 // 		emergencyStop,
 // 		q[0],
 // 		q[1],
@@ -179,6 +179,7 @@ int main() {
 		safetySys.triggerEvent(swInitDone, privateContext);
 	});
 	
+	// Define entry level
 	safetySys.setEntryLevel(off);
 	
 	std::cout << "Example done..." << std::endl;

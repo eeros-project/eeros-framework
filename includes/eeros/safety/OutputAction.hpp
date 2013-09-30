@@ -1,6 +1,11 @@
 #ifndef ORG_EEROS_SAFETY_OUTPUTACTION_HPP_
 #define ORG_EEROS_SAFETY_OUTPUTACTION_HPP_
 
+#include <stdint.h>
+#include <eeros/hal/HAL.hpp>
+
+////////////////////////////// TODO split .hpp/.cpp //////////////////////////////
+
 class OutputAction {
 public:
 	virtual ~OutputAction(void) { }

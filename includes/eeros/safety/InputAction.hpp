@@ -1,7 +1,10 @@
 #ifndef ORG_EEROS_SAFETY_INPUTACTION_HPP_
 #define ORG_EEROS_SAFETY_INPUTACTION_HPP_
+
 #include <stdint.h>
 #include <eeros/hal/HAL.hpp>
+
+////////////////////////////// TODO split .hpp/.cpp //////////////////////////////
 
 class InputAction {
 public:

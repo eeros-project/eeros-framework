@@ -16,7 +16,7 @@ uint32_t SafetyLevel::getId() {
 uint32_t SafetyLevel::getLevelIdForEvent(uint32_t event, bool privateEventOk) {
 	auto it = transitions.find(event);
 	if(it != transitions.end()) {
-// TODO
+	// TODO
 		return it->second;
 	}
 	return kInvalidLevel;
@@ -25,6 +25,7 @@ uint32_t SafetyLevel::getLevelIdForEvent(uint32_t event, bool privateEventOk) {
 void SafetyLevel::addEvent(uint32_t event, uint32_t nextLevelId, EventType type) {
 	//transitions.insert(std::make_pair(event, nextLevel));
 	//transitions[event] = nextLevelId
+	// TODO
 }
 
 void SafetyLevel::setLevelAction(std::function<void (SafetyContext*)> action) {

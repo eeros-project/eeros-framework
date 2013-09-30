@@ -7,13 +7,8 @@ SafetySystem::SafetySystem() : currentLevel(0) {
 SafetySystem::SafetySystem(const SafetySystem&) { }
 SafetySystem& SafetySystem::operator=(const SafetySystem&) { }
 
-// SafetySystem::SafetySystem(uint32_t maxNofLevels, uint32_t nofCriticalInputs, uint32_t nofCriticalOutputs) : 
-// 	levels(maxNofLevels), criticalInputs(nofCriticalInputs), criticalOutputs(nofCriticalOutputs) { }
-// 
-// SafetySystem::SafetySystem(std::vector<SafetyLevel> safetyLevels, std::vector<std::string> criticalInputs, std::vector<std::string> criticalOutputs) : 
-// 	levels(safetyLevels), criticalInputs(criticalInputs), criticalOutputs(criticalOutputs) { }
-
 SafetyLevel& SafetySystem::getLevel(uint32_t levelId) {
+	// TODO fix warning: "reference to local variable ‘level’ returned"
 	for(auto level : levels) {
 		if(level.getId() == levelId) return level;
 	}
@@ -35,6 +30,7 @@ void SafetySystem::setEntryLevel(uint32_t levelId) {
 	throw -1; // TODO define error number and send error message to logger
 }
 
+// TODO
 // void SafetySystem::defineCriticalOutputs(std::vector<CriticalOutput> outputs) {
 // 	criticalOutputs = outputs;
 // }
@@ -69,14 +65,7 @@ void SafetySystem::addEventToAllLevelsBetween(uint32_t lowerLevelId, uint32_t up
 
 void SafetySystem::triggerEvent(uint32_t event, SafetyContext* context) {
 	if(currentLevel) {
-		uint32_t nextLevelId;
-		if(context == privateContext) {
-			nextLevelId = currentLevel->getLevelIdForEvent(event, true);
-		}
-		else { // publicContext
-			nextLevelId = currentLevel->getLevelIdForEvent(event, false);
-		}
-		
+		uint32_t nextLevelId = currentLevel->getLevelIdForEvent(event, context == privateContext);
 		if(nextLevelId != kInvalidLevel) {
 			SafetyLevel* nextLevel = &(getLevel(nextLevelId));
 			currentLevel = nextLevel;
@@ -92,16 +81,16 @@ void SafetySystem::run() {
 	SafetyLevel* level = this->currentLevel;
 	
 	// 2) Read inputs
-	for(auto input : criticalInputs) {
-		// TODO
+	for(auto ia : level->inputAction) {
+		ia.check();
 	}
 	
 	// 3) Execute level action
 	currentLevel->action(privateContext);
 	
 	// 4) Set outputs
-	for(auto output : criticalOutputs) {
-		// TODO
+	for(auto oa : level->outputAction) {
+		oa.set();
 	}
 }
 
