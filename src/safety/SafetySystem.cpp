@@ -1,47 +1,108 @@
 #include <eeros/safety/SafetySystem.hpp>
 
-SafetySystem::SafetySystem() { }
+SafetySystem::SafetySystem() : currentLevel(0) {
+	privateContext = new SafetyContext();
+}
+
 SafetySystem::SafetySystem(const SafetySystem&) { }
 SafetySystem& SafetySystem::operator=(const SafetySystem&) { }
 
-void SafetySystem::setSafetyLevels(std::vector<SafetyLevel>& levels) {
-	this->levels = levels;
-}
-
-// void SafetySystem::addCriticalOutput(std::string output) {
-// 	
-// }
+// SafetySystem::SafetySystem(uint32_t maxNofLevels, uint32_t nofCriticalInputs, uint32_t nofCriticalOutputs) : 
+// 	levels(maxNofLevels), criticalInputs(nofCriticalInputs), criticalOutputs(nofCriticalOutputs) { }
 // 
-// void SafetySystem::addCriticalInput(std::string output, Event* event) {
-// 	
-// }
+// SafetySystem::SafetySystem(std::vector<SafetyLevel> safetyLevels, std::vector<std::string> criticalInputs, std::vector<std::string> criticalOutputs) : 
+// 	levels(safetyLevels), criticalInputs(criticalInputs), criticalOutputs(criticalOutputs) { }
 
-SafetyLevel& SafetySystem::level(uint32_t levelId) {
-	int i = 0;
-	
-	while(i < levels.size()) {
-		if(levels[i].getId() == levelId) return levels[i];
+SafetyLevel& SafetySystem::getLevel(uint32_t levelId) {
+	for(auto level : levels) {
+		if(level.getId() == levelId) return level;
 	}
-	
-	throw -1;
+	throw -1; // TODO define error number and send error message to logger
 }
 
 SafetyLevel& SafetySystem::operator[](unsigned levelId) {
-	return level(levelId);
+	return getLevel(levelId);
 }
 
-void SafetySystem::addEventToAllLevelsAbove(uint32_t level, uint32_t event, uint32_t nextLevel) {
-	for(auto l : levels) {
-		if(l.getId() >= level) l.addEvent(event, nextLevel);
+void SafetySystem::defineSafetyLevels(std::vector<SafetyLevel> levels) {
+	this->levels = levels;
+}
+
+void SafetySystem::setEntryLevel(uint32_t levelId) {
+	if(!currentLevel) { // set only if currentLevel is 
+		currentLevel = &(getLevel(levelId));
+	}
+	throw -1; // TODO define error number and send error message to logger
+}
+
+// void SafetySystem::defineCriticalOutputs(std::vector<CriticalOutput> outputs) {
+// 	criticalOutputs = outputs;
+// }
+// 
+// void SafetySystem::defineCriticalInputs(std::vector<CriticalInput> inputs) {
+// 	criticalInputs = inputs;
+// }
+
+void SafetySystem::addEventToLevel(uint32_t levelId, uint32_t event, uint32_t nextLevelId, EventType type) {
+	SafetyLevel& level = getLevel(levelId);
+	level.addEvent(event, nextLevelId, type);
+}
+
+
+void SafetySystem::addEventToLevelAndAbove(uint32_t levelId, uint32_t event, uint32_t nextLevelId, EventType type) {
+	for(auto level : levels) {
+		if(level.getId() >= levelId) level.addEvent(event, nextLevelId, type);
+	}
+}
+
+void SafetySystem::addEventToLevelAndBelow(uint32_t levelId, uint32_t event, uint32_t nextLevelId, EventType type) {
+	for(auto level : levels) {
+		if(level.getId() <= levelId) level.addEvent(event, nextLevelId, type);
+	}
+}
+
+void SafetySystem::addEventToAllLevelsBetween(uint32_t lowerLevelId, uint32_t upperLevelId, uint32_t event, uint32_t nextLevelId, EventType type) {
+	for(auto level : levels) {
+		if(level.getId() >= lowerLevelId && level.getId() <= upperLevelId) level.addEvent(event, nextLevelId, type);
+	}
+}
+
+void SafetySystem::triggerEvent(uint32_t event, SafetyContext* context) {
+	if(currentLevel) {
+		uint32_t nextLevelId;
+		if(context == privateContext) {
+			nextLevelId = currentLevel->getLevelIdForEvent(event, true);
+		}
+		else { // publicContext
+			nextLevelId = currentLevel->getLevelIdForEvent(event, false);
+		}
+		
+		if(nextLevelId != kInvalidLevel) {
+			SafetyLevel* nextLevel = &(getLevel(nextLevelId));
+			currentLevel = nextLevel;
+		}
+	}
+	else {
+		throw -1; // TODO define error number and send error message to logger
 	}
 }
 
 void SafetySystem::run() {
-	// 1) Read inputs and throw event
+	// 1) Make local copy of currentLevel
+	SafetyLevel* level = this->currentLevel;
 	
-	// 2) Execute level action
+	// 2) Read inputs
+	for(auto input : criticalInputs) {
+		// TODO
+	}
 	
-	// 3) Set outputs
+	// 3) Execute level action
+	currentLevel->action(privateContext);
+	
+	// 4) Set outputs
+	for(auto output : criticalOutputs) {
+		// TODO
+	}
 }
 
 SafetySystem& SafetySystem::instance() {

@@ -1,25 +1,49 @@
 #include <eeros/safety/SafetyLevel.hpp>
 
-SafetyLevel::SafetyLevel(uint32_t id, std::string description, std::map<std::string, bool> outputStates) : id(id), description(description), outputs(outputStates) {
-	// nothing to do
+SafetyLevel::SafetyLevel(uint32_t id, std::string description) : id(id), description(description) {
+	// nothing to do...
 }
+
+SafetyLevel::~SafetyLevel() {
+	// nothing to do...
+}
+
 
 uint32_t SafetyLevel::getId() {
 	return id;
 }
 
-void SafetyLevel::addEvent(uint32_t event, uint32_t nextLevel) {
-	transitions.insert(std::make_pair(event, nextLevel));
+uint32_t SafetyLevel::getLevelIdForEvent(uint32_t event, bool privateEventOk) {
+	auto it = transitions.find(event);
+	if(it != transitions.end()) {
+// TODO
+		return it->second;
+	}
+	return kInvalidLevel;
 }
 
-void SafetyLevel::setExitEvent(uint32_t event) {
-	
+void SafetyLevel::addEvent(uint32_t event, uint32_t nextLevelId, EventType type) {
+	//transitions.insert(std::make_pair(event, nextLevel));
+	//transitions[event] = nextLevelId
 }
 
-void SafetyLevel::setLevelAction(std::function<void (void)> action) {
+void SafetyLevel::setLevelAction(std::function<void (SafetyContext*)> action) {
 	this->action = action;
 }
 
-SafetyLevel::~SafetyLevel() {
-	
+
+void SafetyLevel::setInputAction(InputAction action) {
+	// TODO
+}
+
+void SafetyLevel::setInputActions(std::vector<InputAction> actionList) {
+	// TODO
+}
+
+void SafetyLevel::setOutputAction(OutputAction action) {
+	// TODO
+}
+
+void SafetyLevel::setOutputActions(std::vector<OutputAction> actionList) {
+	// TODO
 }

@@ -2,15 +2,18 @@
 #include <vector>
 #include <initializer_list>
 #include <eeros/safety/SafetySystem.hpp>
-#include <eeros/safety/SafetyLevel.hpp>
+#include <eeros/hal/HAL.hpp>
 
 int main() {
 	std::cout << "Safety System Example started..." << std::endl;
-	
-	// 1) Get Safety System instance
+
+	// Get Safety System instance
 	SafetySystem& safetySys = SafetySystem::instance();
 	
-	// 2) Define all possible events
+	// Get HAL instance
+	HAL& hal = HAL::instance();
+	
+	// Define all possible events
 	enum {
 		doSwInit,
 		swShutDownDone,
@@ -33,7 +36,7 @@ int main() {
 		doEmergency
 	};
 	
-	// 3) Name all levels
+	// Name all levels
 	enum {
 		off = 10,
 		swShutingDown = 11,
@@ -51,80 +54,103 @@ int main() {
 		motionStarting = 42,
 		moving = 50
 	};
-
-	// 4) Create a list of all levels
-	std::vector<SafetyLevel> levels {
-		{ off,               "Ausgeschalteter Zustand" },
-		{ swShutingDown,     "Software herunterfahren" },
-		{ swInitializing,    "Aufstarten der Software" },
-		{ swInitialized,     "Software ist initialisiert" },
-		{ controlStopping,   "Reglertask wird gestoppt" },
-		{ controlStarting,   "Reglertask wird gestartet" },
-		{ emergency,         "Notauszustand" },
-		{ resetingEmergency, "Zurücksetzen des Notaus" },
-		{ systemOn,          "System ist bereit, aber noch ohne Leistung", { {"wd", true}, {"power", true} } },
-		{ poweringDown,      "Leistung ausschalten",                       { {"wd", true}, {"power", true}, {"enable", true} } },
-		{ poweringUp,        "Leistung einschalten",                       { {"wd", true}, {"power", true}, {"enable", true} } },
-		{ powerOn,           "Leistung ist ein, Motoren werden geregelt",  { {"wd", true}, {"power", true}, {"enable", true}, {"break", true} } },
-		{ motionStopping,    "",                                           { {"wd", true}, {"power", true}, {"enable", true}, {"break", true} } },
-		{ motionStarting,    "",                                           { {"wd", true}, {"power", true}, {"enable", true}, {"break", true} } },
-		{ moving,            "",                                           { {"wd", true}, {"power", true}, {"enable", true}, {"break", true} } },
+	
+	// Define criticcal outputs
+	SystemOutput<bool> power { hal.getLogicSystemOutput("power") };
+	SystemOutput<bool> enable[] {
+		hal.getLogicSystemOutput("enable0"),
+		hal.getLogicSystemOutput("enable1"),
+		hal.getLogicSystemOutput("enable2"),
+		hal.getLogicSystemOutput("enable3")
 	};
+	SystemOutput<bool> brake[] {
+		hal.getLogicSystemOutput("brake0"),
+		hal.getLogicSystemOutput("brake1"),
+		hal.getLogicSystemOutput("brake2"),
+		hal.getLogicSystemOutput("brake3")
+	};
+// 	safetySys.defineCriticalOutputs({ 
+// 		power,
+// 		enable[0],
+// 		enable[1],
+// 		enable[2],
+// 		enable[3],
+// 		brake[0],
+// 		brake[1],
+// 		brake[2],
+// 		brake[3]
+// 	});
 	
-	// 5) Set the levels in the safety system
-	safetySys.setSafetyLevels(levels);
-	
-	// 6) Add events to each level
-	safetySys[off].addEvent(doSwInit, swInitializing);  // Alternative: safetySys.level(off).addEvent(doSwInit, swInitializing);
-	
-	safetySys[swShutingDown].addEvent(swShutDownDone, off);
-	safetySys[swShutingDown].setExitEvent(off);
-	
-	safetySys[swInitializing].addEvent(swInitDone, swInitialized);
-	safetySys[swInitializing].setExitEvent(swInitDone);
-	
-	safetySys[swInitialized].addEvent(doOff, swShutingDown);
-	safetySys[swInitialized].addEvent(doControlStart, controlStarting);
-	
-	safetySys[controlStopping].addEvent(controlStoppingDone, swInitialized);
-	safetySys[controlStopping].setExitEvent(controlStoppingDone);
-	
-	safetySys[controlStarting].addEvent(controlStartingDone, systemOn);
-	safetySys[controlStarting].setExitEvent(controlStartingDone);
-	
-	safetySys[emergency].addEvent(doEmergencyReset, resetingEmergency);
-	
-	safetySys[resetingEmergency].addEvent(emergencyResetDone, systemOn);
-	safetySys[resetingEmergency].setExitEvent(emergencyResetDone);
-	
-	safetySys[systemOn].addEvent(doStopControl, controlStopping);
-	safetySys[systemOn].addEvent(doPoweringUp, poweringUp);
-	
-	safetySys[poweringDown].addEvent(poweringDownDone, systemOn);
-	safetySys[poweringDown].setExitEvent(poweringDownDone);
-	
-	safetySys[poweringUp].addEvent(poweringUpDone, powerOn);
-	safetySys[poweringUp].setExitEvent(poweringUpDone);
-	
-	safetySys[powerOn].addEvent(doPoweringDown, poweringDown);
-	safetySys[powerOn].addEvent(doStartingMotion, motionStarting);
-	
-	safetySys[motionStopping].addEvent(motionStoppingDone, powerOn);
-	safetySys[motionStopping].setExitEvent(motionStoppingDone);
-	
-	safetySys[motionStarting].addEvent(motionStartingDone, moving);
-	safetySys[motionStarting].setExitEvent(motionStartingDone);
-	
-	safetySys[moving].addEvent(doMotionStopping, motionStopping);
-	
-	// 7) Add events to multiple levels
-	safetySys.addEventToAllLevelsAbove(powerOn, doEmergency, emergency);
-	
-	// 8) Define and add level functions
-	safetySys[swInitializing].setLevelAction([]() { 
-		int a = 0;
-		int b = 5;
+	// Define criticcal inputs
+	SystemInput<bool> emergencyStop { hal.getLogicSystemInput("emergencyStop") };
+	SystemInput<double> q[] {
+		hal.getRealSystemInput("q0"),
+		hal.getRealSystemInput("q1"),
+		hal.getRealSystemInput("q2"),
+		hal.getRealSystemInput("q3")
+	};
+// 	safetySys.defineCriticalInputs({
+// 		emergencyStop,
+// 		q[0],
+// 		q[1],
+// 		q[2],
+// 		q[3]
+// 	});
+		
+	// Define Levels
+	safetySys.defineSafetyLevels({
+		{ off,               "Ausgeschalteter Zustand",                    },
+		{ swShutingDown,     "Software herunterfahren",                    },
+		{ swInitializing,    "Aufstarten der Software",                    },
+		{ swInitialized,     "Software ist initialisiert",                 },
+		{ controlStopping,   "Reglertask wird gestoppt",                   },
+		{ controlStarting,   "Reglertask wird gestartet",                  },
+		{ emergency,         "Notauszustand",                              },
+		{ resetingEmergency, "Zurücksetzen des Notaus",                    },
+		{ systemOn,          "System ist bereit, aber noch ohne Leistung", },
+		{ poweringDown,      "Leistung ausschalten",                       },
+		{ poweringUp,        "Leistung einschalten",                       },
+		{ powerOn,           "Leistung ist ein, Motoren werden geregelt",  },
+		{ motionStopping,    "",                                           },
+		{ motionStarting,    "",                                           },
+		{ moving,            "",                                           }
 	});
+	
+	// Add events to each level
+	safetySys[off              ].addEvent(doSwInit,            swInitializing,    kPublicEvent); // Alternative: safetySys.level(off).addEvent(doSwInit, swInitializing, kPublicEvent);
+	safetySys[swShutingDown    ].addEvent(swShutDownDone,      off,               kPrivateEvent);
+	safetySys[swInitializing   ].addEvent(swInitDone,          swInitialized,     kPrivateEvent);
+	safetySys[swInitialized    ].addEvent(doOff,               swShutingDown,     kPublicEvent);
+	safetySys[swInitialized    ].addEvent(doControlStart,      controlStarting,   kPublicEvent);
+	safetySys[controlStopping  ].addEvent(controlStoppingDone, swInitialized,     kPrivateEvent);
+	safetySys[controlStarting  ].addEvent(controlStartingDone, systemOn,          kPrivateEvent);
+	safetySys[emergency        ].addEvent(doEmergencyReset,    resetingEmergency, kPublicEvent);
+	safetySys[resetingEmergency].addEvent(emergencyResetDone,  systemOn,          kPrivateEvent);
+	safetySys[systemOn         ].addEvent(doStopControl,       controlStopping,   kPublicEvent);
+	safetySys[systemOn         ].addEvent(doPoweringUp,        poweringUp,        kPublicEvent);
+	safetySys[poweringDown     ].addEvent(poweringDownDone,    systemOn,          kPrivateEvent);
+	safetySys[poweringUp       ].addEvent(poweringUpDone,      powerOn,           kPrivateEvent);
+	safetySys[powerOn          ].addEvent(doPoweringDown,      poweringDown,      kPublicEvent);
+	safetySys[powerOn          ].addEvent(doStartingMotion,    motionStarting,    kPublicEvent);
+	safetySys[motionStopping   ].addEvent(motionStoppingDone,  powerOn,           kPrivateEvent);
+	safetySys[motionStarting   ].addEvent(motionStartingDone,  moving,            kPrivateEvent);
+	safetySys[moving           ].addEvent(doMotionStopping,    motionStopping,    kPublicEvent);
+	
+	// Add events to multiple levels
+	safetySys.addEventToLevelAndAbove(powerOn, doEmergency, emergency, kPublicEvent);
+	
+	// Define input states and events for all levels
+	
+	// Define output states and events for all levels
+	safetySys[off              ].setOutputAction(set(power, false));
+	
+			
+	// Define and add level functions
+	safetySys[swInitializing].setLevelAction([&](SafetyContext* privateContext) {
+		safetySys.triggerEvent(swInitDone, privateContext);
+	});
+	
+	safetySys.setEntryLevel(off);
 	
 	std::cout << "Example done..." << std::endl;
 }
