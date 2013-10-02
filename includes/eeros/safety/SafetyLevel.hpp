@@ -15,31 +15,12 @@ class SafetySystem;
 enum { kInvalidLevel = -1 };
 enum EventType { kPrivateEvent, kPublicEvent };
 
-//enum Action { notDefined, checkTrue, checkFalse, ignore, checkRange, setTrue, setFalse, leave, setToValue };
-
-// class InputAction {
-// public:
-// 	InputAction(Action action);
-// 	InputAction(Action action, double lowerLimit, double upperLimit);
-// };
-// 
-// class OutputAction {
-// public:
-// 	OutputAction(Action action);
-// 	OutputAction(Action action, double value);
-// 	OutputAction(Action action, double lowerLimit, double upperLimit);
-// };
-
 class SafetyLevel {
 
 	friend class SafetySystem;
 
 public:
 	SafetyLevel(uint32_t id, std::string description);
-	
-// 	SafetyLevel(uint32_t id, std::string description,
-// 				std::map<std::string, InputAction> inputStates,
-// 				std::map<std::string, OutputAction> outputStates);
 	
 	virtual ~SafetyLevel();
 	
@@ -62,7 +43,7 @@ private:
 	
 	uint32_t id;
 	std::string description;
-	std::map<uint32_t, uint32_t> transitions;
+	std::map<uint32_t, std::pair<uint32_t, EventType>> transitions;
 	
 	std::vector<InputAction> inputAction;
 	std::vector<OutputAction> outputAction;

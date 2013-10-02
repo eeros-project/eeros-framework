@@ -3,6 +3,8 @@
 #include <initializer_list>
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/hal/HAL.hpp>
+#include <eeros/core/Executor.hpp>
+#include <eeros/core/EEROSException.hpp>
 
 int main() {
 	std::cout << "Safety System Example started..." << std::endl;
@@ -176,11 +178,22 @@ int main() {
 			
 	// Define and add level functions
 	safetySys[swInitializing].setLevelAction([&](SafetyContext* privateContext) {
-		safetySys.triggerEvent(swInitDone, privateContext);
+		//safetySys.triggerEvent(swInitDone, privateContext);
 	});
 	
 	// Define entry level
 	safetySys.setEntryLevel(off);
+	
+	std::cout << "Starting executor..." << std::endl;
+	Executor e(1);
+	e.addRunnable(safetySys);
+	e.start();
+	
+	sleep(20);
+	
+	std::cout << "Stopping executor..." << std::endl;
+	e.stop();
+	while(!e.isTerminated());
 	
 	std::cout << "Example done..." << std::endl;
 }

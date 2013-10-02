@@ -11,20 +11,24 @@ HAL& HAL::instance() {
 
 SystemOutput<bool> HAL::getLogicSystemOutput(std::string name) {
 	// TODO
-	return SystemOutput<bool>();
+	static bool value = false;
+	return SystemOutput<bool>(value);
 }
 
 SystemOutput<double> HAL::getRealSystemOutput(std::string name) {
 	// TODO
-	return SystemOutput<double>();
+	static double value = 0;
+	return SystemOutput<double>(value);
 }
 
 SystemInput<bool> HAL::getLogicSystemInput(std::string name) {
 	// TODO
-	return SystemInput<bool>();
+	static bool value = false;
+	return SystemInput<bool>(value);
 }
 
 SystemInput<double> HAL::getRealSystemInput(std::string name) {
 	// TODO
-	return SystemInput<double>();
+	static double value = 0;
+	return SystemInput<double>(value);
 }

@@ -4,22 +4,29 @@
 #include <string>
 
 /////////////////////////////// TODO move this to separate file ///////////////////////////////
+
+class SystemInputInterface { };
+class SystemOutputInterface { };
+
+
 template <typename T>
-class SystemInput {
+class SystemInput : public SystemInputInterface {
 public:
-	virtual ~SystemInput(void) { }
-	virtual T& get(void) { return value; }
-protected:
-	T value;
+	explicit SystemInput(T& value) : value(value) { }
+	inline T& get(void) { return value; }
+private:
+	T& value;
 };
 
 template <typename T>
-class SystemOutput : public SystemInput<T> {
+class SystemOutput : public SystemOutputInterface {
 public:
-	virtual ~SystemOutput(void) { }
-	virtual T& get(void) { return this->value; }
-	virtual void set(T value) { this->value = value; }
-	virtual SystemInput<T>& getInput(void) { return static_cast<SystemInput<T>&>(*this); }
+	explicit SystemOutput(T& value) : value(value) { }
+	inline T& get(void) { return value; }
+	inline void set(T value) { this->value = value; }
+	inline SystemInput<T> getInput(void) { return SystemInput<T>(value); }
+private:
+	T& value;
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////
 

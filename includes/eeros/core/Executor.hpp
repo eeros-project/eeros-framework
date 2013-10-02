@@ -21,6 +21,7 @@ public:
 	virtual void start();
 	virtual bool isTerminated();
 	virtual void stop();
+	virtual void join();
 	
 //#ifndef WINDOWS		// TODO Check why the visual studio compiler the friend declaration above not understands. Remove this pre processor macro.
 	protected:		// PARV has no problem with private VS 2010, I have no WINDOWS define but _WINDOWS!

@@ -4,20 +4,18 @@
 #include <stdint.h>
 #include <eeros/hal/HAL.hpp>
 
-////////////////////////////// TODO split .hpp/.cpp //////////////////////////////
-
 class OutputAction {
 public:
-	virtual ~OutputAction(void) { }
-	virtual void set() { };
+	virtual ~OutputAction() { }
+	virtual void set() { }
 };
 
 template < typename T >
 class LeaveOutputAction : public OutputAction {
 public:
-	LeaveOutputAction(SystemOutput<T>& output) : output(output) { }
-	virtual ~LeaveOutputAction(void) { }
-	virtual void set() {  }
+	LeaveOutputAction(SystemOutput<T>& output) { }
+	virtual ~LeaveOutputAction() { }
+	virtual void set() { }
 private:
 	SystemOutput<T>& output;
 };
@@ -26,11 +24,23 @@ template < typename T >
 class SetOutputAction : public OutputAction {
 public:
 	SetOutputAction(SystemOutput<T>& output, T value) : output(output), value(value) { }
-	virtual ~SetOutputAction(void) { }
-	virtual void set() { output.set(value); }
+	virtual ~SetOutputAction() { }
+	virtual void set() { 
+		output.set(value);
+	}
 private:
 	SystemOutput<T>& output;
 	T value;
 };
+
+template <typename T>
+SetOutputAction<T> set(SystemOutput<T>& output, T value) {
+	return SetOutputAction<T>(output, value);
+}
+
+template <typename T>
+LeaveOutputAction<T> leave(SystemOutput<T>& output) {
+	return LeaveOutputAction<T>(output);
+}
 
 #endif // ORG_EEROS_SAFETY_OUTPUTACTION_HPP_

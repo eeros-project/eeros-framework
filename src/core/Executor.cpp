@@ -46,6 +46,11 @@ void Executor::stop()
 	this->status = kStop;
 }
 
+void Executor::join()
+{
+	// TODO
+}
+
 void Executor::run()
 {
 	for(std::list<Runnable*>::iterator i = runnables.begin(); i != runnables.end(); i++)

@@ -13,4 +13,4 @@ elseif(WINDOWS)
 endif()
 
 # Platform independent source files 
-add_eeros_sources(Executor.cpp System.cpp RingBuffer.cpp)
+add_eeros_sources(Executor.cpp System.cpp RingBuffer.cpp EEROSException.cpp)
