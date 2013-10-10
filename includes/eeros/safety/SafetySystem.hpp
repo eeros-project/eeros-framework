@@ -8,24 +8,28 @@
 #include <eeros/safety/SafetyContext.hpp>
 #include <eeros/safety/SafetyState.hpp>
 #include <eeros/safety/InputAction.hpp>
+#include <eeros/safety/inputActions.hpp>
 #include <eeros/safety/OutputAction.hpp>
 #include <eeros/hal/HAL.hpp>
 
 class SafetySystem : public Runnable {
 public:
-	SafetyLevel& getLevel(uint32_t levelId);
+	SafetyLevel& getCurrentLevel(void);
+	SafetyLevel& getLevel(int32_t levelId);
 	SafetyLevel& operator[](unsigned levelId);
 	
 	void defineSafetyLevels(std::vector<SafetyLevel> levels);
-	void setEntryLevel(uint32_t levelId);
+	void setEntryLevel(int32_t levelId);
 
 	void defineCriticalInputs(std::vector<SystemInputInterface*> inputs);
 	void defineCriticalOutputs(std::vector<SystemOutputInterface*> outputs);
+	void addCriticalInput(SystemInputInterface& input);
+	void addCriticalOutput(SystemOutputInterface& output);
 	
-	void addEventToLevel(uint32_t levelId, uint32_t event, uint32_t nextLevelId, EventType type = kPrivateEvent);
-	void addEventToLevelAndAbove(uint32_t levelId, uint32_t event, uint32_t nextLevelId, EventType type = kPrivateEvent);
-	void addEventToLevelAndBelow(uint32_t levelId, uint32_t event, uint32_t nextLevelId, EventType type = kPrivateEvent);
-	void addEventToAllLevelsBetween(uint32_t lowerLevelId, uint32_t upperLevelId, uint32_t event, uint32_t nextLevelId, EventType type = kPrivateEvent);
+	void addEventToLevel(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type = kPrivateEvent);
+	void addEventToLevelAndAbove(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type = kPrivateEvent);
+	void addEventToLevelAndBelow(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type = kPrivateEvent);
+	void addEventToAllLevelsBetween(int32_t lowerLevelId, int32_t upperLevelId, uint32_t event, int32_t nextLevelId, EventType type = kPrivateEvent);
 	
 	void triggerEvent(uint32_t event);
 	

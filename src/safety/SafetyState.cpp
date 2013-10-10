@@ -1,10 +1,11 @@
 #include <eeros/safety/SafetyState.hpp>
+#include <eeros/core/EEROSException.hpp>
 
 SafetyState::SafetyState() : currentLevel(0) { }
 
-SafetyLevel& SafetyState::getLevel(uint32_t levelId) {
+SafetyLevel& SafetyState::getLevel(int32_t levelId) {
 	for(auto& level : levels) {
 		if(level.getId() == levelId) return level;
 	}
-	throw -1; // TODO define error number and send error message to logger 
+	throw EEROSException("level not defined"); // TODO define error number and send error message to logger 
 }

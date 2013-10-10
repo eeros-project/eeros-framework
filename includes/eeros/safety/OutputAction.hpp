@@ -34,13 +34,13 @@ private:
 };
 
 template <typename T>
-SetOutputAction<T> set(SystemOutput<T>& output, T value) {
-	return SetOutputAction<T>(output, value);
+SetOutputAction<T>* set(SystemOutput<T>& output, T value) {
+	return new SetOutputAction<T>(output, value);
 }
 
 template <typename T>
-LeaveOutputAction<T> leave(SystemOutput<T>& output) {
-	return LeaveOutputAction<T>(output);
+LeaveOutputAction<T>* leave(SystemOutput<T>& output) {
+	return new LeaveOutputAction<T>(output);
 }
 
 #endif // ORG_EEROS_SAFETY_OUTPUTACTION_HPP_

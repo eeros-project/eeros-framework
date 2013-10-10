@@ -8,7 +8,7 @@
 class SafetyState {
 public:
 	SafetyState();
-	SafetyLevel& getLevel(uint32_t levelId);
+	SafetyLevel& getLevel(int32_t levelId);
 	
 	std::vector<SafetyLevel> levels;
 	SafetyLevel* currentLevel;

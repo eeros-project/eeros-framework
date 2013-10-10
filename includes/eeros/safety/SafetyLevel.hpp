@@ -20,19 +20,18 @@ class SafetyLevel {
 	friend class SafetySystem;
 
 public:
-	SafetyLevel(uint32_t id, std::string description);
-	
+	SafetyLevel(int32_t id, std::string description);
 	virtual ~SafetyLevel();
 	
-	uint32_t getId();
-	uint32_t getLevelIdForEvent(uint32_t event, bool privateEventOk = false);
+	int32_t getId();
+	int32_t getLevelIdForEvent(uint32_t event, bool privateEventOk = false);
 	
-	void addEvent(uint32_t event, uint32_t nextLevelId, EventType type = kPrivateEvent);
+	void addEvent(uint32_t event, int32_t nextLevelId, EventType type = kPrivateEvent);
 	
-	void setInputAction(InputAction action);
-	void setInputActions(std::vector<InputAction> actionList);
-	void setOutputAction(OutputAction action);
-	void setOutputActions(std::vector<OutputAction> actionList);
+	void setInputAction(InputAction* action);
+	void setInputActions(std::vector<InputAction*> actionList);
+	void setOutputAction(OutputAction* action);
+	void setOutputActions(std::vector<OutputAction*> actionList);
 	
 	void setLevelAction(std::function<void (SafetyContext* context)> action);
 	
@@ -41,12 +40,12 @@ public:
 private:
 	std::function<void (SafetyContext*)> action;
 	
-	uint32_t id;
+	int32_t id;
 	std::string description;
-	std::map<uint32_t, std::pair<uint32_t, EventType>> transitions;
+	std::map<uint32_t, std::pair<int32_t, EventType>> transitions;
 	
-	std::vector<InputAction> inputAction;
-	std::vector<OutputAction> outputAction;
+	std::vector<InputAction*> inputAction;
+	std::vector<OutputAction*> outputAction;
 };
 
 #endif // ORG_EEROS_SAFETY_SAFETYLEVEL_HPP_

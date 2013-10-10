@@ -6,7 +6,16 @@ SafetySystem::SafetySystem() : privateContext(state) { }
 SafetySystem::SafetySystem(const SafetySystem&) : privateContext(state) { }
 SafetySystem& SafetySystem::operator=(const SafetySystem&) { }
 
-SafetyLevel& SafetySystem::getLevel(uint32_t levelId) {
+SafetyLevel& SafetySystem::getCurrentLevel(void) {
+	if(state.currentLevel) {
+		return *state.currentLevel;
+	}
+	else {
+		throw EEROSException("currentLevel not defiend"); // TODO define error number and send error message to logger
+	}
+}
+
+SafetyLevel& SafetySystem::getLevel(int32_t levelId) {
 	return state.getLevel(levelId);
 }
 
@@ -18,11 +27,13 @@ void SafetySystem::defineSafetyLevels(std::vector<SafetyLevel> levels) {
 	state.levels = levels;
 }
 
-void SafetySystem::setEntryLevel(uint32_t levelId) {
-	if(!state.currentLevel) { // set only if currentLevel is 
+void SafetySystem::setEntryLevel(int32_t levelId) {
+	if(!state.currentLevel) { // set only if currentLevel is not null
 		state.currentLevel = &(getLevel(levelId));
 	}
-	else throw EEROSException("currentLevel already defined"); // TODO define error number and send error message to logger
+	else {
+		throw EEROSException("currentLevel already defined"); // TODO define error number and send error message to logger
+	}
 }
 
 void SafetySystem::defineCriticalOutputs(std::vector<SystemOutputInterface*> outputs) {
@@ -33,25 +44,32 @@ void SafetySystem::defineCriticalInputs(std::vector<SystemInputInterface*> input
 	state.criticalInputs = inputs;
 }
 
-void SafetySystem::addEventToLevel(uint32_t levelId, uint32_t event, uint32_t nextLevelId, EventType type) {
+void SafetySystem::addCriticalInput(SystemInputInterface& input) {
+	state.criticalInputs.push_back(&input);
+}
+
+void SafetySystem::addCriticalOutput(SystemOutputInterface& output) {
+	state.criticalOutputs.push_back(&output);
+}
+
+void SafetySystem::addEventToLevel(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type) {
 	SafetyLevel& level = getLevel(levelId);
 	level.addEvent(event, nextLevelId, type);
 }
 
-
-void SafetySystem::addEventToLevelAndAbove(uint32_t levelId, uint32_t event, uint32_t nextLevelId, EventType type) {
+void SafetySystem::addEventToLevelAndAbove(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type) {
 	for(auto level : state.levels) {
 		if(level.getId() >= levelId) level.addEvent(event, nextLevelId, type);
 	}
 }
 
-void SafetySystem::addEventToLevelAndBelow(uint32_t levelId, uint32_t event, uint32_t nextLevelId, EventType type) {
+void SafetySystem::addEventToLevelAndBelow(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type) {
 	for(auto level : state.levels) {
 		if(level.getId() <= levelId) level.addEvent(event, nextLevelId, type);
 	}
 }
 
-void SafetySystem::addEventToAllLevelsBetween(uint32_t lowerLevelId, uint32_t upperLevelId, uint32_t event, uint32_t nextLevelId, EventType type) {
+void SafetySystem::addEventToAllLevelsBetween(int32_t lowerLevelId, int32_t upperLevelId, uint32_t event, int32_t nextLevelId, EventType type) {
 	for(auto level : state.levels) {
 		if(level.getId() >= lowerLevelId && level.getId() <= upperLevelId) level.addEvent(event, nextLevelId, type);
 	}
@@ -59,24 +77,47 @@ void SafetySystem::addEventToAllLevelsBetween(uint32_t lowerLevelId, uint32_t up
 
 void SafetySystem::triggerEvent(uint32_t event) {
 	if(state.currentLevel) {
-		uint32_t nextLevelId = state.currentLevel->getLevelIdForEvent(event, false);
+		int32_t nextLevelId = state.currentLevel->getLevelIdForEvent(event, true);
 		if(nextLevelId != kInvalidLevel) {
-			SafetyLevel* nextLevel = &(getLevel(nextLevelId));
-			state.currentLevel = nextLevel; // TODO make atomic
+			SafetyLevel* nextLevel = &(state.getLevel(nextLevelId));
+			if(nextLevel != nullptr) {
+				state.currentLevel = nextLevel; // TODO make atomic
+			}
+			else {
+				throw EEROSException("unknown safety level"); // TODO define error number and send error message to logger
+			}
+			
+		}
+		else {
+			// TODO send msg to logger
 		}
 	}
 	else {
-		throw EEROSException("currentLevel not defiend"); // TODO define error number and send error message to logger
+		throw EEROSException("current level not defined"); // TODO define error number and send error message to logger
 	}
 }
 
 void SafetySystem::run() {
+	// 0) Check if all safety critical I/Os are defined in all levels
+	static bool first = true;
+	if(first) {
+		first = false;
+		if (state.currentLevel == nullptr) {
+			throw EEROSException("currentLevel not defiend");
+		}
+		for (auto level : state.levels) {
+			// TODO check if all input/output actions are defined
+		}
+	}
+	
 	// 1) Make local copy of currentLevel
 	SafetyLevel* level = state.currentLevel;
 	
 	// 2) Read inputs
 	for(auto ia : level->inputAction) {
-		ia.check();
+		if(ia != nullptr) {
+			ia->check(&privateContext);
+		}
 	}
 	
 	// 3) Execute level action
@@ -86,7 +127,9 @@ void SafetySystem::run() {
 		
 	// 4) Set outputs
 	for(auto oa : level->outputAction) {
-		oa.set();
+		if(oa != nullptr) {
+			oa->set();
+		}
 	}
 }
 

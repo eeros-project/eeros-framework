@@ -2,17 +2,16 @@
 #define ORG_EEROS_SAFETY_SAFETYCONTEXT_HPP_
 
 #include <eeros/safety/SafetyState.hpp>
-#include <eeros/types.hpp>
+#include <stdint.h>
 
 class SafetySystem;
 
 class SafetyContext {
 	friend class SafetySystem;
 public:
-	void triggerEvent(uint32_t event);
+	void triggerEvent(int32_t event);
 	
 private:
-//	SafetyContext();
 	explicit SafetyContext(SafetyState& state);
 	SafetyState& state;
 };
