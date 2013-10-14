@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 	mainSequencer.start();
 
 	//Thread stoppen wird in Step Stopping gemacht
-	//mainSequence.stop();
+	//callerThread.stop();
 	
 	while(!mainSequencer.isTerminated()){
 		cout << "waiting for executor to terminate..." << std::endl;
