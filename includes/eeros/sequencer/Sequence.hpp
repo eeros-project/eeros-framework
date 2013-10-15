@@ -20,6 +20,7 @@ namespace eeros{
 		public:
 			typedef void (Sequence::*method)();
 			Sequence(std::string name, Sequencer& caller);
+			~Sequence();
 			std::string getName();
 			void addCallBack(method callback);
 			std::list<Sequence::method>::iterator findCallBack(method callback, bool setCurrent);
@@ -27,6 +28,7 @@ namespace eeros{
 			virtual void run();
 			virtual void fillCallBacks() = 0;
 			static Sequence* getSequence(std::string name);
+			static void removeSequence(std::string name);
 			int getState();
 		protected:
 			Sequencer& callerThread;
