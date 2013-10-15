@@ -6,48 +6,49 @@ MySequence::MySequence(std::string name, eeros::sequencer::Sequencer& caller)
 }
 
 void MySequence::fillCallBacks(){
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::Init));
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::Initialising));
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::Initialised));
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::Homed));
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::Move));
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::Stopping));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::init));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::initialising));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::initialised));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::homed));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::move));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::stopping));
 }
 
 /** Initialisation
  */
-void MySequence::Init(){
-	calledMethode.append("Init");
+void MySequence::init(){
+	calledMethode.append("Init ");
 }
 
 /** Initialising
 	*/
-void MySequence::Initialising(){
-	calledMethode.append("Initialising");
+void MySequence::initialising(){
+	calledMethode.append("Initialising ");
 }
 
 /** Initialised
 	*/
-void MySequence::Initialised(){
-	calledMethode.append("Initialised");
+void MySequence::initialised(){
+	calledMethode.append("Initialised ");
 }
 
 /** Homed
 */
-void MySequence::Homed(){
-	calledMethode.append("Homed");
+void MySequence::homed(){
+	calledMethode.append("Homed ");
 }
 
 /** Move
 */
-void MySequence::Move(){
-	calledMethode.append("Move");
+void MySequence::move(){
+	calledMethode.append("Move ");
 }
 
 /** Stopping
 */
-void MySequence::Stopping(){
+void MySequence::stopping(){
 	calledMethode.append("Stopping");
+	//stop the thread
 	callerThread.stop();
 }
 

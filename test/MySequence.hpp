@@ -5,7 +5,7 @@
 #include <eeros/sequencer/Sequencer.hpp>
 
 class MySequence: public eeros::sequencer::Sequence{
-private:
+protected:
 	std::string calledMethode;
 public:
 	MySequence(std::string name, eeros::sequencer::Sequencer& caller);
@@ -14,27 +14,27 @@ public:
 	
 	/** Initialisation
 	 */
-	void Init();
+	void init();
 
 	/** Initialising
 	 */
-	void Initialising();
+	void initialising();
 
 	/** Initialised
 	 */
-	void Initialised();
+	void initialised();
 
 	/** Homed
 	*/
-	void Homed();
+	void homed();
 
 	/** Move
 	*/
-	void Move();
+	void move();
 
 	/** Stopping
 	*/
-	void Stopping();
+	void stopping();
 	
 	std::string getCalledMethode();
 };
