@@ -14,12 +14,16 @@ Sequence::Sequence(std::string name, Sequencer& caller)
 	if(&callerThread != Sequencer::getMainSequencer()){
 		Sequencer::getMainSequencer()->addSubSequencer(&caller);
 	}
-	Sequence* seq = getSequence(name);
+	Sequence* seq = getSequence(sequenceName);
 	if(seq){
 		 throw "Sequence allready exists!";
 	}
 	Sequence::allSequences.push_back(this);
 	currentCallBackIterator = callBacks.end();
+}
+
+Sequence::~Sequence(){
+	removeSequence(sequenceName);
 }
 
 std::string Sequence::getName(){
@@ -94,6 +98,17 @@ Sequence* Sequence::getSequence(std::string name){
 			iter++;
 		}
 		return 0;
+}
+
+void Sequence::removeSequence(std::string name){
+	std::list<Sequence*>::iterator iter = eeros::sequencer::Sequence::allSequences.begin();
+	while(iter != eeros::sequencer::Sequence::allSequences.end()){
+		if((*iter)->getName().compare(name) == 0){
+			iter = allSequences.erase(iter);
+		}else{
+		  iter++;
+		}
+	}
 }
 
 int Sequence::getState(){
