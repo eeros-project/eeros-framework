@@ -3,32 +3,8 @@
 
 #include <string>
 
-/////////////////////////////// TODO move this to separate file ///////////////////////////////
-
-class SystemInputInterface { };
-class SystemOutputInterface { };
-
-
-template <typename T>
-class SystemInput : public SystemInputInterface {
-public:
-	explicit SystemInput(T& value) : value(value) { }
-	inline T& get(void) { return value; }
-private:
-	T& value;
-};
-
-template <typename T>
-class SystemOutput : public SystemOutputInterface {
-public:
-	explicit SystemOutput(T& value) : value(value) { }
-	inline T& get(void) { return value; }
-	inline void set(T value) { this->value = value; }
-	inline SystemInput<T> getInput(void) { return SystemInput<T>(value); }
-private:
-	T& value;
-};
-///////////////////////////////////////////////////////////////////////////////////////////////
+#include <eeros/hal/SystemInput.hpp>
+#include <eeros/hal/SystemOutput.hpp>
 
 class HAL {
 public:
@@ -45,5 +21,6 @@ private:
 	HAL& operator=(const HAL&);
 };
 
-#endif /* ORG_EEROS_HAL_HAL_HPP_ */
 
+
+#endif /* ORG_EEROS_HAL_HAL_HPP_ */
