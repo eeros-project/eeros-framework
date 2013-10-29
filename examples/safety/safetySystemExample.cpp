@@ -5,6 +5,7 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/core/Executor.hpp>
 #include <eeros/core/EEROSException.hpp>
+#include <eeros/hal/ComediFqd.hpp>
 
 int main() {
 	std::cout << "Safety System Example started..." << std::endl;
@@ -14,6 +15,10 @@ int main() {
 	
 	// Get HAL instance
 	HAL& hal = HAL::instance();
+	
+	// Define system in- and outputs
+	ComediDevice comedi0("/dev/comedi0");
+	ComediFqd enc0("q0", comedi0, 2, 8, 10, 9, 6.28318530718 / 2000.0, 0, 0);
 	
 	// Define all possible events
 	enum {
@@ -58,19 +63,18 @@ int main() {
 	};
 	
 	// Define criticcal outputs
-	SystemOutput<bool> power { hal.getLogicSystemOutput("power") };
-	SystemOutput<bool> enable[] {
-		hal.getLogicSystemOutput("enable0"),
-		hal.getLogicSystemOutput("enable1"),
-		hal.getLogicSystemOutput("enable2"),
-		hal.getLogicSystemOutput("enable3")
-	};
-	SystemOutput<bool> brake[] {
-		hal.getLogicSystemOutput("brake0"),
-		hal.getLogicSystemOutput("brake1"),
-		hal.getLogicSystemOutput("brake2"),
-		hal.getLogicSystemOutput("brake3")
-	};
+	SystemOutput<bool>& power = hal.getLogicSystemOutput("power");
+	
+	SystemOutput<bool>& enable0 = hal.getLogicSystemOutput("enable0");
+	SystemOutput<bool>& enable1 = hal.getLogicSystemOutput("enable1");
+	SystemOutput<bool>& enable2 = hal.getLogicSystemOutput("enable2");
+	SystemOutput<bool>& enable3 = hal.getLogicSystemOutput("enable3");
+
+	SystemOutput<bool>& brake0 = hal.getLogicSystemOutput("brake0");
+	SystemOutput<bool>& brake1 = hal.getLogicSystemOutput("brake1");
+	SystemOutput<bool>& brake2 = hal.getLogicSystemOutput("brake2");
+	SystemOutput<bool>& brake3 = hal.getLogicSystemOutput("brake3");
+
 // 	safetySys.defineCriticalOutputs({ // TODO
 // 		power,
 // 		enable[0],
@@ -84,13 +88,12 @@ int main() {
 // 	});
 	
 	// Define criticcal inputs
-	SystemInput<bool> emergencyStop { hal.getLogicSystemInput("emergencyStop") };
-	SystemInput<double> q[] {
-		hal.getRealSystemInput("q0"),
-		hal.getRealSystemInput("q1"),
-		hal.getRealSystemInput("q2"),
-		hal.getRealSystemInput("q3")
-	};
+	SystemInput<bool>& emergencyStop = hal.getLogicSystemInput("emergencyStop");
+	SystemInput<double>& q0 = hal.getRealSystemInput("q0");
+	SystemInput<double>& q1 = hal.getRealSystemInput("q0");
+	SystemInput<double>& q2 = hal.getRealSystemInput("q0");
+	SystemInput<double>& q3 = hal.getRealSystemInput("q0");
+	
 // 	safetySys.defineCriticalInputs({ // TODO
 // 		emergencyStop,
 // 		q[0],
@@ -142,38 +145,38 @@ int main() {
 	safetySys.addEventToLevelAndAbove(powerOn, doEmergency, emergency, kPublicEvent);
 	
 	// Define input states and events for all levels
-	safetySys[off              ].setInputActions({ ignore(emergencyStop),                   ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[swShutingDown    ].setInputActions({ ignore(emergencyStop),                   ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[swInitializing   ].setInputActions({ ignore(emergencyStop),                   ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[swInitialized    ].setInputActions({ ignore(emergencyStop),                   ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[controlStopping  ].setInputActions({ ignore(emergencyStop),                   ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[controlStarting  ].setInputActions({ ignore(emergencyStop),                   ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[emergency        ].setInputActions({ ignore(emergencyStop),                   ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[resetingEmergency].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[systemOn         ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[poweringDown     ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[poweringUp       ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[powerOn          ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[motionStopping   ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[motionStarting   ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q[0]),                              ignore(q[1]),                              ignore(q[2]),                              ignore(q[3])                              });
-	safetySys[moving           ].setInputActions({ check(emergencyStop, true, doEmergency), range(q[0], 0.0, 6.283, doMotionStopping), range(q[1], 0.0, 6.283, doMotionStopping), range(q[2], 0.0, 6.283, doMotionStopping), range(q[3], 0.0, 6.283, doMotionStopping) });
+	safetySys[off              ].setInputActions({ ignore(emergencyStop),                   ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[swShutingDown    ].setInputActions({ ignore(emergencyStop),                   ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[swInitializing   ].setInputActions({ ignore(emergencyStop),                   ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[swInitialized    ].setInputActions({ ignore(emergencyStop),                   ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[controlStopping  ].setInputActions({ ignore(emergencyStop),                   ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[controlStarting  ].setInputActions({ ignore(emergencyStop),                   ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[emergency        ].setInputActions({ ignore(emergencyStop),                   ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[resetingEmergency].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[systemOn         ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[poweringDown     ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[poweringUp       ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[powerOn          ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[motionStopping   ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[motionStarting   ].setInputActions({ check(emergencyStop, true, doEmergency), ignore(q0),                              ignore(q1),                              ignore(q2),                              ignore(q3)                              });
+	safetySys[moving           ].setInputActions({ check(emergencyStop, true, doEmergency), range(q0, 0.0, 6.283, doMotionStopping), range(q1, 0.0, 6.283, doMotionStopping), range(q2, 0.0, 6.283, doMotionStopping), range(q3, 0.0, 6.283, doMotionStopping) });
 	
 	// Define output states and events for all levels
-	safetySys[off              ].setOutputActions({ set(power, false), set(enable[0], false), set(enable[1], false), set(enable[2], false), set(enable[3], false), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[swShutingDown    ].setOutputActions({ set(power, false), set(enable[0], false), set(enable[1], false), set(enable[2], false), set(enable[3], false), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[swInitializing   ].setOutputActions({ set(power, false), set(enable[0], false), set(enable[1], false), set(enable[2], false), set(enable[3], false), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[swInitialized    ].setOutputActions({ set(power, false), set(enable[0], false), set(enable[1], false), set(enable[2], false), set(enable[3], false), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[controlStopping  ].setOutputActions({ set(power, false), set(enable[0], false), set(enable[1], false), set(enable[2], false), set(enable[3], false), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[controlStarting  ].setOutputActions({ set(power, false), set(enable[0], false), set(enable[1], false), set(enable[2], false), set(enable[3], false), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[emergency        ].setOutputActions({ set(power, false), set(enable[0], false), set(enable[1], false), set(enable[2], false), set(enable[3], false), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[resetingEmergency].setOutputActions({ set(power, false), set(enable[0], false), set(enable[1], false), set(enable[2], false), set(enable[3], false), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[systemOn         ].setOutputActions({ set(power, true ), set(enable[0], false), set(enable[1], false), set(enable[2], false), set(enable[3], false), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[poweringDown     ].setOutputActions({ set(power, true ), set(enable[0], true ), set(enable[1], true ), set(enable[2], true ), set(enable[3], true ), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[poweringUp       ].setOutputActions({ set(power, true ), set(enable[0], true ), set(enable[1], true ), set(enable[2], true ), set(enable[3], true ), set(brake[0], true ), set(brake[1], true ), set(brake[2], true ), set(brake[3], true ) });
-	safetySys[powerOn          ].setOutputActions({ set(power, true ), set(enable[0], true ), set(enable[1], true ), set(enable[2], true ), set(enable[3], true ), set(brake[0], false), set(brake[1], false), set(brake[2], false), set(brake[3], false) });
-	safetySys[motionStopping   ].setOutputActions({ set(power, true ), set(enable[0], true ), set(enable[1], true ), set(enable[2], true ), set(enable[3], true ), set(brake[0], false), set(brake[1], false), set(brake[2], false), set(brake[3], false) });
-	safetySys[motionStarting   ].setOutputActions({ set(power, true ), set(enable[0], true ), set(enable[1], true ), set(enable[2], true ), set(enable[3], true ), set(brake[0], false), set(brake[1], false), set(brake[2], false), set(brake[3], false) });
-	safetySys[moving           ].setOutputActions({ set(power, true ), set(enable[0], true ), set(enable[1], true ), set(enable[2], true ), set(enable[3], true ), set(brake[0], false), set(brake[1], false), set(brake[2], false), set(brake[3], false) });
+	safetySys[off              ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(enable2, false), set(enable3, false), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[swShutingDown    ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(enable2, false), set(enable3, false), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[swInitializing   ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(enable2, false), set(enable3, false), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[swInitialized    ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(enable2, false), set(enable3, false), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[controlStopping  ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(enable2, false), set(enable3, false), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[controlStarting  ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(enable2, false), set(enable3, false), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[emergency        ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(enable2, false), set(enable3, false), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[resetingEmergency].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(enable2, false), set(enable3, false), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[systemOn         ].setOutputActions({ set(power, true ), set(enable0, false), set(enable1, false), set(enable2, false), set(enable3, false), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[poweringDown     ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(enable2, true ), set(enable3, true ), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[poweringUp       ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(enable2, true ), set(enable3, true ), set(brake0, true ), set(brake1, true ), set(brake2, true ), set(brake3, true ) });
+	safetySys[powerOn          ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(enable2, true ), set(enable3, true ), set(brake0, false), set(brake1, false), set(brake2, false), set(brake3, false) });
+	safetySys[motionStopping   ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(enable2, true ), set(enable3, true ), set(brake0, false), set(brake1, false), set(brake2, false), set(brake3, false) });
+	safetySys[motionStarting   ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(enable2, true ), set(enable3, true ), set(brake0, false), set(brake1, false), set(brake2, false), set(brake3, false) });
+	safetySys[moving           ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(enable2, true ), set(enable3, true ), set(brake0, false), set(brake1, false), set(brake2, false), set(brake3, false) });
 	
 			
 	// Define and add level functions

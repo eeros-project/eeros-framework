@@ -2,18 +2,20 @@
 #define ORG_EEROS_HAL_SYSTEMOUTPUT_HPP_
 
 #include <eeros/hal/SystemInput.hpp>
+#include <eeros/core/System.hpp>
 
-class SystemOutputInterface { };
+class SystemOutputInterface { public: virtual ~SystemOutputInterface() {} };
 
 template <typename T>
 class SystemOutput : public SystemOutputInterface {
 public:
-	explicit SystemOutput(T& value) : value(value) { }
-	inline T& get(void) { return value; }
-	inline void set(T value) { this->value = value; }
-	inline SystemInput<T> getInput(void) { return SystemInput<T>(value); }
+	explicit SystemOutput(std::string id) : id(id) { }
+    virtual ~SystemOutput() { }
+	virtual T get() = 0;
+	virtual void set(T value) = 0;
+//	inline SystemInput<T> getInput(void) { return SystemInput<T>(value); }
 private:
-	T& value;
+	std::string id;
 };
 
 #endif /* ORG_EEROS_HAL_SYSTEMOUTPUT_HPP_ */

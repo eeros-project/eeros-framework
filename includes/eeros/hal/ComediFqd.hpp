@@ -1,0 +1,32 @@
+#ifndef ORG_EEROS_HAL_COMEDIFQD_HPP_
+#define ORG_EEROS_HAL_COMEDIFQD_HPP_
+
+#include <string>
+#include <vector>
+
+#include <comedilib.h>
+
+#include <eeros/hal/SystemInput.hpp>
+#include <eeros/hal/SystemOutput.hpp>
+#include <eeros/hal/ComediDevice.hpp>
+
+class ComediFqd : public SystemInput<double> {
+public:
+	ComediFqd(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channelA, uint32_t channelB, uint32_t channelZ, double scale, double offset, double initValue);
+	virtual double get();
+	
+private:
+	int init(unsigned int initialValue);
+	
+	comedi_t* deviceHandle;
+	uint32_t subDeviceNumber;
+	uint32_t channelA;
+	uint32_t channelB;
+	uint32_t channelZ;
+	lsampl_t counter_mode;
+	
+	double scale;
+	double offset;
+};
+
+#endif /* ORG_EEROS_HAL_COMEDIFQD_HPP_ */

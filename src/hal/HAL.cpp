@@ -9,26 +9,18 @@ HAL& HAL::instance() {
 	return halInstance;
 }
 
-SystemOutput<bool> HAL::getLogicSystemOutput(std::string name) {
-	// TODO
-	static bool value = false;
-	return SystemOutput<bool>(value);
+SystemOutput<bool>& HAL::getLogicSystemOutput(std::string name) {
+	return *dynamic_cast<SystemOutput<bool>*>(outputs[name]);
 }
 
-SystemOutput<double> HAL::getRealSystemOutput(std::string name) {
-	// TODO
-	static double value = 0;
-	return SystemOutput<double>(value);
+SystemOutput<double>& HAL::getRealSystemOutput(std::string name) {
+	return *dynamic_cast<SystemOutput<double>*>(outputs[name]);
 }
 
-SystemInput<bool> HAL::getLogicSystemInput(std::string name) {
-	// TODO
-	static bool value = false;
-	return SystemInput<bool>(value);
+SystemInput<bool>& HAL::getLogicSystemInput(std::string name) {
+	return *dynamic_cast<SystemInput<bool>*>(outputs[name]);
 }
 
-SystemInput<double> HAL::getRealSystemInput(std::string name) {
-	// TODO
-	static double value = 0;
-	return SystemInput<double>(value);
+SystemInput<double>& HAL::getRealSystemInput(std::string name) {
+	return *dynamic_cast<SystemInput<double>*>(outputs[name]);
 }
