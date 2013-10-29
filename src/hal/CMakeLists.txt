@@ -1,1 +1,1 @@
-add_eeros_sources(HAL.cpp ComediDevice.cpp ComediFqd.cpp)
+add_eeros_sources(HAL.cpp ComediDevice.cpp ComediAdc.cpp ComediDac.cpp ComediFqd.cpp)

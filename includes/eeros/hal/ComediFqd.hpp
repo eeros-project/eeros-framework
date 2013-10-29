@@ -16,8 +16,6 @@ public:
 	virtual double get();
 	
 private:
-	int init(unsigned int initialValue);
-	
 	comedi_t* deviceHandle;
 	uint32_t subDeviceNumber;
 	uint32_t channelA;
