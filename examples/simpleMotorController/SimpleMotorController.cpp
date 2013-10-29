@@ -17,33 +17,13 @@
 
 #define TIMETOWAIT 30
 
-class Reader : public Runnable {
-public:
-	Reader(void* memory, uint32_t size) : r(memory, size) {}
-	
-	void run() {
-		if(r.signalTypeAvailableToRead() == kSignalTypeReal) {
-			r.readRealSignal(&id, &ts, &val);
-			std::cout << '#' << (id >> 16) << ' ' << ts << ':' << val << std::endl;
-		}
-	}
-
-private:
-	SignalBufferReader r;
-	sigid_t id;
-	uint64_t ts;
-	double val;
-};
-
 int main() {
 	std::cout << "Simple Motor Controller Demo started..." << std::endl;
 
-	std::cout << "Creating executors..." << std::endl;
+	std::cout << "Creating executor..." << std::endl;
 	Executor e1(0.001); // control loop -> 1 ms period time
-	Executor e2(0.1); // output -> 100 ms period time
 
-	std::cout << "Creating and connecting control system elements..." << std::endl;
-
+	std::cout << "Creating control system elements..." << std::endl;
 	Step step(0.0, -3.14159265359, 5);
 	step.getOut().setName("phi_desired");
 	step.getOut().setUnit("rad");
@@ -89,6 +69,15 @@ int main() {
 	ComediDac dac(0);
 	GlobalSignalProvider globalSignalProvider;
 
+	std::cout << "Available signals:" << std::endl;
+	for(std::list<Signal*>::iterator i = Signal::getSignalList()->begin(); i != Signal::getSignalList()->end(); i++) {
+		uint32_t length = (*i)->getDimension();
+		for(uint32_t j = 0; j < length; j++) {
+			std::cout << "  " << (*i)->getLabel(j) << std::endl;
+		}
+	}
+	
+	std::cout << "Connecting control system elements..." << std::endl;
 	diff1.getIn().connect(enc.getOut());
 	sum1.getIn(0).connect(step.getOut());
 	sum1.getIn(1).connect(enc.getOut());
@@ -101,14 +90,7 @@ int main() {
 	invMotConst.getIn().connect(inertia.getOut());
 	dac.getIn().connect(invMotConst.getOut());
     
-	std::cout << "Available signals:" << std::endl;
-	for(std::list<Signal*>::iterator i = Signal::getSignalList()->begin(); i != Signal::getSignalList()->end(); i++) {
-		uint32_t length = (*i)->getDimension();
-		for(uint32_t j = 0; j < length; j++) {
-			std::cout << "  " << (*i)->getLabel(j) << std::endl;
-		}
-	}
-    
+	std::cout << "Adding blocks to executor..." << std::endl;
 	e1.addRunnable(step);
 	e1.addRunnable(enc);
 	e1.addRunnable(sum1);
@@ -120,27 +102,18 @@ int main() {
 	e1.addRunnable(invMotConst);
 	e1.addRunnable(dac);
 	e1.addRunnable(globalSignalProvider);
-
-	std::cout << "Creating reader..." << std::endl;
-	Reader r(globalSignalProvider.getSharedMemory(), kSharedMemorySize);
-	e2.addRunnable(r);
 	
-	std::cout << "Starting executors..." << std::endl;
+	std::cout << "Starting executor..." << std::endl;
 	e1.start();
-	e2.start();
 
-	std::cout << "Waiting for " << TIMETOWAIT << " seconds while executors are running" << std::endl;
+	std::cout << "Waiting for " << TIMETOWAIT << " seconds while executor is running" << std::endl;
 	sleep(TIMETOWAIT);
 
 	std::cout << "Stopping executor..." << std::endl;
 	e1.stop();
-	e2.stop();
 
-	std::cout << "Waiting for executors to terminate..." << std::endl;
-	while(!e1.isTerminated() && !e2.isTerminated());
-// 	while(!e1.isTerminated());
-    
-	std::cout << "Output value = " << dac.getIn().getValue() << std::endl;
-    
-	std::cout << "Example done..." << std::endl;
+	std::cout << "Waiting for executor to terminate..." << std::endl;
+ 	while(!e1.isTerminated());
+        
+	std::cout << "Example finished..." << std::endl;
 }
