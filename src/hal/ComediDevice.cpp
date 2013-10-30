@@ -1,11 +1,12 @@
 #include <eeros/hal/ComediDevice.hpp>
+#include <eeros/core/EEROSException.hpp>
 
 using namespace eeros::hal;
 
 ComediDevice::ComediDevice(std::string deviceNode) {
-	it = comedi_open("/dev/comedi0");
+	it = comedi_open(deviceNode.c_str());
 	if(!it) {
-		throw -1; // TODO
+		throw EEROSException("Can't open device \"" +  deviceNode + "\"!"); // TODO define error number and send error message to logger
 	}
 }
 

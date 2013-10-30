@@ -24,6 +24,9 @@ if(NOT WINDOWS)
 	add_executable(martinTest3 MartinTest3.cpp)
 	target_link_libraries(martinTest3 eeros)
 	
+	add_executable(martinTest4 MartinTest4.cpp)
+	target_link_libraries(martinTest4 eeros)
+	
 #	add_executable(sharedMemoryReaderTest SharedMemoryReaderTest.cpp)
 #	target_link_libraries(sharedMemoryReaderTest eeros)
 
