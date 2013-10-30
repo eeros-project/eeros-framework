@@ -5,19 +5,25 @@
 #include <eeros/types.hpp>
 #include <eeros/control/SignalBuffer.hpp>
 
-class Signal;
+namespace eeros {
+	namespace control {
 
-class SignalBufferWriter : public SignalBuffer {
-public:
-    SignalBufferWriter(void* memory, uint32_t size);
-	void addSignal(sigid_t id);
-	void removeSignal(sigid_t id);
-	void appendData();
-	
-private:
-	void updateHeader();
-	
-	std::list<sigid_t> observedSignalIds;
+		class Signal;
+
+		class SignalBufferWriter : public SignalBuffer {
+		public:
+			SignalBufferWriter(void* memory, uint32_t size);
+			void addSignal(sigid_t id);
+			void removeSignal(sigid_t id);
+			void appendData();
+			
+		private:
+			void updateHeader();
+			
+			std::list<sigid_t> observedSignalIds;
+		};
+
+	};
 };
 
 #endif // ORG_EEROS_CONTROL_SIGNALBUFFERWRITER_HPP_

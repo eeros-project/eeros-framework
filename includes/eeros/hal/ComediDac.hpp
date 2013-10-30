@@ -9,20 +9,26 @@
 #include <eeros/hal/SystemOutput.hpp>
 #include <eeros/hal/ComediDevice.hpp>
 
-enum { minVal = 0, maxVal = 65535 };
+namespace eeros {
+	namespace hal {
 
-class ComediDac : public SystemOutput<double> {
-public:
-	ComediDac(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channel, double scale, double offset);
-	virtual void set(double value);
-	
-private:
-	comedi_t* deviceHandle;
-	uint32_t subDeviceNumber;
-	uint32_t channel;
-	
-	double scale;
-	double offset;
+		enum { minVal = 0, maxVal = 65535 };
+
+		class ComediDac : public SystemOutput<double> {
+		public:
+			ComediDac(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channel, double scale, double offset);
+			virtual void set(double value);
+			
+		private:
+			comedi_t* deviceHandle;
+			uint32_t subDeviceNumber;
+			uint32_t channel;
+			
+			double scale;
+			double offset;
+		};
+
+	};
 };
 
 #endif /* ORG_EEROS_HAL_COMEDIDAC_HPP_ */

@@ -3,6 +3,8 @@
 #include <eeros/control/RealSignalOutput.hpp>
 #include <string.h>
 
+using namespace eeros::control;
+
 SignalBufferReader::SignalBufferReader(void* memory, uint32_t size) : SignalBuffer(memory, size) {
 	headerVersion = header->version;
 	readIndex = 0;

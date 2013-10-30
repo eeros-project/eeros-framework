@@ -1,5 +1,7 @@
 #include <eeros/control/Step.hpp>
 
+using namespace eeros::control;
+
 Step::Step(double initValue, double stepHeight, double delayTime, sigdim_t dim) : Block1o(dim), initValue(dim), stepHeight(dim) {
 	for(sigdim_t i = 0; i < dim; i++) {
 		this->initValue[i] = initValue;

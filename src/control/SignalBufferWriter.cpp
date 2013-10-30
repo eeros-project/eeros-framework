@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+using namespace eeros::control;
+
 SignalBufferWriter::SignalBufferWriter(void* memory, uint32_t size) : SignalBuffer(memory, size) {
 	// nothing to do
 }

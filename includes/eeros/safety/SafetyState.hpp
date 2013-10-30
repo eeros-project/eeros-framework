@@ -5,16 +5,22 @@
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/hal/HAL.hpp>
 
-class SafetyState {
-public:
-	SafetyState();
-	SafetyLevel& getLevel(int32_t levelId);
-	
-	std::vector<SafetyLevel> levels;
-	SafetyLevel* currentLevel;
-	
-	std::vector<SystemOutputInterface*> criticalOutputs;
-	std::vector<SystemInputInterface*> criticalInputs;
+namespace eeros {
+	namespace safety {
+
+		class SafetyState {
+		public:
+			SafetyState();
+			SafetyLevel& getLevel(int32_t levelId);
+			
+			std::vector<SafetyLevel> levels;
+			SafetyLevel* currentLevel;
+			
+			std::vector<eeros::hal::SystemOutputInterface*> criticalOutputs;
+			std::vector<eeros::hal::SystemInputInterface*> criticalInputs;
+		};
+
+	};
 };
 
 #endif // ORG_EEROS_SAFETY_SAFETYSTATE_HPP_

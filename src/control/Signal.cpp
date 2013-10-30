@@ -1,6 +1,8 @@
 #include <eeros/control/Signal.hpp>
 #include <sstream>
 
+using namespace eeros::control;
+
 uint16_t Signal::signalCounter = 1;
 std::list<Signal*> Signal::signalList;
 

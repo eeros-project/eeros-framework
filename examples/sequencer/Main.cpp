@@ -11,6 +11,7 @@
 #include "MySequence.hpp"
 
 using namespace std;
+using namespace eeros::examples::sequencer;
 
 int main(int argc, char* argv[])
 {

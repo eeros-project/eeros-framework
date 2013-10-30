@@ -9,6 +9,8 @@
 
 #include "MyErrorHandlerA.hpp"
 
+using namespace eeros::examples::sequencer;
+
 MyBlockingSubSequence::MyBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller) 
 	: eeros::sequencer::Sequence(name, caller){
 }

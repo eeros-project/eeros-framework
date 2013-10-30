@@ -6,16 +6,21 @@
 
 #include <vector>
 
-class D: public Block1i1o {
-public:
-	D(sigdim_t dim = 1);
-	virtual ~D();
+namespace eeros {
+	namespace control {
 
-	virtual void run();
-	
-private:
-	bool first;
-	std::vector<realSignalDatum> prev;
+		class D: public Block1i1o {
+		public:
+			D(sigdim_t dim = 1);
+			virtual ~D();
+
+			virtual void run();
+			
+		private:
+			bool first;
+			std::vector<realSignalDatum> prev;
+		};
+
+	};
 };
-
 #endif /* ORG_EEROS_CONTROL_D_HPP_ */

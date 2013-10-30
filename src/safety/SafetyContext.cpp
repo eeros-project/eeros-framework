@@ -2,6 +2,8 @@
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/core/EEROSException.hpp>
 
+using namespace eeros::safety;
+
 SafetyContext::SafetyContext(SafetyState& state) : state(state) { }
 
 void SafetyContext::triggerEvent(int32_t event) {

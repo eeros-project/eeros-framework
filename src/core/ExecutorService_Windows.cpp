@@ -10,6 +10,8 @@
 #define NSEC_PER_SEC (1000000000) /* The number of nsecs per sec. */
 #define MAX_SAFE_STACK (8*1024) /* The maximum stack size which is guaranteed safe to access without faulting */
 
+using namespace eeros;
+
 DWORD WINAPI ExecutorService::threadAction(LPVOID ptr) {
 	Executor* e = (Executor*) ptr;
 	

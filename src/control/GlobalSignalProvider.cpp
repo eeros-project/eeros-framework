@@ -12,6 +12,8 @@
 #include <iostream>
 #include <cerrno>
 
+using namespace eeros::control;
+
 GlobalSignalProvider::GlobalSignalProvider() {
 	/* create message queues */
 	msqStatBuffer.mq_msgsize = kMsqMsgSize;

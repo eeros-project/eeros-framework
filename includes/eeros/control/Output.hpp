@@ -3,11 +3,17 @@
 
 #include <eeros/types.hpp>
 
-class Output {
-public:
-	virtual void dummy();
-private:
-	
+namespace eeros {
+	namespace control {
+
+		class Output {
+		public:
+			virtual void dummy();
+		private:
+			
+		};
+
+	};
 };
 
 #endif /* ORG_EEROS_CONTROL_OUTPUT_HPP_ */

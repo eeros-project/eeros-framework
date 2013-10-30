@@ -8,11 +8,10 @@
 #include <sys/mman.h>
 #include <string.h>
 
-
-
-
 #define RT_PRIORITY (90) /* we use 90 cause no other idea xD */
 #define NSEC_PER_SEC (1000000000) /* The number of nsecs per sec. */
+
+using namespace eeros;
 
 int ExecutorService::nofThreads = 0;
 RT_TASK ExecutorService::threads[MAX_NOF_THREADS] = {0,0,0,0,0,0,0,0};

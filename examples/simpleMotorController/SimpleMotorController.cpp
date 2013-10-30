@@ -17,6 +17,10 @@
 
 #define TIMETOWAIT 30
 
+using namespace eeros;
+using namespace eeros::control;
+using namespace eeros::examples::simpleMotorController;
+
 int main() {
 	std::cout << "Simple Motor Controller Demo started..." << std::endl;
 

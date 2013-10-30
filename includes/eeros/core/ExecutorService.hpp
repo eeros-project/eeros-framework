@@ -15,33 +15,36 @@
 #define RUNNING 1
 #define MAX_NOF_THREADS 8
 
-class Executor;
+namespace eeros {
 
-class ExecutorService {
+	class Executor;
 
-public:
-	static int createNewThread(Executor* e);
-	static void waitForSequenceEnd(Executor* waitExecutor);
+	class ExecutorService {
 
-private:
-	static int nofThreads;
-#if defined(WINDOWS)
-	static HANDLE getHandle(int i);
-	static DWORD WINAPI threadAction(LPVOID ptr);
-	static DWORD dwThreads[];
-	static HANDLE hThreads[];
-#endif
-#if defined(LINUX) || defined(PREEMPT_RT) || defined(FREEBSD)
-	static void* threadAction(void*);
-	static pthread_t threads[];
-#endif
-#if defined(XENOMAI)
-	// TODO
-#endif
+	public:
+		static int createNewThread(Executor* e);
+		static void waitForSequenceEnd(Executor* waitExecutor);
 
-#if defined(QNX)
-	// TODO
-#endif
+	private:
+		static int nofThreads;
+	#if defined(WINDOWS)
+		static HANDLE getHandle(int i);
+		static DWORD WINAPI threadAction(LPVOID ptr);
+		static DWORD dwThreads[];
+		static HANDLE hThreads[];
+	#endif
+	#if defined(LINUX) || defined(PREEMPT_RT) || defined(FREEBSD)
+		static void* threadAction(void*);
+		static pthread_t threads[];
+	#endif
+	#if defined(XENOMAI)
+		// TODO
+	#endif
+
+	#if defined(QNX)
+		// TODO
+	#endif
+	};
 };
 
 #endif // ORG_EEROS_CORE_EXECUTORSERVICE_HPP_

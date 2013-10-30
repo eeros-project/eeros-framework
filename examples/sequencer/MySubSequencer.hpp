@@ -3,9 +3,17 @@
 
 #include <eeros/sequencer/Sequencer.hpp>
 
-class MySubSequencer : public eeros::sequencer::Sequencer{
-public:
-	MySubSequencer(std::string name);
+namespace eeros {
+	namespace examples {
+		namespace sequencer {
+
+			class MySubSequencer : public eeros::sequencer::Sequencer {
+			public:
+				MySubSequencer(std::string name);
+			};
+
+		};
+	};
 };
 
 #endif

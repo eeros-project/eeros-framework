@@ -1,5 +1,7 @@
 #include "ComediDac.hpp"
 
+using namespace eeros::examples::simpleMotorController;
+
 ComediDac::ComediDac(int chan) {
     deviceName = DAC_DEV;
     subDevice = DAC_SUBDEV;

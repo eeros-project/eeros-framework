@@ -6,23 +6,29 @@
 #include <eeros/control/RealSignalOutput.hpp>
 #include <eeros/control/Block1i1o.hpp>
 
-class Gain: public Block1i1o {
-public:
-	Gain(double c = 1, sigdim_t dim = 1);
-	Gain(const double c[], sigdim_t dim);
-	Gain(const std::vector<double>, sigdim_t dim);
-	virtual ~Gain();
+namespace eeros {
+	namespace control {
 
-	virtual void run();
-	
-	virtual void enable();
-    virtual void disable();
-	virtual void setGain(double c);
-	virtual void setGain(sigindex_t index, double c);
+		class Gain: public Block1i1o {
+		public:
+			Gain(double c = 1, sigdim_t dim = 1);
+			Gain(const double c[], sigdim_t dim);
+			Gain(const std::vector<double>, sigdim_t dim);
+			virtual ~Gain();
 
-protected:
-	std::vector<double> gain;
-	bool enabled;
+			virtual void run();
+			
+			virtual void enable();
+			virtual void disable();
+			virtual void setGain(double c);
+			virtual void setGain(sigindex_t index, double c);
+
+		protected:
+			std::vector<double> gain;
+			bool enabled;
+		};
+
+	};
 };
 
 #endif /* ORG_EEROS_CONTROL_GAIN_HPP_ */

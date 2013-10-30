@@ -1,6 +1,8 @@
 #include <eeros/control/RealSignalInput.hpp>
 #include <eeros/control/RealSignalOutput.hpp>
 
+using namespace eeros::control;
+
 double RealSignalInput::getValue() {
 	return getValue(0);
 }

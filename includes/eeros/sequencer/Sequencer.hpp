@@ -4,10 +4,14 @@
 #include <string>
 #include <eeros/core/Executor.hpp>
 
-class TimeDomain;
 
 
 namespace eeros{
+
+	namespace control {
+		class TimeDomain;
+	};
+	
 	namespace sequencer{
 		class SequenceException;
 
@@ -17,7 +21,7 @@ namespace eeros{
 			static Sequencer* getMainSequencer();
 			Sequencer(std::string name);
 			virtual ~Sequencer();
-			void addTimeDomain(TimeDomain* tDomain);
+			void addTimeDomain(control::TimeDomain* tDomain);
 			void deleteAllTimeDomains();
 			void addSubSequencer(Sequencer* seq);
 			void deleteAllSubSequencers();
@@ -30,7 +34,7 @@ namespace eeros{
 			static Sequencer* mainSequencer;
 			//List for the mainSequencer, the only Object
 			std::list<Sequencer*> subSequencers;
-			std::list<TimeDomain*> timeDomains;
+			std::list<control::TimeDomain*> timeDomains;
 			std::string sequenceName;
 		};//class Sequence
 

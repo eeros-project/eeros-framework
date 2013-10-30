@@ -1,6 +1,8 @@
 #include <eeros/core/RingBuffer.hpp>
 #include <string.h>
 
+using namespace eeros;
+
 RingBuffer::RingBuffer(void* memory, uint32_t size) {
 	char* pWork = static_cast<char*>(memory);
 	ringSize = size - sizeof(*pWriteIndex);

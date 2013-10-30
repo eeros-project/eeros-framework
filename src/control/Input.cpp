@@ -1,5 +1,7 @@
 #include <eeros/control/Input.hpp>
 
+using namespace eeros::control;
+
 Input::Input() : connectedOutput(0) {
 
 }

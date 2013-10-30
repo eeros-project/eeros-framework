@@ -1,5 +1,7 @@
 #include "ComediEncoder.hpp"
 
+using namespace eeros::examples::simpleMotorController;
+
 ComediEncoder::ComediEncoder() : Block1o(1) {
     deviceName = ENCODER_DEV;
     subDevice = ENCODER_SUBDEV;
@@ -21,8 +23,6 @@ void ComediEncoder::run() {
     out.setValue(static_cast<int>(data) * 6.28318530718 / 2000.0);
 //	out.setValue(static_cast<double>(data));
 }
-
-
 
 int ComediEncoder::ni_gpct_start_encoder(comedi_t *device, unsigned subdevice, unsigned int initial_value, int a, int b, int z) {
     int retval;

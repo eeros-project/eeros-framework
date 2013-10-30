@@ -13,6 +13,8 @@
 #define MAX_SAFE_STACK (8*1024) /* The maximum stack size which is guaranteed safe to access without faulting */
 #define NSEC_PER_SEC (1000000000) /* The number of nsecs per sec. */
 
+using namespace eeros;
+
 void stack_prefault(void) {
 	unsigned char dummy[MAX_SAFE_STACK];
 	memset(dummy, 0, MAX_SAFE_STACK);

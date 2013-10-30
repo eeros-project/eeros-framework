@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+using namespace eeros::control;
+
 D::D(sigdim_t dim) : Block1i1o(dim), prev(dim) {
 	first = true;
 }

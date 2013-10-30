@@ -1,5 +1,7 @@
 #include <eeros/control/Gain.hpp>
 
+using namespace eeros::control;
+
 Gain::Gain(double c, sigdim_t dim) : Block1i1o(dim), gain(dim) {
 	for(sigdim_t i = 0; i < dim; i++) {
 		this->gain[i] = c;

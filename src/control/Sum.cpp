@@ -1,5 +1,7 @@
 #include <eeros/control/Sum.hpp>
 
+using namespace eeros::control;
+
 Sum::Sum(uint8_t nofInputs, sigdim_t dim) : out(dim), in(nofInputs), negated(nofInputs) {
 	
 }

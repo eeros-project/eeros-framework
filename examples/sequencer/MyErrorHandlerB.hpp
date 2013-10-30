@@ -5,17 +5,23 @@
 
 #include <eeros/sequencer/ErrorHandler.hpp>
 
-class MyErrorHandlerB : public eeros::sequencer::ErrorHandler
-{
-public:
-	MyErrorHandlerB(std::string name);
-	virtual ~MyErrorHandlerB(void);
+namespace eeros {
+	namespace examples {
+		namespace sequencer {
 
-	virtual void run();
+			class MyErrorHandlerB : public eeros::sequencer::ErrorHandler {
+			public:
+				MyErrorHandlerB(std::string name);
+				virtual ~MyErrorHandlerB(void);
 
-	void Reset();
-	void Referencing();
-	void RestartSequence();
+				virtual void run();
 
+				void Reset();
+				void Referencing();
+				void RestartSequence();
+
+			};
+		};
+	};
 };
 #endif

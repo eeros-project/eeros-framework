@@ -18,6 +18,10 @@
 #include "MyNonBlockingSubSequence.hpp"
 #include "MyErrorHandlerA.hpp"
 
+using namespace eeros;
+using namespace eeros::control;
+using namespace eeros::examples::sequencer;
+
 MySequence::MySequence(std::string name, eeros::sequencer::Sequencer& caller)
 	: eeros::sequencer::Sequence(name, caller){
 	callerThread.addRunnable(this);

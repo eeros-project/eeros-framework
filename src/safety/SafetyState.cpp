@@ -1,6 +1,8 @@
 #include <eeros/safety/SafetyState.hpp>
 #include <eeros/core/EEROSException.hpp>
 
+using namespace eeros::safety;
+
 SafetyState::SafetyState() : currentLevel(0) { }
 
 SafetyLevel& SafetyState::getLevel(int32_t levelId) {

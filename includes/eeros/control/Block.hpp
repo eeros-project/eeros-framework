@@ -4,13 +4,19 @@
 #include <string>
 #include <eeros/core/Runnable.hpp>
 
-class Block : public Runnable {
-public:
-	virtual void setName(std::string name);
-	virtual std::string getName();
-	
-private:
-	std::string name;
+namespace eeros {
+	namespace control {
+		
+		class Block : public Runnable {
+		public:
+			virtual void setName(std::string name);
+			virtual std::string getName();
+			
+		private:
+			std::string name;
+		};
+
+	};
 };
 
 #endif /* ORG_EEROS_CONTROL_BLOCK_HPP_ */

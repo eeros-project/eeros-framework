@@ -1,8 +1,8 @@
 #include <eeros/control/BlockOutput.hpp>
 
+using namespace eeros::control;
+
 enum { kSharedMemoryBufLength = 16 };
-
-
 
 BlockOutput::BlockOutput()
 {

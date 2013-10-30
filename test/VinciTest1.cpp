@@ -17,22 +17,30 @@
 
 #define TIMETOWAIT 30
 
-class Reader : public Runnable {
-public:
-	Reader(void* memory, uint32_t size) : r(memory, size) {}
-	
-	void run() {
-		while(r.signalTypeAvailableToRead() == kSignalTypeReal) {
-			r.readRealSignal(&id, &ts, &val);
-			std::cout << '#' << id << ' ' << ts << ':' << val << std::endl;
-		}
-	}
+namespace eeros {
+	namespace test {
+		namespace vinci {
 
-private:
-	SignalBufferReader r;
-	sigid_t id;
-	uint64_t ts;
-	double val;
+		class Reader : public Runnable {
+		public:
+			Reader(void* memory, uint32_t size) : r(memory, size) {}
+			
+			void run() {
+				while(r.signalTypeAvailableToRead() == eeros::control::kSignalTypeReal) {
+					r.readRealSignal(&id, &ts, &val);
+					std::cout << '#' << id << ' ' << ts << ':' << val << std::endl;
+				}
+			}
+
+		private:
+			eeros::control::SignalBufferReader r;
+			sigid_t id;
+			uint64_t ts;
+			double val;
+		};
+
+		};
+	};
 };
 
 static bool run = true;
@@ -47,6 +55,10 @@ void signal_callback_handler(int signum) {
 }
 
 int main() {
+	using namespace eeros;
+	using namespace eeros::control;
+	using namespace eeros::test::vinci;
+	
 	// Register signal and signal handler
 	signal(SIGINT, signal_callback_handler);
 	

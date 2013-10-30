@@ -1,6 +1,8 @@
 #include <eeros/control/RealSignalOutput.hpp>
 #include <sstream>
 
+using namespace eeros::control;
+
 const std::string RealSignalOutput::SENDING_DIRECTION_SERVER_TO_CLIENT = "ServerToClient";
 const std::string RealSignalOutput::SENDING_DIRECTION_CLIENT_TO_SERVER = "ClientToServer";
 

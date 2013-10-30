@@ -10,8 +10,10 @@
 
 #define TIMETOWAIT 1
 
-int main()
-{	
+int main() {
+	using namespace eeros;
+	using namespace eeros::control;
+	
 	std::cout << "Martin Test 2 started..." << std::endl;
 	
 	Executor e(0.01); // 10 ms period time

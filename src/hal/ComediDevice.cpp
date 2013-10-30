@@ -1,5 +1,7 @@
 #include <eeros/hal/ComediDevice.hpp>
 
+using namespace eeros::hal;
+
 ComediDevice::ComediDevice(std::string deviceNode) {
 	it = comedi_open("/dev/comedi0");
 	if(!it) {

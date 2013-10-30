@@ -9,15 +9,21 @@
 #include <eeros/hal/SystemInput.hpp>
 #include <eeros/hal/SystemOutput.hpp>
 
-class ComediDevice {
-public:
-	ComediDevice(std::string deviceNode);
-	virtual ~ComediDevice();
-	
-	comedi_t* getDeviceHandle();
+namespace eeros {
+	namespace hal {
 
-private:
-	comedi_t *it;
+		class ComediDevice {
+		public:
+			ComediDevice(std::string deviceNode);
+			virtual ~ComediDevice();
+			
+			comedi_t* getDeviceHandle();
+
+		private:
+			comedi_t *it;
+		};
+
+	};
 };
 
 #endif /* ORG_EEROS_HAL_COMEDIDEVICE_HPP_ */

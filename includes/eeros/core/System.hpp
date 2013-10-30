@@ -1,26 +1,22 @@
-/*
- * System.hpp
- *
- *  Created on: 22.04.2013
- *      Author: zueger1
- */
-
-#ifndef SYSTEM_HPP_
-#define SYSTEM_HPP_
+#ifndef ORG_EEROS_CORE_SYSTEM_HPP_
+#define ORG_EEROS_CORE_SYSTEM_HPP_
 
 #include <stdint.h>
 
-class System
-{
-public:
-	System();
-	virtual ~System();
+namespace eeros {
 
-	static double getTime();
-	static uint64_t getTimeNs();
-	
-private:
-	static uint64_t timeoffset;
+	class System {
+	public:
+		System();
+		virtual ~System();
+
+		static double getTime();
+		static uint64_t getTimeNs();
+		
+	private:
+		static uint64_t timeoffset;
+	};
+
 };
 
-#endif /* SYSTEM_HPP_ */
+#endif /* ORG_EEROS_CORE_SYSTEM_HPP_ */

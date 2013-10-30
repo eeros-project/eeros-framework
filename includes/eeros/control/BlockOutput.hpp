@@ -3,27 +3,32 @@
 
 #include <eeros/control/Block1i.hpp>
 
-struct signalData {
-	double value;
-	uint64_t timestamp;
-};
+namespace eeros {
+	namespace control {
 
-class BlockOutput : public Block1i
-{
+		struct signalData {
+			double value;
+			uint64_t timestamp;
+		};
 
-public:
-	BlockOutput();
-	virtual ~BlockOutput();
-	virtual void run();
+		class BlockOutput : public Block1i {
 
-private:
-	std::string identifier;
-	double scale;
-	double offset;
-	double min;
-	double max;
-	
-	signalData dat;
+		public:
+			BlockOutput();
+			virtual ~BlockOutput();
+			virtual void run();
+
+		private:
+			std::string identifier;
+			double scale;
+			double offset;
+			double min;
+			double max;
+			
+			signalData dat;
+		};
+
+	};
 };
 
 #endif // ORG_EEROS_CONTROL_BLOCKOUTPUT_HPP

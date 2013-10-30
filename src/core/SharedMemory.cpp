@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+using namespace eeros;
+
 SharedMemory::SharedMemory(std::string virtualPath, uint32_t size) : virtualPath(virtualPath), size(size) { }
 
 SharedMemory::~SharedMemory() {

@@ -1,5 +1,7 @@
 #include <eeros/core/EEROSException.hpp>
 
+using namespace eeros;
+
 EEROSException::EEROSException(std::string message) : message(message) { }
 
 EEROSException::~EEROSException() throw() { }

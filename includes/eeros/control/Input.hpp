@@ -1,18 +1,24 @@
 #ifndef ORG_EEROS_CONTROL_INPUT_HPP_
 #define ORG_EEROS_CONTROL_INPUT_HPP_
 
-class Output;
+namespace eeros {
+	namespace control {
 
-class Input {
-public:
-	Input();
+		class Output;
 
-	virtual bool connect(Output& output);
-	virtual void disconnect();
-	virtual bool isConnected();
+		class Input {
+		public:
+			Input();
 
-protected:
-	Output* connectedOutput;
+			virtual bool connect(Output& output);
+			virtual void disconnect();
+			virtual bool isConnected();
+
+		protected:
+			Output* connectedOutput;
+		};
+
+	};
 };
 
 #endif /* ORG_EEROS_CONTROL_INPUT_HPP_ */

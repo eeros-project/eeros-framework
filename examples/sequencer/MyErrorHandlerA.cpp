@@ -4,6 +4,8 @@
 //TODELETE
 #include <iostream>
 
+using namespace eeros::examples::sequencer;
+
 MyErrorHandlerA::MyErrorHandlerA(std::string name)
 	: eeros::sequencer::ErrorHandler(name){
 }

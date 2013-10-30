@@ -8,28 +8,36 @@
 
 #define TIMETOWAIT 3
 
-class Test : public Runnable
-{
-public:
-	Test() { counter = 0; }
-	virtual void run() { counter++; }
-	int counter;
+namespace eeros {
+	namespace test {
+		namespace martin {
+
+			class Test : public Runnable {
+			public:
+				Test() { counter = 0; }
+				virtual void run() { counter++; }
+				int counter;
+			};
+
+		};
+	};
 };
 
-
-int main()
-{
+int main() {
+	using namespace eeros;
+	using namespace eeros::test::martin;
+	
 	std::cout << "Martin Test 1 started..." << std::endl;
 	Test test;
 	Executor e(0.1); // 100 ms period time
 	e.addRunnable(&test);
 	e.start();
 	std::cout << "waiting for " << TIMETOWAIT << " seconds while executor is counting" << std::endl;
-#if defined(WINDOWS)
+	#if defined(WINDOWS)
 	Sleep(TIMETOWAIT * 1000);
-#else
+	#else
 	sleep(TIMETOWAIT);
-#endif
+	#endif
 	e.stop();
 	std::cout << "waiting for executor to terminate..." << std::endl;
 	while(!e.isTerminated());

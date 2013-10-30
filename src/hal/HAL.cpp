@@ -1,5 +1,7 @@
 #include <eeros/hal/HAL.hpp>
 
+using namespace eeros::hal;
+
 HAL::HAL() { }
 HAL::HAL(const HAL&) { }
 HAL& HAL::operator=(const HAL&) { }

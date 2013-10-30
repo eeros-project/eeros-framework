@@ -11,21 +11,29 @@
 #define DAC_SUBDEV 1
 #define DAC_DEFAULT_VAL 0
 
-enum { minVal = 0, maxVal = 65535 };
+namespace eeros {
+	namespace examples {
+		namespace simpleMotorController {
 
-class ComediDac : public Block1i
-{
+			enum { minVal = 0, maxVal = 65535 };
 
-public:
-    ComediDac(int channel);
-    virtual ~ComediDac();
-    virtual void run();
+			class ComediDac : public Block1i
+			{
 
-private:
-    comedi_t* it;
-    std::string deviceName;
-    int subDevice;
-    int channel;
+			public:
+				ComediDac(int channel);
+				virtual ~ComediDac();
+				virtual void run();
+
+			private:
+				comedi_t* it;
+				std::string deviceName;
+				int subDevice;
+				int channel;
+			};
+
+		};
+	};
 };
 
 #endif /* ORG_EEROS_EXAMPLES_SIMPLEMOTORCONTROLER_COMEDIDAC_HPP_ */

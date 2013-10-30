@@ -9,6 +9,8 @@
 
 #include "MyErrorHandlerA.hpp"
 
+using namespace eeros::examples::sequencer;
+
 MyNonBlockingSubSequence::MyNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller) 
 	: eeros::sequencer::Sequence(name, caller){
 	callerThread.addRunnable(this);

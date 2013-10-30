@@ -1,5 +1,7 @@
 #include <eeros/safety/SafetyLevel.hpp>
 
+using namespace eeros::safety;
+
 SafetyLevel::SafetyLevel(int32_t id, std::string description) : id(id), description(description) {
 	// nothing to do...
 }

@@ -8,6 +8,10 @@
 #include <eeros/core/EEROSException.hpp>
 #include <eeros/hal/ComediFqd.hpp>
 
+using namespace eeros;
+using namespace eeros::hal;
+using namespace eeros::safety;
+
 int main() {
 	std::cout << "Safety System Example started..." << std::endl;
 

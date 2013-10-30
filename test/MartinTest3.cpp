@@ -16,25 +16,38 @@
 
 #define TIMETOWAIT 30
 
-class Reader : public Runnable {
-public:
-	Reader(void* memory, uint32_t size) : r(memory, size) {}
-	
-	void run() {
-		while(r.signalTypeAvailableToRead() == kSignalTypeReal) {
-			r.readRealSignal(&id, &ts, &val);
-			std::cout << '#' << id << ' ' << ts << ':' << val << std::endl;
-		}
-	}
+namespace eeros {
+	namespace test {
+		namespace martin {
+			
+			class Reader : public Runnable {
+				
+			public:
+				Reader(void* memory, uint32_t size) : r(memory, size) {}
+				
+				void run() {
+					while(r.signalTypeAvailableToRead() == eeros::control::kSignalTypeReal) {
+						r.readRealSignal(&id, &ts, &val);
+						std::cout << '#' << id << ' ' << ts << ':' << val << std::endl;
+					}
+				}
 
-private:
-	SignalBufferReader r;
-	sigid_t id;
-	uint64_t ts;
-	double val;
+			private:
+				eeros::control::SignalBufferReader r;
+				sigid_t id;
+				uint64_t ts;
+				double val;
+			};
+
+		};
+	};
 };
 
 int main() {
+	using namespace eeros;
+	using namespace eeros::control;
+	using namespace eeros::test::martin;
+	
 	std::cout << "Martin Test 3 started..." << std::endl;
 	
 	std::cout << "Creating executors..." << std::endl;

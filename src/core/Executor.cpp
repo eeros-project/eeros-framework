@@ -1,60 +1,50 @@
 #include <eeros/core/Executor.hpp>
 
-Executor::Executor(double period)
-{
+using namespace eeros;
+
+Executor::Executor(double period) {
 	this->period = period;
 	this->status = kStopped;
 }
 
-int Executor::getThreadId()
-{
+int Executor::getThreadId() {
 	return this->threadId;
 }
 
-double Executor::getPeriod()
-{
+double Executor::getPeriod() {
 	return this->period;
 }
 
-int Executor::getStatus()
-{
+int Executor::getStatus() {
 	return this->status;
 }
 
-void Executor::addRunnable(Runnable* runnable)
-{
+void Executor::addRunnable(Runnable* runnable) {
 	runnables.push_back(runnable);
 }
 
-void Executor::addRunnable(Runnable& runnable)
-{
+void Executor::addRunnable(Runnable& runnable) {
 	runnables.push_back(&runnable);
 }
 
-void Executor::start()
-{
+void Executor::start() {
 	status = kRunning;
 	threadId = ExecutorService::createNewThread(this);
 }
 
-bool Executor::isTerminated()
-{
+bool Executor::isTerminated() {
 	return status == kStopped;
 }
-void Executor::stop()
-{
+void Executor::stop() {
 	this->status = kStop;
 }
 
-void Executor::join()
-{
+void Executor::join() {
 	// TODO
 }
 
-void Executor::run()
-{
-	for(std::list<Runnable*>::iterator i = runnables.begin(); i != runnables.end(); i++)
-	{
+void Executor::run() {
+	for(std::list<Runnable*>::iterator i = runnables.begin(); i != runnables.end(); i++) {
 		(*i)->run();
 	}
 }

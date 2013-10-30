@@ -5,29 +5,35 @@
 #include <string>
 #include <eeros/types.hpp>
 
-enum { kSignalTypeUnknown = 0, kSignalIdInvalid = -1 };
+namespace eeros {
+	namespace control {
 
-class Signal {
-public:
-	Signal(sigdim_t dim);
-	virtual ~Signal();
-	
-	virtual sigmajorid_t getMajorId() const;
-	virtual sigid_t getSignalId(sigindex_t index) const;
-	virtual sigdim_t getDimension() const;
-	virtual sigtype_t getType() const;
-	virtual std::string getLabel() const;
-	virtual std::string getLabel(sigindex_t index) const;
-	
-	static std::list<Signal*>* getSignalList();
-	static Signal* getSignalById(sigid_t id);
+		enum { kSignalTypeUnknown = 0, kSignalIdInvalid = -1 };
 
-protected:
-	sigmajorid_t majorId; /**< unique signal id */
-	sigdim_t dimension; /**< number of elements in this signal */
+		class Signal {
+		public:
+			Signal(sigdim_t dim);
+			virtual ~Signal();
+			
+			virtual sigmajorid_t getMajorId() const;
+			virtual sigid_t getSignalId(sigindex_t index) const;
+			virtual sigdim_t getDimension() const;
+			virtual sigtype_t getType() const;
+			virtual std::string getLabel() const;
+			virtual std::string getLabel(sigindex_t index) const;
+			
+			static std::list<Signal*>* getSignalList();
+			static Signal* getSignalById(sigid_t id);
 
-	static std::list<Signal*> signalList;
-	static uint16_t signalCounter;
+		protected:
+			sigmajorid_t majorId; /**< unique signal id */
+			sigdim_t dimension; /**< number of elements in this signal */
+
+			static std::list<Signal*> signalList;
+			static uint16_t signalCounter;
+		};
+
+	};
 };
 
 #endif /* ORG_EEROS_CONTROL_SIGNAL_HPP_ */

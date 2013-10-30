@@ -1,6 +1,9 @@
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/core/EEROSException.hpp>
 
+using namespace eeros::safety;
+using namespace eeros::hal;
+
 SafetySystem::SafetySystem() : privateContext(state) { }
 
 SafetySystem::SafetySystem(const SafetySystem&) : privateContext(state) { }

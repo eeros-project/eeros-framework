@@ -5,61 +5,66 @@
 
 #include <eeros/sequencer/Sequence.hpp>
 
-/** This is a example, how the user should work with this sequence.
-  * 
-  */
-class eeros::sequencer::Sequencer;
+namespace eeros {
+	namespace examples {
+		namespace sequencer {
 
-class MySequence : public eeros::sequencer::Sequence
-{
-public:
-	MySequence(std::string name, eeros::sequencer::Sequencer& caller);
-	virtual ~MySequence(void);
+			/** This is a example, how the user should work with this sequence.
+			* 
+			*/
+			class MySequence : public eeros::sequencer::Sequence {
+			public:
+				MySequence(std::string name, eeros::sequencer::Sequencer& caller);
+				virtual ~MySequence(void);
 
-	/** In this method you can fill for ex. all the methods you want to call, according the inserted order
-	 */
-	virtual void fillCallBacks();
-	void fillVersion1();
-	void fillVersion2();
-	void fillVersion3();
-	void fillVersion4();
-	void fillVersion5();
+				/** In this method you can fill for ex. all the methods you want to call, according the inserted order
+				*/
+				virtual void fillCallBacks();
+				void fillVersion1();
+				void fillVersion2();
+				void fillVersion3();
+				void fillVersion4();
+				void fillVersion5();
 
 
-	/** Initialisation
-	 */
-	void Init();
+				/** Initialisation
+				*/
+				void Init();
 
-	/** Initialising
-	 */
-	void Initialising();
+				/** Initialising
+				*/
+				void Initialising();
 
-	/** Initialised
-	 */
-	void Initialised();
+				/** Initialised
+				*/
+				void Initialised();
 
-	/** Homed
-	*/
-	void Homed();
+				/** Homed
+				*/
+				void Homed();
 
-	/** Move
-	*/
-	void Move();
-	void MoveException();
+				/** Move
+				*/
+				void Move();
+				void MoveException();
 
-	void MoveBlocking();
-	void MoveNonBlocking();
+				void MoveBlocking();
+				void MoveNonBlocking();
 
-	/** Moving waits until the Move is completed
-	*/
-	void Moving();
+				/** Moving waits until the Move is completed
+				*/
+				void Moving();
 
-	void Waiting();
-	void WaitingForNonBlocking();
+				void Waiting();
+				void WaitingForNonBlocking();
 
-	/** Stopping
-	*/
-	void Stopping();
+				/** Stopping
+				*/
+				void Stopping();
+			};
+
+		};
+	};
 };
 
 #endif

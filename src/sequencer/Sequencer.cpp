@@ -3,6 +3,7 @@
 #include <eeros/control/TimeDomain.hpp>
 
 using namespace eeros::sequencer;
+using namespace eeros::control;
 
 Sequencer* Sequencer::mainSequencer = 0;
 

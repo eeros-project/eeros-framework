@@ -11,6 +11,8 @@
 
 #define NS_PER_SEC 1000000000
 
+using namespace eeros;
+
 uint64_t System::timeoffset = 0; // [s]
 
 System::System() {

@@ -11,6 +11,8 @@
 
 #define NSEC_PER_SEC (1000000000) /* The number of nsecs per sec. */
 
+using namespace eeros;
+
 int ExecutorService::nofThreads = 0;
 pthread_t ExecutorService::threads[MAX_NOF_THREADS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
