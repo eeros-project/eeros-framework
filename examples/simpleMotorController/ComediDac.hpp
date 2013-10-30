@@ -17,7 +17,7 @@ namespace eeros {
 
 			enum { minVal = 0, maxVal = 65535 };
 
-			class ComediDac : public Block1i
+			class ComediDac : public control::Block1i
 			{
 
 			public:
