@@ -36,5 +36,4 @@ void ErrorHandler::removeErrorHandler(std::string name){
 			}
 			iter++;
 		}
-		return 0;
 }
