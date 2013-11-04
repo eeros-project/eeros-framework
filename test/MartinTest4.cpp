@@ -7,8 +7,10 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/hal/ComediDevice.hpp>
 #include <eeros/hal/ComediDac.hpp>
+#include <eeros/hal/ComediAdc.hpp>
+#include <eeros/hal/ComediFqd.hpp>
 
-#define TIMETOWAIT 30
+#define TIMETOWAIT 5
 
 namespace eeros {
 	namespace test {
@@ -19,19 +21,33 @@ namespace eeros {
 			class TestRunner : public Runnable {
 			
 			public:
-				TestRunner() : hal(HAL::instance()), comediDev0("/dev/comedi0"), dac0("dac0", comediDev0, 0, 1, 1, 0), counter(0) {
-					
+				int adcVal;
+				int fqdVal;
+				
+				TestRunner() : 
+				hal(HAL::instance()),
+				comediDev0("/dev/comedi0"),
+				dac("dac", comediDev0, 1, 1),
+				adc("adc", comediDev0, 0, 0),
+				fqd("fqd", comediDev0, 11, 8, 10, 9),
+				counter(0) {
+					// nothing to do
 				}
 				
 				void run() {
-					dac0.set(counter);
+					adcVal = adc.get();
+					fqdVal = fqd.get();
+					
+					dac.set(counter);
 					counter += 0.1;
 				}
 
 			private:
 				HAL& hal;
 				ComediDevice comediDev0;
-				ComediDac dac0;
+				ComediDac dac;
+				ComediAdc adc;
+				ComediFqd fqd;
 				double counter;
 			};
 
@@ -63,6 +79,8 @@ int main() {
 	
 	std::cout << "Waiting for executor to terminate..." << std::endl;
 	while(!e.isTerminated());
-		
+	
+	std::cout << "ADC value: " << t.adcVal << std::endl;
+	
 	std::cout << "Martin Test 4 done!" << std::endl;
 }

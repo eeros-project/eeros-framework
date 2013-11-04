@@ -16,7 +16,7 @@ namespace eeros {
 
 		class ComediDac : public SystemOutput<double> {
 		public:
-			ComediDac(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channel, double scale, double offset);
+			ComediDac(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0);
 			virtual double get();
 			virtual void set(double value);
 			

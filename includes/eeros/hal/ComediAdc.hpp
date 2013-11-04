@@ -15,7 +15,7 @@ namespace eeros {
 
 		class ComediAdc : public SystemInput<double> {
 		public:
-			ComediAdc(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channel, double scale, double offset);
+			ComediAdc(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0);
 			virtual double get();
 			
 		private:
