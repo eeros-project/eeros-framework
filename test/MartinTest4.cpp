@@ -9,6 +9,8 @@
 #include <eeros/hal/ComediDac.hpp>
 #include <eeros/hal/ComediAdc.hpp>
 #include <eeros/hal/ComediFqd.hpp>
+#include <eeros/hal/ComediDigIn.hpp>
+#include <eeros/hal/ComediDigOut.hpp>
 
 #define TIMETOWAIT 5
 
@@ -23,21 +25,27 @@ namespace eeros {
 			public:
 				int adcVal;
 				int fqdVal;
+				bool dinVal;
 				
-				TestRunner() : 
+				TestRunner() :
 				hal(HAL::instance()),
 				comediDev0("/dev/comedi0"),
+				dout("dout", comediDev0, 2, 0),
+				din("din", comediDev0, 2, 1),
 				dac("dac", comediDev0, 1, 1),
 				adc("adc", comediDev0, 0, 0),
 				fqd("fqd", comediDev0, 11, 8, 10, 9),
-				counter(0) {
+				counter(0), doutVal(false) {
 					// nothing to do
 				}
 				
 				void run() {
 					adcVal = adc.get();
 					fqdVal = fqd.get();
-					
+					dinVal = din.get();
+
+					dout.set(doutVal);
+					doutVal = !doutVal;
 					dac.set(counter);
 					counter += 0.1;
 				}
@@ -45,10 +53,13 @@ namespace eeros {
 			private:
 				HAL& hal;
 				ComediDevice comediDev0;
+				ComediDigOut dout;
+				ComediDigIn din;
 				ComediDac dac;
 				ComediAdc adc;
 				ComediFqd fqd;
 				double counter;
+				bool doutVal;
 			};
 
 		};
@@ -84,5 +95,7 @@ int main() {
 	
 	std::cout << "FQD value: " << t.fqdVal << std::endl;
 	
+	std::cout << "Digital Input value: " << t.dinVal << std::endl;
+
 	std::cout << "Martin Test 4 done!" << std::endl;
 }
