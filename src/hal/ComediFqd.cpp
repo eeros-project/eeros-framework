@@ -5,9 +5,9 @@ using namespace eeros::hal;
 ComediFqd::ComediFqd(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channelA, uint32_t channelB, uint32_t channelZ, double scale, double offset, double initValue) : SystemInput<double>(id) {
 	this->deviceHandle = device.getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
-	this->channelA = NI_GPCT_PFI_OTHER_SELECT(channelA);
-	this->channelB = NI_GPCT_PFI_OTHER_SELECT(channelB);
-	this->channelZ = NI_GPCT_PFI_OTHER_SELECT(channelZ);
+	this->channelA = channelA;
+	this->channelB = channelB;
+	this->channelZ = channelZ;
 	this->scale = scale;
 	this->offset = offset;
 	
@@ -21,9 +21,9 @@ ComediFqd::ComediFqd(std::string id, ComediDevice& device, uint32_t subDeviceNum
 	comedi_set_gate_source(deviceHandle, subDeviceNumber, 0, 0, NI_GPCT_DISABLED_GATE_SELECT);
     comedi_set_gate_source(deviceHandle, subDeviceNumber, 0, 1, NI_GPCT_DISABLED_GATE_SELECT);
 	
-	comedi_set_other_source(deviceHandle, subDeviceNumber, 0, NI_GPCT_SOURCE_ENCODER_A, channelA);
-    comedi_set_other_source(deviceHandle, subDeviceNumber, 0, NI_GPCT_SOURCE_ENCODER_B, channelB);
-    comedi_set_other_source(deviceHandle, subDeviceNumber, 0, NI_GPCT_SOURCE_ENCODER_Z, channelZ);
+	comedi_set_other_source(deviceHandle, subDeviceNumber, 0, NI_GPCT_SOURCE_ENCODER_A, NI_GPCT_PFI_OTHER_SELECT(channelA));
+    comedi_set_other_source(deviceHandle, subDeviceNumber, 0, NI_GPCT_SOURCE_ENCODER_B, NI_GPCT_PFI_OTHER_SELECT(channelB));
+    comedi_set_other_source(deviceHandle, subDeviceNumber, 0, NI_GPCT_SOURCE_ENCODER_Z, NI_GPCT_PFI_OTHER_SELECT(channelZ));
 	
 	lsampl_t counterMode;
 	counterMode = (NI_GPCT_COUNTING_MODE_QUADRATURE_X4_BITS | NI_GPCT_COUNTING_DIRECTION_HW_UP_DOWN_BITS);

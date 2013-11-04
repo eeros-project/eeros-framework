@@ -82,5 +82,7 @@ int main() {
 	
 	std::cout << "ADC value: " << t.adcVal << std::endl;
 	
+	std::cout << "FQD value: " << t.fqdVal << std::endl;
+	
 	std::cout << "Martin Test 4 done!" << std::endl;
 }
