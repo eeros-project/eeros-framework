@@ -83,14 +83,12 @@ int main() {
 	Gain gain(2.0); // A/N
 	gain.getOut().setName("Gain");
 	
-	BlockOutput output;
 	GlobalSignalProvider globalSignalProvider;
 	
 	
 	sum.getIn(0).connect(step1.getOut());
 	sum.getIn(1).connect(step2.getOut());
 	gain.getIn().connect(sum.getOut());
-	output.getIn().connect(gain.getOut());
 	
 	std::cout << "Available signals:" << std::endl;
 	for(std::list<Signal*>::iterator i = Signal::getSignalList()->begin(); i != Signal::getSignalList()->end(); i++) {
@@ -104,7 +102,6 @@ int main() {
 	e1.addRunnable(step2);
 	e1.addRunnable(sum);
 	e1.addRunnable(gain);
-	e1.addRunnable(output);
 	e1.addRunnable(globalSignalProvider);
 	
 	std::cout << "Creating reader..." << std::endl;
@@ -127,8 +124,6 @@ int main() {
 	std::cout << "Waiting for executors to terminate..." << std::endl;
 	while(!e1.isTerminated() && !e2.isTerminated());
 //	while(!e1.isTerminated());
-	
-	std::cout << "Output value = " << output.getIn().getValue() << std::endl;
 	
 	std::cout << "Vinci Test 1 done..." << std::endl;
 }

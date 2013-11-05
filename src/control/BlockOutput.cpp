@@ -2,26 +2,11 @@
 
 using namespace eeros::control;
 
-enum { kSharedMemoryBufLength = 16 };
-
-BlockOutput::BlockOutput()
-{
-	const char shmPath[] = "/tmp/eeros.shm";
-	//std::ofstream shmFileStream(shmPath);
-		
-	//SharedMemoryWriter writer = SharedMemoryWriter(shmPath, 1, kSharedMemoryBufLength);
-
+BlockOutput::BlockOutput(std::string id) : hal(hal::HAL::instance()) {
+	systemOutput = &hal.getRealSystemOutput(id);
+	if(systemOutput == nullptr) throw -999;
 }
 
-BlockOutput::~BlockOutput()
-{
-
-}
-
-void BlockOutput::run()
-{
-	dat.timestamp = in.getTimestamp();
-	dat.value = in.getValue();
-	
-	//writer.write(&dat, sizeof(dat));
+void BlockOutput::run() {
+	systemOutput->set(in.getValue());
 }

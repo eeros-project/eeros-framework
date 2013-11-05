@@ -2,30 +2,21 @@
 #define ORG_EEROS_CONTROL_BLOCKOUTPUT_HPP
 
 #include <eeros/control/Block1i.hpp>
+#include <eeros/hal/HAL.hpp>
+#include <eeros/hal/SystemOutput.hpp>
 
 namespace eeros {
 	namespace control {
 
-		struct signalData {
-			double value;
-			uint64_t timestamp;
-		};
-
 		class BlockOutput : public Block1i {
 
 		public:
-			BlockOutput();
-			virtual ~BlockOutput();
+			BlockOutput(std::string id);
 			virtual void run();
 
 		private:
-			std::string identifier;
-			double scale;
-			double offset;
-			double min;
-			double max;
-			
-			signalData dat;
+			hal::HAL& hal;
+			hal::SystemOutput<double>* systemOutput;
 		};
 
 	};

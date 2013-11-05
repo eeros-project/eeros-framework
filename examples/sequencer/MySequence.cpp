@@ -102,14 +102,14 @@ void MySequence::Initialising(){
 
 	Step* step = new Step(1.0, 5.0, 0.0);
 	Gain* gain = new Gain(10);
-	BlockOutput* output = new BlockOutput();
+//	BlockOutput* output = new BlockOutput();
 	gain->getIn().connect(step->getOut());
-	output->getIn().connect(gain->getOut());
+//	output->getIn().connect(gain->getOut());
 
 	//add the blocks to the time domain
 	timeDomain->addBlock(step);
 	timeDomain->addBlock(gain);
-	timeDomain->addBlock(output);
+//	timeDomain->addBlock(output);
 }
 
 /** Initialised
