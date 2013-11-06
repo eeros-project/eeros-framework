@@ -21,15 +21,18 @@ namespace eeros {
 			void addSystemInput(SystemInputInterface* systemInput);
 			void addSystemOutput(SystemOutputInterface* systemOutput);
 			
+			bool readConfigFromFile(std::string file);
+			
 			static HAL& instance();
 			
 		private:
 			HAL();
 			HAL(const HAL&);
 			HAL& operator=(const HAL&);
-
-			std::map<std::string, ComediDevice> devices;
 			
+			bool loadModule(std::string moduleName);
+			
+			std::map<std::string, ComediDevice> devices;
 			std::map<std::string, SystemInputInterface*> inputs;
 			std::map<std::string, SystemOutputInterface*> outputs;
 		};
