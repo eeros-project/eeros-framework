@@ -11,7 +11,7 @@ namespace eeros {
 		EEROSException(std::string message);
 		virtual ~EEROSException() throw();
 		
-		virtual const char* what();
+		virtual const char* what() const throw();
 		
 	private:
 		std::string message;

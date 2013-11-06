@@ -6,6 +6,6 @@ EEROSException::EEROSException(std::string message) : message(message) { }
 
 EEROSException::~EEROSException() throw() { }
 
-const char* EEROSException::what() {
+const char* EEROSException::what() const throw() {
 	return message.c_str();
 }

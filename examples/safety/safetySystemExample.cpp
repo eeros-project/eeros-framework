@@ -14,7 +14,7 @@ using namespace eeros::safety;
 
 int main() {
 	std::cout << "Safety System Example started..." << std::endl;
-
+	
 	// Get Safety System instance
 	SafetySystem& safetySys = SafetySystem::instance();
 	
@@ -80,17 +80,17 @@ int main() {
 	SystemOutput<bool>& brake2 = hal.getLogicSystemOutput("brake2");
 	SystemOutput<bool>& brake3 = hal.getLogicSystemOutput("brake3");
 
-// 	safetySys.defineCriticalOutputs({ // TODO
-// 		power,
-// 		enable[0],
-// 		enable[1],
-// 		enable[2],
-// 		enable[3],
-// 		brake[0],
-// 		brake[1],
-// 		brake[2],
-// 		brake[3]
-// 	});
+	safetySys.defineCriticalOutputs({
+		&power,
+		&enable0,
+		&enable1,
+		&enable2,
+		&enable3,
+		&brake0,
+		&brake1,
+		&brake2,
+		&brake3
+	});
 	
 	// Define criticcal inputs
 	SystemInput<bool>& emergencyStop = hal.getLogicSystemInput("emergencyStop");
@@ -99,13 +99,13 @@ int main() {
 	SystemInput<double>& q2 = hal.getRealSystemInput("q0");
 	SystemInput<double>& q3 = hal.getRealSystemInput("q0");
 	
-// 	safetySys.defineCriticalInputs({ // TODO
-// 		emergencyStop,
-// 		q[0],
-// 		q[1],
-// 		q[2],
-// 		q[3]
-// 	});
+	safetySys.defineCriticalInputs({
+		&emergencyStop,
+		&q0,
+		&q1,
+		&q2,
+		&q3
+	});
 		
 	// Define Levels
 	safetySys.defineSafetyLevels({
