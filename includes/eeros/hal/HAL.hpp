@@ -18,8 +18,8 @@ namespace eeros {
 			SystemInput<bool>& getLogicSystemInput(std::string name);
 			SystemInput<double>& getRealSystemInput(std::string name);
 			
-			void addSystemInput(SystemInputInterface* systemInput);
-			void addSystemOutput(SystemOutputInterface* systemOutput);
+			bool addSystemInput(SystemInputInterface* systemInput);
+			bool addSystemOutput(SystemOutputInterface* systemOutput);
 			
 			bool readConfigFromFile(std::string file);
 			
@@ -32,7 +32,6 @@ namespace eeros {
 			
 			bool loadModule(std::string moduleName);
 			
-			std::map<std::string, ComediDevice> devices;
 			std::map<std::string, SystemInputInterface*> inputs;
 			std::map<std::string, SystemOutputInterface*> outputs;
 		};

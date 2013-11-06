@@ -8,6 +8,7 @@ namespace eeros {
 		class SystemInputInterface {
 		public:
 			virtual ~SystemInputInterface() { }
+			virtual std::string getId() = 0;
 		};
 
 		template <typename T>
@@ -15,6 +16,7 @@ namespace eeros {
 		public:
 			explicit SystemInput(std::string id) : id(id) { }
 			virtual ~SystemInput() { }
+			virtual inline std::string getId() { return id; }
 			virtual T get() = 0;
 		private:
 			std::string id;

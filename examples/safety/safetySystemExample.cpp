@@ -34,6 +34,16 @@ int main() {
 	ComediDigOut dout11("brake1", comedi0, 2, 11);
 	ComediDigOut dout12("power", comedi0, 2, 12);
 	
+	// Add system in- and outputs to the HAL
+	hal.addSystemInput(&enc0);
+	hal.addSystemInput(&enc1);
+	hal.addSystemInput(&din0);
+	hal.addSystemOutput(&dout8);
+	hal.addSystemOutput(&dout9);
+	hal.addSystemOutput(&dout10);
+	hal.addSystemOutput(&dout11);
+	hal.addSystemOutput(&dout12);
+	
 	// Define all possible events
 	enum {
 		doSwInit,

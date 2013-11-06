@@ -23,6 +23,21 @@ bool HAL::loadModule(std::string moduleName) {
 	return false;
 }
 
+bool HAL::addSystemInput(SystemInputInterface* systemInput) {
+	if(systemInput != nullptr) {
+		inputs.insert(std::pair<std::string, SystemInputInterface*>(systemInput->getId(), systemInput));
+		return true;
+	}
+	return false;
+}
+bool HAL::addSystemOutput(SystemOutputInterface* systemOutput) {
+	if(systemOutput != nullptr) {
+		outputs.insert(std::pair<std::string, SystemOutputInterface*>(systemOutput->getId(), systemOutput));
+		return true;
+	}
+	return false;
+}
+
 SystemOutput<bool>& HAL::getLogicSystemOutput(std::string name) {
 	SystemOutput<bool>* out = dynamic_cast<SystemOutput<bool>*>(outputs[name]);
 	if(out == nullptr) throw EEROSException("Logic system output '" + name + "' not found!");
