@@ -9,7 +9,13 @@
 
 using namespace eeros;
 
-SharedMemory::SharedMemory(std::string virtualPath, uint32_t size) : virtualPath(virtualPath), size(size) { }
+SharedMemory::SharedMemory(std::string virtualPath, uint32_t size) : virtualPath(virtualPath), size(size) { 
+  	memory = (void*)kShmError;
+	fd = shm_open(virtualPath.c_str(), (O_CREAT | O_RDWR), 0600);
+	if(fd == -1) return;
+	if(ftruncate(fd, (off_t)size)) return;
+	memory = mmap(NULL, size, (PROT_READ | PROT_WRITE), (MAP_SHARED), fd, (off_t)0);
+} 
 
 SharedMemory::~SharedMemory() {
 	destroy();

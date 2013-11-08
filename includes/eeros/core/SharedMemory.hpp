@@ -6,7 +6,8 @@
 
 namespace eeros {
 
-	enum SharedMemoryError { kShmOk = 0, kShmFileOpenError = -1, kShmTrucateError = -2, kShmMapError = -3, kShmUnMapError = -4 };
+	enum SharedMemoryError { kShmFileOpenError = -1, kShmTrucateError = -2, kShmMapError = -3, kShmUnMapError = -4 };
+	enum SharedMemoryError1 { kShmOk = 0, kShmError = -1};
 
 	class SharedMemory {
 	public:

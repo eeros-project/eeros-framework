@@ -3,12 +3,19 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <eeros/core/RingBuffer.hpp>
+#include <iostream>
+#include <ostream>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include <eeros/core/Runnable.hpp>
 #include <eeros/core/Executor.hpp>
+#include <eeros/core/SharedMemory.hpp>
+#include <eeros/core/RingBuffer.hpp>
 
 #define MEM_SIZE 12
 #define TIMETOWAIT 15
+#define SHM 1
 
 namespace eeros {
 	namespace test {
@@ -17,7 +24,9 @@ namespace eeros {
 			class Reader : public Runnable {
 			public:
 				Reader(void* memory, uint32_t size) : rb(memory, size) {
-					// nothing to do;
+					std::cout << std::hex;
+					std::cout << "configure memory for reader: addr = " << memory << std::endl;
+					std::cout << std::dec;
 				}
 				
 				void run() {
@@ -35,7 +44,10 @@ namespace eeros {
 			class Writer : public Runnable {
 			public:
 				Writer(void* memory, uint32_t size) : rb(memory, size), counter(1000) {
-					// nothing to do;
+					std::cout << std::hex;
+					std::cout << "configure memory for writer: addr = " << memory << std::endl;
+					std::cout << std::dec;
+				  
 				}
 				
 				void run() {
@@ -59,8 +71,18 @@ int main() {
 	
 	std::cout << "RingBuffer test started..." << std::endl;
 	
-	std::cout << "Allocating memory (" << MEM_SIZE << " bytes)..." << std::endl;
+#ifndef SHM
+	std::cout << "Allocating memory on heap (" << MEM_SIZE << " bytes)..." << std::endl;
 	void* memory = malloc(MEM_SIZE);
+#else
+	std::cout << "Allocating memory in shared segment (" << MEM_SIZE << " bytes)..." << std::endl;
+	SharedMemory* shm = new SharedMemory("/eeros.shm", MEM_SIZE);
+	void* memory = shm->getMemoryPointer();
+	if (memory == (void*)kShmError) {
+		std::cout << "Could not get shared memory" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+#endif
 	
 	std::cout << "Creating executors..." << std::endl;
 	Executor e1(0.1); // 100 ms period time
@@ -88,8 +110,13 @@ int main() {
 	std::cout << "Waiting for executors to terminate..." << std::endl;
 	while(!e1.isTerminated() && !e2.isTerminated());
 	
+#ifndef SHM
 	std::cout << "Freeing memory (" << MEM_SIZE << " bytes)..." << std::endl;
 	free(memory);
+#else
+	std::cout << "Freeing shared memory (" << MEM_SIZE << " bytes)..." << std::endl;
+	shm->destroy();
+#endif
 	
 	std::cout << "Test done..." << std::endl;
 }
