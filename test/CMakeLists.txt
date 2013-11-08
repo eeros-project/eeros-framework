@@ -17,8 +17,11 @@ target_link_libraries(martinTest1 eeros)
 add_executable(martinTest2 MartinTest2.cpp)
 target_link_libraries(martinTest2 eeros)
 
-add_executable(ringbufferTest RingBufferTest.cpp)
-target_link_libraries(ringbufferTest eeros)
+add_executable(ringBufferTest RingBufferTest.cpp)
+target_link_libraries(ringBufferTest eeros)
+
+add_executable(ringBufferProcessTest RingBufferProcessTest.cpp)
+target_link_libraries(ringBufferProcessTest eeros)
 
 if(NOT WINDOWS)
 	add_executable(martinTest3 MartinTest3.cpp)
