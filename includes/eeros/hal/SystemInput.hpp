@@ -5,6 +5,7 @@
 namespace eeros {
 	namespace hal {
 
+		// TODO rename to PeripheralInput
 		class SystemInputInterface {
 		public:
 			virtual ~SystemInputInterface() { }

@@ -4,9 +4,9 @@
 using namespace eeros::safety;
 using namespace eeros::hal;
 
-SafetySystem::SafetySystem() : privateContext(state) { }
+SafetySystem::SafetySystem() : privateContext(state), wdOutput(nullptr), wdOutputState(false) { }
 
-SafetySystem::SafetySystem(const SafetySystem&) : privateContext(state) { }
+SafetySystem::SafetySystem(const SafetySystem&) : privateContext(state), wdOutput(nullptr) { }
 SafetySystem& SafetySystem::operator=(const SafetySystem&) { }
 
 SafetyLevel& SafetySystem::getCurrentLevel(void) {
@@ -100,13 +100,17 @@ void SafetySystem::triggerEvent(uint32_t event) {
 	}
 }
 
+void SafetySystem::setWatchdogOutput(eeros::hal::SystemOutput<bool>* output) {
+	wdOutput = output;
+}
+
 void SafetySystem::run() {
 	// 0) Check if all safety critical I/Os are defined in all levels
 	static bool first = true;
 	if(first) {
 		first = false;
 		if (state.currentLevel == nullptr) {
-			throw EEROSException("currentLevel not defiend");
+			throw EEROSException("current level not defiend! May forget to set entry level?");
 		}
 		for (auto level : state.levels) {
 			// TODO check if all input/output actions are defined
@@ -133,6 +137,12 @@ void SafetySystem::run() {
 		if(oa != nullptr) {
 			oa->set();
 		}
+	}
+	
+	// 5) Toggle watchdog output
+	if(wdOutput != nullptr) {
+		wdOutput->set(wdOutputState);
+		wdOutputState = !wdOutputState;
 	}
 }
 

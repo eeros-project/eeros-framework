@@ -21,9 +21,11 @@ namespace eeros {
 			SafetyLevel& getLevel(int32_t levelId);
 			SafetyLevel& operator[](unsigned levelId);
 			
+			void setWatchdogOutput(eeros::hal::SystemOutput<bool>* output);
+			
 			void defineSafetyLevels(std::vector<SafetyLevel> levels);
 			void setEntryLevel(int32_t levelId);
-
+			
 			void defineCriticalInputs(std::vector<eeros::hal::SystemInputInterface*> inputs);
 			void defineCriticalOutputs(std::vector<eeros::hal::SystemOutputInterface*> outputs);
 			void addCriticalInput(eeros::hal::SystemInputInterface& input);
@@ -53,6 +55,9 @@ namespace eeros {
 			
 			SafetyContext privateContext;
 			SafetyState state;
+			
+			eeros::hal::SystemOutput<bool>* wdOutput;
+			bool wdOutputState;
 		};
 
 	};

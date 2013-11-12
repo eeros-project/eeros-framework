@@ -7,6 +7,7 @@
 namespace eeros {
 	namespace hal {
 
+		// TODO rename to PeripheralOutput
 		class SystemOutputInterface {
 		public:
 			virtual ~SystemOutputInterface() { }
