@@ -40,10 +40,20 @@ namespace eeros {
 		SetOutputAction<T>* set(eeros::hal::SystemOutput<T>& output, T value) {
 			return new SetOutputAction<T>(output, value);
 		}
+		
+		template <typename T>
+		SetOutputAction<T>* set(eeros::hal::SystemOutput<T>* output, T value) {
+			return new SetOutputAction<T>(*output, value);
+		}
 
 		template <typename T>
 		LeaveOutputAction<T>* leave(eeros::hal::SystemOutput<T>& output) {
 			return new LeaveOutputAction<T>(output);
+		}
+		
+		template <typename T>
+		LeaveOutputAction<T>* leave(eeros::hal::SystemOutput<T>* output) {
+			return new LeaveOutputAction<T>(*output);
 		}
 
 	};

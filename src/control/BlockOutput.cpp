@@ -3,7 +3,7 @@
 using namespace eeros::control;
 
 BlockOutput::BlockOutput(std::string id) : hal(hal::HAL::instance()) {
-	systemOutput = &hal.getRealSystemOutput(id);
+	systemOutput = hal.getRealSystemOutput(id);
 	if(systemOutput == nullptr) throw -999;
 }
 

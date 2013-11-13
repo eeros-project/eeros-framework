@@ -87,31 +87,31 @@ int main() {
 	};
 	
 	// Define criticcal outputs
-	SystemOutput<bool>& power = hal.getLogicSystemOutput("power");
+	SystemOutput<bool>* power = hal.getLogicSystemOutput("power");
 	
-	SystemOutput<bool>& enable0 = hal.getLogicSystemOutput("enable0");
-	SystemOutput<bool>& enable1 = hal.getLogicSystemOutput("enable1");
+	SystemOutput<bool>* enable0 = hal.getLogicSystemOutput("enable0");
+	SystemOutput<bool>* enable1 = hal.getLogicSystemOutput("enable1");
 
-	SystemOutput<bool>& brake0 = hal.getLogicSystemOutput("brake0");
-	SystemOutput<bool>& brake1 = hal.getLogicSystemOutput("brake1");
+	SystemOutput<bool>* brake0 = hal.getLogicSystemOutput("brake0");
+	SystemOutput<bool>* brake1 = hal.getLogicSystemOutput("brake1");
 
 	safetySys.defineCriticalOutputs({
-		&power,
-		&enable0,
-		&enable1,
-		&brake0,
-		&brake1,
+		power,
+		enable0,
+		enable1,
+		brake0,
+		brake1,
 	});
 	
 	// Define criticcal inputs
-	SystemInput<bool>& emergencyStop = hal.getLogicSystemInput("emergencyStop");
-	SystemInput<double>& q0 = hal.getRealSystemInput("q0");
-	SystemInput<double>& q1 = hal.getRealSystemInput("q1");
+	SystemInput<bool>* emergencyStop = hal.getLogicSystemInput("emergencyStop");
+	SystemInput<double>* q0 = hal.getRealSystemInput("q0");
+	SystemInput<double>* q1 = hal.getRealSystemInput("q1");
 	
 	safetySys.defineCriticalInputs({
-		&emergencyStop,
-		&q0,
-		&q1
+		emergencyStop,
+		q0,
+		q1
 	});
 		
 	// Define Levels

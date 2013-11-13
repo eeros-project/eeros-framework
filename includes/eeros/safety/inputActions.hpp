@@ -54,15 +54,30 @@ namespace eeros {
 		IgnoreInputAction<T>* ignore(eeros::hal::SystemInput<T>& input) {
 			return new IgnoreInputAction<T>(input);
 		}
+		
+		template <typename T>
+		IgnoreInputAction<T>* ignore(eeros::hal::SystemInput<T>* input) {
+			return new IgnoreInputAction<T>(*input);
+		}
 
 		template <typename T>
 		CheckInputAction<T>* check(eeros::hal::SystemInput<T>& input, T value, uint32_t event) {
 			return new CheckInputAction<T>(input, value, event);
 		}
+		
+		template <typename T>
+		CheckInputAction<T>* check(eeros::hal::SystemInput<T>* input, T value, uint32_t event) {
+			return new CheckInputAction<T>(*input, value, event);
+		}
 
 		template <typename T>
 		CheckRangeInputAction<T>* range(eeros::hal::SystemInput<T>& input, T min, T max, uint32_t event) {
 			return new CheckRangeInputAction<T>(input, min, max, event);
+		}
+		
+		template <typename T>
+		CheckRangeInputAction<T>* range(eeros::hal::SystemInput<T>* input, T min, T max, uint32_t event) {
+			return new CheckRangeInputAction<T>(*input, min, max, event);
 		}
 
 	};
