@@ -14,6 +14,23 @@ using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;
 
+void initHardware() {
+	HAL& hal = HAL::instance();
+	
+	// Define system in- and outputs
+	ComediDevice* comedi0 = new ComediDevice("/dev/comedi0");
+	
+	// Add system in- and outputs to the HAL
+	hal.addSystemInput(new ComediFqd("q0", comedi0, 11, 8, 10, 9, 6.28318530718 / 2000.0, 0, 0));
+	hal.addSystemInput(new ComediFqd("q1", comedi0, 11, 3, 11, 4, 6.28318530718 / 2000.0, 0, 0));
+	hal.addSystemInput(new ComediDigIn("emergencyStop", comedi0, 2, 0));
+	hal.addSystemOutput(new ComediDigOut("enable0", comedi0, 2, 8));
+	hal.addSystemOutput(new ComediDigOut("enable1", comedi0, 2, 9));
+	hal.addSystemOutput(new ComediDigOut("brake0", comedi0, 2, 10));
+	hal.addSystemOutput(new ComediDigOut("brake1", comedi0, 2, 11));
+	hal.addSystemOutput(new ComediDigOut("power", comedi0, 2, 12));
+}
+
 int main() {
 	std::cout << "Safety System Example started..." << std::endl;
 	
@@ -23,26 +40,8 @@ int main() {
 	// Get HAL instance
 	HAL& hal = HAL::instance();
 	
-	// Define system in- and outputs
-	ComediDevice comedi0("/dev/comedi0");
-	ComediFqd enc0("q0", comedi0, 11, 8, 10, 9, 6.28318530718 / 2000.0, 0, 0);
-	ComediFqd enc1("q1", comedi0, 11, 3, 11, 4, 6.28318530718 / 2000.0, 0, 0);
-	ComediDigIn din0("emergencyStop", comedi0, 2, 0);
-	ComediDigOut dout8("enable0", comedi0, 2, 8);
-	ComediDigOut dout9("enable1", comedi0, 2, 9);
-	ComediDigOut dout10("brake0", comedi0, 2, 10);
-	ComediDigOut dout11("brake1", comedi0, 2, 11);
-	ComediDigOut dout12("power", comedi0, 2, 12);
-	
-	// Add system in- and outputs to the HAL
-	hal.addSystemInput(&enc0);
-	hal.addSystemInput(&enc1);
-	hal.addSystemInput(&din0);
-	hal.addSystemOutput(&dout8);
-	hal.addSystemOutput(&dout9);
-	hal.addSystemOutput(&dout10);
-	hal.addSystemOutput(&dout11);
-	hal.addSystemOutput(&dout12);
+	// Initialize Hardware
+	initHardware();
 	
 	// Define all possible events
 	enum {

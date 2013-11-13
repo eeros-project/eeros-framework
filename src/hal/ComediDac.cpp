@@ -2,8 +2,8 @@
 
 using namespace eeros::hal;
 
-ComediDac::ComediDac(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channel, double scale, double offset) : SystemOutput<double>(id) {
-	this->deviceHandle = device.getDeviceHandle();
+ComediDac::ComediDac(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale, double offset) : SystemOutput<double>(id) {
+	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channel = channel;
 	this->scale = scale;

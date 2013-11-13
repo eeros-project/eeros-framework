@@ -30,11 +30,11 @@ namespace eeros {
 				TestRunner() :
 				hal(HAL::instance()),
 				comediDev0("/dev/comedi0"),
-				dout("dout", comediDev0, 2, 0),
-				din("din", comediDev0, 2, 1),
-				dac("dac", comediDev0, 1, 1),
-				adc("adc", comediDev0, 0, 0),
-				fqd("fqd", comediDev0, 11, 8, 10, 9),
+				dout("dout", &comediDev0, 2, 0),
+				din("din", &comediDev0, 2, 1),
+				dac("dac", &comediDev0, 1, 1),
+				adc("adc", &comediDev0, 0, 0),
+				fqd("fqd", &comediDev0, 11, 8, 10, 9),
 				counter(0), doutVal(false) {
 					// nothing to do
 				}

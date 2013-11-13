@@ -15,7 +15,7 @@ namespace eeros {
 
 		class ComediDigIn : public SystemInput<bool> {
 		public:
-			ComediDigIn(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channel, bool inverted = false);
+			ComediDigIn(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted = false);
 			virtual bool get();
 			
 		private:

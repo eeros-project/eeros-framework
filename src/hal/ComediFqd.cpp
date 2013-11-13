@@ -2,8 +2,8 @@
 
 using namespace eeros::hal;
 
-ComediFqd::ComediFqd(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channelA, uint32_t channelB, uint32_t channelZ, double scale, double offset, double initValue) : SystemInput<double>(id) {
-	this->deviceHandle = device.getDeviceHandle();
+ComediFqd::ComediFqd(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channelA, uint32_t channelB, uint32_t channelZ, double scale, double offset, double initValue) : SystemInput<double>(id) {
+	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channelA = channelA;
 	this->channelB = channelB;

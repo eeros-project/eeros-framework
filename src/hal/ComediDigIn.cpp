@@ -2,8 +2,8 @@
 
 using namespace eeros::hal;
 
-ComediDigIn::ComediDigIn(std::string id, ComediDevice& device, uint32_t subDeviceNumber, uint32_t channel, bool inverted) : SystemInput<bool>(id) {
-	this->deviceHandle = device.getDeviceHandle();
+ComediDigIn::ComediDigIn(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted) : SystemInput<bool>(id) {
+	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channel = channel;
 	this->inverted = inverted;
