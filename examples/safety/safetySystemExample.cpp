@@ -29,6 +29,7 @@ void initHardware() {
 	hal.addSystemOutput(new ComediDigOut("brake0", comedi0, 2, 10));
 	hal.addSystemOutput(new ComediDigOut("brake1", comedi0, 2, 11));
 	hal.addSystemOutput(new ComediDigOut("power", comedi0, 2, 12));
+	hal.addSystemOutput(new ComediDigOut("wd", comedi0, 2, 13));
 }
 
 int main() {
@@ -87,6 +88,7 @@ int main() {
 	
 	// Define criticcal outputs
 	SystemOutput<bool>* power = hal.getLogicSystemOutput("power");
+	SystemOutput<bool>* wd = hal.getLogicSystemOutput("wd");
 	
 	SystemOutput<bool>* enable0 = hal.getLogicSystemOutput("enable0");
 	SystemOutput<bool>* enable1 = hal.getLogicSystemOutput("enable1");
@@ -173,23 +175,22 @@ int main() {
 	safetySys[moving           ].setInputActions({ check(emergencyStop, true, doEmergency), range(q0, 0.0, 6.283, doMotionStopping), range(q1, 0.0, 6.283, doMotionStopping) });
 	
 	// Define output states and events for all levels
-	safetySys[off              ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ) });
-	safetySys[swShutingDown    ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ) });
-	safetySys[swInitializing   ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ) });
-	safetySys[swInitialized    ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ) });
-	safetySys[controlStopping  ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ) });
-	safetySys[controlStarting  ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ) });
-	safetySys[emergency        ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ) });
-	safetySys[resetingEmergency].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ) });
-	safetySys[systemOn         ].setOutputActions({ set(power, true ), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ) });
-	safetySys[poweringDown     ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, true ), set(brake1, true ) });
-	safetySys[poweringUp       ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, true ), set(brake1, true ) });
-	safetySys[powerOn          ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, false), set(brake1, false) });
-	safetySys[motionStopping   ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, false), set(brake1, false) });
-	safetySys[motionStarting   ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, false), set(brake1, false) });
-	safetySys[moving           ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, false), set(brake1, false) });
+	safetySys[off              ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ), leave(wd) });
+	safetySys[swShutingDown    ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ), leave(wd) });
+	safetySys[swInitializing   ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ), leave(wd) });
+	safetySys[swInitialized    ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ), leave(wd) });
+	safetySys[controlStopping  ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ), leave(wd) });
+	safetySys[controlStarting  ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ), leave(wd) });
+	safetySys[emergency        ].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ), leave(wd) });
+	safetySys[resetingEmergency].setOutputActions({ set(power, false), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ), leave(wd) });
+	safetySys[systemOn         ].setOutputActions({ set(power, true ), set(enable0, false), set(enable1, false), set(brake0, true ), set(brake1, true ), toggle(wd) });
+	safetySys[poweringDown     ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, true ), set(brake1, true ), toggle(wd) });
+	safetySys[poweringUp       ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, true ), set(brake1, true ), toggle(wd) });
+	safetySys[powerOn          ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, false), set(brake1, false), toggle(wd) });
+	safetySys[motionStopping   ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, false), set(brake1, false), toggle(wd) });
+	safetySys[motionStarting   ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, false), set(brake1, false), toggle(wd) });
+	safetySys[moving           ].setOutputActions({ set(power, true ), set(enable0, true ), set(enable1, true ), set(brake0, false), set(brake1, false), toggle(wd) });
 	
-			
 	// Define and add level functions
 	safetySys[swInitializing].setLevelAction([&](SafetyContext* privateContext) {
 		//safetySys.triggerEvent(swInitDone, privateContext);

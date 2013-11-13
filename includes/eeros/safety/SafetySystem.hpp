@@ -21,8 +21,6 @@ namespace eeros {
 			SafetyLevel& getLevel(int32_t levelId);
 			SafetyLevel& operator[](unsigned levelId);
 			
-			void setWatchdogOutput(eeros::hal::SystemOutput<bool>* output);
-			
 			void defineSafetyLevels(std::vector<SafetyLevel> levels);
 			void setEntryLevel(int32_t levelId);
 			

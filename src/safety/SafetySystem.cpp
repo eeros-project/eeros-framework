@@ -100,10 +100,6 @@ void SafetySystem::triggerEvent(uint32_t event) {
 	}
 }
 
-void SafetySystem::setWatchdogOutput(eeros::hal::SystemOutput<bool>* output) {
-	wdOutput = output;
-}
-
 void SafetySystem::run() {
 	// 0) Check if all safety critical I/Os are defined in all levels
 	static bool first = true;
@@ -137,12 +133,6 @@ void SafetySystem::run() {
 		if(oa != nullptr) {
 			oa->set();
 		}
-	}
-	
-	// 5) Toggle watchdog output
-	if(wdOutput != nullptr) {
-		wdOutput->set(wdOutputState);
-		wdOutputState = !wdOutputState;
 	}
 }
 
