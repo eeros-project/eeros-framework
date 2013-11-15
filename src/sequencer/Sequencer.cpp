@@ -13,13 +13,17 @@ Sequencer* Sequencer::getMainSequencer(){
 
 Sequencer::Sequencer(std::string name)
 	: Executor(0),
-      sequenceName(name) {
+      sequencerName(name) {
 	if(!mainSequencer){
 		  Sequencer::mainSequencer = this;
 	}
 }
 
 Sequencer::~Sequencer(){
+	deleteSequencer(sequencerName);
+	if(Sequencer::mainSequencer == this){
+		  Sequencer::mainSequencer = 0;
+	}
 }
 
 void Sequencer::addSubSequencer(Sequencer* seq){
@@ -53,7 +57,7 @@ void Sequencer::deleteAllTimeDomains(){
 }
 
 std::string Sequencer::getName(){
-	return sequenceName;
+	return sequencerName;
 }
 
 Sequencer* Sequencer::findSequencer(std::string name) {

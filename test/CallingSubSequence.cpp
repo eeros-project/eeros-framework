@@ -1,5 +1,6 @@
 #include "CallingSubSequence.hpp"
 #include "BlockingSubSequence.hpp"
+#include "MySequencer.hpp"
 
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -40,7 +41,8 @@ void CallingSubSequence::callSubSequence(){
 /** Stopping
 */
 void CallingSubSequence::stopping(){
-	calledMethode.append("Stopping");
+	
 	//stop the thread
 	callerThread.stop();
+	calledMethode.append("Stopping");
 }

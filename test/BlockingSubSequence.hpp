@@ -8,7 +8,7 @@
   */
 class BlockingSubSequence : public eeros::sequencer::Sequence
 {
-private:
+protected:
 	std::string calledMethode;
 public:
 	BlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller);

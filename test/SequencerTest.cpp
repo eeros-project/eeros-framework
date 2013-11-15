@@ -1,6 +1,8 @@
 #include "SequencerTest.hpp"
+#include "MySequencer.hpp"
 #include "MySequence.hpp"
 #include "CallingSubSequence.hpp"
+#include "CallingNonBlockingSubSequence.hpp"
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SequencerTest);
 
@@ -44,5 +46,18 @@ void SequencerTest::testSimpleSubSequence(){
 	CPPUNIT_ASSERT(sequence.getCalledMethode().compare("Init Initialising Initialised Homed Move MoveToA MoveToB MoveToC Stopping") == 0);
 }
 
-MySequencer::MySequencer(std::string name) : eeros::sequencer::Sequencer(name){
+void SequencerTest::testNonBlockingSubSequence(){
+	MySequencer mainSequencer("MainSequencer");
+	CallingNonBlockingSubSequence sequence("CallingNonBlockingSubSequence", mainSequencer);
+	//Thread erzeugen:
+	mainSequencer.start();
+	
+	//Thread stoppen wird in Step Stopping gemacht
+	//callerThread.stop();
+	
+	while(!mainSequencer.isTerminated()){
+		//std::cout << "waiting for executor to terminate..." << std::endl;
+	}
+	
+	CPPUNIT_ASSERT(sequence.getCalledMethode().compare("Init Initialising Initialised Homed Move MoveToA MoveToB MoveToC Stop Wait Stopping") == 0);
 }

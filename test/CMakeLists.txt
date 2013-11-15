@@ -8,7 +8,7 @@ include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR})
 #add_executable(test SuiteBaseTests.cpp SignalTest.cpp)
 #target_link_libraries(test cppunit eeros )
 
-add_executable(cppUnitTest CPPUnitTestMain.cpp SequencerTest.cpp MySequence.cpp CallingSubSequence.cpp BlockingSubSequence.cpp)
+add_executable(cppUnitTest NonBlockingSubSequence.cpp MySequencer.cpp CallingNonBlockingSubSequence.cpp CPPUnitTestMain.cpp SequencerTest.cpp MySequence.cpp CallingSubSequence.cpp BlockingSubSequence.cpp)
 target_link_libraries(cppUnitTest cppunit eeros )
 
 add_executable(martinTest1 MartinTest1.cpp)

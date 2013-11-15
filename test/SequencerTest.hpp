@@ -4,13 +4,12 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-#include <eeros/sequencer/Sequencer.hpp>
-
 class SequencerTest : public CppUnit::TestFixture{
 	
 	CPPUNIT_TEST_SUITE(SequencerTest);
 	CPPUNIT_TEST(testSimpleSequence);
 	CPPUNIT_TEST(testSimpleSubSequence);
+	CPPUNIT_TEST(testNonBlockingSubSequence);
 	CPPUNIT_TEST_SUITE_END();
 	
 public:
@@ -18,13 +17,7 @@ public:
 	void tearDown();	
 	void testSimpleSequence();
 	void testSimpleSubSequence();
-};
-
-
-
-class MySequencer : public eeros::sequencer::Sequencer{
-public:
-	MySequencer(std::string name);
+	void testNonBlockingSubSequence();
 };
 
 #endif

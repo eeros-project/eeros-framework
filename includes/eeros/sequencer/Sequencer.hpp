@@ -96,7 +96,7 @@ namespace eeros{
 			//List for the mainSequencer, the only Object
 			std::list<Sequencer*> subSequencers;
 			std::list<control::TimeDomain*> timeDomains;
-			std::string sequenceName;
+			std::string sequencerName;
 		};//class Sequence
 
 	};//namespace sequencer
