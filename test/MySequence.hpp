@@ -5,6 +5,7 @@
 #include <eeros/sequencer/Sequencer.hpp>
 
 class MySequence: public eeros::sequencer::Sequence{
+	friend class ErrorHandlerA;
 protected:
 	std::string calledMethode;
 public:

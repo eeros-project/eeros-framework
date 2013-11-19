@@ -83,6 +83,7 @@ void Sequence::run(){
 				//else continue after Error Handling with the same Method
 				e->errorHandler->run();
 			}
+			delete e;
 		}catch(...){
 			callerThread.stop();
 		}
