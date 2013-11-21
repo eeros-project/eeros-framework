@@ -36,7 +36,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
-ErrorHandlerA::ErrorHandlerA(std::string name, SequenceMoveException1_3* s, bool callB)
+ErrorHandlerA::ErrorHandlerA(std::string name, MySequence* s, bool callB)
 	: eeros::sequencer::ErrorHandler(name), seq(s), callErrorHandlerB(callB){
 }
 

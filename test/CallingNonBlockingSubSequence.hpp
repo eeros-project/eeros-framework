@@ -37,8 +37,13 @@
 
 class CallingNonBlockingSubSequence : public CallingSubSequence
 {
+private:
+	//For 5th case (-> note case 5 (in my Folder)).
+	//set restartSequencer = true to restart the sequencer
+	//set restartSequencer = false to not restart the sequencer and not waiting
+	bool restartSequencer;
 public: 
-	CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller);
+	CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller, bool restart);
 	virtual ~CallingNonBlockingSubSequence();
 	
 	virtual void fillCallBacks();

@@ -35,3 +35,6 @@
 MySequencer::MySequencer(std::string name) : eeros::sequencer::Sequencer(name){
 }
 
+MySequencer::~MySequencer(){
+}
+

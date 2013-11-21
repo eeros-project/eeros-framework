@@ -35,16 +35,16 @@
 
 #include <eeros/sequencer/ErrorHandler.hpp>
 
-class SequenceMoveException1_3;
+class MySequence;
 
 class ErrorHandlerA  : public eeros::sequencer::ErrorHandler {
 private:
 	bool callErrorHandlerB;
 protected:
 	std::string calledMethode;
-	SequenceMoveException1_3* seq;
+	MySequence* seq;
 public:
-	ErrorHandlerA(std::string name, SequenceMoveException1_3* s, bool callB);
+	ErrorHandlerA(std::string name, MySequence* s, bool callB);
 	virtual ~ErrorHandlerA(void);
 
 	virtual void run();

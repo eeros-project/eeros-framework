@@ -5,6 +5,9 @@ MySequence::MySequence(std::string name, eeros::sequencer::Sequencer& caller)
 	callerThread.addRunnable(this);
 }
 
+MySequence::~MySequence(){
+}
+
 void MySequence::fillCallBacks(){
 	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::init));
 	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&MySequence::initialising));

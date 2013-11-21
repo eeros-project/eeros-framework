@@ -10,6 +10,7 @@ protected:
 	std::string calledMethode;
 public:
 	MySequence(std::string name, eeros::sequencer::Sequencer& caller);
+	virtual ~MySequence();
 	
 	virtual void fillCallBacks();
 	

@@ -32,7 +32,7 @@
 
 #include "ErrorHandlerB.hpp"
 
-ErrorHandlerB::ErrorHandlerB(std::string name, SequenceMoveException1_3* s)
+ErrorHandlerB::ErrorHandlerB(std::string name, MySequence* s)
 	: ErrorHandlerA(name, s, false) {
 }
 

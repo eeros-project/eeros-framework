@@ -37,7 +37,7 @@
 
 class ErrorHandlerB : public ErrorHandlerA {
 public:
-	ErrorHandlerB(std::string name, SequenceMoveException1_3* s);
+	ErrorHandlerB(std::string name, MySequence* s);
 	virtual ~ErrorHandlerB(void);
 
 	virtual void run();

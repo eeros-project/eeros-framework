@@ -106,6 +106,7 @@ void Sequence::removeSequence(std::string name){
 	while(iter != eeros::sequencer::Sequence::allSequences.end()){
 		if((*iter)->getName().compare(name) == 0){
 			iter = allSequences.erase(iter);
+			return;
 		}else{
 		  iter++;
 		}

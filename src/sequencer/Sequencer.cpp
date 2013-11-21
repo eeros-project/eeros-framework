@@ -19,10 +19,11 @@ Sequencer::Sequencer(std::string name)
 	}
 }
 
-Sequencer::~Sequencer(){
-	deleteSequencer(sequencerName);
+Sequencer::~Sequencer(){	
 	if(Sequencer::mainSequencer == this){
 		  Sequencer::mainSequencer = 0;
+	}else{
+		deleteSequencer(sequencerName);
 	}
 }
 
@@ -74,11 +75,11 @@ Sequencer* Sequencer::findSequencer(std::string name) {
 
 void Sequencer::deleteSequencer(std::string name){
 	std::list<Sequencer*>::iterator iter = subSequencers.begin();
-		while(iter != subSequencers.end()){
-			if((*iter)->getName().compare(name) == 0){
-				subSequencers.erase(iter);
-				return;
-			}
-			iter++;
+	while(iter != subSequencers.end()){
+		if((*iter)->getName().compare(name) == 0){
+			subSequencers.erase(iter);
+			return;
 		}
+		iter++;
+	}
 }

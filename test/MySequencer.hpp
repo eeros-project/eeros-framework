@@ -38,6 +38,7 @@
 class MySequencer : public eeros::sequencer::Sequencer{
 public:
 	MySequencer(std::string name);
+	virtual ~MySequencer();
 };
 
 #endif // MYSEQUENCER_H

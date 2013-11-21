@@ -39,8 +39,8 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 
-CallingNonBlockingSubSequence::CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller)
-	: CallingSubSequence(name, caller){
+CallingNonBlockingSubSequence::CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller, bool restart)
+	: CallingSubSequence(name, caller), restartSequencer(restart){
 	//callerThread.addRunnable(this);
 }
 
@@ -60,52 +60,50 @@ void CallingNonBlockingSubSequence::fillCallBacks(){
 
 void CallingNonBlockingSubSequence::callSubSequence(){
 	MySequencer* subSequencer = 0;
-	NonBlockingSubSequence* subSequence = dynamic_cast<NonBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence"));
-	if(!subSequence){
+	try{
+		subSequencer = dynamic_cast<MySequencer*>(eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer"));
+	}catch(const char * e){
+		
+	}
+	
+	bool seqIsNew = false;
+	if(!subSequencer){
 		//use pointer to leave the object in memory!!
 		//without pointer the objetct will be destroyed.
 		subSequencer = new MySequencer("SubSequencer");
+		seqIsNew = true;
 		//callerThread for NonBlocking Sub Sequence is a new Sequencer
 		//please take attention, if this Object looses scope, so it will be deleted!!
 		//that's why you should use a pointer to allocate memory!!
 		//else the pointer in the Executor runnables list of the Sequencer will point to nowhere!!
+	}
+	NonBlockingSubSequence* subSequence = dynamic_cast<NonBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence"));
+	if(!subSequence){
 		//MyNonBlockingSubSequence is a Runnable!!
 		subSequence = new NonBlockingSubSequence("NonBlockingSubSequence", *subSequencer);
+		if(seqIsNew){
+			//now we start the Thread of the subSequencer
+			subSequencer->start();
+		}
 	}
-
-	//warten bis SubSequencer fertig ist
-	bool subSequencerWasStarted = false;
-	try{
-		if(!subSequencer){
-			//SubSequencer existiert schon und wurde hier nicht neu erzeugt
-			subSequencer = dynamic_cast<MySequencer*>(eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer"));
-			//For 5th case (-> note case 5 (in my Folder)).
-			//set sequencerWasStarted = false to restart the sequencer
-			//set sequencerWasStarted = true to not restart the sequencer and not waiting
-			//suSequencerWasStarted = true;
-			subSequencerWasStarted = false;
-		}//else{
-			//SubSequencer wurde neu erzeugt
-			//sequencerWasStarted = false;
-		//}
-	
-		if(!subSequencerWasStarted && subSequencer && subSequencer->getStatus() != eeros::kStopped){
+	try{	
+		if(!seqIsNew && restartSequencer && subSequencer && subSequencer->getStatus() != eeros::kStopped){
 			eeros::ExecutorService::waitForSequenceEnd(subSequencer);
+			subSequencer->start();
 		}
 
 	}catch(char *str){
 
 	}
-	
-	//now we start the Thread
-	if(!subSequencerWasStarted){
-		subSequencer->start();
-	}
 }
 
 void CallingNonBlockingSubSequence::wait(){
 	//Here we wait for the subsequencer Thread
-	eeros::sequencer::Sequencer* seq = eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer");
+	eeros::sequencer::Sequencer* seq = 0;
+	try{
+		seq = eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer");
+	}catch(const char * e){
+	}
 	
 	if(seq && seq->getStatus() != eeros::kStopped){
 		eeros::ExecutorService::waitForSequenceEnd(seq);
@@ -115,6 +113,4 @@ void CallingNonBlockingSubSequence::wait(){
 	CPPUNIT_ASSERT(subSequence->getCalledMethode().compare("MoveToA MoveToB MoveToC Stop ") == 0);
 	calledMethode.append(subSequence->getCalledMethode());
 	calledMethode.append("Wait ");
-	
-	delete seq;
 }
