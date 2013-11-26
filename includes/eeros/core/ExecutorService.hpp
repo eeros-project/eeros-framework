@@ -13,7 +13,7 @@
 #endif
 
 #define RUNNING 1
-#define MAX_NOF_THREADS 8
+#define MAX_NOF_THREADS 64
 
 namespace eeros {
 
