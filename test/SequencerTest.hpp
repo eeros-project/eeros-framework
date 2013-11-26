@@ -7,7 +7,7 @@
 class SequencerTest : public CppUnit::TestFixture{
 	
 	CPPUNIT_TEST_SUITE(SequencerTest);
-	//CPPUNIT_TEST(testSimpleSequence);
+	CPPUNIT_TEST(testSimpleSequence);
 	CPPUNIT_TEST(testSimpleSubSequence);
 	CPPUNIT_TEST(testNonBlockingSubSequence);
 	CPPUNIT_TEST(testErrorHandlerCase1_3);
@@ -15,8 +15,8 @@ class SequencerTest : public CppUnit::TestFixture{
 	CPPUNIT_TEST(testErrorHandlerCase2b);
 	CPPUNIT_TEST(testErrorHandlerCase5);
 	CPPUNIT_TEST(testErrorHandlerCase5Restart);
-	//CPPUNIT_TEST(testErrorHandlerCase6a);
-	//CPPUNIT_TEST(testErrorHandlerCase6b);
+	CPPUNIT_TEST(testErrorHandlerCase6a);
+	CPPUNIT_TEST(testErrorHandlerCase6b);
 	CPPUNIT_TEST_SUITE_END();
 	
 public:

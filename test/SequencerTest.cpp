@@ -7,6 +7,8 @@
 #include "SequenceMoveException2a.hpp"
 #include "SequenceMoveException2b.hpp"
 #include "CallingNonBlockingSequence_ErrorHandler.hpp"
+#include "SequenceMoveException6a.hpp"
+#include "SequenceMoveException6b.hpp"
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SequencerTest);
 
@@ -218,7 +220,7 @@ void SequencerTest::testErrorHandlerCase5Restart(){
 	while(!mainSequencer.isTerminated()){
 		//std::cout << "waiting for executor to terminate..." << std::endl;
 	}
-	/*
+	
 	//after the exception the sequence is restaarted
 	//1. all the steps until the exception occurs where called first "Init Initialising Initialised Homed Move MoveException "
 	std::string s1 = "Init Initialising Initialised Homed MoveException ";
@@ -251,11 +253,102 @@ void SequencerTest::testErrorHandlerCase5Restart(){
 	if(subSequence){
 		delete subSequence;
 	}
-	*/
 }
 
 void SequencerTest::testErrorHandlerCase6a(){
+	MySequencer mainSequencer("MainSequencer");
+	SequenceMoveException6a sequence("SequenceMoveException6a", mainSequencer);
+	SequenceMoveException6a::i = 0;
+	
+	//Thread erzeugen:
+	mainSequencer.start();
+	
+	//Thread stoppen wird in Step Stopping gemacht
+	//callerThread.stop();
+	
+	while(!mainSequencer.isTerminated()){
+		//std::cout << "waiting for executor to terminate..." << std::endl;
+	}
+	
+	//after the exception the sequence is restaarted
+	//1. all the steps until the exception occurs where called first "Init Initialising Initialised Homed Move MoveException "
+	std::string s1 = "Init Initialising Initialised Homed MoveException ";
+	//2. the ErrorHandler is called (without ErrorHandlerB) "Reset Referencing Restart "
+	std::string s2 = "Reset Restart ";
+	//3. the sequence continues"
+	//   in this run the sequencer will terminate normally
+	std::string s3 = "MoveException ";
+	//4. NonBlockingSubSequence ends here before the main sequence stopping is from the main sequncer
+	std::string s4 = "MoveToA MoveToB MoveToC Stop ";
+	std::string s5 = "Wait Stopping";
+	
+	//std::string str1 = sequence.getCalledMethode();
+	std::string str2;
+	str2.append(s1.append(s2.append(s3.append(s4))));
+	str2.append(s5);
+	
+	CPPUNIT_ASSERT(sequence.getCalledMethode().compare(str2) == 0);
+	
+	
+	eeros::sequencer::Sequencer* seq = 0;
+	try{
+		seq = eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer");
+	}catch(const char * e){
+	}
+	if(seq){
+		delete seq;
+	}
+	eeros::sequencer::Sequence* subSequence = eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence");
+	if(subSequence){
+		delete subSequence;
+	}
 }
 
 void SequencerTest::testErrorHandlerCase6b(){
+	MySequencer mainSequencer("MainSequencer");
+	SequenceMoveException6b sequence("SequenceMoveException6b", mainSequencer);
+	SequenceMoveException6b::i = 0;
+	
+	//Thread erzeugen:
+	mainSequencer.start();
+	
+	//Thread stoppen wird in Step Stopping gemacht
+	//callerThread.stop();
+	
+	while(!mainSequencer.isTerminated()){
+		//std::cout << "waiting for executor to terminate..." << std::endl;
+	}
+	
+	//after the exception the sequence is restaarted
+	//1. all the steps until the exception occurs where called first "Init Initialising Initialised Homed Move MoveException "
+	std::string s1 = "Init Initialising Initialised Homed MoveException ";
+	//2. the ErrorHandler is called (without ErrorHandlerB) "Reset Referencing Restart "
+	std::string s2 = "Reset Restart ";
+	//3. the sequence restarts on the homed method"
+	//   in this run the sequencer will terminate normally
+	std::string s3 = "Homed MoveException ";
+	//4. NonBlockingSubSequence ends here before the main sequence stopping is from the main sequncer
+	std::string s4 = "MoveToA MoveToB MoveToC Stop ";
+	std::string s5 = "Wait Stopping";
+	
+	//std::string str1 = sequence.getCalledMethode();
+	std::string str2;
+	str2.append(s1.append(s2.append(s3.append(s4))));
+	str2.append(s5);
+	
+	CPPUNIT_ASSERT(sequence.getCalledMethode().compare(str2) == 0);
+	
+	
+	eeros::sequencer::Sequencer* seq = 0;
+	try{
+		seq = eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer");
+	}catch(const char * e){
+	}
+	if(seq){
+		delete seq;
+	}
+	eeros::sequencer::Sequence* subSequence = eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence");
+	if(subSequence){
+		delete subSequence;
+	}
 }
