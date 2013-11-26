@@ -30,31 +30,20 @@
 */
 
 
-#ifndef CALLINGNONBLOCKINGSUBSEQUENCE_HPP
-#define CALLINGNONBLOCKINGSUBSEQUENCE_HPP
+#ifndef CALLINGNONBLOCKINGSEQUENCE_ERRORHANDLER_HPP
+#define CALLINGNONBLOCKINGSEQUENCE_ERRORHANDLER_HPP
 
-#include "CallingSubSequence.hpp"
+#include "CallingNonBlockingSubSequence.hpp"
 
-class CallingNonBlockingSubSequence : public CallingSubSequence
+class CallingNonBlockingSequence_ErrorHandler : public CallingNonBlockingSubSequence
 {
-private:
-	//For 5th case (-> note case 5 (in my Folder)).
-	//set restartSequencer = true to restart the subSequencer
-	//set restartSequencer = false to not restart the subSequencer and not waiting
-	bool restartSubSequencer;
-public: 
-	CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller, bool restart);
-	virtual ~CallingNonBlockingSubSequence();
+public:
+	CallingNonBlockingSequence_ErrorHandler(std::string name, eeros::sequencer::Sequencer& caller, bool restart);
+	virtual ~CallingNonBlockingSequence_ErrorHandler();
 	
 	virtual void fillCallBacks();
-	
-	/** Call SubSequence
-	 * */
-	void callSubSequence();
-	
-	/** wait for SubSequnce to terminate
-	 */
-	void wait();
+	virtual void moveException();
+	static int i;
 };
 
-#endif // CALLINGNONBLOCKINGSUBSEQUENCE_HPP
+#endif // CALLINGNONBLOCKINGSEQUENCE_ERRORHANDLER_HPP

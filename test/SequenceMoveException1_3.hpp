@@ -39,7 +39,7 @@ class SequenceMoveException1_3 : public MySequence
 {
 public:
 	SequenceMoveException1_3(std::string name, eeros::sequencer::Sequencer& caller);
-	~SequenceMoveException1_3();
+	virtual ~SequenceMoveException1_3();
 	
 	virtual void fillCallBacks();
 	virtual void moveException();

@@ -37,7 +37,7 @@ namespace eeros{
 			/**
 			 * Destructor removes this sequence from the list allSequences. 
 			 */
-			~Sequence();
+			virtual ~Sequence();
 			
 			/**
 			 * returns the name of the sequence
