@@ -4,7 +4,7 @@
 #include <eeros/sequencer/Sequence.hpp>
 
 /** This examples shows how you can use a subsequence, if the main sequence will wait in a step of their terminaton
-  *
+  * This sequence has not to be saved to the executer as runnable, because the superior sequnces will call the run method
   */
 class BlockingSubSequence : public eeros::sequencer::Sequence
 {
@@ -16,7 +16,7 @@ public:
 	virtual void fillCallBacks();
 	std::string getCalledMethode();
 
-private:
+protected:
 	void MoveToA();
 	void MoveToB();
 	void MoveToC();	

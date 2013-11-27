@@ -38,7 +38,7 @@
 int CallingNonBlockingSequence_ErrorHandler::i = 0;
 
 CallingNonBlockingSequence_ErrorHandler::CallingNonBlockingSequence_ErrorHandler(std::string name, eeros::sequencer::Sequencer& caller, bool restart)
-	: CallingNonBlockingSubSequence(name, caller, restart){
+	: CallingNonBlockingSubSequence(name, caller, restart, false){
 	//callerThread.addRunnable(this);
 }
 

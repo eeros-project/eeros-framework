@@ -42,7 +42,7 @@ public:
 	virtual ~NonBlockingSubSequence_ErrorHandler(void);
 	virtual void fillCallBacks();
 	
-	void moveException();
+	virtual void moveException();
 	static int i;
 };
 

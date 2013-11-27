@@ -6,7 +6,6 @@
 
 CallingSubSequence::CallingSubSequence(std::string name, eeros::sequencer::Sequencer& caller)
 	: MySequence(name, caller){
-	//callerThread.addRunnable(this);
 }
 
 CallingSubSequence::~CallingSubSequence(){

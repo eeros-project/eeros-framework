@@ -42,19 +42,20 @@ private:
 	//set restartSequencer = true to restart the subSequencer
 	//set restartSequencer = false to not restart the subSequencer and not waiting
 	bool restartSubSequencer;
+	bool withErrorHandling;
 public: 
-	CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller, bool restart);
+	CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller, bool restart, bool withError);
 	virtual ~CallingNonBlockingSubSequence();
 	
 	virtual void fillCallBacks();
 	
 	/** Call SubSequence
 	 * */
-	void callSubSequence();
+	virtual void callSubSequence();
 	
 	/** wait for SubSequnce to terminate
 	 */
-	void wait();
+	virtual void wait();
 };
 
 #endif // CALLINGNONBLOCKINGSUBSEQUENCE_HPP

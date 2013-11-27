@@ -13,7 +13,7 @@ public:
 	
 	/** Call SubSequence
 	 * */
-	void callSubSequence();
+	virtual void callSubSequence();
 	
 	
 	/** Stopping

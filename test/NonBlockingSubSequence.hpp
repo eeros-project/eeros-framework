@@ -33,15 +33,18 @@
 #ifndef NONBLOCKINGSUBSEQUENCE_HPP
 #define NONBLOCKINGSUBSEQUENCE_HPP
 
-#include "BlockingSubSequence.hpp"
+#include "MySequence.hpp"
 
-class NonBlockingSubSequence : public BlockingSubSequence
+class NonBlockingSubSequence : public MySequence
 {
 public:
 	NonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller);
 	virtual ~NonBlockingSubSequence(void);
 	virtual void fillCallBacks();
 	
+	void MoveToA();
+	void MoveToB();
+	void MoveToC();	
 	/** Stopping
 	*/
 	void stopping();

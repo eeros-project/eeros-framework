@@ -33,37 +33,38 @@
 #include "CallingNonBlockingSubSequence.hpp"
 #include "MySequencer.hpp"
 #include "NonBlockingSubSequence.hpp"
+#include "NonBlockingSubSequence_ErrorHandler.hpp"
 
 #include <eeros/core/Executor.hpp>
 
 #include <cppunit/extensions/HelperMacros.h>
 
 
-CallingNonBlockingSubSequence::CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller, bool restart)
-	: CallingSubSequence(name, caller), restartSubSequencer(restart){
-	//callerThread.addRunnable(this);
+CallingNonBlockingSubSequence::CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller, bool restart, bool withError)
+	: CallingSubSequence(name, caller), restartSubSequencer(restart), withErrorHandling(withError){
 }
 
 CallingNonBlockingSubSequence::~CallingNonBlockingSubSequence(){
 }
 
 void CallingNonBlockingSubSequence::fillCallBacks(){
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingSubSequence::init));
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingSubSequence::initialising));
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingSubSequence::initialised));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingNonBlockingSubSequence::init));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingNonBlockingSubSequence::initialising));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingNonBlockingSubSequence::initialised));
 	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingNonBlockingSubSequence::callSubSequence));
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingSubSequence::homed));
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingSubSequence::move));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingNonBlockingSubSequence::homed));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingNonBlockingSubSequence::move));
 	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingNonBlockingSubSequence::wait));
-	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingSubSequence::stopping));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&CallingNonBlockingSubSequence::stopping));
 }
 
 void CallingNonBlockingSubSequence::callSubSequence(){
 	MySequencer* subSequencer = 0;
+	MySequence* subSequence = 0; 
 	try{
 		subSequencer = dynamic_cast<MySequencer*>(eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer"));
 	}catch(const char * e){
-		
+		std::cout << e << std::endl;
 	}
 	
 	bool seqIsNew = false;
@@ -77,13 +78,26 @@ void CallingNonBlockingSubSequence::callSubSequence(){
 		//that's why you should use a pointer to allocate memory!!
 		//else the pointer in the Executor runnables list of the Sequencer will point to nowhere!!
 	}
-	NonBlockingSubSequence* subSequence = dynamic_cast<NonBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence"));
-	if(!subSequence){
-		//MyNonBlockingSubSequence is a Runnable!!
-		subSequence = new NonBlockingSubSequence("NonBlockingSubSequence", *subSequencer);
-		if(seqIsNew){
-			//now we start the Thread of the subSequencer
-			subSequencer->start();
+	if(!withErrorHandling){
+		subSequence = dynamic_cast<NonBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence"));
+		if(!subSequence){
+			//MyNonBlockingSubSequence is a Runnable!!
+			subSequence = new NonBlockingSubSequence("NonBlockingSubSequence", *subSequencer);
+			if(seqIsNew){
+				//now we start the Thread of the subSequencer
+				subSequencer->start();
+			}
+		}
+	}else{
+		subSequence = dynamic_cast<NonBlockingSubSequence_ErrorHandler*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence_ErrorHandler"));
+		if(!subSequence){
+			//MyNonBlockingSubSequence is a Runnable!!
+			subSequence = new NonBlockingSubSequence_ErrorHandler("NonBlockingSubSequence_ErrorHandler", *subSequencer);
+			NonBlockingSubSequence_ErrorHandler::i = 0;
+			if(seqIsNew){
+				//now we start the Thread of the subSequencer
+				subSequencer->start();
+			}
 		}
 	}
 	try{	
@@ -93,7 +107,6 @@ void CallingNonBlockingSubSequence::callSubSequence(){
 			}
 			subSequencer->start();
 		}
-
 	}catch(char *str){
 
 	}
@@ -105,13 +118,19 @@ void CallingNonBlockingSubSequence::wait(){
 	try{
 		seq = eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer");
 	}catch(const char * e){
+		std::cout << e << std::endl;
 	}
 	
 	if(seq && seq->getStatus() != eeros::kStopped){
 		eeros::ExecutorService::waitForSequenceEnd(seq);
 	}
 	
-	NonBlockingSubSequence* subSequence = dynamic_cast<NonBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence"));
+	MySequence* subSequence = 0;
+	if(!withErrorHandling){
+		subSequence = dynamic_cast<NonBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence"));
+	}else{
+		subSequence = dynamic_cast<NonBlockingSubSequence_ErrorHandler*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence_ErrorHandler"));
+	}
 	//CPPUNIT_ASSERT(subSequence->getCalledMethode().compare("MoveToA MoveToB MoveToC Stop ") == 0);
 	calledMethode.append(subSequence->getCalledMethode());
 	calledMethode.append("Wait ");

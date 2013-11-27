@@ -36,16 +36,29 @@
 
 
 NonBlockingSubSequence::NonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller)
-	: BlockingSubSequence(name, caller){
-		callerThread.addRunnable(this);
+	: MySequence(name, caller){
 }
 
 NonBlockingSubSequence::~NonBlockingSubSequence(void){
 }
 	
 void NonBlockingSubSequence::fillCallBacks(){
-	BlockingSubSequence::fillCallBacks();
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&NonBlockingSubSequence::MoveToA));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&NonBlockingSubSequence::MoveToB));
+	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&NonBlockingSubSequence::MoveToC));
 	addCallBack(static_cast<eeros::sequencer::Sequence::method>(&NonBlockingSubSequence::stopping));
+}
+
+void NonBlockingSubSequence::MoveToA(){
+	calledMethode.append("MoveToA ");
+}
+
+void NonBlockingSubSequence::MoveToB(){
+	calledMethode.append("MoveToB ");
+}
+
+void NonBlockingSubSequence::MoveToC(){
+	calledMethode.append("MoveToC ");
 }
 
 /** Stopping
