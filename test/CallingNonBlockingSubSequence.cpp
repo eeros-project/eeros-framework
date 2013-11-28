@@ -34,14 +34,16 @@
 #include "MySequencer.hpp"
 #include "NonBlockingSubSequence.hpp"
 #include "NonBlockingSubSequence_ErrorHandler.hpp"
+#include "SequenceMoveException8a.hpp"
+#include "SequenceMoveException8b.hpp"
 
 #include <eeros/core/Executor.hpp>
 
 #include <cppunit/extensions/HelperMacros.h>
 
 
-CallingNonBlockingSubSequence::CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller, bool restart, bool withError)
-	: CallingSubSequence(name, caller), restartSubSequencer(restart), withErrorHandling(withError){
+CallingNonBlockingSubSequence::CallingNonBlockingSubSequence(std::string name, eeros::sequencer::Sequencer& caller, bool restart, int handlingNr)
+	: CallingSubSequence(name, caller), restartSubSequencer(restart), handlingNumber(handlingNr){
 }
 
 CallingNonBlockingSubSequence::~CallingNonBlockingSubSequence(){
@@ -78,27 +80,60 @@ void CallingNonBlockingSubSequence::callSubSequence(){
 		//that's why you should use a pointer to allocate memory!!
 		//else the pointer in the Executor runnables list of the Sequencer will point to nowhere!!
 	}
-	if(!withErrorHandling){
-		subSequence = dynamic_cast<NonBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence"));
-		if(!subSequence){
-			//MyNonBlockingSubSequence is a Runnable!!
-			subSequence = new NonBlockingSubSequence("NonBlockingSubSequence", *subSequencer);
-			if(seqIsNew){
-				//now we start the Thread of the subSequencer
-				subSequencer->start();
+	switch(handlingNumber){
+		case 0:{
+			subSequence = dynamic_cast<NonBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence"));
+			if(!subSequence){
+				//MyNonBlockingSubSequence is a Runnable!!
+				subSequence = new NonBlockingSubSequence("NonBlockingSubSequence", *subSequencer);
+				if(seqIsNew){
+					//now we start the Thread of the subSequencer
+					subSequencer->start();
+				}
 			}
+			break;
 		}
-	}else{
-		subSequence = dynamic_cast<NonBlockingSubSequence_ErrorHandler*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence_ErrorHandler"));
-		if(!subSequence){
-			//MyNonBlockingSubSequence is a Runnable!!
-			subSequence = new NonBlockingSubSequence_ErrorHandler("NonBlockingSubSequence_ErrorHandler", *subSequencer);
-			NonBlockingSubSequence_ErrorHandler::i = 0;
-			if(seqIsNew){
-				//now we start the Thread of the subSequencer
-				subSequencer->start();
+		case 1:{
+			subSequence = dynamic_cast<NonBlockingSubSequence_ErrorHandler*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence_ErrorHandler"));
+			if(!subSequence){
+				//NonBlockingSubSequence_ErrorHandler is a Runnable!!
+				subSequence = new NonBlockingSubSequence_ErrorHandler("NonBlockingSubSequence_ErrorHandler", *subSequencer);
+				NonBlockingSubSequence_ErrorHandler::i = 0;
+				if(seqIsNew){
+					//now we start the Thread of the subSequencer
+					subSequencer->start();
+				}
 			}
+			break;
 		}
+		case 2:{
+			subSequence = dynamic_cast<SequenceMoveException8a*>(eeros::sequencer::Sequence::getSequence("SequenceMoveException8a"));
+			if(!subSequence){
+				//SequenceMoveException8a is a Runnable!!
+				subSequence = new SequenceMoveException8a("SequenceMoveException8a", *subSequencer);
+				NonBlockingSubSequence_ErrorHandler::i = 0;
+				if(seqIsNew){
+					//now we start the Thread of the subSequencer
+					subSequencer->start();
+				}
+			}
+			break;
+		}
+		case 3:{
+			subSequence = dynamic_cast<SequenceMoveException8b*>(eeros::sequencer::Sequence::getSequence("SequenceMoveException8b"));
+			if(!subSequence){
+				//SequenceMoveException8a is a Runnable!!
+				subSequence = new SequenceMoveException8b("SequenceMoveException8b", *subSequencer);
+				NonBlockingSubSequence_ErrorHandler::i = 0;
+				if(seqIsNew){
+					//now we start the Thread of the subSequencer
+					subSequencer->start();
+				}
+			}
+			break;
+		}
+		default:
+			throw "callSubSequence: no case specified!!";
 	}
 	try{	
 		if(!seqIsNew && restartSubSequencer && subSequencer){
@@ -126,12 +161,25 @@ void CallingNonBlockingSubSequence::wait(){
 	}
 	
 	MySequence* subSequence = 0;
-	if(!withErrorHandling){
+	switch(handlingNumber){
+	case 0:
 		subSequence = dynamic_cast<NonBlockingSubSequence*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence"));
-	}else{
+		break;
+	case 1:
 		subSequence = dynamic_cast<NonBlockingSubSequence_ErrorHandler*>(eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence_ErrorHandler"));
+		break;
+	case 2:
+		subSequence = dynamic_cast<SequenceMoveException8a*>(eeros::sequencer::Sequence::getSequence("SequenceMoveException8a"));
+		break;
+	case 3:
+		subSequence = dynamic_cast<SequenceMoveException8b*>(eeros::sequencer::Sequence::getSequence("SequenceMoveException8b"));
+		break;
+	default:
+		throw "Wait: no case specified!!";
 	}
-	//CPPUNIT_ASSERT(subSequence->getCalledMethode().compare("MoveToA MoveToB MoveToC Stop ") == 0);
-	calledMethode.append(subSequence->getCalledMethode());
-	calledMethode.append("Wait ");
+	if(subSequence){
+		//CPPUNIT_ASSERT(subSequence->getCalledMethode().compare("MoveToA MoveToB MoveToC Stop ") == 0);
+		calledMethode.append(subSequence->getCalledMethode());
+		calledMethode.append("Wait ");
+	}
 }

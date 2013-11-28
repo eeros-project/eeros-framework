@@ -30,19 +30,20 @@
 */
 
 
-#include "SequenceMoveException6a.hpp"
+#include "SequenceMoveException8b.hpp"
 #include "ErrorHandlerA.hpp"
 
 #include <eeros/sequencer/SequenceException.hpp>
 
-SequenceMoveException6a::SequenceMoveException6a(std::string name, eeros::sequencer::Sequencer& caller)
-	: CallingNonBlockingSequence_ErrorHandler(name, caller, false) {
-	}
-	
-SequenceMoveException6a::~SequenceMoveException6a(){
+
+SequenceMoveException8b::SequenceMoveException8b(std::string name, eeros::sequencer::Sequencer& caller)
+	: NonBlockingSubSequence_ErrorHandler(name, caller){
 }
-	
-void SequenceMoveException6a::moveException(){
+
+SequenceMoveException8b::~SequenceMoveException8b(void){
+}
+
+void SequenceMoveException8b::moveException(){
 	calledMethode.append("MoveException ");
 	
 	//Please take attention the exception should only be thrown once, else the sequencer thread will never end.
@@ -55,7 +56,9 @@ void SequenceMoveException6a::moveException(){
 		}
 		//case 2a (except the call in ErrorHandlerA to ErrorHandlerB it is also Casse 4a)
 		//After this exception the sequence is continues in this method
-		throw new eeros::sequencer::SequenceException(this, static_cast<eeros::sequencer::Sequence::method>(&SequenceMoveException6a::moveException), 0,
-			                                      errorHandlerA, false, false, "Exception ErrorHandlerA");
+		throw new eeros::sequencer::SequenceException(this, static_cast<eeros::sequencer::Sequence::method>(&SequenceMoveException8b::moveException),
+							      static_cast<eeros::sequencer::Sequence::method>(&NonBlockingSubSequence_ErrorHandler::homed),
+			                                      errorHandlerA, false, true, "Exception ErrorHandlerA");
 	}
 }
+

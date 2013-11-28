@@ -62,7 +62,7 @@ void SequencerTest::testNonBlockingSubSequence(){
 	//For 5th case (-> note case 5 (in my Folder)).
 	//set restartSequencer = true to restart the sequencer
 	//set restartSequencer = false to not restart the sequencer and not waiting
-	CallingNonBlockingSubSequence sequence("CallingNonBlockingSubSequence", mainSequencer, false, false);
+	CallingNonBlockingSubSequence sequence("CallingNonBlockingSubSequence", mainSequencer, false, 0);
 	//Thread erzeugen:
 	mainSequencer.start();
 	
@@ -358,7 +358,7 @@ void SequencerTest::testErrorHandlerCase7(){
 	//For 5th case (-> note case 5 (in my Folder)).
 	//set restartSequencer = true to restart the sequencer
 	//set restartSequencer = false to not restart the sequencer and not waiting
-	CallingNonBlockingSubSequence sequence("CallingNonBlockingSubSequence", mainSequencer, false, true);
+	CallingNonBlockingSubSequence sequence("CallingNonBlockingSubSequence", mainSequencer, false, 1);
 	//Thread erzeugen:
 	mainSequencer.start();
 	
@@ -368,15 +368,15 @@ void SequencerTest::testErrorHandlerCase7(){
 	while(!mainSequencer.isTerminated()){
 		//std::cout << "waiting for executor to terminate..." << std::endl;
 	}
-	//1. Sequencer starts
-	std::string s1 ="Init Initialising Initialised ";
+	//1. Sequencer starts and wait on the wait method for the end of the subsequencer
+	std::string s1 ="Init Initialising Initialised Homed Move ";
 	//2. SubSequnecer with Exception starts
 	std::string s2 ="Init MoveException Reset Restart ";
 	//3. SubSequencer restarts
 	std::string s3 ="Init MoveException ";
 	std::string s4 ="Homed Stopping";
 	//Sequencer ends
-	std::string s5 ="Homed Move Wait Stopping";
+	std::string s5 ="Wait Stopping";
 	
 	std::string str = s1.append(s2.append(s3.append(s4.append(s5))));
 	
@@ -390,7 +390,93 @@ void SequencerTest::testErrorHandlerCase7(){
 	if(seq){
 		delete seq;
 	}
-	eeros::sequencer::Sequence* subSequence = eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence");
+	eeros::sequencer::Sequence* subSequence = eeros::sequencer::Sequence::getSequence("NonBlockingSubSequence_ErrorHandler");
+	if(subSequence){
+		delete subSequence;
+	}
+}
+
+void SequencerTest::testErrorHandlerCase8a(){
+	MySequencer mainSequencer("MainSequencer");
+	//For 5th case (-> note case 5 (in my Folder)).
+	//set restartSequencer = true to restart the sequencer
+	//set restartSequencer = false to not restart the sequencer and not waiting
+	CallingNonBlockingSubSequence sequence("CallingNonBlockingSubSequence", mainSequencer, false, 2);
+	//Thread erzeugen:
+	mainSequencer.start();
+	
+	//Thread stoppen wird in Step Stopping gemacht
+	//callerThread.stop();
+	
+	while(!mainSequencer.isTerminated()){
+		//std::cout << "waiting for executor to terminate..." << std::endl;
+	}
+	//1. Sequencer starts and wait on the wait method for the end of the subsequencer
+	std::string s1 ="Init Initialising Initialised Homed Move ";
+	//2. SubSequnecer with Exception starts
+	std::string s2 ="Init MoveException Reset Restart ";
+	//3. SubSequencer restarts
+	std::string s3 ="MoveException ";
+	std::string s4 ="Homed Stopping";
+	//Sequencer ends
+	std::string s5 ="Wait Stopping";
+	
+	std::string str = s1.append(s2.append(s3.append(s4.append(s5))));
+	
+	CPPUNIT_ASSERT(sequence.getCalledMethode().compare(str) == 0);
+	
+	eeros::sequencer::Sequencer* seq = 0;
+	try{
+		seq = eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer");
+	}catch(const char * e){
+	}
+	if(seq){
+		delete seq;
+	}
+	eeros::sequencer::Sequence* subSequence = eeros::sequencer::Sequence::getSequence("SequenceMoveException8a");
+	if(subSequence){
+		delete subSequence;
+	}
+}
+
+void SequencerTest::testErrorHandlerCase8b(){
+	MySequencer mainSequencer("MainSequencer");
+	//For 5th case (-> note case 5 (in my Folder)).
+	//set restartSequencer = true to restart the sequencer
+	//set restartSequencer = false to not restart the sequencer and not waiting
+	CallingNonBlockingSubSequence sequence("CallingNonBlockingSubSequence", mainSequencer, false, 3);
+	//Thread erzeugen:
+	mainSequencer.start();
+	
+	//Thread stoppen wird in Step Stopping gemacht
+	//callerThread.stop();
+	
+	while(!mainSequencer.isTerminated()){
+		//std::cout << "waiting for executor to terminate..." << std::endl;
+	}
+	//1. Sequencer starts and wait on the wait method for the end of the subsequencer
+	std::string s1 ="Init Initialising Initialised Homed Move ";
+	//2. SubSequnecer with Exception starts
+	std::string s2 ="Init MoveException Reset Restart ";
+	//3. SubSequencer restarts
+	std::string s3 ="";
+	std::string s4 ="Homed Stopping";
+	//Sequencer ends
+	std::string s5 ="Wait Stopping";
+	
+	std::string str = s1.append(s2.append(s3.append(s4.append(s5))));
+	
+	CPPUNIT_ASSERT(sequence.getCalledMethode().compare(str) == 0);
+	
+	eeros::sequencer::Sequencer* seq = 0;
+	try{
+		seq = eeros::sequencer::Sequencer::getMainSequencer()->findSequencer("SubSequencer");
+	}catch(const char * e){
+	}
+	if(seq){
+		delete seq;
+	}
+	eeros::sequencer::Sequence* subSequence = eeros::sequencer::Sequence::getSequence("SequenceMoveException8b");
 	if(subSequence){
 		delete subSequence;
 	}

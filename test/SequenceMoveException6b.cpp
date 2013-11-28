@@ -55,7 +55,7 @@ void SequenceMoveException6b::moveException(){
 		}
 		//case 2a (except the call in ErrorHandlerA to ErrorHandlerB it is also Casse 4a)
 		//After this exception the sequence is continues in this method
-		throw new eeros::sequencer::SequenceException(this, static_cast<eeros::sequencer::Sequence::method>(&CallingNonBlockingSequence_ErrorHandler::moveException), 
+		throw new eeros::sequencer::SequenceException(this, static_cast<eeros::sequencer::Sequence::method>(&SequenceMoveException6b::moveException), 
 							      static_cast<eeros::sequencer::Sequence::method>(&CallingNonBlockingSequence_ErrorHandler::homed),
 			                                      errorHandlerA, false, true, "Exception ErrorHandlerA");
 	}
