@@ -13,11 +13,14 @@ ComediDigOut::ComediDigOut(std::string id, ComediDevice* device, uint32_t subDev
 
 bool ComediDigOut::get() {
 	lsampl_t data = 0;
+	bool value;
 	comedi_dio_read(deviceHandle, subDeviceNumber, channel, &data);
-	if(inverted) data = !data;
-	return static_cast<bool>(data);
+	value = static_cast<bool>(data);
+	if(inverted) value = !value;
+	return value;
 }
 
 void ComediDigOut::set(bool value) {
+	if(inverted) value = !value;
 	comedi_dio_write(deviceHandle, subDeviceNumber, channel, value);
 }

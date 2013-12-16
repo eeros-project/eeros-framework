@@ -13,7 +13,9 @@ ComediDigIn::ComediDigIn(std::string id, ComediDevice* device, uint32_t subDevic
 
 bool ComediDigIn::get() {
 	lsampl_t data = 0;
+	bool value;
 	comedi_dio_read(deviceHandle, subDeviceNumber, channel, &data);
-	if(inverted) data = !data;
-	return static_cast<bool>(data);
+	value = static_cast<bool>(data);
+	if(inverted) value = !value;
+	return value;
 }
