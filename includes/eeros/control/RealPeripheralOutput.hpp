@@ -11,12 +11,16 @@ namespace eeros {
 		class RealPeripheralOutput : public Block1i {
 
 		public:
-			RealPeripheralOutput(std::string outputId);
+			RealPeripheralOutput(std::string outputId, double scale = 1, double offset = 0);
 			virtual void run();
-
+			virtual void setOffset(double o);
+			virtual void setScale(double s);
+			
 		private:
 			hal::HAL& hal;
 			hal::SystemOutput<double>* systemOutput;
+			double scale;
+			double offset;
 		};
 
 	};

@@ -31,9 +31,9 @@ namespace eeros {
 			
 			void addEvent(uint32_t event, int32_t nextLevelId, EventType type = kPrivateEvent);
 			
-			void setInputAction(InputAction* action);
+			void setInputAction(InputAction* action); // TODO rename to add...
 			void setInputActions(std::vector<InputAction*> actionList);
-			void setOutputAction(OutputAction* action);
+			void setOutputAction(OutputAction* action); // TODO rename to add...
 			void setOutputActions(std::vector<OutputAction*> actionList);
 			
 			void setLevelAction(std::function<void (SafetyContext* context)> action);
