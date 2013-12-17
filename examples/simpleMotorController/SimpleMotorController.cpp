@@ -3,27 +3,45 @@
 #include <fstream>
 #include <stdlib.h>
 #include <unistd.h>
+
 #include <eeros/core/Executor.hpp>
-#include <eeros/core/SharedMemory.hpp>
+#include <eeros/hal/HAL.hpp>
+#include <eeros/hal/ComediFqd.hpp>
+#include <eeros/hal/ComediDac.hpp>
 #include <eeros/control/Step.hpp>
 #include <eeros/control/Sum.hpp>
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/D.hpp>
 #include <eeros/control/GlobalSignalProvider.hpp>
 #include <eeros/control/SignalBufferReader.hpp>
-
-#include "ComediDac.hpp"
-#include "ComediEncoder.hpp"
+#include <eeros/control/RealPeripheralInput.hpp>
+#include <eeros/control/RealPeripheralOutput.hpp>
 
 #define TIMETOWAIT 30
 
 using namespace eeros;
+using namespace eeros::hal;
 using namespace eeros::control;
-using namespace eeros::examples::simpleMotorController;
+
+void initHardware() {
+	HAL& hal = HAL::instance();
+
+	std::cout << "  Creating device structure..." << std::endl;
+	ComediDevice* comedi0 = new ComediDevice("/dev/comedi0");
+
+	std::cout << "  Registering I/Os in the HAL..." << std::endl;
+	hal.addSystemInput(new ComediFqd("enc", comedi0, 11, 8, 10, 9, 6.28318530718 / (4 * 500.0), 0, 0));
+// 	hal.addSystemOutput(new ComediDigOut("enable", comedi0, 2, 0));
+	hal.addSystemOutput(new ComediDac("dac", comedi0, 1, 0));
+}
+
 
 int main() {
 	std::cout << "Simple Motor Controller Demo started..." << std::endl;
 
+	std::cout << "Initializing Hardware..." << std::endl;
+	initHardware();
+	
 	std::cout << "Creating executor..." << std::endl;
 	Executor e1(0.001); // control loop -> 1 ms period time
 
@@ -32,7 +50,7 @@ int main() {
 	step.getOut().setName("phi_desired");
 	step.getOut().setUnit("rad");
 
-	ComediEncoder enc;
+	RealPeripheralInput enc("enc");
 	enc.getOut().setName("phi_actual");
 	enc.getOut().setUnit("rad");
 
@@ -70,7 +88,7 @@ int main() {
 	invMotConst.getOut().setName("i");
 	invMotConst.getOut().setUnit("A");
 		
-	ComediDac dac(0);
+	RealPeripheralOutput dac("dac");
 	GlobalSignalProvider globalSignalProvider;
 
 	std::cout << "Available signals:" << std::endl;
