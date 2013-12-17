@@ -20,6 +20,8 @@ double ComediDac::get() {
 }
 
 void ComediDac::set(double value) {
+	if(value > maxVoltage) value = maxVoltage;
+	if(value < minVoltage) value = minVoltage;
 	lsampl_t data = static_cast<lsampl_t>(value * maxValue / (maxVoltage - minVoltage) + maxValue / 2.0);
 	comedi_data_write(deviceHandle, subDeviceNumber, channel, 0, AREF_GROUND, data);
 }
