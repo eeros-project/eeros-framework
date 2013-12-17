@@ -8,6 +8,9 @@ ComediDac::ComediDac(std::string id, ComediDevice* device, uint32_t subDeviceNum
 	this->channel = channel;
 	this->scale = scale;
 	this->offset = offset;
+	this->minVoltage = -10.0; // default +/-10V
+	this->maxVoltage = 10.0;
+	this->maxValue = 65535; // default 16bit
 }
 
 double ComediDac::get() {
@@ -17,6 +20,16 @@ double ComediDac::get() {
 }
 
 void ComediDac::set(double value) {
-	lsampl_t data = static_cast<lsampl_t>(value * maxVal / 20.0 + maxVal / 2.0);
+	lsampl_t data = static_cast<lsampl_t>(value * maxValue / (maxVoltage - minVoltage) + maxValue / 2.0);
 	comedi_data_write(deviceHandle, subDeviceNumber, channel, 0, AREF_GROUND, data);
+}
+
+void ComediDac::setVoltageRange(double minVoltage, double maxVoltage) {
+	this->minVoltage = minVoltage;
+	this->maxVoltage = maxVoltage;
+}
+
+
+void ComediDac::setDacResolution(uint8_t bits) {
+	this->maxValue = (1 << bits) - 1;
 }
