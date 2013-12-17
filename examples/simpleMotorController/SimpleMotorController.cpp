@@ -46,7 +46,7 @@ int main() {
 	Executor e1(0.001); // control loop -> 1 ms period time
 
 	std::cout << "Creating control system elements..." << std::endl;
-	Step step(0.0, -3.14159265359, 5);
+	Step step(0.0, -3.14159265359, 20);
 	step.getOut().setName("phi_desired");
 	step.getOut().setUnit("rad");
 
@@ -68,8 +68,8 @@ int main() {
 	posController.getOut().setUnit("rad/s");
 
 	D diff2;
-	diff1.getOut().setName("phi_d_set_ff");
-	diff1.getOut().setUnit("rad/s");
+	diff2.getOut().setName("phi_d_set_ff");
+	diff2.getOut().setUnit("rad/s");
 	
 	Sum sum2(3);
 	sum2.negateInput(1);
@@ -104,6 +104,7 @@ int main() {
 	sum1.getIn(0).connect(step.getOut());
 	sum1.getIn(1).connect(enc.getOut());
 	posController.getIn().connect(sum1.getOut());
+	diff2.getIn().connect(step.getOut());
 	sum2.getIn(0).connect(posController.getOut());
 	sum2.getIn(1).connect(diff1.getOut());
 	sum2.getIn(2).connect(diff2.getOut());
