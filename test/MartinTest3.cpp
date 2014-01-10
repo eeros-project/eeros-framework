@@ -13,6 +13,9 @@
 #include <eeros/control/BlockOutput.hpp>
 #include <eeros/control/GlobalSignalProvider.hpp>
 #include <eeros/control/SignalBufferReader.hpp>
+#include <eeros/logger/Logger.hpp>
+#include <eeros/logger/LogWriter.hpp>
+#include <eeros/logger/StreamLogWriter.hpp>
 
 #define TIMETOWAIT 30
 
@@ -38,7 +41,7 @@ namespace eeros {
 				uint64_t ts;
 				double val;
 			};
-
+			
 		};
 	};
 };
@@ -46,15 +49,20 @@ namespace eeros {
 int main() {
 	using namespace eeros;
 	using namespace eeros::control;
+	using namespace eeros::logger;
 	using namespace eeros::test::martin;
 	
-	std::cout << "Martin Test 3 started..." << std::endl;
+	Logger<LogWriter> l('M');
+	StreamLogWriter w(std::cout);
+	l.set(w);
 	
-	std::cout << "Creating executors..." << std::endl;
+	l.info() << "Martin Test 3 started..." << endl;
+	
+	l.info() << "Creating executors..." << endl;
 	Executor e1(0.01); // 10 ms period time
 	Executor e2(0.1); // 100 ms period time
 	
-	std::cout << "Creating and connecting control system elements..." << std::endl;
+	l.info() << "Creating and connecting control system elements..." << endl;
 	Step step1(0.0, 5.0, 20.0);
 	step1.getOut().setName("Step 1");
 	
@@ -75,11 +83,14 @@ int main() {
 	sum.getIn(1).connect(step2.getOut());
 	gain.getIn().connect(sum.getOut());
 	
-	std::cout << "Available signals:" << std::endl;
-	for(std::list<Signal*>::iterator i = Signal::getSignalList()->begin(); i != Signal::getSignalList()->end(); i++) {
-		uint32_t length = (*i)->getDimension();
-		for(uint32_t j = 0; j < length; j++) {
-			std::cout << "  " << (*i)->getLabel(j) << std::endl;
+	{
+		auto e = l.info();
+		e << "Available signals:" << endl;
+		for(std::list<Signal*>::iterator i = Signal::getSignalList()->begin(); i != Signal::getSignalList()->end(); i++) {
+			uint32_t length = (*i)->getDimension();
+			for(uint32_t j = 0; j < length; j++) {
+				e << "  " << (*i)->getLabel(j) << endl;
+			}
 		}
 	}
 	
@@ -89,24 +100,24 @@ int main() {
 	e1.addRunnable(gain);
 	e1.addRunnable(globalSignalProvider);
 	
-	std::cout << "Creating reader..." << std::endl;
+	l.info() << "Creating reader..." << endl;
 	Reader r(globalSignalProvider.getSharedMemory(), kSharedMemorySize);
 	e2.addRunnable(r);
 	
-	std::cout << "Starting executors..." << std::endl;
+	l.info() << "Starting executors..." << endl;
 	e1.start();
 	e2.start();
 	
-	std::cout << "Waiting for " << TIMETOWAIT << " seconds while executors are running" << std::endl;
+	l.info() << "Waiting for " << TIMETOWAIT << " seconds while executors are running" << endl;
 	sleep(TIMETOWAIT);
- 
-	std::cout << "Stopping executors..." << std::endl;
+
+	l.info() << "Stopping executors..." << endl;
 	e1.stop();
 	e2.stop();
 	
-	std::cout << "Waiting for executors to terminate..." << std::endl;
+	l.info() << "Waiting for executors to terminate..." << endl;
 	while(!e1.isTerminated() && !e2.isTerminated());
 //	while(!e1.isTerminated());
 	
-	std::cout << "Test 3 done..." << std::endl;
+	l.info() << "Test 3 done..." << endl;
 }
