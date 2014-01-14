@@ -27,6 +27,7 @@ namespace eeros {
 			virtual ~SafetyLevel();
 			
 			int32_t getId();
+			std::string getDescription();
 			int32_t getLevelIdForEvent(uint32_t event, bool privateEventOk = false);
 			
 			void addEvent(uint32_t event, int32_t nextLevelId, EventType type = kPrivateEvent);

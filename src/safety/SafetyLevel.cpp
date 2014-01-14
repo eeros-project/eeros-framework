@@ -14,6 +14,10 @@ int32_t SafetyLevel::getId() {
 	return id;
 }
 
+std::string SafetyLevel::getDescription() {
+	return description;
+}
+
 int32_t SafetyLevel::getLevelIdForEvent(uint32_t event, bool privateEventOk) {
 	auto it = transitions.find(event);
 	if(it != transitions.end()) {
