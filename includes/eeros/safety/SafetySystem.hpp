@@ -6,6 +6,8 @@
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetyProperties.hpp>
 #include <eeros/safety/SafetyContext.hpp>
+#include <eeros/logger/Logger.hpp>
+#include <eeros/logger/LogWriter.hpp>
 
 namespace eeros {
 	namespace safety {
@@ -26,6 +28,8 @@ namespace eeros {
 			
 			static SafetySystem& instance();
 			
+			logger::Logger<logger::LogWriter> log;
+
 		private:
 			SafetySystem();
 			SafetySystem(const SafetySystem&);

@@ -4,9 +4,9 @@
 namespace eeros {
 	namespace safety {
 
-		SafetySystem::SafetySystem() { }
+		SafetySystem::SafetySystem() : log('X') { }
 
-		SafetySystem::SafetySystem(const SafetySystem&) { }
+		SafetySystem::SafetySystem(const SafetySystem&) : log('X') { }
 		SafetySystem& SafetySystem::operator=(const SafetySystem&) { }
 
 		SafetyLevel& SafetySystem::getCurrentLevel(void) {
@@ -31,11 +31,16 @@ namespace eeros {
 
 		void SafetySystem::triggerEvent(uint32_t event, SafetyContext* context) {
 			if(currentLevel) {
+				log.info() << "triggering event: (" << (int)event << ")";
 				int32_t nextLevelId = currentLevel->getLevelIdForEvent(event, context == &privateContext);
 				if(nextLevelId != kInvalidLevel) {
 					SafetyLevel* nextLevel = &(getLevelById(nextLevelId));
 					if(nextLevel != nullptr) {
+						bool transition = (nextLevel != currentLevel);
 						currentLevel = nextLevel; // TODO make atomic
+
+						if (transition)
+							log.info() << "new safety level: [" << nextLevelId << "] " << nextLevel->getDescription();
 					}
 					else {
 						throw EEROSException("unknown safety level"); // TODO define error number and send error message to logger
@@ -43,7 +48,9 @@ namespace eeros {
 					
 				}
 				else {
-					// TODO send msg to logger
+					log.error()	<< "no transition for event (" << (int)event
+								<< ") in level [" << currentLevel->getId() << "] "
+								<< currentLevel->getDescription();
 				}
 			}
 			else {
@@ -69,6 +76,14 @@ namespace eeros {
 			for(auto ia : level->inputAction) {
 				if(ia != nullptr) {
 					ia->check(&privateContext);
+					SafetyLevel* new_level = currentLevel;
+					if (new_level != level) {
+						using namespace eeros::logger;
+						eeros::hal::SystemInputInterface* action = (eeros::hal::SystemInputInterface*)(ia->inputInterface); // TODO make getId() const
+						log.warn()	<< "level changed due to input action: " << action->getId() << endl
+									<< "  previous level: [" << level->getId() << "] " << level->getDescription() << endl
+									<< "  new level:      [" << new_level->getId() << "] " << new_level->getDescription();
+					}
 				}
 			}
 			
