@@ -46,19 +46,19 @@ namespace eeros {
 		}
 
 		void SafetyProperties::addEventToLevelAndAbove(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type) {
-			for(auto level : levels) {
+			for(auto& level : levels) {
 				if(level.getId() >= levelId) level.addEvent(event, nextLevelId, type);
 			}
 		}
 
 		void SafetyProperties::addEventToLevelAndBelow(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type) {
-			for(auto level : levels) {
+			for(auto& level : levels) {
 				if(level.getId() <= levelId) level.addEvent(event, nextLevelId, type);
 			}
 		}
 
 		void SafetyProperties::addEventToAllLevelsBetween(int32_t lowerLevelId, int32_t upperLevelId, uint32_t event, int32_t nextLevelId, EventType type) {
-			for(auto level : levels) {
+			for(auto& level : levels) {
 				if(level.getId() >= lowerLevelId && level.getId() <= upperLevelId) level.addEvent(event, nextLevelId, type);
 			}
 		}
