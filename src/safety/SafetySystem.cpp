@@ -4,10 +4,12 @@
 namespace eeros {
 	namespace safety {
 
-		SafetySystem::SafetySystem() : log('X') { }
+		SafetySystem::~SafetySystem() {}
 
-		SafetySystem::SafetySystem(const SafetySystem&) : log('X') { }
-		SafetySystem& SafetySystem::operator=(const SafetySystem&) { }
+		SafetySystem::SafetySystem() : log('X'), currentLevel(nullptr) { }
+
+		SafetySystem::SafetySystem(const SafetySystem&) : log('X'), currentLevel(nullptr) { }
+		SafetySystem& SafetySystem::operator=(const SafetySystem&) { return *this; }
 
 		SafetyLevel& SafetySystem::getCurrentLevel(void) {
 			if(currentLevel) {

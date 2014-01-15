@@ -14,6 +14,7 @@ namespace eeros {
 
 	public:
 		Executor(double period);
+		virtual ~Executor();
 		virtual int getThreadId();
 		virtual double getPeriod();
 		virtual int getStatus();

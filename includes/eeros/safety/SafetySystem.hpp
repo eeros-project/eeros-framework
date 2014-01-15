@@ -18,6 +18,8 @@ namespace eeros {
 		
 		class SafetySystem : public Runnable {
 		public:
+			virtual ~SafetySystem();
+
 			SafetyLevel& getCurrentLevel(void);
 			SafetyLevel& getLevelById(int32_t levelId);
 			SafetyLevel& operator[](unsigned levelId);

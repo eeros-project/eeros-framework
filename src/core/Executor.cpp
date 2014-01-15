@@ -2,10 +2,12 @@
 
 using namespace eeros;
 
-Executor::Executor(double period) {
+Executor::Executor(double period) : threadId(-1) {
 	this->period = period;
 	this->status = kStopped;
 }
+
+Executor::~Executor() { }
 
 int Executor::getThreadId() {
 	return this->threadId;

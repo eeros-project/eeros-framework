@@ -4,7 +4,7 @@
 namespace eeros {
 	namespace safety {
 
-		SafetyProperties::SafetyProperties() {
+		SafetyProperties::SafetyProperties() : entryLevel(-1) {
 			// nothing to do
 		}
 		
