@@ -77,14 +77,18 @@ namespace eeros {
 			// 2) Read inputs
 			for(auto ia : level->inputAction) {
 				if(ia != nullptr) {
-					ia->check(&privateContext);
-					SafetyLevel* new_level = currentLevel;
-					if (new_level != level) {
+					SafetyLevel* oldLevel = currentLevel;
+					if (ia->check(&privateContext)) {
+						SafetyLevel* newLevel = currentLevel;
 						using namespace eeros::logger;
 						eeros::hal::SystemInputInterface* action = (eeros::hal::SystemInputInterface*)(ia->inputInterface); // TODO make getId() const
-						log.warn()	<< "level changed due to input action: " << action->getId() << endl
-									<< "  previous level: [" << level->getId() << "] " << level->getDescription() << endl
-									<< "  new level:      [" << new_level->getId() << "] " << new_level->getDescription();
+						if (oldLevel != newLevel) {
+							log.warn()	<< "level changed due to input action: " << action->getId() << endl
+										<< "  previous level: [" << oldLevel->getId() << "] " << oldLevel->getDescription() << endl
+										<< "  new level:      [" << newLevel->getId() << "] " << newLevel->getDescription();
+						} else {
+//							log.warn()	<< "no change by input action: " << action->getId();
+						}
 					}
 				}
 			}

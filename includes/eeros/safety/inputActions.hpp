@@ -12,7 +12,7 @@ namespace eeros {
 		public:
 			IgnoreInputAction(eeros::hal::SystemInput<T>& input) : InputAction(input), input(input) { }
 			virtual ~IgnoreInputAction() { }
-			virtual void check(SafetyContext* context) { }
+			virtual bool check(SafetyContext* context) { return false; }
 
 		private:
 			eeros::hal::SystemInput<T>& input;
@@ -23,8 +23,12 @@ namespace eeros {
 		public:
 			CheckInputAction(eeros::hal::SystemInput<T>& input, T value, uint32_t event) : InputAction(input), input(input), value(value), event(event) { }
 			virtual ~CheckInputAction() { }
-			virtual void check(SafetyContext* context) {
-				if(input.get() != value) context->triggerEvent(event);
+			virtual bool check(SafetyContext* context) {
+				if(input.get() != value) {
+					context->triggerEvent(event);
+					return true;
+				}
+				return false;
 			}
 			
 		private:
@@ -38,9 +42,13 @@ namespace eeros {
 		public:
 			CheckRangeInputAction(eeros::hal::SystemInput<T>& input, T min, T max, uint32_t event) : InputAction(input), input(input), min(min), max(max), event(event) { }
 			virtual ~CheckRangeInputAction() { }
-			virtual void check(SafetyContext* context) {
+			virtual bool check(SafetyContext* context) {
 				T value = input.get();
-				if (value < min || value > max) context->triggerEvent(event);
+				if (value < min || value > max) {
+					context->triggerEvent(event);
+					return true;
+				}
+				return false;
 			}
 
 		private:

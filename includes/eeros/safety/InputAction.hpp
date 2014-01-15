@@ -13,7 +13,7 @@ namespace eeros {
 		public:
 			InputAction(eeros::hal::SystemInputInterface& inputInterface) : inputInterface(&inputInterface) { }
 			virtual ~InputAction() { }
-			virtual void check(SafetyContext* context) { }
+			virtual bool check(SafetyContext* context) { return false; }
 			
 			eeros::hal::SystemInputInterface const* inputInterface;
 		};
