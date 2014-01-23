@@ -2,30 +2,12 @@
 
 using namespace eeros::control;
 
-Saturation::Saturation(double lim, sigdim_t dim) : Block1i1o(dim), lowLimit(dim)u, pLimit(dim) {
+Saturation::Saturation(double lim, sigdim_t dim) : Block1i1o(dim), lowLimit(dim), upLimit(dim) {
 	for(sigdim_t i = 0; i < dim; i++) {
 		this->upLimit[i] = lim;
 		this->lowLimit[i] = -lim;
 	}
 	this->enabled = true;
-}
-
-Saturation::Saturation(const double lim[], sigdim_t dim) : Block1i1o(dim), lowLimit(dim), upLimit(dim) {
-	for(sigdim_t i = 0; i < dim; i++) {
-		this->upLimit[i] = lim;
-		this->lowLimit[i] = -lim;
-	}
-	this->enabled = true;
-}
-
-Saturation::Saturation(std::vector<double> lim, sigdim_t dim) : Block1i1o(dim), lowLimit(dim), upLimit(dim) {
-	if(lim.size() == dim) {
-		for(sigdim_t i = 0; i < dim; i++) {
-			this->upLimit[i] = lim;
-			this->lowLimit[i] = -lim;
-		}
-		this->enabled = true;
-	}
 }
 
 Saturation::Saturation(double upLim, double lowLim, sigdim_t dim) : Block1i1o(dim), lowLimit(dim), upLimit(dim) {
@@ -36,19 +18,37 @@ Saturation::Saturation(double upLim, double lowLim, sigdim_t dim) : Block1i1o(di
 	this->enabled = true;
 }
 
-Saturation::Saturation(const double upLim[], const double lowLim[], sigdim_t dim) : Block1i1o(dim), lowLimit(dim), upLimit(dim) {
+Saturation::Saturation(const double lim[], sigdim_t dim) : Block1i1o(dim), lowLimit(dim), upLimit(dim) {
 	for(sigdim_t i = 0; i < dim; i++) {
-		this->upLimit[i] = upLim;
-		this->lowLimit[i] = lowLim;
+		this->upLimit[i] = lim[i];
+		this->lowLimit[i] = -lim[i];
 	}
 	this->enabled = true;
+}
+
+Saturation::Saturation(const double upLim[], const double lowLim[], sigdim_t dim) : Block1i1o(dim), lowLimit(dim), upLimit(dim) {
+	for(sigdim_t i = 0; i < dim; i++) {
+		this->upLimit[i] = upLim[i];
+		this->lowLimit[i] = lowLim[i];
+	}
+	this->enabled = true;
+}
+
+Saturation::Saturation(std::vector<double> lim, sigdim_t dim) : Block1i1o(dim), lowLimit(dim), upLimit(dim) {
+	if(lim.size() == dim) {
+		for(sigdim_t i = 0; i < dim; i++) {
+			this->upLimit[i] = lim[i];
+			this->lowLimit[i] = -lim[i];
+		}
+		this->enabled = true;
+	}
 }
 
 Saturation::Saturation(std::vector<double> upLim, std::vector<double> lowLim, sigdim_t dim) : Block1i1o(dim), lowLimit(dim), upLimit(dim) {
 	if(upLim.size() == lowLim.size() == dim) {
 		for(sigdim_t i = 0; i < dim; i++) {
-			this->upLimit[i] = upLim;
-			this->lowLimit[i] = lowLim;
+			this->upLimit[i] = upLim[i];
+			this->lowLimit[i] = lowLim[i];
 		}
 		this->enabled = true;
 	}
@@ -61,10 +61,10 @@ Saturation::~Saturation() {
 void Saturation::run() {
 	for(int i = 0; i < out.getDimension(); i++) {
 		if(enabled){
-			if(in.getValue(i)>upLimit(i))
-				out.setValue(upLimit(i), i);
-			else if (in.getValue(i)<lowLimit(i))
-				out.setValue(lowLimit(i), i);
+			if(in.getValue(i)>upLimit[i])
+				out.setValue(upLimit[i], i);
+			else if (in.getValue(i)<lowLimit[i])
+				out.setValue(lowLimit[i], i);
 			else
 				out.setValue(in.getValue(i), i);
 		}
@@ -84,28 +84,28 @@ void Saturation::disable() {
 }
 
 void Saturation::setSaturationLimit(double lim) {
-	for(sigdim_t i = 0; i < lowLim.size(); i++) {
+	for(sigdim_t i = 0; i < lowLimit.size(); i++) {
 		this->upLimit[i] = lim;
 		this->lowLimit[i] = -lim;
 	}
 }
 
 void Saturation::setSaturationLimit(double lowLim, double upLim) {
-	for(sigdim_t i = 0; i < lowLim.size(); i++) {
+	for(sigdim_t i = 0; i < lowLimit.size(); i++) {
 		this->upLimit[i] = upLim;
 		this->lowLimit[i] = lowLim;
 	}
 }
 
 void Saturation::setSaturationLimit(sigindex_t index, double lim) {
-	if(index < this->lim.size()) {
+	if(index < this->lowLimit.size()) {
 		upLimit[index] = lim;
 		lowLimit[index] = -lim;
 	}
 }
 
 void Saturation::setSaturationLimit(sigindex_t index, double lowLim, double upLim) {
-	if(index < this->upLim.size()) {
+	if(index < this->lowLimit.size()) {
 		upLimit[index] = upLim;
 		lowLimit[index] = lowLim;
 	}
