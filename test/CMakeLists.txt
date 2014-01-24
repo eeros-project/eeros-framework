@@ -38,4 +38,8 @@ if(NOT WINDOWS)
 
 	add_executable(vinciTest1 VinciTest1.cpp)
 	target_link_libraries(vinciTest1 eeros)
+	
+	add_executable(matrixTest MatrixTest.cpp)
+	target_link_libraries(matrixTest eeros)
+	add_test(mTest matrixTest)
 endif()

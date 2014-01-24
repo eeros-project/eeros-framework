@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <unordered_set>
 
 #include <eeros/hal/SystemInput.hpp>
 #include <eeros/hal/SystemOutput.hpp>
@@ -10,13 +11,13 @@
 
 namespace eeros {
 	namespace hal {
-
+		
 		class HAL {
 		public:
-			SystemOutput<bool>* getLogicSystemOutput(std::string name);
-			SystemOutput<double>* getRealSystemOutput(std::string name);
-			SystemInput<bool>* getLogicSystemInput(std::string name);
-			SystemInput<double>* getRealSystemInput(std::string name);
+			SystemOutput<bool>* getLogicSystemOutput(std::string name, bool exclusive = false);
+			SystemOutput<double>* getRealSystemOutput(std::string name, bool exclusive = false);
+			SystemInput<bool>* getLogicSystemInput(std::string name, bool exclusive = false);
+			SystemInput<double>* getRealSystemInput(std::string name, bool exclusive = false);
 			
 			bool addSystemInput(SystemInputInterface* systemInput);
 			bool addSystemOutput(SystemOutputInterface* systemOutput);
@@ -31,6 +32,9 @@ namespace eeros {
 			HAL& operator=(const HAL&);
 			
 			bool loadModule(std::string moduleName);
+			
+			std::unordered_set<SystemOutputInterface*> exclusiveReservedOutputs;
+			std::unordered_set<SystemInputInterface*> exclusiveReservedInputs;
 			
 			std::map<std::string, SystemInputInterface*> inputs;
 			std::map<std::string, SystemOutputInterface*> outputs;
