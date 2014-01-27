@@ -1,15 +1,15 @@
 #include <cstdlib>
 #include <iostream>
 
-#include <eeros/core/Matrix.hpp>
+#include <eeros/math/Matrix.hpp>
 using namespace eeros::math;
 
 template < uint8_t N, uint8_t M, typename T >
 void print(Matrix<N,M,T> &A, int indent = 1) {
-	for (int n = 1; n <= N; n++) {
-		for (int i = 0; i < indent; i++) std::cout << '\t';
-		for (int m = 1; m <= M; m++) {
-			if (m > 1) std::cout << '\t';
+	for(int n = 0; n < N; n++) {
+		for(int i = 0; i < indent; i++) std::cout << '\t';
+		for(int m = 0; m < M; m++) {
+			if(m > 0) std::cout << '\t';
 			std::cout << A(n,m);
 		}
 		std::cout << std::endl;
@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
 	stage = 1;
 	Matrix<3,3> m1;
 	m1.zero();
-	for(int n = 1; n <= 3; n++) {
-		for(int m = 1; m <= 3; m++) {
+	for(int n = 0; n < 3; n++) {
+		for(int m = 0; m < 3; m++) {
 			if(m1(n,m) != 0) {
 				std::cout << stage << ": 0 expected, n = " << n << ", m = " << m << std::endl;
 				error++;
@@ -54,10 +54,10 @@ int main(int argc, char *argv[]) {
 		std::cout << stage << ": trace expected to be 3, m2.trace() = " << m2trace << std::endl;
 		error++;
 	}
-	for (int n = 1; n <= 3; n++) {
-		for (int m = 1; m <= 3; m++) {
-			if (n == m) {
-				if (m2(n,m) != 1) {
+	for(int n = 0; n < 3; n++) {
+		for(int m = 0; m < 3; m++) {
+			if(n == m) {
+				if(m2(n,m) != 1) {
 					std::cout << stage << ": 1 expected, n = " << n << ", m = " << m << std::endl;
 					error++;
 				}
@@ -94,21 +94,21 @@ int main(int argc, char *argv[]) {
 	// Stage 4: rot()
 	stage = 4;
 	Matrix<3,3> m4;
-	for (int j = 0; j < 3; j++) {
-		for (int i = 0; i < 360; i++) {
+	for(int j = 0; j < 3; j++) {
+		for(int i = 0; i < 360; i++) {
 			rot<3,3,double>(j, m4, i*3.14/180);
 			Matrix<3,3> m4inv = !m4;
 			Matrix<3,3> m4result = (m4 * m4inv);
 
 			double sum = 0;
-			for (int n = 1; n <= 3; n++) {
-				for (int m = 1; m <= 3; m++) {
+			for(int n = 0; n < 3; n++) {
+				for (int m = 0; m < 3; m++) {
 					double res = m4result(n,m);
 					sum += (res > 0 ) ? res : -res;
 				}
 			}
 
-			if (sum != 3) {
+			if(sum != 3) {
 				std::cout << stage << ": inverse fails, j = " << j << ", i = " << i << ", sum = " << sum << std::endl;
 				error++;
 
