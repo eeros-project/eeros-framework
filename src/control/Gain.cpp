@@ -34,7 +34,7 @@ void Gain::run() {
 		if(enabled) out.setValue(in.getValue(i) * gain[i], i);
 		else out.setValue(in.getValue(i), i);
 		out.setTimeStamp(in.getTimestamp());
-	}
+	}	
 }
 
 void Gain::enable() {
