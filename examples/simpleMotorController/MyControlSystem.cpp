@@ -2,7 +2,7 @@
 
 using namespace eeros::control;
 
-MyControlSystem::MyControlSystem() : setpoint(0.0), enc("enc"), posController(174.5), sum2(3), speedController(565.48), inertia(14.2e-7), invMotConst(1/15.7e-3 * 2.0), dac("dac"), executor(0.001) {
+MyControlSystem::MyControlSystem() : setpoint(0.0), enc("q"), posController(174.5), sum2(3), speedController(565.48), inertia(14.2e-7), invMotConst(1/15.7e-3 * 2.0), dac("dac"), executor(0.001) {
 	
 	setpoint.getOut().setName("phi_desired");
 	setpoint.getOut().setUnit("rad");

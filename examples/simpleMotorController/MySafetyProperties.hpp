@@ -20,16 +20,16 @@ class MySafetyProperties : public eeros::safety::SafetyProperties {
 	
 	// Define all possible events
 	enum {
-		doSystemOn,
-		doSystemOff,
-		startControl,
-		stopControl,
-		startControlDone,
-		stopControlDone,
-		startMoving,
-		stopMoving,
-		doEmergency,
-		resetEmergency
+		doSystemOn = 100,
+		doSystemOff = 101,
+		startControl = 102,
+		stopControl = 103,
+		startControlDone = 104,
+		stopControlDone = 105,
+		startMoving = 106,
+		stopMoving = 107,
+		doEmergency = 108,
+		resetEmergency = 109
 	};
 			
 	public:

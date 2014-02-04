@@ -30,7 +30,7 @@ MySafetyProperties::MySafetyProperties() {
 	criticalInputs = { emergency, q };
 	
 	// ############ Define Levels ############
-	levels = {		
+	levels = {
 			{ off,                        "Software is off",                                     },
 			{ emergencyState,             "Emergency state",                                     },
 			{ systemOn,                   "System is ready, power off",                          },
@@ -65,15 +65,25 @@ MySafetyProperties::MySafetyProperties() {
 		
 		// Define and add level functions
 		level(off).setLevelAction([&](SafetyContext* privateContext) {
-			privateContext->triggerEvent(systemOn);
+			privateContext->triggerEvent(doSystemOn);
+		});
+		
+		level(systemOn).setLevelAction([&](SafetyContext* privateContext) {
+			privateContext->triggerEvent(startControl); // TODO read input
 		});
 		
 		level(startingControl).setLevelAction([&](SafetyContext* privateContext) {
 			MyControlSystem::instance().start();
+			privateContext->triggerEvent(startControlDone);
 		});
 		
 		level(stoppingControl).setLevelAction([&](SafetyContext* privateContext) {
 			MyControlSystem::instance().stop();
+			privateContext->triggerEvent(stopControlDone);
+		});
+		
+		level(powerOn).setLevelAction([&](SafetyContext* privateContext) {
+			privateContext->triggerEvent(startMoving); // TODO read input
 		});
 		
 		// Define entry level
