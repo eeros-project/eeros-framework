@@ -3,19 +3,19 @@
 using namespace eeros::control;
 
 Switch::Switch(uint8_t nofInputs, sigdim_t dim) : out(dim), in(nofInputs), currentInput(0), maxDifference(dim) {
-	
+	this->dim = dim;
 }
 
 void Switch::run() {
-	for(uint8_t i = 0; i < in.size(); i++) {
+	for(uint8_t i = 0; i < dim; i++) { //in.size(); i++) { 			// wurde bei Claudia geändert 
 		out.setValue(in[currentInput].getValue(i), i);
 		out.setTimeStamp(in[currentInput].getTimestamp(i), i);
 	}
 }
+
 RealSignalInput& Switch::getIn(uint8_t input) {
 	return in[input];
 }
-
 RealSignalOutput& Switch::getOut() {
 	return out;
 }
@@ -33,18 +33,19 @@ void Switch::setSwitchTolerance(std::vector<double> maxDifference) {
 }
 
 bool Switch::switchToInput(uint8_t newInput) {
-	bool checkOk = true;
+// 	bool checkOk = true;
 	double valA, valB;
 	sigdim_t i = 0;
-	while(checkOk && i < out.getDimension()) {
+// 	while(checkOk && i < out.getDimension()) {
+	while(i < out.getDimension()) {
 		valA = in[currentInput].getValue(i);
 		valB = in[newInput].getValue(i);
-		checkOk = (valB > valA - maxDifference[i] && valB < valA + maxDifference[i]);
+// 		checkOk = (valB > valA - maxDifference[i] && valB < valA + maxDifference[i]);
 		i++;
 	}
-	if(checkOk) {
+// 	if(checkOk) {
 		currentInput = newInput;
-		return true;
-	}
-	return false;
+// 		return true;
+// 	}
+// 	return false;
 }

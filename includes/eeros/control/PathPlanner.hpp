@@ -31,12 +31,11 @@ namespace eeros {
 			virtual void addPosition(std::vector<double> posFinal);
 			virtual void addHelpPosition(std::vector<double> posFinal);
 			virtual void setInitialPosition(std::vector<double> posInit);
+			
 			virtual RealSignalOutput& getPosOut();
 			virtual RealSignalOutput& getVelOut();
 			virtual RealSignalOutput& getAccOut();
-			
-			std::vector<double> posFinalPrev;
-	
+				
 		protected:
 			bool enabled = false;
 			bool first = true;
@@ -57,11 +56,10 @@ namespace eeros {
 			std::vector<bool> isNewValue, isHelpValue;
 			std::vector<double> velMax, accMax, decMax; 
 			std::vector<double> distance, distance1, distance2;
-			std::vector<double> /*posFinalPrev,*/ posPrev;
+			std::vector<double> posFinalPrev, posPrev;
 			
-// 			std::vector<std::vector<double> > posFinal;
-			static const int dimBuffer = 6; 
-			eeros::math::Vector64 posFinal;
+			static const int dimBuffer = 10; 
+			eeros::math::Matrix<10,4> posFinal;
 		
 			std::vector<double> posHelp, posA, posB, cCircle;
 	

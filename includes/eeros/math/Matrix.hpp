@@ -358,7 +358,6 @@ namespace eeros {
 		typedef Matrix<2,1> Vector2;
 		typedef Matrix<3,1> Vector3;
 		typedef Matrix<4,1> Vector4;
-		typedef Matrix<6,4> Vector64;
 	}
 }
 

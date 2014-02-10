@@ -30,10 +30,6 @@ PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax,
 	this->decMax = decMax;
 	this->indexAddPos = 0;
 	this->indexReadPos = 0;
-// 	posFinal.resize(dimBuffer);
-// 	for (sigdim_t i = 0; i<dimBuffer; i++) {
-// 		posFinal[i].resize(dim);
-// 	}
 }
  
 PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax, double dt, sigdim_t dim, 
@@ -56,10 +52,6 @@ PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax,
 	  this->decMax = accMax;
       this->indexAddPos = 0;
       this->indexReadPos = 0;
-//       posFinal.resize(dimBuffer);
-//       for (sigdim_t i = 0; i<dimBuffer; i++) {
-// 			posFinal[i].resize(dim);
-//       }     
  }
 
  
@@ -79,6 +71,17 @@ PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax,
 }
  void PathPlanner::disable(){
 	 enabled = false;
+	 first = true;
+	 trajParamSet = false;
+	 smoothTrajectory = false;
+	 helpParamError = false;
+	 
+	 for(sigdim_t i = 0; i < dim; i++){
+		 isNewValue[i] = false;
+		 isHelpValue[i] = false;
+	 }
+	 indexReadPos = 0;
+	 indexAddPos = 0;
 }
  
  void PathPlanner::setVelMax(std::vector<double> velMax) { 
@@ -111,11 +114,6 @@ PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax,
 		 indexAddPos = 0;
 	 else
 		 indexAddPos = indexAddPos + 1;
-	 
-	/*posFinal(0) = posFinal;
-		myVector(2) = 8;
-		double x = myVector(5);*/
-
 	mutex.unlock();
 }   
  void PathPlanner::addHelpPosition(std::vector<double> posFinal) {
@@ -630,10 +628,9 @@ double PathPlanner::setAccGain(double k, double dK){
 			acc.setValue(0.0, i);
 			vel.setValue(0.0, i);
 			pos.setValue(posFinalPrev[i], i);
-		    
 // 			acc.setTimeStamp(System::getTimeNs(),i);
 // 			vel.setTimeStamp(System::getTimeNs(),i);
-// 			pos.setTimeStamp(System::getTimeNs(),i);
+			pos.setTimeStamp(System::getTimeNs(),i);
 		
 			first = false;   
 		}
@@ -712,7 +709,7 @@ double PathPlanner::setAccGain(double k, double dK){
 				}
 // 		   		acc.setTimeStamp(System::getTimeNs(),i);
 // 		   		vel.setTimeStamp(System::getTimeNs(),i);
-// 		    	pos.setTimeStamp(System::getTimeNs(),i);
+		    	pos.setTimeStamp(System::getTimeNs(),i);
 		    
 				posPrev[i] = pos.getValue(i);
 			}	
@@ -753,7 +750,7 @@ double PathPlanner::setAccGain(double k, double dK){
 				}
 // 		    	acc.setTimeStamp(System::getTimeNs(),i);
 // 		    	vel.setTimeStamp(System::getTimeNs(),i);
-// 		    	pos.setTimeStamp(System::getTimeNs(),i);
+		    	pos.setTimeStamp(System::getTimeNs(),i);
 		    
 				posPrev[i] = pos.getValue(i);
 			}
@@ -766,6 +763,7 @@ double PathPlanner::setAccGain(double k, double dK){
 		  acc.setValue(0.0, i);
 		  vel.setValue(0.0, i);
 		  pos.setValue(posFinalPrev[i], i);
+		  pos.setTimeStamp(System::getTimeNs(),i);
 	  }	  
   }
   timePrev = time;
