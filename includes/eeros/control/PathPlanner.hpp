@@ -52,7 +52,7 @@ namespace eeros {
 		private:
 			sigdim_t dim;
 			int indexAddPos, indexReadPos;
-			bool prevNewValue;
+			bool readValueNew;
 			TrajectoryType trajType;
 			Mutex mutex;
 	

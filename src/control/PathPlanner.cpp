@@ -131,7 +131,7 @@ PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax,
 	mutex.unlock();
 }
  void PathPlanner::checkPathEnd() {
-	if(prevNewValue == false) 
+	if(readValueNew == false) 
 		this->pathEnded = true;
 	else
 		this->pathEnded = false;
@@ -342,7 +342,7 @@ void PathPlanner::setTrajectoryParameters(){
     
     // calculation of the distance between the two points
 	mutex.lock();
-	prevNewValue = isNewValue[indexReadPos];
+	readValueNew = isNewValue[indexReadPos];
     if(isNewValue[indexReadPos] == true){
 		if (isHelpValue[indexReadPos] == true){
 			for(sigdim_t i = 0; i < dim; i++)
