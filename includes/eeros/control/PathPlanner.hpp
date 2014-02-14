@@ -35,6 +35,8 @@ namespace eeros {
 			virtual RealSignalOutput& getPosOut();
 			virtual RealSignalOutput& getVelOut();
 			virtual RealSignalOutput& getAccOut();
+			
+			bool pathEnded = false;
 				
 		protected:
 			bool enabled = false;
@@ -42,7 +44,7 @@ namespace eeros {
 			bool trajParamSet = false;
 			bool smoothTrajectory = false;
 			bool helpParamError = false;
-	
+				
 			RealSignalOutput acc;
 			RealSignalOutput vel;
 			RealSignalOutput pos;
@@ -50,6 +52,7 @@ namespace eeros {
 		private:
 			sigdim_t dim;
 			int indexAddPos, indexReadPos;
+			bool prevNewValue;
 			TrajectoryType trajType;
 			Mutex mutex;
 	
@@ -69,6 +72,7 @@ namespace eeros {
 			double dt, dT1, dT2, dT3, dT4, dTC; 
 			double tOffset, time, timePrev, timeScaled;
 	
+			virtual void checkPathEnd();
 			virtual void setLambda(TrajectoryType trajType);	
 			virtual void setSmoothCurvesParameters();
 			virtual void setTrajectoryParameters();

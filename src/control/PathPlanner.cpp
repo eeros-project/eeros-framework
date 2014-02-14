@@ -21,10 +21,6 @@ PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax,
 	this->velNorm = 1000;
 	this->velNorm1 = 1000;
 	this->velNorm2 = 1000;
-	first = true;
-	trajParamSet = false;
-	smoothTrajectory = false; 
-	helpParamError = false;
 	this->velMax = velMax;
 	this->accMax = accMax;
 	this->decMax = decMax;
@@ -43,10 +39,6 @@ PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax,
       this->velNorm = 1000;
       this->velNorm1 = 1000;
       this->velNorm2 = 1000;
-      first = true;
-      trajParamSet = false;   
-      smoothTrajectory = false; 
-      helpParamError = false;
 	  this->velMax = velMax;
 	  this->accMax = accMax;
 	  this->decMax = accMax;
@@ -54,7 +46,6 @@ PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax,
       this->indexReadPos = 0;
  }
 
- 
  // *** public *** //
  
  PathPlanner::~PathPlanner() { 
@@ -117,7 +108,7 @@ PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax,
 	mutex.unlock();
 }   
  void PathPlanner::addHelpPosition(std::vector<double> posFinal) {
-	 mutex.lock();
+	mutex.lock();
 	 if (isNewValue[indexAddPos] == false){
 		 for(sigdim_t i = 0; i < dim; i++)
 			 this->posFinal(indexAddPos,i) = posFinal[i];
@@ -132,12 +123,18 @@ PathPlanner::PathPlanner(std::vector<double> velMax, std::vector<double> accMax,
 	else
 		indexAddPos = indexAddPos + 1;   
 	mutex.unlock();
-}  
+ }
  void PathPlanner::setInitialPosition(std::vector<double> posInit) {
 	mutex.lock();
 	for(sigdim_t i = 0; i < dim; i++)
 		this->posFinalPrev[i] = posInit[i];
 	mutex.unlock();
+}
+ void PathPlanner::checkPathEnd() {
+	if(prevNewValue == false) 
+		this->pathEnded = true;
+	else
+		this->pathEnded = false;
 } 
 
 RealSignalOutput& PathPlanner::getPosOut() { 
@@ -345,21 +342,22 @@ void PathPlanner::setTrajectoryParameters(){
     
     // calculation of the distance between the two points
 	mutex.lock();
+	prevNewValue = isNewValue[indexReadPos];
     if(isNewValue[indexReadPos] == true){
 		if (isHelpValue[indexReadPos] == true){
 			for(sigdim_t i = 0; i < dim; i++)
 				this->posHelp[i] = this->posFinal(indexReadPos,i);
 	
-				this->isNewValue[indexReadPos] = false; 
-				this->isHelpValue[indexReadPos] = false;
-				indexReadPos = indexReadPos + 1; 
-				this->isNewValue[indexReadPos] = false; 
-				setSmoothCurvesParameters();
-				if(helpParamError){
-					smoothTrajectory = false;
-					helpParamError = false;
-				}
-				else
+			this->isNewValue[indexReadPos] = false; 
+			this->isHelpValue[indexReadPos] = false;
+			indexReadPos = indexReadPos + 1; 
+			this->isNewValue[indexReadPos] = false; 
+			setSmoothCurvesParameters();
+			if(helpParamError){
+				smoothTrajectory = false;
+				helpParamError = false;
+			}
+			else
 				smoothTrajectory = true;
 			}
 		else{
@@ -491,18 +489,27 @@ void PathPlanner::setTrajectoryParameters(){
 	    // adaptation of speed to new timestamps
 	    velNorm = 1/((dT2 + (dT1 + dT3)*0.5)*dt);
 	}
-	
-	if (isNewValue[indexReadPos+1] == false)
-		indexReadPos = indexReadPos;
-	else{
-		if (indexReadPos % dimBuffer == (dimBuffer-1)) 
+
+	if(indexReadPos % dimBuffer == (dimBuffer-1)){
+		if (isNewValue[0] == false){
+			indexReadPos = indexReadPos;
+		}
+		else{
 			indexReadPos = 0;
-		else
-			indexReadPos = indexReadPos + 1; 
+		}
 	}
+	else{
+		if (isNewValue[indexReadPos+1] == false){
+			indexReadPos = indexReadPos;
+		}
+		else{
+			indexReadPos = indexReadPos + 1; 
+		}
+	}
+	
 	trajParamSet = true;     
    }
-} 
+}
 
 double PathPlanner::setPosGain(double k, double dK){   
 	double gainP, u, k2; 
@@ -698,20 +705,18 @@ double PathPlanner::setAccGain(double k, double dK){
 
 					posFinalPrev[i] = pos.getValue(i);
 		      
-					std::cout << "pos[" << i <<  "]: " << pos.getValue(i) << std::endl;
-					std::cout << "posPrev[" << i <<  "]: " << posFinalPrev[i] << std::endl;
-
 					if(i==dim-1){ 		// calculate new trajectory
 						tOffset = time; 	  
 						trajParamSet = false; 
 						smoothTrajectory = false;
+						checkPathEnd();
 					}
 				}
-// 		   		acc.setTimeStamp(System::getTimeNs(),i);
-// 		   		vel.setTimeStamp(System::getTimeNs(),i);
-		    	pos.setTimeStamp(System::getTimeNs(),i);
+// 		   	acc.setTimeStamp(System::getTimeNs(),i);
+// 		   	vel.setTimeStamp(System::getTimeNs(),i);
+		    pos.setTimeStamp(System::getTimeNs(),i);
 		    
-				posPrev[i] = pos.getValue(i);
+			posPrev[i] = pos.getValue(i);
 			}	
 		}
 		else {	
@@ -746,6 +751,7 @@ double PathPlanner::setAccGain(double k, double dK){
 						trajParamSet = false; 
 						for(sigdim_t i = 0; i<dim; i++)
 							posFinalPrev[i] = pos.getValue(i);
+						checkPathEnd();
 					}
 				}
 // 		    	acc.setTimeStamp(System::getTimeNs(),i);
