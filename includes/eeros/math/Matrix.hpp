@@ -331,7 +331,7 @@ namespace eeros {
 				return v;
 			}
 			
-		private:
+//		private:
 			T value[ N * M ];
 			
 			T& v(uint8_t n, uint8_t m = 0) {

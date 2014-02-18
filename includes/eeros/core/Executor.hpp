@@ -13,6 +13,7 @@ namespace eeros {
 		friend class ExecutorService;
 
 	public:
+		Executor();
 		Executor(double period);
 		virtual ~Executor();
 		virtual int getThreadId();

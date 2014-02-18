@@ -2,23 +2,22 @@
 
 using namespace eeros;
 
-Executor::Executor(double period) : threadId(-1) {
-	this->period = period;
-	this->status = kStopped;
-}
+Executor::Executor() : threadId(-1), period(0), status(kStopped) { }
 
-Executor::~Executor() { }
+Executor::Executor(double period) : threadId(-1), period(period), status(kStopped) { }
+
+Executor::~Executor() { stop(); }
 
 int Executor::getThreadId() {
-	return this->threadId;
+	return threadId;
 }
 
 double Executor::getPeriod() {
-	return this->period;
+	return period;
 }
 
 int Executor::getStatus() {
-	return this->status;
+	return status;
 }
 
 void Executor::addRunnable(Runnable* runnable) {
@@ -37,6 +36,7 @@ void Executor::start() {
 bool Executor::isTerminated() {
 	return status == kStopped;
 }
+
 void Executor::stop() {
 	this->status = kStop;
 }
@@ -46,7 +46,7 @@ void Executor::join() {
 }
 
 void Executor::run() {
-	for(std::list<Runnable*>::iterator i = runnables.begin(); i != runnables.end(); i++) {
-		(*i)->run();
+	for(auto runnable : runnables) {
+		runnable->run();
 	}
 }

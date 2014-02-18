@@ -27,7 +27,7 @@ int ExecutorService::createNewThread(Executor* e) {
 /**** TODO check if simulation or not! ****/
 
 void* ExecutorService::threadAction(void* ptr) {
-	Executor* e = (Executor*) ptr;
+	Executor* e = (Executor*)ptr;
 	struct timespec t;
 
 	int interval = (int)(e->period * NSEC_PER_SEC); /* s -> ns */
@@ -37,18 +37,17 @@ void* ExecutorService::threadAction(void* ptr) {
 	while(e->status != kStop) {
 		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t, NULL);
 		e->run();
-		t.tv_nsec += interval;
-		while (t.tv_nsec >= NSEC_PER_SEC) {
-			t.tv_nsec -= NSEC_PER_SEC;
-			t.tv_sec++;
+		if(interval > 0) { // calculate next shot
+			t.tv_nsec += interval;
+			while (t.tv_nsec >= NSEC_PER_SEC) {
+				t.tv_nsec -= NSEC_PER_SEC;
+				t.tv_sec++;
+			}
+		}
+		else { // oneshot -> terminate
+			e->stop();
 		}
 	}
 	std::cout << "Thread finished" << std::endl;
 	e->status = kStopped;
-}
-
-void ExecutorService::waitForSequenceEnd(Executor* waitExecutor) {
-	if(waitExecutor && waitExecutor->getStatus() == kRunning){
-		pthread_join(threads[waitExecutor->getThreadId()], NULL);
-	}
 }
