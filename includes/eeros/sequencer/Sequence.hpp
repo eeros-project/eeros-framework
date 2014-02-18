@@ -50,10 +50,10 @@ namespace eeros {
 		protected:
 			virtual void addStep(std::function<void(void)> action);
 			SequenceState state;
-			ExceptionReturnBehavior returnBehavior;
 			uint32_t currentStep;
 			std::string name;
 			std::vector<std::function<void(void)>> actionList;
+			uint32_t exceptionRetryCounter;
 			
 		private:
 			static std::map<std::string, Sequence*> allSequences;

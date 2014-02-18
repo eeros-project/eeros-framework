@@ -1,8 +1,6 @@
 #include <eeros/core/ExecutorService.hpp>
 
 #include <cstdlib>
-#include <iostream>
-#include <ostream>
 #include <pthread.h>
 #include <time.h>
 #include <sched.h>
@@ -12,15 +10,17 @@
 #define NSEC_PER_SEC (1000000000) /* The number of nsecs per sec. */
 
 using namespace eeros;
+using namespace eeros::logger;
 
 int ExecutorService::nofThreads = 0;
-pthread_t ExecutorService::threads[MAX_NOF_THREADS] = {0, 0, 0, 0, 0, 0, 0, 0};
+pthread_t ExecutorService::threads[MAX_NOF_THREADS] = {0, 0, 0, 0, 0, 0, 0, 0}; // TODO
+Logger<LogWriter> ExecutorService::log;
 
 int ExecutorService::createNewThread(Executor* e) {
-	int threadId = nofThreads;
+	int threadId = ExecutorService::nofThreads++;
 	int ret;
-	ret = pthread_create(&ExecutorService::threads[ExecutorService::nofThreads++], NULL, ExecutorService::threadAction, (void*)e);
-	std::cout << "Thread (#" << threadId << ") created with return value " << ret << std::endl;
+	ret = pthread_create(&ExecutorService::threads[threadId], NULL, ExecutorService::threadAction, (void*)e);
+	log.info() << "Thread #" << threadId << " created with return value '" << ret << "'.";
 	return threadId;
 }
 
@@ -48,6 +48,6 @@ void* ExecutorService::threadAction(void* ptr) {
 			e->stop();
 		}
 	}
-	std::cout << "Thread finished" << std::endl;
+	log.info() << "Thread '" << e->threadId << "'finished";
 	e->status = kStopped;
 }

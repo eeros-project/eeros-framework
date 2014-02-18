@@ -4,6 +4,9 @@
 #include <config.hpp>
 #include <eeros/core/Executor.hpp>
 
+#include <eeros/logger/Logger.hpp>
+#include <eeros/logger/LogWriter.hpp>
+
 #if defined(WINDOWS)
 #include <windows.h>
 #endif
@@ -27,6 +30,7 @@ namespace eeros {
 
 	private:
 		static int nofThreads;
+		static eeros::logger::Logger<eeros::logger::LogWriter> log;
 	#if defined(WINDOWS)
 		static HANDLE getHandle(int i);
 		static DWORD WINAPI threadAction(LPVOID ptr);

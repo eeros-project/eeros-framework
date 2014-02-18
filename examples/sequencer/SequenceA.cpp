@@ -5,7 +5,7 @@ using namespace eeros::sequencer;
 using namespace eeros::logger;
 
 SequenceA::SequenceA(std::string name, int param) : param(param), Sequence(name) {
-	log.info() << "Sequencer created: " << name;
+	log.info() << "Sequence created: " << name;
 }
 
 SequenceA::~SequenceA(){

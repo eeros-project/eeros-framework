@@ -5,7 +5,7 @@ using namespace eeros::sequencer;
 using namespace eeros::logger;
 
 SequenceC::SequenceC(std::string name) : Sequence(name) {
-	log.info() << "Sequencer created: " << name << endl;
+	log.info() << "Sequence created: " << name;
 }
 
 SequenceC::~SequenceC(){
@@ -13,18 +13,18 @@ SequenceC::~SequenceC(){
 }
 
 void SequenceC::init() {
-	log.info() << "[" << name << "] " << "Init started..." << endl;
+	log.info() << "[" << name << "] " << "Init started...";
 	
 	addStep([&]() {
-		log.info() << "[" << name << "] " << "Lalala... I'm doing something..." << endl;
+		log.info() << "[" << name << "] " << "Lalala... I'm doing something...";
 		sleep(1);
 	});
 		
-	log.info() << "[" << name << "] " << "Init done!" << endl;
+	log.info() << "[" << name << "] " << "Init done!";
 }
 
 void SequenceC::exit() {
-	log.info() << "[" << name << "] " << "Exit started..." << endl;
+	log.info() << "[" << name << "] " << "Exit started...";
 	
-	log.info() << "[" << name << "] " << "Exit done!" << endl;
+	log.info() << "[" << name << "] " << "Exit done!";
 }

@@ -1,46 +1,47 @@
 #include <iostream>
 
-#include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/LogWriter.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
+#include <eeros/sequencer/Sequencer.hpp>
 
 #include "MainSequence.hpp"
 #include "SequenceA.hpp"
 #include "SequenceB.hpp"
+#include "SequenceC.hpp"
 
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
 int main(int argc, char* argv[]) {
-	Logger<LogWriter> log;
 	StreamLogWriter w(std::cout);
-	log.set(w);
+	Logger<LogWriter>::setDefaultWriter(&w);
+	Logger<LogWriter> log;
 	
-	log.info() << "Sequencer Example started..." << endl;
+	log.info() << "Sequencer Example started...";
 	
-	log.info() << "Creating sequences" << endl;
+	log.info() << "Creating sequences";
 	MainSequence mainSequence("Sequence Main");
-	mainSequence.log.set(w);
+// 	mainSequence.log.set(w);
 	
 	SequenceA subSequenceA1("Sequence A1", 0);
-	subSequenceA1.log.set(w);
+// 	subSequenceA1.log.set(w);
 	
 	SequenceA subSequenceA2("Sequence A2", 100);
-	subSequenceA2.log.set(w);
+// 	subSequenceA2.log.set(w);
 	
 	SequenceB subSequenceB("Sequence B");
-	subSequenceB.log.set(w);
+// 	subSequenceB.log.set(w);
 	
-	SequenceB subSequenceC("Sequence C");
-	subSequenceC.log.set(w);
+	SequenceC subSequenceC("Sequence C");
+// 	subSequenceC.log.set(w);
 	
-	log.info() << "Creating and starting sequencer..." << endl;
+	log.info() << "Creating and starting sequencer...";
 	Sequencer sequencer("Example sequencer", mainSequence);
 	
 	while(!sequencer.done());
 	
-	log.info() << "Sequencer Example done..." << endl;
+	log.info() << "Sequencer Example done...";
 	
 	return 0;
 }

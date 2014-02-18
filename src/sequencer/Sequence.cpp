@@ -1,4 +1,5 @@
 #include <eeros/sequencer/Sequence.hpp>
+#include <eeros/core/EEROSException.hpp>
 
 using namespace eeros::sequencer;
 using namespace eeros::logger;
@@ -10,9 +11,8 @@ Sequence::Sequence(std::string name) : name(name) {
 	reset();
 	
 	// add the sequence to the list with all sequences
-	auto res = Sequence::allSequences.insert( {name, this} ).second;
-	if(res == false) {
-		throw -1; // TODO
+	if(!Sequence::allSequences.insert( {name, this} ).second) {
+		log.error() << "Sequence '" << name << "' already exists, please choose a unique name!";
 	}
 }
 
@@ -40,14 +40,16 @@ void Sequence::run() {
 				init();
 				break;
 			case kSequenceException:
-				// TODO counter
+				exceptionRetryCounter++;
 				break;
 			default:
-				throw -454; // TODO
+				log.error() << "Illegal sequence state '" << (int)state << "', resetting sequence!";
+				reset();
+				init();
 				break;
 		}
 		
-		while(!checkPreCondition());
+		while(!checkPreCondition()); // TODO add abort condition
 		
 		// execute action lambdas
 		while(currentStep < actionList.size()) {
@@ -55,11 +57,6 @@ void Sequence::run() {
 			currentStep++;
 		}
 		
-// 		for(auto action : actionList) {
-// 			action();
-// 			currentStep++;
-// 		}
-
 		// check postcondition
 		if(!checkPostCondition()) throw -715; // TODO
 		
@@ -70,7 +67,7 @@ void Sequence::run() {
 	catch(SequenceException const &e) {
 		log.info() << e.what();
 		e.handle();
-		returnBehavior = e.getReturnBehavior();
+		ExceptionReturnBehavior returnBehavior = e.getReturnBehavior();
 		
 		switch(returnBehavior) {
 			case kRepeatSequence:
@@ -88,7 +85,7 @@ void Sequence::run() {
 				callSubSequence(e.getEnsuingSequence());
 				break;
 			default:
-				throw -789; // TODO
+				log.error() << "Illegal return behavior '" << (int)returnBehavior << "' in exception '" << e.what() << "'!";
 				break;
 		}
 	}
@@ -97,7 +94,7 @@ void Sequence::run() {
 }
 
 void Sequence::init() {
-    // TODO
+    
 }
 
 bool Sequence::checkPreCondition() {
@@ -109,14 +106,13 @@ bool Sequence::checkPostCondition() {
 }
 
 void Sequence::exit() {
-    // TODO
+    
 }
-
 
 void Sequence::reset() {
 	state = kSequenceNotStarted;
-	returnBehavior = kContinue;
 	currentStep = 0;
+	exceptionRetryCounter = 0;
 }
 
 void Sequence::callSubSequence(Sequence* sequence) {
