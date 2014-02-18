@@ -47,6 +47,8 @@ void Sequence::run() {
 				break;
 		}
 		
+		while(!checkPreCondition());
+		
 		// execute action lambdas
 		while(currentStep < actionList.size()) {
 			actionList[currentStep]();

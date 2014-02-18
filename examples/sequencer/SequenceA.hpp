@@ -9,6 +9,9 @@ public:
 	SequenceA(std::string name, int param);
 	virtual ~SequenceA();
 	
+	virtual bool checkPreCondition();
+	virtual bool checkPostCondition();
+	
 	virtual void init();
 	virtual void exit();
 	

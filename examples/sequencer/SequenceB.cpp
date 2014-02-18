@@ -5,7 +5,7 @@ using namespace eeros::sequencer;
 using namespace eeros::logger;
 
 SequenceB::SequenceB(std::string name) : Sequence(name) {
-	log.info() << "Sequencer created: " << name << endl;
+	log.info() << "Sequencer created: " << name;
 }
 
 SequenceB::~SequenceB(){
@@ -13,28 +13,28 @@ SequenceB::~SequenceB(){
 }
 
 void SequenceB::init() {
-	log.info() << "[" << name << "] " << "Init started..." << endl;
+	log.info() << "[" << name << "] " << "Init started...";
 	
 	addStep([&]() {
-		log.info() << "[" << name << "] " << "First step..." << endl;
+		log.info() << "[" << name << "] " << "First step...";
 		sleep(1);
 	});
 	
 	addStep([&]() {
-		log.info() << "[" << name << "] " << "Second step..." << endl;
+		log.info() << "[" << name << "] " << "Second step...";
 		sleep(1);
 	});
 	
 	addStep([&]() {
-		log.info() << "[" << name << "] " << "Third step..." << endl;
+		log.info() << "[" << name << "] " << "Third step...";
 		sleep(1);
 	});
 	
-	log.info() << "[" << name << "] " << "Init done!" << endl;
+	log.info() << "[" << name << "] " << "Init done!";
 }
 
 void SequenceB::exit() {
-	log.info() << "[" << name << "] " << "Exit started..." << endl;
+	log.info() << "[" << name << "] " << "Exit started...";
 	
-	log.info() << "[" << name << "] " << "Exit done!" << endl;
+	log.info() << "[" << name << "] " << "Exit done!";
 }
