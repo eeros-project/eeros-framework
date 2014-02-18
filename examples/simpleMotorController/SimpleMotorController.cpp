@@ -59,7 +59,7 @@ int main() {
 	safetySys.setProperties(properties);
 	
 	std::cout << "Creating executors..." << std::endl;
-	Executor safetySysExecutor(1); // safety system -> 1 ms period time
+	Executor safetySysExecutor(0.01); // safety system -> 10 ms period time
 	safetySysExecutor.addRunnable(safetySys);
 
 	// Start safety system
@@ -75,6 +75,8 @@ int main() {
 	Sequencer sequencer("Example sequencer", mainSequence);
 	
 	while(!sequencer.done());
+	
+	sleep(10);
 	
 	controlSys.stop();
 	safetySysExecutor.stop();

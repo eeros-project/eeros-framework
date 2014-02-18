@@ -1,8 +1,11 @@
 #include "SequenceA.hpp"
 #include "MyControlSystem.hpp"
+#include "MySafetyProperties.hpp"
+#include <eeros/safety/SafetySystem.hpp>
 #include <unistd.h>
 
 using namespace eeros::sequencer;
+using namespace eeros::safety;
 using namespace eeros::logger;
 
 SequenceA::SequenceA(std::string name, double angle) : angle(angle), Sequence(name) {
@@ -23,6 +26,11 @@ void SequenceA::init() {
 		controlSys.setpoint.setValue(angle);
 	});
 	
+	addStep([&]() {
+		sleep(1);
+		controlSys.setpoint.setValue(2*angle);
+	});
+	
 	log.info() << "[" << name << "] " << "Init done!";
 }
 
@@ -34,7 +42,9 @@ void SequenceA::exit() {
 
 bool SequenceA::checkPreCondition() {
 	log.info() << "[" << name << "] " << "Checking precondition...";
-	return true;
+	SafetySystem& safetySys = SafetySystem::instance();
+	
+	return safetySys.getCurrentLevel().getId() >= moving;
 }
 
 bool SequenceA::checkPostCondition() {

@@ -60,14 +60,18 @@ namespace eeros {
 			}
 		}
 
-			bool SafetySystem::setProperties(SafetyProperties safetyProperties) {
-				if(safetyProperties.verify()) {
-					properties = safetyProperties;
-					currentLevel = properties.entryLevelPtr();
-					return true;
-				}
-				return false;
+		bool SafetySystem::setProperties(SafetyProperties safetyProperties) {
+			if(safetyProperties.verify()) {
+				properties = safetyProperties;
+				currentLevel = properties.entryLevelPtr();
+				return true;
 			}
+			return false;
+		}
+		
+		const SafetyProperties* SafetySystem::getProperties() const {
+			return &properties;
+		}
 
 		void SafetySystem::run() {
 			

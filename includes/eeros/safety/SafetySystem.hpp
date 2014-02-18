@@ -27,6 +27,7 @@ namespace eeros {
 			void triggerEvent(uint32_t event, SafetyContext* context = nullptr);
 			void run();
 			bool setProperties(SafetyProperties properties);
+			const SafetyProperties* getProperties() const;
 			
 			static SafetySystem& instance();
 			
