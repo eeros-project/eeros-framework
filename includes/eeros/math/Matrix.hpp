@@ -187,12 +187,32 @@ namespace eeros {
 				}
 				return result;
 			}
-
+			
+			Matrix<N,M,T> operator*(T right) const {
+				Matrix<N,M,T> result;
+				for (uint8_t n = 0; n < N; n++) {
+					for (uint8_t m = 0; m < M; m++) {
+						result(n,m) = (*this)(n,m) * right;
+					}
+				}
+				return result;
+			}
+			
 			Matrix<N,M,T> operator+(const Matrix<N,M,T> right) const {
 				Matrix<N,M,T> result;
 				for (uint8_t n = 0; n < N; n++) {
 					for (uint8_t m = 0; m < M; m++) {
 						result(n,m) = (*this)(n,m) + right(n,m);
+					}
+				}
+				return result;
+			}
+			
+			Matrix<N,M,T> operator+(const T right) const {
+				Matrix<N,M,T> result;
+				for (uint8_t n = 0; n < N; n++) {
+					for (uint8_t m = 0; m < M; m++) {
+						result(n,m) = (*this)(n,m) + right;
 					}
 				}
 				return result;
@@ -207,17 +227,7 @@ namespace eeros {
 				}
 				return result;
 			}
-
-			Matrix<N,M,T> operator*(T right) const {
-				Matrix<N,M,T> result;
-				for (uint8_t n = 0; n < N; n++) {
-					for (uint8_t m = 0; m < M; m++) {
-						result(n,m) = (*this)(n,m) * right;
-					}
-				}
-				return result;
-			}
-
+			
 			Matrix<N,M,T> operator/(T right) const {
 				Matrix<N,M,T> result;
 				for(uint8_t n = 0; n < N; n++) {
@@ -331,7 +341,7 @@ namespace eeros {
 				return v;
 			}
 			
-//		private:
+		private:
 			T value[ N * M ];
 			
 			T& v(uint8_t n, uint8_t m = 0) {
@@ -353,12 +363,26 @@ namespace eeros {
 					throw EEROSException(msg.str());
 				}
 			}
-		};
+		}; // END class Matrix
+		
+		/********** Operators **********/
+		
+		template < uint8_t N, uint8_t M = 1, typename T = double >
+		Matrix<N,M,T> operator*(T left, Matrix<N,M,T> right) {
+			Matrix<N,M,T> result;
+			for (uint8_t n = 0; n < N; n++) {
+				for (uint8_t m = 0; m < M; m++) {
+					result(n,m) = right(n,m) * left;
+				}
+			}
+			return result;
+		}
 		
 		typedef Matrix<2,1> Vector2;
 		typedef Matrix<3,1> Vector3;
 		typedef Matrix<4,1> Vector4;
-	}
-}
+		
+	} // END namespace math
+} // END namespache eeros
 
 #endif /* ORG_EEROS_MATH_MATRIX_HPP_ */

@@ -54,11 +54,6 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	print(m123,1);
-	
-	for(int i = 0; i < 9; i++) {
-		std::cout << '[' << i << "] = " << m123.value[i] << std::endl;
-	}
 	
 	// zero()
 	testNo++;
