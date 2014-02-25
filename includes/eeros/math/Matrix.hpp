@@ -117,20 +117,96 @@ namespace eeros {
 			}
 			
 			bool isInvertible() const {
-				// TODO
-				return false;
+				if (N!= M){ //non square matrices can't be inverted
+				  return false;
+				}else{
+				  if( this->det() == 0){ //if the determinat of a matrix is zero it is not invertible 
+				    return false;
+				  }else{
+				    return true;
+				  }
+				}
+				
 			}
 			
 			/********** Functions for calculating some characteristics of the matrix **********/
 			
-			uint32_t rank() const {
-				// TODO
-				return 0;
+			uint32_t rank() const{
+				uint32_t numberOfNonZeroRows = 0;
+				uint32_t i = 0;
+				Matrix<N,M,T> matrix;
+				for (uint8_t n = 0; n < N; n++) {
+				    for (uint8_t m = 0; m < M; m++) {
+				      matrix(n,m) = v(n,m);
+				    }
+				}
+				matrix.gaussRowElimination();
+				for (uint8_t n = 0; n < N; n++) {
+				    for (uint8_t m = 0; m < M; m++) {
+					if(matrix(n,m)!=0){
+					  numberOfNonZeroRows++;
+					  break;
+				      }    
+				    }
+				}
+				return numberOfNonZeroRows;
 				
 			}
 			
 			T det() const {
-				// TODO
+				if (N==M){
+				  if(N==2){
+				    return (v(0,0)*v(1,1)-v(0,1)*v(1,0));
+				  }else if(N==3){
+				    double det = 0; 
+				    det = v(0, 0) * v(1, 1) * v(2, 2) +
+					  v(0, 1) * v(1, 2) * v(2, 0) +
+					  v(0, 2) * v(1, 0) * v(2, 1) -
+					  v(0, 2) * v(1, 1) * v(2, 0) -
+					  v(0, 0) * v(1, 2) * v(2, 1) -
+					  v(0, 1) * v(1, 0) * v(2, 2);
+				    return det;
+				  }else{
+				    //use recurcive laplace formula to calculate this
+				    //TODO for big matrices this methods needs a lot of time this could be improved with another algorithm
+				     double det = 0;
+				     uint8_t  ignoredRow = 0;
+				    for (uint8_t n = 0; n < N; n++) {
+				      Matrix<N-1,M-1,T> smallerPart;
+				      uint8_t x = 0,y = 0;
+				      uint8_t b = 1,a = 0;
+				      while(a < N){
+					while(b < M){
+					    if (a != ignoredRow){
+					      smallerPart(y,x) = v(a,b);
+					      x++;
+					    }
+					    b++;
+					}
+					b = 1;
+					x = 0;
+					if (a != ignoredRow){
+					  y++; 
+					}
+					a++;
+					
+				      }
+				      ignoredRow++;
+				      double detSmallerPart = smallerPart.det();
+				      if(n%2 == 0){ //even
+					det = det + v(n,0)*detSmallerPart; 
+					
+				      }else{ //odd
+					det = det - v(n,0)*detSmallerPart; 
+				      }
+				     }
+				     return det;
+				  }
+				}else{
+				  std::stringstream msg;
+				  msg << "Calculating determinant failed: Matrix must be square";
+				  throw EEROSException(msg.str()); 
+				}
 				return 0;
 			}
 			
@@ -143,7 +219,7 @@ namespace eeros {
 			}
 			
 			Matrix<M,N,T> transpose() const {
-				Matrix<M,N,T> result;
+				Matrix<M,N,T> result; Matrix<N-1,M-1,T> smallerPart;
 				for(uint8_t n = 0; n < N; n++) {
 					for (uint8_t m = 0; m < M; m++) {
 						result(m,n) = (*this)(n,m);
@@ -341,6 +417,64 @@ namespace eeros {
 				return v;
 			}
 			
+			
+			void gaussRowElimination(){
+			  uint8_t completedColum = 0;
+			  uint8_t completedRow = 0;
+			  uint8_t checkingRow = 0;
+			  uint8_t rootRow = 0;
+			  double rowFactor = 0;
+			  
+			  sortForGaussAlgorithm();
+			  while(completedColum < M){
+			    rootRow = completedRow;
+			    checkingRow = rootRow + 1;
+			    while(checkingRow < N && v(rootRow,completedColum) != 0){
+			      if(v(checkingRow,completedColum) != 0){
+				  rowFactor = v(checkingRow,completedColum)/v(rootRow,completedColum); 
+				  for(uint8_t m = completedColum; m < M; m++) {
+				      (*this)(checkingRow,m) = v(checkingRow,m) - rowFactor*v(rootRow,m);
+				  }
+				  
+			      }
+			      checkingRow++;
+			    }
+			    completedRow++;
+			    completedColum++;
+			  }
+			}
+			
+			void  sortForGaussAlgorithm(){
+				uint8_t completedColum = 0;
+				uint8_t completedRow = 0;
+				uint8_t swapRow = completedRow + 1;
+				
+				while(completedColum < M){
+				  
+				  while(completedRow < N){
+				    if(v(completedRow,completedColum) == 0 && swapRow < N && completedRow <N-1){
+				      swapRows(completedRow,swapRow);
+				      swapRow++;
+				    }else{
+				      completedRow++; 
+				    }
+				  }
+				  completedColum++;
+				  swapRow = completedRow + 1;
+				}
+			}
+			
+			void swapRows(uint8_t row1, uint8_t row2) { 
+			    
+			    Matrix<1,M,T> temp;
+			    temp.zero();
+			    for(uint8_t m = 0; m < M; m++) {
+				     temp(0,m) = v(row1,m);
+				     (*this)(row1,m) = v(row2,m);
+				     (*this)(row2,m) =  temp(0,m);
+			    }
+			}
+			
 		private:
 			T value[ N * M ];
 			
@@ -363,6 +497,14 @@ namespace eeros {
 					throw EEROSException(msg.str());
 				}
 			}
+			
+			
+			
+			
+			
+			
+			
+			
 		}; // END class Matrix
 		
 		/********** Operators **********/

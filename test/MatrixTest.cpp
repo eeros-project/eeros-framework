@@ -120,9 +120,331 @@ int main(int argc, char *argv[]) {
 	// TODO
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
+	testNo++;
+	std::cout << "Test #" << testNo << ": swaping Rows" << std::endl;
+	
+	Matrix<3,3> swapMatrix1;
+	swapMatrix1(0,0) = 1; swapMatrix1(0,1) = 1; swapMatrix1(0,2) = 0;
+	swapMatrix1(1,0) = 0; swapMatrix1(1,1) = 0; swapMatrix1(1,2) = 2;
+	swapMatrix1(2,0) = 1; swapMatrix1(2,1) = 0; swapMatrix1(2,2) = 0;
+	Matrix<3,3> swapSolutionMatrix1;
+	swapSolutionMatrix1(0,0) = 0; swapSolutionMatrix1(0,1) = 0; swapSolutionMatrix1(0,2) = 2;
+	swapSolutionMatrix1(1,0) = 1; swapSolutionMatrix1(1,1) = 1; swapSolutionMatrix1(1,2) = 0;
+	swapSolutionMatrix1(2,0) = 1; swapSolutionMatrix1(2,1) = 0; swapSolutionMatrix1(2,2) = 0;
+	
+	
+	Matrix<4,3> swapMatrix2;
+	swapMatrix2(0,0) = 1; swapMatrix2(0,1) = 1; swapMatrix2(0,2) = 0;
+	swapMatrix2(1,0) = 0; swapMatrix2(1,1) = 0; swapMatrix2(1,2) = 2;
+	swapMatrix2(2,0) = 1; swapMatrix2(2,1) = 0; swapMatrix2(2,2) = 0;
+	swapMatrix2(3,0) = 4; swapMatrix2(3,1) = 5; swapMatrix2(3,2) = 6;
+	
+	Matrix<4,3> swapSolutionMatrix2;
+	swapSolutionMatrix2(0,0) = 4; swapSolutionMatrix2(0,1) = 5; swapSolutionMatrix2(0,2) = 6;
+	swapSolutionMatrix2(1,0) = 0; swapSolutionMatrix2(1,1) = 0; swapSolutionMatrix2(1,2) = 2;
+	swapSolutionMatrix2(2,0) = 1; swapSolutionMatrix2(2,1) = 0; swapSolutionMatrix2(2,2) = 0;
+	swapSolutionMatrix2(3,0) = 1; swapSolutionMatrix2(3,1) = 1; swapSolutionMatrix2(3,2) = 0;
+	
+	
+	
+	
+	swapMatrix1.swapRows(0,1);
+	swapMatrix2.swapRows(0,3);
+	
+	if (swapMatrix1 != swapSolutionMatrix1){
+	    std::cout << "  Failure: Matrix 1 rows not correctly swaped" << std::endl;
+	    error++;
+	}
+	
+	if (swapMatrix2 != swapSolutionMatrix2){
+	    std::cout << "  Failure: Matrix 2 rows not correctly swaped" << std::endl;
+	    error++;
+	}
+	
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	
+	testNo++;
+	std::cout << "Test #" << testNo << ": Gauss sorting Matrix" << std::endl;
+	Matrix<3,3> sortMatrix1;
+	sortMatrix1(0,0) = 1; sortMatrix1(0,1) = 1; sortMatrix1(0,2) = 0;
+	sortMatrix1(1,0) = 0; sortMatrix1(1,1) = 0; sortMatrix1(1,2) = 2;
+	sortMatrix1(2,0) = 1; sortMatrix1(2,1) = 0; sortMatrix1(2,2) = 0;
+	Matrix<3,3> sortSolutionMatrix1;
+	sortSolutionMatrix1(0,0) = 1; sortSolutionMatrix1(0,1) = 1; sortSolutionMatrix1(0,2) = 0;
+	sortSolutionMatrix1(1,0) = 1; sortSolutionMatrix1(1,1) = 0; sortSolutionMatrix1(1,2) = 0;
+	sortSolutionMatrix1(2,0) = 0; sortSolutionMatrix1(2,1) = 0; sortSolutionMatrix1(2,2) = 2;
+	
+	Matrix<3,3> sortMatrix2;
+	sortMatrix2(0,0) = 0; sortMatrix2(0,1) = 1; sortMatrix2(0,2) = 0;
+	sortMatrix2(1,0) = 0; sortMatrix2(1,1) = 0; sortMatrix2(1,2) = 2;
+	sortMatrix2(2,0) = 1; sortMatrix2(2,1) = 0; sortMatrix2(2,2) = 0;
+
+	Matrix<3,3> sortSolutionMatrix2;
+	sortSolutionMatrix2(0,0) = 1; sortSolutionMatrix2(0,1) = 0; sortSolutionMatrix2(0,2) = 0;
+	sortSolutionMatrix2(1,0) = 0; sortSolutionMatrix2(1,1) = 1; sortSolutionMatrix2(1,2) = 0;
+	sortSolutionMatrix2(2,0) = 0; sortSolutionMatrix2(2,1) = 0; sortSolutionMatrix2(2,2) = 2;
+	
+	
+	Matrix<3,3> sortMatrix3;
+	sortMatrix3(0,0) = 5; sortMatrix3(0,1) = 1; sortMatrix3(0,2) = 3;
+	sortMatrix3(1,0) = 2; sortMatrix3(1,1) = 1; sortMatrix3(1,2) = 2;
+	sortMatrix3(2,0) = 5.25; sortMatrix3(2,1) = 3.125; sortMatrix3(2,2) = 2.5;
+
+	Matrix<3,3> sortSolutionMatrix3;
+	sortSolutionMatrix3(0,0) = 5; sortSolutionMatrix3(0,1) = 1; sortSolutionMatrix3(0,2) = 3;
+	sortSolutionMatrix3(1,0) = 2; sortSolutionMatrix3(1,1) = 1; sortSolutionMatrix3(1,2) = 2;
+	sortSolutionMatrix3(2,0) = 5.25; sortSolutionMatrix3(2,1) = 3.125; sortSolutionMatrix3(2,2) = 2.5;
+	
+	Matrix<4,3> sortMatrix4;
+	sortMatrix4(0,0) = 1; sortMatrix4(0,1) = 1; sortMatrix4(0,2) = 0;
+	sortMatrix4(1,0) = 0; sortMatrix4(1,1) = 0; sortMatrix4(1,2) = 2;
+	sortMatrix4(2,0) = 1; sortMatrix4(2,1) = 0; sortMatrix4(2,2) = 0;
+	sortMatrix4(3,0) = 4; sortMatrix4(3,1) = 5; sortMatrix4(3,2) = 6;
+	
+	Matrix<4,3> sortSolutionMatrix4;
+	sortSolutionMatrix4(0,0) = 1; sortSolutionMatrix4(0,1) = 1; sortSolutionMatrix4(0,2) = 0;
+	sortSolutionMatrix4(1,0) = 1; sortSolutionMatrix4(1,1) = 0; sortSolutionMatrix4(1,2) = 0;
+	sortSolutionMatrix4(2,0) = 4; sortSolutionMatrix4(2,1) = 5; sortSolutionMatrix4(2,2) = 6;
+	sortSolutionMatrix4(3,0) = 0; sortSolutionMatrix4(3,1) = 0; sortSolutionMatrix4(3,2) = 2;
+	
+	Matrix<3,4> sortMatrix5;
+	sortMatrix5(0,0) = 1; sortMatrix5(0,1) = 1; sortMatrix5(0,2) = 0; sortMatrix5(0,3) = 0;
+	sortMatrix5(1,0) = 0; sortMatrix5(1,1) = 0; sortMatrix5(1,2) = 2; sortMatrix5(1,3) = 2;
+	sortMatrix5(2,0) = 1; sortMatrix5(2,1) = 0; sortMatrix5(2,2) = 0; sortMatrix5(2,3) = 0;
+	
+	Matrix<3,4> sortSolutionMatrix5;
+	sortSolutionMatrix5(0,0) = 1; sortSolutionMatrix5(0,1) = 1; sortSolutionMatrix5(0,2) = 0; sortSolutionMatrix5(0,3) = 0;
+	sortSolutionMatrix5(1,0) = 1; sortSolutionMatrix5(1,1) = 0; sortSolutionMatrix5(1,2) = 0; sortSolutionMatrix5(1,3) = 0;
+	sortSolutionMatrix5(2,0) = 0; sortSolutionMatrix5(2,1) = 0; sortSolutionMatrix5(2,2) = 2; sortSolutionMatrix5(2,3) = 2;
+	
+	Matrix<3,4> sortMatrix6;
+	sortMatrix6(0,0) = 2; sortMatrix6(0,1) = 4; sortMatrix6(0,2) = 6; sortMatrix6(0,3) = 8;
+	sortMatrix6(1,0) = 1; sortMatrix6(1,1) = 2; sortMatrix6(1,2) = 3; sortMatrix6(1,3) = 4;
+	sortMatrix6(2,0) = 0; sortMatrix6(2,1) = 1; sortMatrix6(2,2) = 1; sortMatrix6(2,3) = 1;
+	
+	Matrix<3,4> sortSolutionMatrix6;
+	sortSolutionMatrix6(0,0) = 2; sortSolutionMatrix6(0,1) = 4; sortSolutionMatrix6(0,2) = 6; sortSolutionMatrix6(0,3) = 8;
+	sortSolutionMatrix6(1,0) = 1; sortSolutionMatrix6(1,1) = 2; sortSolutionMatrix6(1,2) = 3; sortSolutionMatrix6(1,3) = 4;
+	sortSolutionMatrix6(2,0) = 0; sortSolutionMatrix6(2,1) = 1; sortSolutionMatrix6(2,2) = 1; sortSolutionMatrix6(2,3) = 1;
+	
+	
+	sortMatrix1.sortForGaussAlgorithm();
+	sortMatrix2.sortForGaussAlgorithm();
+	sortMatrix3.sortForGaussAlgorithm();
+	sortMatrix4.sortForGaussAlgorithm();
+	sortMatrix5.sortForGaussAlgorithm();
+	sortMatrix6.sortForGaussAlgorithm();
+	
+	
+	if (sortMatrix1 != sortSolutionMatrix1){
+	    std::cout << "  Failure: Matrix 1 not sorted correctly" << std::endl;
+	    error++;
+	}
+	
+	if (sortMatrix2 != sortSolutionMatrix2){
+	    std::cout << "  Failure: Matrix 2 not sorted correctly" << std::endl;
+	    error++;
+	}
+	
+	if (sortMatrix3 != sortSolutionMatrix3){
+	    std::cout << "  Failure: Matrix 3 not sorted correctly" << std::endl;
+	    error++;
+	}
+	if (sortMatrix4 != sortSolutionMatrix4){
+	    std::cout << "  Failure: Matrix 4 not sorted correctly" << std::endl;
+	    error++;
+	}
+	if (sortMatrix5 != sortSolutionMatrix5){
+	    std::cout << "  Failure: Matrix 5 not sorted correctly" << std::endl;
+	    error++;
+	}
+	
+	if (sortMatrix6 != sortSolutionMatrix6){
+	    std::cout << "  Failure: Matrix 6 not sorted correctly" << std::endl;
+	    error++;
+	}
+	
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	
+	testNo++;
+	std::cout << "Test #" << testNo << ": gaus row elimination" << std::endl;
+	
+	Matrix<3,3> gaussMatrix1;
+	gaussMatrix1(0,0) = 1; gaussMatrix1(0,1) = 1; gaussMatrix1(0,2) = 0;
+	gaussMatrix1(1,0) = 0; gaussMatrix1(1,1) = 0; gaussMatrix1(1,2) = 2;
+	gaussMatrix1(2,0) = 1; gaussMatrix1(2,1) = 0; gaussMatrix1(2,2) = 0;
+
+	Matrix<3,3> gaussSolutionMatrix1;
+	gaussSolutionMatrix1(0,0) = 1; gaussSolutionMatrix1(0,1) = 1; gaussSolutionMatrix1(0,2) = 0;
+	gaussSolutionMatrix1(1,0) = 0; gaussSolutionMatrix1(1,1) = -1; gaussSolutionMatrix1(1,2) = 0;
+	gaussSolutionMatrix1(2,0) = 0; gaussSolutionMatrix1(2,1) = 0; gaussSolutionMatrix1(2,2) = 2;
+	
+	
+	Matrix<3,3> gaussMatrix2;
+	gaussMatrix2(0,0) = 1; gaussMatrix2(0,1) = 3; gaussMatrix2(0,2) = 2;
+	gaussMatrix2(1,0) = 2; gaussMatrix2(1,1) = 4; gaussMatrix2(1,2) = 4;
+	gaussMatrix2(2,0) = 3; gaussMatrix2(2,1) = 5; gaussMatrix2(2,2) = 6;
+	
+	
+	Matrix<3,3> gaussSolutionMatrix2;
+	gaussSolutionMatrix2(0,0) = 1; gaussSolutionMatrix2(0,1) = 3; gaussSolutionMatrix2(0,2) = 2;
+	gaussSolutionMatrix2(1,0) = 0; gaussSolutionMatrix2(1,1) = -2; gaussSolutionMatrix2(1,2) = 0;
+	gaussSolutionMatrix2(2,0) = 0; gaussSolutionMatrix2(2,1) = 0; gaussSolutionMatrix2(2,2) = 0;
+	
+	
+	Matrix<3,4> gaussMatrix3;
+	gaussMatrix3(0,0) = 1; gaussMatrix3(0,1) = 2; gaussMatrix3(0,2) = 3; gaussMatrix3(0,3) = 4;
+	gaussMatrix3(1,0) = -1; gaussMatrix3(1,1) = 0; gaussMatrix3(1,2) = 1; gaussMatrix3(1,3) = 0;
+	gaussMatrix3(2,0) = 3; gaussMatrix3(2,1) = 5; gaussMatrix3(2,2) = 6; gaussMatrix3(2,3) = 9;
+	
+	Matrix<3,4> gaussSolutionMatrix3;
+	gaussSolutionMatrix3(0,0) = 1; gaussSolutionMatrix3(0,1) = 2; gaussSolutionMatrix3(0,2) = 3; gaussSolutionMatrix3(0,3) = 4;
+	gaussSolutionMatrix3(1,0) = 0; gaussSolutionMatrix3(1,1) = 2; gaussSolutionMatrix3(1,2) = 4; gaussSolutionMatrix3(1,3) = 4;
+	gaussSolutionMatrix3(2,0) = 0; gaussSolutionMatrix3(2,1) = 0; gaussSolutionMatrix3(2,2) = -1; gaussSolutionMatrix3(2,3) = -1;
+	
+	
+	Matrix<3,4> gaussMatrix4;
+	gaussMatrix4(0,0) = 2; gaussMatrix4(0,1) = 4; gaussMatrix4(0,2) = 6; gaussMatrix4(0,3) = 8;
+	gaussMatrix4(1,0) = 1; gaussMatrix4(1,1) = 2; gaussMatrix4(1,2) = 3; gaussMatrix4(1,3) = 5;
+	gaussMatrix4(2,0) = 0; gaussMatrix4(2,1) = 1; gaussMatrix4(2,2) = 1; gaussMatrix4(2,3) = 1;
+	
+	Matrix<3,4> gaussSolutionMatrix4;
+	gaussSolutionMatrix4(0,0) = 2; gaussSolutionMatrix4(0,1) = 4; gaussSolutionMatrix4(0,2) = 6; gaussSolutionMatrix4(0,3) = 8;
+	gaussSolutionMatrix4(1,0) = 0; gaussSolutionMatrix4(1,1) = 0; gaussSolutionMatrix4(1,2) = 0; gaussSolutionMatrix4(1,3) = 1;
+	gaussSolutionMatrix4(2,0) = 0; gaussSolutionMatrix4(2,1) = 1; gaussSolutionMatrix4(2,2) = 1; gaussSolutionMatrix4(2,3) = 1;
+	
+	
+	gaussMatrix1.gaussRowElimination();
+	gaussMatrix2.gaussRowElimination();
+	gaussMatrix3.gaussRowElimination();
+	gaussMatrix4.gaussRowElimination();
+	 
+	
+	if (gaussMatrix1 != gaussSolutionMatrix1){
+	    std::cout << "  Failure: Matrix 1 row elimination not correctly done" << std::endl;
+	    error++;
+	}
+	
+	if (gaussMatrix2 != gaussSolutionMatrix2){
+	    std::cout << "  Failure: Matrix 2 row elimination not correctly done" << std::endl;
+	    error++;
+	}
+	
+	if (gaussMatrix3 != gaussSolutionMatrix3){
+	    std::cout << "  Failure: Matrix 3 row elimination not correctly done" << std::endl;
+	    error++;
+	}
+	
+	if (gaussMatrix4 != gaussSolutionMatrix4){
+	    std::cout << "  Failure: Matrix 4 row elimination not correctly done" << std::endl;
+	    error++;
+	}
+	
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	
+	
+	
 	/********** Functions for checking the matrix characteristics **********/
 	
-	// TODO
+	Matrix<3,3> characteristicsMatrix1;
+	characteristicsMatrix1(0,0) = 1; characteristicsMatrix1(0,1) = 0; characteristicsMatrix1(0,2) = 0;
+	characteristicsMatrix1(1,0) = 0; characteristicsMatrix1(1,1) = 1; characteristicsMatrix1(1,2) = 0;
+	characteristicsMatrix1(2,0) = 0; characteristicsMatrix1(2,1) = 0; characteristicsMatrix1(2,2) = 1;
+	
+	Matrix<3,3> characteristicsMatrix2;
+	characteristicsMatrix2(0,0) = 1; characteristicsMatrix2(0,1) = 3; characteristicsMatrix2(0,2) = 2;
+	characteristicsMatrix2(1,0) = 2; characteristicsMatrix2(1,1) = 4; characteristicsMatrix2(1,2) = 4;
+	characteristicsMatrix2(2,0) = 3; characteristicsMatrix2(2,1) = 5; characteristicsMatrix2(2,2) = 6;
+	
+	Matrix<2,2> characteristicsMatrix3;
+	characteristicsMatrix3(0,0) = 2; characteristicsMatrix3(0,1) = 5; 
+	characteristicsMatrix3(1,0) = 4; characteristicsMatrix3(1,1) = 6; 
+	
+	Matrix<4,4> characteristicsMatrix4;
+	characteristicsMatrix4(0,0) = 1; characteristicsMatrix4(0,1) = 3; characteristicsMatrix4(0,2) = 2; characteristicsMatrix4(0,3) = 6;
+	characteristicsMatrix4(1,0) = 2; characteristicsMatrix4(1,1) = 4; characteristicsMatrix4(1,2) = 4; characteristicsMatrix4(1,3) = 3;
+	characteristicsMatrix4(2,0) = 3; characteristicsMatrix4(2,1) = 5; characteristicsMatrix4(2,2) = 6; characteristicsMatrix4(2,3) = 1;
+	characteristicsMatrix4(3,0) = 7; characteristicsMatrix4(3,1) = 9; characteristicsMatrix4(3,2) = 1; characteristicsMatrix4(3,3) = 4;
+
+	Matrix<4,4> characteristicsMatrix5;
+	characteristicsMatrix5(0,0) = 3; characteristicsMatrix5(0,1) = 7; characteristicsMatrix5(0,2) = 3; characteristicsMatrix5(0,3) = 0;
+	characteristicsMatrix5(1,0) = 0; characteristicsMatrix5(1,1) = 2; characteristicsMatrix5(1,2) = -1; characteristicsMatrix5(1,3) = 1;
+	characteristicsMatrix5(2,0) = 5; characteristicsMatrix5(2,1) = 4; characteristicsMatrix5(2,2) = 3; characteristicsMatrix5(2,3) = 2;
+	characteristicsMatrix5(3,0) = 6; characteristicsMatrix5(3,1) = 6; characteristicsMatrix5(3,2) = 4; characteristicsMatrix5(3,3) = -1;
+	    
+	
+	
+	testNo++;
+	std::cout << "Test #" << testNo << ": rank of a matrix" << std::endl;
+
+	if (characteristicsMatrix1.rank() != 3){
+	    std::cout << "  Failure: Matrix 1 rank not correct" << std::endl;
+	    error++;
+	}
+	
+	if (characteristicsMatrix2.rank() != 2){
+	    std::cout << "  Failure: Matrix 2 rank not correct" << std::endl;
+	    error++;
+	}
+
+	if (characteristicsMatrix3.rank() != 2){
+	    std::cout << "  Failure: Matrix 3 rank not correct" << std::endl;
+	    error++;
+	}
+	
+	if (characteristicsMatrix4.rank() != 4){
+	    std::cout << "  Failure: Matrix 4 rank not correct" << std::endl;
+	    error++;
+	}
+	
+	if (characteristicsMatrix5.rank() != 4){
+	    std::cout << "  Failure: Matrix 4 rank not correct" << std::endl;
+	    error++;
+	}
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	testNo++;
+	std::cout << "Test #" << testNo << ": det of a matrix" << std::endl;
+
+	double det = characteristicsMatrix1.det();
+	if (det != 1){
+	    std::cout << "  Failure: Matrix 1 det not correct should be: 1 is: "<< det << std::endl;
+	    error++;
+	}
+	
+	det = characteristicsMatrix2.det();
+	if (det != 0){
+	    std::cout << "  Failure: Matrix 2 det not correct should be: 0 is: "<< det << std::endl;
+	    error++;
+	}
+	
+	
+	det = characteristicsMatrix3.det();
+	if (characteristicsMatrix3.det() != -8){
+	    std::cout << "  Failure: Matrix 3 det not correct should be: -8 is: "<< det << std::endl;
+	    error++;
+	}
+	
+	det = characteristicsMatrix4.det();
+	if (det != -26){
+	    std::cout << "  Failure: Matrix 4 det not correct should be: -26 is: "<< det << std::endl;
+	    error++;
+	}
+	
+	det = characteristicsMatrix5.det();
+	if (det != 105){
+	    std::cout << "  Failure: Matrix 5 det not correct should be: 105 is: "<< det << std::endl;
+	    error++;
+	}
+	
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	/********** Functions for calculating some characteristics of the matrix **********/
 	
