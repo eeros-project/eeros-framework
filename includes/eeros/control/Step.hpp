@@ -1,32 +1,54 @@
 #ifndef ORG_EEROS_CONTROL_STEP_HPP_
 #define ORG_EEROS_CONTROL_STEP_HPP_
 
-#include <vector>
 #include <eeros/control/Block1o.hpp>
 #include <eeros/core/System.hpp>
 
 namespace eeros {
 	namespace control {
 
-		class Step: public Block1o {
-		public:
-			Step(double initValue = 0.0, double stepHeight = 1.0, double delayTime = 1.0, sigdim_t dim = 1);
-			Step(const double initValue[], const double stepHeight[], const double delayTime, sigdim_t dim);
-			Step(const std::vector<double> initValues, const std::vector<double> stepHeight, double delayTime, sigdim_t dim);
-			virtual ~Step();
-
-			virtual void run();
+		template < typename T = double >
+		class Step : public Block1o<T> {
 			
-			virtual void reset();
-			virtual void setInitValue(double initValue);
-			virtual void setInitValue(sigindex_t index, double initValue);
-			virtual void setStepHeight(double stepHeight);
-			virtual void setStepHeight(sigindex_t index, double stepHeight);
-			virtual void setDelayTime(double delayTime);
+		public:
+			Step(T initValue = 0, T stepHeight = 1, double delayTime = 1) {
+				
+			}
+			
+			
+			virtual void run() {
+				if(first) {
+					stepTime += System::getTime();
+					this->out.getSignal().setValue(initValue);
+					first = false;
+				}
+				else if(!stepDone && System::getTime() >= stepTime) {
+					this->out.getSignal().setValue(initValue + stepHeight);
+					stepDone = true;
+				}
+				this->out.getSignal().setTimestamp(System::getTimeNs());
+			}
+			
+			virtual void reset() {
+				stepDone = false;
+				first = true;
+			}
+			
+			virtual void setInitValue(T initValue) {
+				this->initValue = initValue;
+			}
+			
+			virtual void setStepHeight(T stepHeight) {
+				this->stepHeight = stepHeight;
+			}
+			
+			virtual void setDelayTime(double delayTime) {
+				this->stepTime = delayTime;
+			}
 
 		protected:
-			std::vector<double> initValue;
-			std::vector<double> stepHeight;
+			T initValue;
+			T stepHeight;
 			double stepTime;
 			bool stepDone;
 			bool first;

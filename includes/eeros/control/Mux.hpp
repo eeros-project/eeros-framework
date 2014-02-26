@@ -2,26 +2,40 @@
 #define ORG_EEROS_CONTROL_MUX_HPP_
 
 #include <vector>
-
 #include <eeros/control/Block.hpp>
-#include <eeros/control/RealSignalInput.hpp>
-#include <eeros/control/RealSignalOutput.hpp>
+#include <eeros/math/Matrix.hpp>
+#include <eeros/control/Input.hpp>
+#include <eeros/control/Output.hpp>
 
 namespace eeros {
 	namespace control {
-
+		
+		template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T> >
 		class Mux: public Block {
+			
 		public:
-			Mux(sigdim_t nofInputs);
+			Mux() { }
 			
-			virtual void run();
+			virtual void run() {
+				C newValue;
+				for(int i = 0; i < N; i++) {
+					newValue(i) = in[i];
+				}
+				out.getSignal().setValue(newValue);
+				out.getSignal().setTimestamp(in[0].getSignal().getTimeStamp());
+			}
 			
-			virtual RealSignalInput& getIn(uint8_t input = 0);
-			virtual RealSignalOutput& getOut();
+			virtual Input<T>& getIn(uint32_t index) {
+				return out[index];
+			}
+			
+			virtual Output<T>& getOut() {
+				return out;
+			}
 			
 		protected:
-			std::vector<RealSignalInput> in;
-			RealSignalOutput out;
+			Input<T> in[N];
+			Output<C> out;
 		};
 
 	};

@@ -9,8 +9,7 @@
 #include <eeros/control/Step.hpp>
 #include <eeros/control/Sum.hpp>
 #include <eeros/control/Gain.hpp>
-#include <eeros/control/D.hpp>
-#include <eeros/control/BlockOutput.hpp>
+#include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/GlobalSignalProvider.hpp>
 #include <eeros/control/SignalBufferReader.hpp>
 #include <eeros/logger/Logger.hpp>
@@ -63,36 +62,35 @@ int main() {
 	Executor e2(0.1); // 100 ms period time
 	
 	l.info() << "Creating and connecting control system elements..." << endl;
-	Step step1(0.0, 5.0, 20.0);
-	step1.getOut().setName("Step 1");
+	Step<> step1(0.0, 5.0, 20.0);
+	step1.setName("Step 1");
 	
-	Step step2(0.0, -8.0, 25.0);
-	step2.getOut().setName("Step 2");
+	Step<> step2(0.0, -8.0, 25.0);
+	step2.setName("Step 2");
 	
-	Sum sum;
-	sum.getOut().setName("Sum");
+	Sum<> sum;
+	sum.setName("Sum");
 	sum.negateInput(1);
 	
-	Gain gain(2.0); // A/N
-	gain.getOut().setName("Gain");
+	Gain<> gain(2.0); // A/N
+	gain.setName("Gain");
 	
 	GlobalSignalProvider globalSignalProvider;
-	
 	
 	sum.getIn(0).connect(step1.getOut());
 	sum.getIn(1).connect(step2.getOut());
 	gain.getIn().connect(sum.getOut());
 	
-	{
-		auto e = l.info();
-		e << "Available signals:" << endl;
-		for(std::list<Signal*>::iterator i = Signal::getSignalList()->begin(); i != Signal::getSignalList()->end(); i++) {
-			uint32_t length = (*i)->getDimension();
-			for(uint32_t j = 0; j < length; j++) {
-				e << "  " << (*i)->getLabel(j) << endl;
-			}
-		}
-	}
+// 	{
+// 		auto e = l.info();
+// 		e << "Available signals:" << endl;
+// 		for(std::list<Signal*>::iterator i = Signal::getSignalList()->begin(); i != Signal::getSignalList()->end(); i++) {
+// 			uint32_t length = (*i)->getDimension();
+// 			for(uint32_t j = 0; j < length; j++) {
+// 				e << "  " << (*i)->getLabel(j) << endl;
+// 			}
+// 		}
+// 	}
 	
 	e1.addRunnable(step1);
 	e1.addRunnable(step2);

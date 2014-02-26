@@ -2,38 +2,28 @@
 
 using namespace eeros::control;
 
-MyControlSystem::MyControlSystem() : setpoint(0.0), enc("q"), posController(174.5), sum2(3), speedController(565.48), inertia(14.2e-7), invMotConst(1/15.7e-3 * 2.0), dac("dac"), executor(0.001) {
+MyControlSystem::MyControlSystem() : setpoint(0.0), enc("q"), posController(174.5), speedController(565.48), inertia(14.2e-7), invMotConst(1/15.7e-3 * 2.0), dac("dac"), executor(0.001) {
 	
-	setpoint.getOut().setName("phi_desired");
-	setpoint.getOut().setUnit("rad");
+	setpoint.getOut().getSignal().setName("phi_desired");
 
-	enc.getOut().setName("phi_actual");
-	enc.getOut().setUnit("rad");
+	enc.getOut().getSignal().setName("phi_actual");
 
-	diff1.getOut().setName("phi_d_actual");
-	diff1.getOut().setUnit("rad/s");
+	diff1.getOut().getSignal().setName("phi_d_actual");
 	sum1.negateInput(1);
-	sum1.getOut().setName("phi_e");
-	sum1.getOut().setUnit("rad");
+	sum1.getOut().getSignal().setName("phi_e");
 	
-	posController.getOut().setName("phi_d_set");
-	posController.getOut().setUnit("rad/s");
+	posController.getOut().getSignal().setName("phi_d_set");
 	
-	diff2.getOut().setName("phi_d_set_ff");
-	diff2.getOut().setUnit("rad/s");
+	diff2.getOut().getSignal().setName("phi_d_set_ff");
 	
 	sum2.negateInput(1);
-	sum2.getOut().setName("phi_d_e");
-	sum2.getOut().setUnit("rad/s");
+	sum2.getOut().getSignal().setName("phi_d_e");
 	
-	speedController.getOut().setName("phi_dd_set");
-	speedController.getOut().setUnit("rad/s^2");
+	speedController.getOut().getSignal().setName("phi_dd_set");
 
-	inertia.getOut().setName("M");
-	inertia.getOut().setUnit("Nm");
+	inertia.getOut().getSignal().setName("M");
 
-	invMotConst.getOut().setName("i");
-	invMotConst.getOut().setUnit("A");
+	invMotConst.getOut().getSignal().setName("i");
 	
 	diff1.getIn().connect(enc.getOut());
 	sum1.getIn(0).connect(setpoint.getOut());

@@ -9,6 +9,8 @@ namespace eeros {
 	
 	namespace control {
 
+		enum { kSignalTypeUnknown = 0, kSignalIdInvalid = -1, kSignalTypeReal = 42 };
+		
 		enum { kMaxNofObservableSignals = 32 };
 
 		enum { kSignalDataSizeReal = 16 };

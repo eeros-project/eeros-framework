@@ -1,24 +1,27 @@
 #ifndef ORG_EEROS_CONTROL_D_HPP_
 #define ORG_EEROS_CONTROL_D_HPP_
 
-#include <eeros/control/RealSignalOutput.hpp>
 #include <eeros/control/Block1i1o.hpp>
-
-#include <vector>
+#include <type_traits>
 
 namespace eeros {
 	namespace control {
 
-		class D: public Block1i1o {
-		public:
-			D(sigdim_t dim = 1);
-			virtual ~D();
-
-			virtual void run();
+		template < typename T = double >
+		class D: public Block1i1o<T> {
 			
-		private:
-			bool first;
-			std::vector<realSignalDatum> prev;
+		public:
+			D() { 
+				prev.clear();
+			}
+			
+			virtual void run() {
+				this->out.getSignal().setValue((this->in.getSignal().getValue() - prev.getValue()) / ((this->in.getSignal().getTimestamp() - prev.getTimestamp()) / 1000000000.0));
+				this->out.getSignal().setTimestamp((this->in.getSignal().getTimestamp() - prev.getTimestamp()) / 2);
+			}
+			
+		protected:
+			Signal<T> prev;
 		};
 
 	};

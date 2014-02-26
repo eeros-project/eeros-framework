@@ -3,15 +3,15 @@
 #include <list>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <iostream>
+#include <cerrno>
+#include <signal.h>
 #include <eeros/control/Signal.hpp>
-#include <eeros/control/RealSignalOutput.hpp>
 #include <eeros/control/SignalBufferWriter.hpp>
 #include <eeros/core/SharedMemory.hpp>
 #include <eeros/core/System.hpp>
 
-#include <iostream>
-#include <cerrno>
-
+using namespace eeros;
 using namespace eeros::control;
 
 GlobalSignalProvider::GlobalSignalProvider() {
@@ -80,17 +80,16 @@ void GlobalSignalProvider::processIPCMessages() {
 			break;
 		}
 		case 'l': {
-			std::list<Signal*>* signalList = Signal::getSignalList();
+			std::list<SignalInterface*> signalList = Signal<double>::getSignalList();
 			int32_t collectedSignals = 0;
 			std::stringstream ss;
-			for (std::list<Signal*>::iterator it = signalList->begin(); it != signalList->end(); it++) {
-				RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(*it);
-				for (sigindex_t i = 0; i < realSignal->getDimension(); i++) {
+			for(auto&& signal : signalList) {
+				Signal<double>* doubleSignal = dynamic_cast<Signal<double>*>(signal);
+				if(doubleSignal != nullptr) { // only list double signals
 					// Collect signals to reduce the number of IPC messages and send them batched
-					ss << realSignal->getSignalId(i) << '\x1D' << realSignal->getLabel(i) << '\x1D' << realSignal->getSendingDirection(i) << '\x1E';
+					ss << signal->getId() << '\x1D' << signal->getLabel() << '\x1D' << "ServerToClient" << '\x1E';
 					collectedSignals++;
-					const int32_t NUMBER_OF_SIGNAL_TO_COLLECT = 10;
-					if (collectedSignals >= NUMBER_OF_SIGNAL_TO_COLLECT) {
+					if (collectedSignals >= 10) {
 						collectedSignals = 0;
 						sendIPCMessage(ss);
 					}
@@ -113,19 +112,19 @@ void GlobalSignalProvider::processIPCMessages() {
 			int32_t nofSignals = *(reinterpret_cast<int32_t*>(pMsg + index));
 			index += sizeof(int32_t);
 			for (int32_t i = 0; i < nofSignals; i++) {
-				uint32_t signalId = *(reinterpret_cast<uint32_t*>(pMsg + index));
-				index += sizeof(signalId);
-
-				// We just ignore the received timestamp
-				uint64_t timestamp = System::getTimeNs();
-				index += sizeof(timestamp);
-
-				double value = *(reinterpret_cast<double*>(pMsg + index));
-				index += sizeof(double);
-				Signal* signal = Signal::getSignalById(signalId);
-				RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(signal);
-				realSignal->setValue(value, (sigindex_t) signalId);
-				realSignal->setTimeStamp(timestamp, (sigindex_t) signalId);
+// 				uint32_t signalId = *(reinterpret_cast<uint32_t*>(pMsg + index));
+// 				index += sizeof(signalId);
+// 
+// 				// We just ignore the received timestamp
+// 				uint64_t timestamp = System::getTimeNs();
+// 				index += sizeof(timestamp);
+// 
+// 				double value = *(reinterpret_cast<double*>(pMsg + index));
+// 				index += sizeof(double);
+// 				Signal* signal = Signal::getSignalById(signalId);
+// 				RealSignalOutput* realSignal = dynamic_cast<RealSignalOutput*>(signal);
+// 				realSignal->setValue(value, (sigindex_t) signalId);
+// 				realSignal->setTimeStamp(timestamp, (sigindex_t) signalId);
 			}
 			break;
 		}

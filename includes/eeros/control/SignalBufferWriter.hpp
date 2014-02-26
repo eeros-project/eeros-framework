@@ -8,8 +8,6 @@
 namespace eeros {
 	namespace control {
 
-		class Signal;
-
 		class SignalBufferWriter : public SignalBuffer {
 		public:
 			SignalBufferWriter(void* memory, uint32_t size);

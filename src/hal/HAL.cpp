@@ -38,6 +38,10 @@ bool HAL::addSystemOutput(SystemOutputInterface* systemOutput) {
 	return false;
 }
 
+SystemOutputInterface* HAL::getSystemOutput(std::string name, bool exclusive) {
+	return outputs[name];
+}
+
 SystemOutput<bool>* HAL::getLogicSystemOutput(std::string name, bool exclusive) {
 	SystemOutput<bool>* out = dynamic_cast<SystemOutput<bool>*>(outputs[name]);
 	if(out == nullptr) throw EEROSException("Logic system output '" + name + "' not found!");
@@ -54,6 +58,10 @@ SystemOutput<double>* HAL::getRealSystemOutput(std::string name, bool exclusive)
 		if(!exclusiveReservedOutputs.insert(out).second) throw EEROSException("Real system output '" + name + "' is exclusive reserved!");
 	}
 	return out;
+}
+
+SystemInputInterface* HAL::getSystemInput(std::string name, bool exclusive) {
+	return inputs[name];
 }
 
 SystemInput<bool>* HAL::getLogicSystemInput(std::string name, bool exclusive) {

@@ -1,6 +1,6 @@
 #include <eeros/control/SignalBufferReader.hpp>
 #include <eeros/core/RingBuffer.hpp>
-#include <eeros/control/RealSignalOutput.hpp>
+#include <eeros/control/Signal.hpp>
 #include <string.h>
 
 using namespace eeros::control;
@@ -34,17 +34,17 @@ bool SignalBufferReader::readRealSignal(sigid_t* id, uint64_t* timestamp, double
 	return false;
 }
 
-realSignalDatum SignalBufferReader::readRealSignal() {
-	realSignalDatum sig;
-	correctHeaderVersion();
-	if(signalTypeAvailableToRead() == kSignalTypeReal) {
-		sig.id = getSignalId(readIndex);
-		buffer->read(&(sig.timestamp), sizeof(sig.timestamp));
-		buffer->read(&(sig.value), sizeof(sig.value));
-		incrementReadIndex();
-	}
-	return sig;
-}
+// realSignalDatum SignalBufferReader::readRealSignal() {
+// 	realSignalDatum sig;
+// 	correctHeaderVersion();
+// 	if(signalTypeAvailableToRead() == kSignalTypeReal) {
+// 		sig.id = getSignalId(readIndex);
+// 		buffer->read(&(sig.timestamp), sizeof(sig.timestamp));
+// 		buffer->read(&(sig.value), sizeof(sig.value));
+// 		incrementReadIndex();
+// 	}
+// 	return sig;
+// }
 
 sigtype_t SignalBufferReader::getSignalType(int readIndex) {
 	if(readIndex >= 0 && readIndex < nofObservedSignals()) {

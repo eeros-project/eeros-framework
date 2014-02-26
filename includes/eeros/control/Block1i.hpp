@@ -2,18 +2,23 @@
 #define ORG_EEROS_CONTROL_BLOCK1I_HPP_
 
 #include <eeros/control/Block.hpp>
-#include <eeros/control/RealSignalInput.hpp>
+#include <eeros/control/Input.hpp>
+#include <eeros/control/Signal.hpp>
 
 namespace eeros {
 	namespace control {
 
-		class Block1i: public Block {
+		template < typename T = double >
+		class Block1i : public Block {
 		public:
-			Block1i();
-			RealSignalInput& getIn();
+			Block1i() { }
 			
+			virtual Input<T>& getIn() {
+				return in;
+			}
+		
 		protected:
-			RealSignalInput in;
+			Input<T> in;
 		};
 
 	};

@@ -221,7 +221,7 @@ namespace eeros {
 			Matrix<M,N,T> transpose() const {
 				Matrix<M,N,T> result; Matrix<N-1,M-1,T> smallerPart;
 				for(uint8_t n = 0; n < N; n++) {
-					for (uint8_t m = 0; m < M; m++) {
+					for(uint8_t m = 0; m < M; m++) {
 						result(m,n) = (*this)(n,m);
 					}
 				}
@@ -229,6 +229,15 @@ namespace eeros {
 			}
 			
 			/********** Operators **********/
+			
+			Matrix<N,M,T>& operator= (T right) const {
+				for(uint8_t n = 0; n < N; n++) {
+					for(uint8_t m = 0; m < M; m++) {
+						v(m,n) = right;
+					}
+				}
+				return *this;
+			}
 			
 			T& operator()(uint8_t n, uint8_t m = 0) {
 				if(n >= 0 && n < N && m >= 0 && m < M)
