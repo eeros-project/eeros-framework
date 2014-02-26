@@ -14,7 +14,9 @@ namespace eeros {
 
 		public:
 			Sum() {
-				// TODO set bool-array to false
+				for(uint8_t i = 0; i < N; i++) {
+					negated[i] = false;
+				}
 			}
 
 			virtual void run() {
