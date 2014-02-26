@@ -10,7 +10,7 @@ namespace eeros {
 		class Gain : public Block1i1o<Tout> {
 			
 		public:
-			Gain(Tgain c) {
+			Gain(Tgain c) : enabled(true) {
 				gain = c;
 			}
 			

@@ -18,6 +18,7 @@ namespace eeros {
 			virtual void run() {
 				this->out.getSignal().setValue((this->in.getSignal().getValue() - prev.getValue()) / ((this->in.getSignal().getTimestamp() - prev.getTimestamp()) / 1000000000.0));
 				this->out.getSignal().setTimestamp((this->in.getSignal().getTimestamp() - prev.getTimestamp()) / 2);
+				prev = this->out.getSignal();
 			}
 			
 		protected:

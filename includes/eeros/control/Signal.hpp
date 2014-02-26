@@ -63,6 +63,17 @@ namespace eeros {
 				value = 0;
 			}
 			
+			Signal<T>& operator= (Signal<T> right) {
+				value = right.value;
+				timestamp = right.timestamp;
+				return *this;
+			}
+			
+			Signal<T>& operator= (T right) {
+				value = right;
+				return *this;
+			}
+			
 			static Signal<T>& getIllegalSignal() {
 				return illegalSignal;
 			}
