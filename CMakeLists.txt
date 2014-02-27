@@ -78,8 +78,8 @@ endif()
 set(LINUX TRUE)
 set(CMAKE_CXX_FLAGS "-std=c++0x")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/config.hpp)
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.hpp DESTINATION include/eeros)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
 
 
 # Special settings for different IDEs

@@ -1,4 +1,4 @@
-#include <config.hpp>
+#include <eeros/config.hpp>
 #include <eeros/core/System.hpp>
 
 #if defined(WINDOWS)
