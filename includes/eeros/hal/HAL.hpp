@@ -6,7 +6,6 @@
 
 #include <eeros/hal/SystemInput.hpp>
 #include <eeros/hal/SystemOutput.hpp>
-#include "ComediDevice.hpp"
 
 namespace eeros {
 	namespace hal {
