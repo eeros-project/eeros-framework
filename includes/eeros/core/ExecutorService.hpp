@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CORE_EXECUTORSERVICE_HPP_
 #define ORG_EEROS_CORE_EXECUTORSERVICE_HPP_
 
-#include <config.hpp>
+#include <eeros/config.hpp>
 #include <eeros/core/Executor.hpp>
 
 #include <eeros/logger/Logger.hpp>
