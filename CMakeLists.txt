@@ -6,6 +6,9 @@ cmake_minimum_required(VERSION 2.8)
 # EEROS Robotic Framework
 project(EEROS)
 
+include_directories(${ADDITIONAL_INCLUDE_DIRS})
+link_directories(${ADDITIONAL_LINK_DIRS})
+
 # Load CMake modules
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
