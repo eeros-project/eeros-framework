@@ -35,6 +35,7 @@ namespace eeros {
 			virtual bool switchToInput(uint8_t input);
 			
 		protected:
+			sigdim_t dim;
 			std::vector<RealSignalInput> in;
 			RealSignalOutput out;
 			uint8_t currentInput;

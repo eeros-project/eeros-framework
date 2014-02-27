@@ -38,26 +38,38 @@ bool HAL::addSystemOutput(SystemOutputInterface* systemOutput) {
 	return false;
 }
 
-SystemOutput<bool>* HAL::getLogicSystemOutput(std::string name) {
+SystemOutput<bool>* HAL::getLogicSystemOutput(std::string name, bool exclusive) {
 	SystemOutput<bool>* out = dynamic_cast<SystemOutput<bool>*>(outputs[name]);
 	if(out == nullptr) throw EEROSException("Logic system output '" + name + "' not found!");
+	if(exclusive) {
+		if(!exclusiveReservedOutputs.insert(out).second) throw EEROSException("Logic system output '" + name + "' is exclusive reserved!");
+	}
 	return out;
 }
 
-SystemOutput<double>* HAL::getRealSystemOutput(std::string name) {
+SystemOutput<double>* HAL::getRealSystemOutput(std::string name, bool exclusive) {
 	SystemOutput<double>* out = dynamic_cast<SystemOutput<double>*>(outputs[name]);
 	if(out == nullptr) throw EEROSException("Real system output '" + name + "' not found!");
+	if(exclusive) {
+		if(!exclusiveReservedOutputs.insert(out).second) throw EEROSException("Real system output '" + name + "' is exclusive reserved!");
+	}
 	return out;
 }
 
-SystemInput<bool>* HAL::getLogicSystemInput(std::string name) {
+SystemInput<bool>* HAL::getLogicSystemInput(std::string name, bool exclusive) {
 	SystemInput<bool>* in = dynamic_cast<SystemInput<bool>*>(inputs[name]);
 	if(in == nullptr) throw EEROSException("Logic system input '" + name + "' not found!");
+	if(exclusive) {
+		if(!exclusiveReservedInputs.insert(in).second) throw EEROSException("Logic system input '" + name + "' is exclusive reserved!");
+	}
 	return in;
 }
 
-SystemInput<double>* HAL::getRealSystemInput(std::string name) {
+SystemInput<double>* HAL::getRealSystemInput(std::string name, bool exclusive) {
 	SystemInput<double>* in = dynamic_cast<SystemInput<double>*>(inputs[name]);
 	if(in == nullptr) throw EEROSException("Real system input '" + name + "' not found!");
+	if(exclusive) {
+		if(!exclusiveReservedInputs.insert(in).second) throw EEROSException("Real system input '" + name + "' is exclusive reserved!");
+	}
 	return in;
 }
