@@ -69,6 +69,10 @@ else()
 	# Cross compile -> use informations form CMAKE_TOOLCHAIN_FILE
 	# TODO
 endif()
+
+set(LINUX TRUE)
+set(CMAKE_CXX_FLAGS "-std=c++0x")
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/config.hpp)
 
 
