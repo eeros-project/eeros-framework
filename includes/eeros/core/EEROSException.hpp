@@ -1,5 +1,5 @@
-#ifndef EEROSEXCEPTION_HPP
-#define EEROSEXCEPTION_HPP
+#ifndef ORG_EEROS_CORE_EEROSEXCEPTION_HPP
+#define ORG_EEROS_CORE_EEROSEXCEPTION_HPP
 
 #include <string>
 #include <exception>
@@ -18,4 +18,4 @@ namespace eeros {
 	};
 };
 
-#endif // EEROSEXCEPTION_HPP
+#endif // ORG_EEROS_CORE_EEROSEXCEPTION_HPP

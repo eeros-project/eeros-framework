@@ -1,118 +1,137 @@
 #include <eeros/sequencer/Sequence.hpp>
-#include <eeros/sequencer/Sequencer.hpp>
-#include <eeros/sequencer/SequenceException.hpp>
-#include <eeros/sequencer/ErrorHandler.hpp>
+#include <eeros/core/EEROSException.hpp>
 
 using namespace eeros::sequencer;
+using namespace eeros::logger;
 
-std::list<eeros::sequencer::Sequence*> Sequence::allSequences;
+std::map<std::string, Sequence*> Sequence::allSequences;
 
-Sequence::Sequence(std::string name, Sequencer& caller)
-	: sequenceName(name),
-      callerThread(caller),
-	  state(kSequenceNotStarted) {
-	if(&callerThread != Sequencer::getMainSequencer()){
-		Sequencer::getMainSequencer()->addSubSequencer(&caller);
+Sequence::Sequence(std::string name) : name(name) {
+	// reset sequence
+	reset();
+	
+	// add the sequence to the list with all sequences
+	if(!Sequence::allSequences.insert( {name, this} ).second) {
+		log.error() << "Sequence '" << name << "' already exists, please choose a unique name!";
 	}
-	Sequence* seq = getSequence(sequenceName);
-	if(seq){
-		 throw "Sequence allready exists!";
-	}
-	Sequence::allSequences.push_back(this);
-	currentCallBackIterator = callBacks.end();
 }
 
-Sequence::~Sequence(){
-	removeSequence(sequenceName);
+Sequence::~Sequence() {
+	// remove the sequence from the list with all sequeces
+	Sequence::allSequences.erase(name);
 }
 
 std::string Sequence::getName(){
-	return sequenceName;
+	return name;
 }
 
-void Sequence::addCallBack(eeros::sequencer::Sequence::method callback){
-	callBacks.push_back(callback);
+int Sequence::getState() {
+    return state;
 }
 
-std::list<Sequence::method>::iterator Sequence::findCallBack(method callback, bool setCurrent) {
-	std::list<Sequence::method>::iterator iter = callBacks.begin();
-	while(iter != callBacks.end()){
-		if(*iter == callback){
-			if(setCurrent){
-				currentCallBackIterator = iter;
-			}
-			return iter;
-		}
-		iter++;
-	}
-	throw "no Method found!";
-	return iter;
-}
-
-void Sequence::setCurrentCallBack(std::list<eeros::sequencer::Sequence::method>::iterator iter){
-	currentCallBackIterator = iter;
-}
-
-void Sequence::run(){
+void Sequence::run() {
 	try{
-		if(callBacks.empty()){
-			fillCallBacks();
+		switch(state) {
+			case kSequenceFinished:
+				reset();
+				init();
+				break;
+			case kSequenceNotStarted:
+				init();
+				break;
+			case kSequenceException:
+				exceptionRetryCounter++;
+				break;
+			default:
+				log.error() << "Illegal sequence state '" << (int)state << "', resetting sequence!";
+				reset();
+				init();
+				break;
 		}
-		//std::list<Sequence::method>::iterator iter = callBacks.begin();
-		if(currentCallBackIterator == callBacks.end()){
-			currentCallBackIterator = callBacks.begin();
-			state = kSequenceRunning;
-
+		
+		while(!checkPreCondition()); // TODO add abort condition
+		
+		// execute action lambdas
+		while(currentStep < actionList.size()) {
+			actionList[currentStep]();
+			currentStep++;
 		}
-		method fun;
-		while(currentCallBackIterator != callBacks.end()){
-			fun = *currentCallBackIterator;
-			(this->*fun)();
-			currentCallBackIterator++;
-		}
-		state = kSequenceFinished;
-	}catch(SequenceException* e){
-		//ErrorHandling 
-		try{
-			if(e->errorHandler){
-				if(e->returnToBegin){
-					currentCallBackIterator = callBacks.begin();
-				}else if (e->goToNext){
-					findCallBack(e->nextMethod, true);
-				}
-				//else continue after Error Handling with the same Method
-				e->errorHandler->run();
-			}
-			delete e;
-		}catch(...){
-			callerThread.stop();
+		
+		// check postcondition
+		if(!checkPostCondition()) throw -715; // TODO
+		
+		// cleanup and exit
+		exit();
+        
+	}
+	catch(SequenceException const &e) {
+		log.info() << e.what();
+		e.handle();
+		ExceptionReturnBehavior returnBehavior = e.getReturnBehavior();
+		
+		switch(returnBehavior) {
+			case kRepeatSequence:
+				reset();
+				break;
+			case kRepeatStep:
+				this->run();
+				break;
+			case kContinue:
+				currentStep++;
+				this->run();
+				break;
+			case kNewSequence:
+				state = kSequenceFinished;
+				callSubSequence(e.getEnsuingSequence());
+				break;
+			default:
+				log.error() << "Illegal return behavior '" << (int)returnBehavior << "' in exception '" << e.what() << "'!";
+				break;
 		}
 	}
+	// TODO catch(EEROSException)
+	// TODO catch(std::exception)
+}
+
+void Sequence::init() {
+    
+}
+
+bool Sequence::checkPreCondition() {
+    return true;
+}
+
+bool Sequence::checkPostCondition() {
+    return true;
+}
+
+void Sequence::exit() {
+    
+}
+
+void Sequence::reset() {
+	state = kSequenceNotStarted;
+	currentStep = 0;
+	exceptionRetryCounter = 0;
+}
+
+void Sequence::callSubSequence(Sequence* sequence) {
+	if(sequence != nullptr) {
+		sequence->run();
+	}
+	else {
+		log.warn() << "Call to NULL sequence ignored!" << endl;
+	}
+}
+
+void Sequence::startParallelSequence(Sequence* sequence) {
+	// TODO
+}
+
+void Sequence::addStep(std::function<void(void)> action) {
+	actionList.push_back(action);
 }
 
 Sequence* Sequence::getSequence(std::string name){
-	std::list<Sequence*>::iterator iter = eeros::sequencer::Sequence::allSequences.begin();
-		while(iter != eeros::sequencer::Sequence::allSequences.end()){
-			if((*iter)->getName().compare(name) == 0){
-				return *iter;
-			}
-			iter++;
-		}
-		return 0;
-}
-
-void Sequence::removeSequence(std::string name){
-	std::list<Sequence*>::iterator iter = eeros::sequencer::Sequence::allSequences.begin();
-	while(iter != eeros::sequencer::Sequence::allSequences.end()){
-		if((*iter)->getName().compare(name) == 0){
-			iter = allSequences.erase(iter);
-			return;
-		}else{
-		  iter++;
-		}
-	}
-}
-
-int Sequence::getState(){
-	return state;
+	return Sequence::allSequences[name];
 }

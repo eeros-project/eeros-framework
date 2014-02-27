@@ -4,9 +4,6 @@
 #include <eeros/safety/SafetyProperties.hpp>
 #include <eeros/hal/HAL.hpp>
 
-// namespace scara {
-class MySafetyProperties : public eeros::safety::SafetyProperties {
-
 	// Name all levels
 	enum {
 		off = 0,
@@ -31,6 +28,8 @@ class MySafetyProperties : public eeros::safety::SafetyProperties {
 		doEmergency = 108,
 		resetEmergency = 109
 	};
+
+class MySafetyProperties : public eeros::safety::SafetyProperties {
 			
 	public:
 		MySafetyProperties();

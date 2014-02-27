@@ -8,22 +8,16 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/hal/ComediFqd.hpp>
 #include <eeros/hal/ComediDac.hpp>
-#include <eeros/control/Step.hpp>
-#include <eeros/control/Sum.hpp>
-#include <eeros/control/Gain.hpp>
-#include <eeros/control/D.hpp>
-#include <eeros/control/GlobalSignalProvider.hpp>
-#include <eeros/control/SignalBufferReader.hpp>
-#include <eeros/control/RealPeripheralInput.hpp>
-#include <eeros/control/RealPeripheralOutput.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/hal/ComediDigIn.hpp>
 #include <eeros/hal/ComediDigOut.hpp>
 #include <eeros/hal/ComediFqd.hpp>
 #include <eeros/hal/ComediDac.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
+#include <eeros/sequencer/Sequencer.hpp>
 #include "MySafetyProperties.hpp"
 #include "MyControlSystem.hpp"
+#include "SequenceA.hpp"
 
 #define TIMETOWAIT 30
 
@@ -32,7 +26,7 @@ using namespace eeros::hal;
 using namespace eeros::control;
 using namespace eeros::safety;
 using namespace eeros::logger;
-//using namespace eeros::sequencer;
+using namespace eeros::sequencer;
 
 void initHardware() {
 	HAL& hal = HAL::instance();
@@ -65,13 +59,29 @@ int main() {
 	safetySys.setProperties(properties);
 	
 	std::cout << "Creating executors..." << std::endl;
-	Executor safetySysExecutor(1); // safety system -> 1 ms period time
+	Executor safetySysExecutor(0.01); // safety system -> 10 ms period time
 	safetySysExecutor.addRunnable(safetySys);
 
 	// Start safety system
 	safetySysExecutor.start();
+	
+	// Get control System instance
+	MyControlSystem& controlSys = MyControlSystem::instance();
 
-	while(1);
+	// Start control system
+	controlSys.start();
+	
+	SequenceA mainSequence("Main Sequence", 2*3.14);
+	Sequencer sequencer("Example sequencer", mainSequence);
+	
+	while(!sequencer.done());
+	
+	sleep(10);
+	
+	controlSys.stop();
+	safetySysExecutor.stop();
+	
+	sleep(1);
 	
 	std::cout << "Example finished..." << std::endl;
 }

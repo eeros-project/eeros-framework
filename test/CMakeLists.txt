@@ -8,11 +8,11 @@ include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR})
 #add_executable(test SuiteBaseTests.cpp SignalTest.cpp)
 #target_link_libraries(test cppunit eeros )
 
-add_executable(cppUnitTest SequenceMoveException8b.cpp SequenceMoveException8a.cpp NonBlockingSubSequence_ErrorHandler.cpp SequenceMoveException6b.cpp SequenceMoveException6a.cpp 
-               CallingNonBlockingSequence_ErrorHandler.cpp SequenceMoveException2b.cpp SequenceMoveException2a.cpp ErrorHandlerB.cpp ErrorHandlerA.cpp 
-               SequenceMoveException1_3.cpp NonBlockingSubSequence.cpp MySequencer.cpp  
-               CallingNonBlockingSubSequence.cpp CPPUnitTestMain.cpp SequencerTest.cpp MySequence.cpp CallingSubSequence.cpp BlockingSubSequence.cpp)
-target_link_libraries(cppUnitTest cppunit eeros )
+#add_executable(cppUnitTest SequenceMoveException8b.cpp SequenceMoveException8a.cpp NonBlockingSubSequence_ErrorHandler.cpp SequenceMoveException6b.cpp SequenceMoveException6a.cpp 
+#               CallingNonBlockingSequence_ErrorHandler.cpp SequenceMoveException2b.cpp SequenceMoveException2a.cpp ErrorHandlerB.cpp ErrorHandlerA.cpp 
+#               SequenceMoveException1_3.cpp NonBlockingSubSequence.cpp MySequencer.cpp  
+#               CallingNonBlockingSubSequence.cpp CPPUnitTestMain.cpp SequencerTest.cpp MySequence.cpp CallingSubSequence.cpp BlockingSubSequence.cpp)
+#target_link_libraries(cppUnitTest cppunit eeros )
 
 add_executable(martinTest1 MartinTest1.cpp)
 target_link_libraries(martinTest1 eeros)
