@@ -38,3 +38,5 @@ endif()
 if(LINUX)
     target_link_libraries(eeros -lrt)
 endif()
+
+INSTALL(TARGETS eeros LIBRARY DESTINATION lib)

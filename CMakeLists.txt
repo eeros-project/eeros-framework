@@ -9,6 +9,8 @@ project(EEROS)
 include_directories(${ADDITIONAL_INCLUDE_DIRS})
 link_directories(${ADDITIONAL_LINK_DIRS})
 
+INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
+
 # Load CMake modules
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
@@ -77,7 +79,7 @@ set(LINUX TRUE)
 set(CMAKE_CXX_FLAGS "-std=c++0x")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/config.hpp)
-
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.hpp DESTINATION include/eeros)
 
 
 # Special settings for different IDEs
