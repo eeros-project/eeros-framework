@@ -42,6 +42,18 @@ void rot(int axis, Matrix<N,M,T> &A, T angle) {
 
 
 
+const double MAX_DEVIATION = 0.1; //in %	
+	
+	
+double abs(double a){
+  if(a>=0){
+    return a;
+  }else{
+    return -a;
+  }
+  
+}
+	
 int main(int argc, char *argv[]) {
 	int error = 0;
 	int testNo = 0;
@@ -107,6 +119,12 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	
+	
+	
+	
 	
 	// rotx()
  	testNo++;
@@ -441,10 +459,10 @@ int main(int argc, char *argv[]) {
 	characteristics44[2].upperTriangular = false;
 	
 	
-	characteristics44[3].matrix(0,0) = 3; characteristics44[3].matrix(0,1) = 4.2; characteristics44[3].matrix(0,2) = 1.3; characteristics44[3].matrix(0,3) = 0.34;
-	characteristics44[3].matrix(1,0) = 0; characteristics44[3].matrix(1,1) = 2; characteristics44[3].matrix(1,2) = 1.3; characteristics44[3].matrix(1,3) = 2;
-	characteristics44[3].matrix(2,0) = 0; characteristics44[3].matrix(2,1) = 0; characteristics44[3].matrix(2,2) = 3.1; characteristics44[3].matrix(2,3) = 1.9;
-	characteristics44[3].matrix(3,0) = 0; characteristics44[2].matrix(3,1) = 0; characteristics44[3].matrix(3,2) = 0; characteristics44[3].matrix(3,3) = -0.1;
+	characteristics44[3].matrix(0,0) = 3; characteristics44[3].matrix(0,1) = 4.20; characteristics44[3].matrix(0,2) = 1.3; characteristics44[3].matrix(0,3) = 0.340;
+	characteristics44[3].matrix(1,0) = 0.0; characteristics44[3].matrix(1,1) = 2; characteristics44[3].matrix(1,2) = 1.3; characteristics44[3].matrix(1,3) = 2;
+	characteristics44[3].matrix(2,0) = 0.0; characteristics44[3].matrix(2,1) = 0.0; characteristics44[3].matrix(2,2) = 3.10; characteristics44[3].matrix(2,3) = 1.90;
+	characteristics44[3].matrix(3,0) = 0.0; characteristics44[3].matrix(3,1) = 0.0; characteristics44[3].matrix(3,2) = 0.0; characteristics44[3].matrix(3,3) = -0.10;
 	characteristics44[3].det = -1.86;
 	characteristics44[3].rank = 4;
 	characteristics44[3].orthogonaly = false;
@@ -452,20 +470,6 @@ int main(int argc, char *argv[]) {
 	characteristics44[3].symetric = false;
 	characteristics44[3].lowerTriangular = false;
 	characteristics44[3].upperTriangular = true;
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	testNo++;
@@ -499,25 +503,31 @@ int main(int argc, char *argv[]) {
 
 	
 	for(uint32_t i = 0; i < characteristics22.size();i++){
-	  if (characteristics22[i].matrix.det() != characteristics22[i].det){
-	     std::cout << "  Failure: Matrix22 " << i << " det not correct is: "<< characteristics22[i].matrix.det() << std::endl;
-	    error++;
-	  }
+	  double maxDeviation = abs(characteristics22[i].det*MAX_DEVIATION/100);
+	  if ( characteristics22[i].matrix.det() < (characteristics22[i].det - maxDeviation ) || 
+	      characteristics22[i].matrix.det() > (characteristics22[i].det +  maxDeviation) ){
+		std::cout << "  Failure: Matrix22 " << i << " det not correct is: "<< characteristics22[i].matrix.det() << std::endl;
+		error++;
+	      }
 	}
+	      
 	
 	for(uint32_t i = 0; i < characteristics33.size();i++){
-	  if (characteristics33[i].matrix.det() != characteristics33[i].det){
-	     std::cout << "  Failure: Matrix33 " << i << " det not correct is: "<< characteristics33[i].matrix.det() << std::endl;
-	    error++;
-	  }
+	  double maxDeviation = abs(characteristics33[i].det*MAX_DEVIATION/100);
+	  if ( characteristics33[i].matrix.det() < (characteristics33[i].det -  maxDeviation) || 
+	      characteristics33[i].matrix.det() > (characteristics33[i].det +  maxDeviation) ){
+		std::cout << "  Failure: Matrix33 " << i << " det not correct is: "<< characteristics33[i].matrix.det() << std::endl;
+		error++;
+	      }
 	}
-	double det = 0;
+	
 	for(uint32_t i = 0; i < characteristics44.size();i++){
-	  if (characteristics44[i].matrix.det() != characteristics44[i].det){
-	    det = characteristics44[i].matrix.det();
-	     std::cout << "  Failure: Matrix44 " << i << " det not correct is: "<< characteristics44[i].matrix.det()<< " should be: " << characteristics44[i].det << std::endl;
-	    error++;
-	  }
+	   double maxDeviation = abs(characteristics44[i].det*MAX_DEVIATION/100);
+	  if ( characteristics44[i].matrix.det() < (characteristics44[i].det -  maxDeviation) || 
+	      characteristics44[i].matrix.det() > (characteristics44[i].det +  maxDeviation) ){
+		std::cout << "  Failure: Matrix44 " << i << " det not correct is: "<< characteristics44[i].matrix.det() << std::endl;
+		error++;
+	      }
 	}
 
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
