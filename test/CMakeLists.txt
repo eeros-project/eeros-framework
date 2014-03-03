@@ -17,4 +17,5 @@ add_subdirectory(control)
 # Misc tests of the EEROS developers
 
 add_subdirectory(martin)
+add_subdirectory(math)
 #add_subdirectory(vinci)

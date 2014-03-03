@@ -40,9 +40,14 @@ void rot(int axis, Matrix<N,M,T> &A, T angle) {
 	  uint8_t upperTriangular;
 	};
 
-
+	struct rotTesting{
+	  Matrix<3,3> uuT;
+	  Matrix<3,3> result;
+	  
+	};
 
 const double MAX_DEVIATION = 0.1; //in %	
+const double NUMBER_OF_ROT_TESTING_DATA = 7; 
 	
 	
 double abs(double a){
@@ -54,107 +59,242 @@ double abs(double a){
   
 }
 	
+int testZero(){
+  int error = 0;;
+  Matrix<3,3> mZero;
+  mZero.zero();
+  for(int n = 0; n < 3; n++) {
+	  for(int m = 0; m < 3; m++) {
+		  if(mZero(n,m) != 0) {
+			  std::cout << "  Failure: M(" << m << ',' << n << ") = " << mZero(m,n) << ", but should be 0!" << std::endl;
+			  error++;
+		  }
+	  }
+  }
+  return error;
+  
+}
+	
+int testElementalAccess(){
+  int error = 0;;
+  Matrix<3,3> m123;
+  m123.zero();
+  int i = 1;
+  for(int n = 0; n < 3; n++) {
+	  for(int m = 0; m < 3; m++) {
+		  m123(m,n) = i++;
+	  }
+  }
+  i = 1;
+  for(int n = 0; n < 3; n++) {
+	  for(int m = 0; m < 3; m++) {
+		  if(i++ != m123(m,n)) {
+			  std::cout << "  Failure: M(" << m << ',' << n << ") = " << m123(m,n) << ", but should be " << i << '!' << std::endl;
+			  error++;
+		  }
+	  }
+  }
+  return error;
+  
+}
+		
+int testEye(){
+  int error = 0;
+  Matrix<3,3> mEye;
+  mEye.eye();
+  for(int n = 0; n < 3; n++) {
+	  for(int m = 0; m < 3; m++) {
+		  if(n == m) { // value should be 1
+			  if(mEye(n,m) != 1) {
+				  std::cout << "  Failure: M(" << m << ',' << n << ") = " << mEye(m,n) << ", but should be 1!" << std::endl;
+				  error++;
+			  }
+		  }
+		  else { // value should be 0
+			  if(mEye(n,m) != 0) {
+				  std::cout << "  Failure: M(" << m << ',' << n << ") = " << mEye(m,n) << ", but should be 0!" << std::endl;
+				  error++;
+			  }
+		  }
+	  }
+  }
+  return error;
+}
+	
+int testRot(std::array<rotTesting,NUMBER_OF_ROT_TESTING_DATA> testingData){
+    int error = 0;
+    for(uint32_t i = 0; i < testingData.size();i++){
+	  for(uint32_t n = 0; n < testingData[i].uuT.getNrOfRows();n++){
+	    for(uint32_t m = 0; m < testingData[i].uuT.getNrOfColums();m++){
+	       double maxDeviation = 0;
+	       if (testingData[i].result(n,m) == 0){
+		maxDeviation = 10e-15; 
+	       }else{
+		maxDeviation = abs(testingData[i].result(n,m)*MAX_DEVIATION/100);
+	       }
+	       
+		if (testingData[i].uuT(n,m) < (testingData[i].result(n,m) -  maxDeviation) || 
+		  testingData[i].uuT(n,m) > (testingData[i].result(n,m) +  maxDeviation) ){
+		  std::cout << "  Failure: rotx " << i << n << m << " not like solution" << std::endl;
+		error++;
+	      }
+
+	    }
+	    
+	  }
+	}
+  return error;
+}
+	
+int testRotX(){
+  std::array<rotTesting,NUMBER_OF_ROT_TESTING_DATA> rotData;
+  rotData[0].uuT.rotx(0);
+  rotData[1].uuT.rotx(M_PI/4);
+  rotData[2].uuT.rotx(M_PI/2);
+  rotData[3].uuT.rotx(M_PI);
+  rotData[4].uuT.rotx(2*M_PI);
+  rotData[5].uuT.rotx(3*M_PI);
+  rotData[6].uuT.rotx(-0.4);
+  
+  rotData[0].result.eye();
+  
+  rotData[1].result(0,0) = 1; rotData[1].result(0,1) = 0; rotData[1].result(0,2) = 0;
+  rotData[1].result(1,0) = 0; rotData[1].result(1,1) = 0.707106781186548; rotData[1].result(1,2) = -0.707106781186547;
+  rotData[1].result(2,0) = 0; rotData[1].result(2,1) = 0.707106781186547; rotData[1].result(2,2) = 0.707106781186548;
+  
+  rotData[2].result(0,0) = 1; rotData[2].result(0,1) = 0; rotData[2].result(0,2) = 0;
+  rotData[2].result(1,0) = 0; rotData[2].result(1,1) = 0; rotData[2].result(1,2) = -1;
+  rotData[2].result(2,0) = 0; rotData[2].result(2,1) = 1; rotData[2].result(2,2) = 0;
+  
+  rotData[3].result(0,0) = 1; rotData[3].result(0,1) = 0; rotData[3].result(0,2) = 0;
+  rotData[3].result(1,0) = 0; rotData[3].result(1,1) = -1; rotData[3].result(1,2) = 0;
+  rotData[3].result(2,0) = 0; rotData[3].result(2,1) = 0; rotData[3].result(2,2) = -1;
+  
+  rotData[4].result.eye();
+  
+  rotData[5].result = rotData[3].result;
+  
+  rotData[6].result(0,0) = 1; rotData[6].result(0,1) = 0; rotData[6].result(0,2) = 0;
+  rotData[6].result(1,0) = 0; rotData[6].result(1,1) = 0.921060994002885; rotData[6].result(1,2) = 0.389418342308651;
+  rotData[6].result(2,0) = 0; rotData[6].result(2,1) = -0.389418342308651; rotData[6].result(2,2) = 0.921060994002885;
+  
+  return testRot(rotData);
+  
+}
+	
+int testRotY(){
+  std::array<rotTesting,NUMBER_OF_ROT_TESTING_DATA> rotData;
+  rotData[0].uuT.roty(0);
+  rotData[1].uuT.roty(M_PI/4);
+  rotData[2].uuT.roty(M_PI/2);
+  rotData[3].uuT.roty(M_PI);
+  rotData[4].uuT.roty(2*M_PI);
+  rotData[5].uuT.roty(3*M_PI);
+  rotData[6].uuT.roty(-0.4);
+
+  
+  rotData[0].result.eye();
+  
+  rotData[1].result(0,0) = 0.707106781186548 ; rotData[1].result(0,1) = 0; rotData[1].result(0,2) = 0.707106781186547;
+  rotData[1].result(1,0) = 0; rotData[1].result(1,1) = 1; rotData[1].result(1,2) = 0;
+  rotData[1].result(2,0) = -0.707106781186547; rotData[1].result(2,1) = 0; rotData[1].result(2,2) = 0.707106781186548;
+
+  rotData[2].result(0,0) = 0; rotData[2].result(0,1) = 0; rotData[2].result(0,2) = 1;
+  rotData[2].result(1,0) = 0; rotData[2].result(1,1) = 1; rotData[2].result(1,2) = 0;
+  rotData[2].result(2,0) = -1; rotData[2].result(2,1) = 0; rotData[2].result(2,2) = 0;
+  
+  rotData[3].result(0,0) = -1; rotData[3].result(0,1) = 0; rotData[3].result(0,2) = 0;
+  rotData[3].result(1,0) = 0; rotData[3].result(1,1) = 1; rotData[3].result(1,2) = 0;
+  rotData[3].result(2,0) = 0; rotData[3].result(2,1) = 0; rotData[3].result(2,2) = -1;
+  
+  rotData[4].result.eye();
+  
+  rotData[5].result = rotData[3].result;
+  
+  rotData[6].result(0,0) = 0.921060994002885 ; rotData[6].result(0,1) = 0; rotData[6].result(0,2) = -0.389418342308651;
+  rotData[6].result(1,0) = 0; rotData[6].result(1,1) = 1; rotData[6].result(1,2) = 0;
+  rotData[6].result(2,0) = 0.389418342308651; rotData[6].result(2,1) = 0; rotData[6].result(2,2) = 0.921060994002885;
+  
+  return testRot(rotData);
+}
+	
+int testRotZ(){
+  std::array<rotTesting,NUMBER_OF_ROT_TESTING_DATA> rotData;
+  rotData[0].uuT.rotz(0);
+  rotData[1].uuT.rotz(M_PI/4);
+  rotData[2].uuT.rotz(M_PI/2);
+  rotData[3].uuT.rotz(M_PI);
+  rotData[4].uuT.rotz(2*M_PI);
+  rotData[5].uuT.rotz(3*M_PI);
+  rotData[6].uuT.rotz(-0.4);
+  
+  rotData[0].result.eye();
+  
+  rotData[1].result(0,0) = 0.707106781186548 ; rotData[1].result(0,1) = -0.707106781186547 ; rotData[1].result(0,2) = 0;
+  rotData[1].result(1,0) = 0.707106781186547; rotData[1].result(1,1) = 0.707106781186548; rotData[1].result(1,2) = 0;
+  rotData[1].result(2,0) = 0; rotData[1].result(2,1) = 0; rotData[1].result(2,2) = 1;
+  
+  rotData[2].result(0,0) = 0; rotData[2].result(0,1) = -1; rotData[2].result(0,2) = 0;
+  rotData[2].result(1,0) = 1; rotData[2].result(1,1) = 0; rotData[2].result(1,2) = 0;
+  rotData[2].result(2,0) = 0; rotData[2].result(2,1) = 0; rotData[2].result(2,2) = 1;
+  
+  rotData[3].result(0,0) = -1; rotData[3].result(0,1) = 0; rotData[3].result(0,2) = 0;
+  rotData[3].result(1,0) = 0; rotData[3].result(1,1) = -1; rotData[3].result(1,2) = 0;
+  rotData[3].result(2,0) = 0; rotData[3].result(2,1) = 0; rotData[3].result(2,2) = 1;                  
+                   
+  rotData[4].result.eye();
+  
+  rotData[5].result = rotData[3].result;
+  
+  rotData[6].result(0,0) = 0.921060994002885 ; rotData[6].result(0,1) = 0.389418342308651; rotData[6].result(0,2) = 0;
+  rotData[6].result(1,0) = -0.389418342308651; rotData[6].result(1,1) = 0.921060994002885; rotData[6].result(1,2) = 0;
+  rotData[6].result(2,0) = 0; rotData[6].result(2,1) = 0; rotData[6].result(2,2) = 1;
+  
+  return testRot(rotData);
+  
+  return 0;
+}
+	
 int main(int argc, char *argv[]) {
 	int error = 0;
-	int testNo = 0;
+	int testNo = 1;
 
 	/********** A) Creating and inizializing **********/
 	
-	// Element access
-	testNo++;
-	std::cout << "Test #" << testNo << ": Element access" << std::endl;
-	Matrix<3,3> m123;
-	m123.zero();
-	int i = 1;
-	for(int n = 0; n < 3; n++) {
-		for(int m = 0; m < 3; m++) {
-			m123(m,n) = i++;
-		}
-	}
-	i = 1;
-	for(int n = 0; n < 3; n++) {
-		for(int m = 0; m < 3; m++) {
-			if(i++ != m123(m,n)) {
-				std::cout << "  Failure: M(" << m << ',' << n << ") = " << m123(m,n) << ", but should be " << i << '!' << std::endl;
-				error++;
-			}
-		}
-	}
+	// zero()
+	std::cout << "Test #" << testNo++ << ": zero()" << std::endl;
+	error = error + testZero();
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
-	// zero()
-	testNo++;
-	std::cout << "Test #" << testNo << ": zero()" << std::endl;
-	Matrix<3,3> mZero;
-	mZero.zero();
-	for(int n = 0; n < 3; n++) {
-		for(int m = 0; m < 3; m++) {
-			if(mZero(n,m) != 0) {
-				std::cout << "  Failure: M(" << m << ',' << n << ") = " << mZero(m,n) << ", but should be 0!" << std::endl;
-				error++;
-			}
-		}
-	}
+	// Element access
+	std::cout << "Test #" << testNo++ << ": Element access" << std::endl;
+	error = error + testElementalAccess();
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	// eye()
- 	testNo++;
-	std::cout << "Test #" << testNo << ": eye()" << std::endl;
-	Matrix<3,3> mEye;
-	mEye.eye();
-	for(int n = 0; n < 3; n++) {
-		for(int m = 0; m < 3; m++) {
-			if(n == m) { // value should be 1
-				if(mEye(n,m) != 1) {
-					std::cout << "  Failure: M(" << m << ',' << n << ") = " << mEye(m,n) << ", but should be 1!" << std::endl;
-					error++;
-				}
-			}
-			else { // value should be 0
-				if(mEye(n,m) != 0) {
-					std::cout << "  Failure: M(" << m << ',' << n << ") = " << mEye(m,n) << ", but should be 0!" << std::endl;
-					error++;
-				}
-			}
-		}
-	}
+	std::cout << "Test #" << testNo++ << ": eye()" << std::endl;
+	error = error + testEye();
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
-	
-	
-	
-	
-	
-	
 	// rotx()
- 	testNo++;
-	std::cout << "Test #" << testNo << ": rotx()" << std::endl;
-	Matrix<3,3> mRotx;
-	double rotxAngle = M_PI;
-	mRotx.rotx(rotxAngle);
-	// TODO
+	std::cout << "Test #" << testNo++ << ": rotx()" << std::endl;
+	error = error + testRotX();
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	// roty()
- 	testNo++;
-	std::cout << "Test #" << testNo << ": roty()" << std::endl;
-	Matrix<3,3> mRoty;
-	double rotyAngle = M_PI;
-	mRoty.roty(rotyAngle);
-	// TODO
+	std::cout << "Test #" << testNo++ << ": roty()" << std::endl;
+	error = error + testRotY();
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	// rotz()
- 	testNo++;
-	std::cout << "Test #" << testNo << ": rotz()" << std::endl;
-	Matrix<3,3> mRotz;
-	double rotzAngle = M_PI;
-	mRotz.rotz(rotzAngle);
-	// TODO
+	std::cout << "Test #" << testNo++ << ": rotz()" << std::endl;
+	error = error + testRotZ();
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
-	testNo++;
-	std::cout << "Test #" << testNo << ": swaping Rows" << std::endl;
+	
+	/********** Functions for checking the matrix characteristics **********/
+	
+	std::cout << "Test #" << testNo++ << ": swaping Rows" << std::endl;
 	
 	Matrix<3,3> swapMatrix1;
 	swapMatrix1(0,0) = 1; swapMatrix1(0,1) = 1; swapMatrix1(0,2) = 0;
@@ -197,9 +337,7 @@ int main(int argc, char *argv[]) {
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	
-	
-	testNo++;
-	std::cout << "Test #" << testNo << ": Gauss sorting Matrix" << std::endl;
+	std::cout << "Test #" << testNo++ << ": Gauss sorting Matrix" << std::endl;
 	Matrix<3,3> sortMatrix1;
 	sortMatrix1(0,0) = 1; sortMatrix1(0,1) = 1; sortMatrix1(0,2) = 0;
 	sortMatrix1(1,0) = 0; sortMatrix1(1,1) = 0; sortMatrix1(1,2) = 2;
@@ -301,10 +439,8 @@ int main(int argc, char *argv[]) {
 	
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
-	
-	
-	testNo++;
-	std::cout << "Test #" << testNo << ": gaus row elimination" << std::endl;
+
+	std::cout << "Test #" << testNo++ << ": gaus row elimination" << std::endl;
 	
 	Matrix<3,3> gaussMatrix1;
 	gaussMatrix1(0,0) = 1; gaussMatrix1(0,1) = 1; gaussMatrix1(0,2) = 0;
@@ -471,9 +607,8 @@ int main(int argc, char *argv[]) {
 	characteristics44[3].lowerTriangular = false;
 	characteristics44[3].upperTriangular = true;
 	
-	
-	testNo++;
-	std::cout << "Test #" << testNo << ": rank of a matrix" << std::endl;
+
+	std::cout << "Test #" << testNo++ << ": rank of a matrix" << std::endl;
 	
 	for(uint32_t i = 0; i < characteristics22.size();i++){
 	  if (characteristics22[i].matrix.rank() != characteristics22[i].rank){
@@ -498,8 +633,7 @@ int main(int argc, char *argv[]) {
 	
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 		
-	testNo++;
-	std::cout << "Test #" << testNo << ": det of a matrix" << std::endl;
+	std::cout << "Test #" << testNo++ << ": det of a matrix" << std::endl;
 
 	
 	for(uint32_t i = 0; i < characteristics22.size();i++){
@@ -536,8 +670,7 @@ int main(int argc, char *argv[]) {
 	
 	/********** Functions for checking the matrix characteristics **********/
 	
-	testNo++;
-	std::cout << "Test #" << testNo << ": orthogonaly of a matrix" << std::endl;
+	std::cout << "Test #" << testNo++ << ": orthogonaly of a matrix" << std::endl;
 	
 	for(uint32_t i = 0; i < characteristics22.size();i++){
 	  if(characteristics22[i].matrix.isOrthogonal() != characteristics22[i].orthogonaly){
@@ -563,8 +696,8 @@ int main(int argc, char *argv[]) {
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	
-	testNo++;
-	std::cout << "Test #" << testNo << ": if matrix is invertible" << std::endl;
+
+	std::cout << "Test #" << testNo++ << ": if matrix is invertible" << std::endl;
 	
 	for(uint32_t i = 0; i < characteristics22.size();i++){
 	  if(characteristics22[i].matrix.isInvertible() != characteristics22[i].invertible){
@@ -589,8 +722,8 @@ int main(int argc, char *argv[]) {
 	
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
-	testNo++;
-	std::cout << "Test #" << testNo << ": if matrix is symetric" << std::endl;
+
+	std::cout << "Test #" << testNo++ << ": if matrix is symetric" << std::endl;
 
 	for(uint32_t i = 0; i < characteristics22.size();i++){
 	  if(characteristics22[i].matrix.isSymmetric() != characteristics22[i].symetric){
@@ -616,8 +749,7 @@ int main(int argc, char *argv[]) {
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	
-	testNo++;
-	std::cout << "Test #" << testNo << ": if matrix is lower triangular" << std::endl;
+	std::cout << "Test #" << testNo++ << ": if matrix is lower triangular" << std::endl;
 
 	for(uint32_t i = 0; i < characteristics22.size();i++){
 	  if(characteristics22[i].matrix.isLowerTriangular() != characteristics22[i].lowerTriangular){
@@ -641,9 +773,8 @@ int main(int argc, char *argv[]) {
 	}
 	
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	testNo++;
-	std::cout << "Test #" << testNo << ": if matrix is upper triangular" << std::endl;
+
+	std::cout << "Test #" << testNo++ << ": if matrix is upper triangular" << std::endl;
 
 	for(uint32_t i = 0; i < characteristics22.size();i++){
 	  if(characteristics22[i].matrix.isUpperTriangular() != characteristics22[i].upperTriangular){

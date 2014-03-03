@@ -516,6 +516,14 @@ namespace eeros {
 			    }
 			}
 			
+			uint8_t getNrOfRows(){
+			    return N; 
+			}
+			
+			uint8_t getNrOfColums(){
+			    return M;
+			}
+			
 		private:
 			T value[ N * M ];
 			
