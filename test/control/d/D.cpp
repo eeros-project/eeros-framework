@@ -55,7 +55,7 @@ class DBlockTest {
 int main(int argc, char* argv[]) {
 	DBlockTest<> tester;
 	if (argc == 2) {
-		tester.run(argv[1]);
+		return tester.run(argv[1]);
 	}
 	else {
 		std::cout << "illegal number of arguments" << std::endl;
