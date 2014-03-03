@@ -92,28 +92,64 @@ namespace eeros {
 			/********** Functions for checking the matrix characteristics **********/
 			
 			bool isOrthogonal() const {
-				// TODO
-				return false;
+				Matrix<N,M,T> result,transposed,eye;
+				eye.eye();
+				transposed = transpose();
+				result = (*this)*transposed;
+				if(result == eye){
+				  return true;
+				}else{
+				  return false;
+				  
+				}
 			}
 			
 			bool isSymmetric() const {
-				// TODO
-				return false;
+				if((*this) == transpose()){
+				  return true;
+				}else{
+				  return false;
+				  
+				}
 			}
 			
 			bool isDiagonal() const {
-				// TODO
-				return false;
+				for(uint8_t n = 0; n < N; n++) {
+					for(uint8_t m = 0; m < M; m++) {
+						if(n!=m){
+						  if(v(n,m)!=0){
+						    return false;
+						  }
+						}
+					}
+				}
+				 return true;
 			}
 			
 			bool isLowerTriangular() const {
-				// TODO
-				return false;
+				for(uint8_t n = 0; n < N; n++) {
+					for(uint8_t m = 0; m < M; m++) {
+						if(n<m){
+						  if(v(n,m)!=0){
+						    return false;
+						  }
+						}
+					}
+				}
+				 return true;
 			}
 			
 			bool isUpperTriangular() const {
-				// TODO
-				return false;
+				for(uint8_t n = 0; n < N; n++) {
+					for(uint8_t m = 0; m < M; m++) {
+					  if(n>m){
+					    if(v(n,m)!=0){
+					      return false;
+					    }
+					  }
+					}
+				}
+				return true;
 			}
 			
 			bool isInvertible() const {
@@ -230,7 +266,7 @@ namespace eeros {
 			
 			/********** Operators **********/
 			
-			Matrix<N,M,T>& operator= (T right) {
+			Matrix<N,M,T>& operator= (T right) const {
 				for(uint8_t n = 0; n < N; n++) {
 					for(uint8_t m = 0; m < M; m++) {
 						v(m,n) = right;
@@ -326,7 +362,7 @@ namespace eeros {
 			bool operator==(const Matrix<N,M,T> right) const {
 				for(uint8_t n = 0; n < N; n++) {
 					for(uint8_t m = 0; m < M; m++) {
-						if(v(n,m) == right(n,m))
+						if(v(n,m) != right(n,m))
 							return false;
 					}
 				}
@@ -344,17 +380,15 @@ namespace eeros {
 			}
 			
 			Matrix<N,M,T> operator!() const {
-				if(N == 3 && M == 3) {
-					T det = (
-								v(0, 0) * v(1, 1) * v(2, 2) +
-								v(0, 1) * v(1, 2) * v(2, 0) +
-								v(0, 2) * v(1, 0) * v(2, 1) -
-								v(0, 2) * v(1, 1) * v(2, 0) -
-								v(0, 0) * v(1, 2) * v(2, 1) -
-								v(0, 1) * v(1, 0) * v(2, 2)
-							);
-					if(det == 0) throw EEROSException("Invert failed: determinat of matrix is 0");
-					
+				T det = det();
+				if(N!=M){
+				  throw EEROSException("Invert failed: matrix not square");
+				  
+				}else if (det == 0){
+				  throw EEROSException("Invert failed: determinat of matrix is 0");
+				}else if (isOrthogonal() == true){
+				  return transpose();
+				}else if(N == 3) {
 					Matrix<N,M,T> result;
 					result(0, 0) = v(1, 1) * v(2, 2) - v(1, 2) * v(2, 1);
 					result(1, 0) = v(1, 2) * v(2, 0) - v(1, 0) * v(2, 2);
@@ -366,21 +400,19 @@ namespace eeros {
 					result(1, 2) = v(0, 2) * v(1, 0) - v(0, 0) * v(1, 2);
 					result(2, 2) = v(0, 0) * v(1, 1) - v(0, 1) * v(1, 0);
 					return (result / det);
-				}
-				else if(N == 2 && M == 2) {
-					T det = ( v(0, 0) * v(1, 1) - v(0, 1) * v(1, 0) );
-					if(det == 0) throw EEROSException("Invert failed: determinat of matrix is 0");
-
+				}else if(N == 2) {
 					Matrix<N,M,T> result;
 					result(0, 0) = v(1, 1);
 					result(1, 0) = -v(1, 0);
 					result(0, 1) = -v(0, 1);
 					result(1, 1) = v(0, 0);
 					return (result / det);
-				}
-				else {
-					// TODO
-					throw EEROSException("Invert failed: function only implemented for matrices with dimension 2x2 and 3x3");
+				}else {
+					
+					//TODO
+				  
+				  
+					throw EEROSException("Invert failed: function only implemented for matrices with dimension 2x2 and 3x3 and ortogonal matrices");
 				}
 			}
 
@@ -432,7 +464,7 @@ namespace eeros {
 			  uint8_t completedRow = 0;
 			  uint8_t checkingRow = 0;
 			  uint8_t rootRow = 0;
-			  double rowFactor = 0;
+			  T rowFactor = 0;
 			  
 			  sortForGaussAlgorithm();
 			  while(completedColum < M){
