@@ -1,6 +1,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
+#include <array>
+
 
 #include <eeros/math/Matrix.hpp>
 using namespace eeros::math;
@@ -26,6 +28,19 @@ void rot(int axis, Matrix<N,M,T> &A, T angle) {
 	else
 		A.rotz(angle);
 }
+
+ template < uint8_t N, uint8_t M = 1 > struct uuT {
+	  Matrix<N,M> matrix;
+	  double det;
+	  uint32_t rank;
+	  uint8_t orthogonaly;
+	  uint8_t invertible;
+	  uint8_t symetric;
+	  uint8_t lowerTriangular;
+	  uint8_t upperTriangular;
+	};
+
+
 
 int main(int argc, char *argv[]) {
 	int error = 0;
@@ -349,104 +364,302 @@ int main(int argc, char *argv[]) {
 	
 	
 	
+	/********** Functions for calculating some characteristics of the matrix **********/
 	
-	/********** Functions for checking the matrix characteristics **********/
+	std::array<uuT<3,3>,2> characteristics33;
 	
-	Matrix<3,3> characteristicsMatrix1;
-	characteristicsMatrix1(0,0) = 1; characteristicsMatrix1(0,1) = 0; characteristicsMatrix1(0,2) = 0;
-	characteristicsMatrix1(1,0) = 0; characteristicsMatrix1(1,1) = 1; characteristicsMatrix1(1,2) = 0;
-	characteristicsMatrix1(2,0) = 0; characteristicsMatrix1(2,1) = 0; characteristicsMatrix1(2,2) = 1;
+	characteristics33[0].matrix(0,0) = 1; characteristics33[0].matrix(0,1) = 0; characteristics33[0].matrix(0,2) = 0;
+	characteristics33[0].matrix(1,0) = 0; characteristics33[0].matrix(1,1) = 1; characteristics33[0].matrix(1,2) = 0;
+	characteristics33[0].matrix(2,0) = 0; characteristics33[0].matrix(2,1) = 0; characteristics33[0].matrix(2,2) = 1;
+	characteristics33[0].det = 1;
+	characteristics33[0].rank = 3;
+	characteristics33[0].orthogonaly = true;
+	characteristics33[0].invertible = true;
+	characteristics33[0].symetric = true;
+	characteristics33[0].lowerTriangular = true;
+	characteristics33[0].upperTriangular = true;
 	
-	Matrix<3,3> characteristicsMatrix2;
-	characteristicsMatrix2(0,0) = 1; characteristicsMatrix2(0,1) = 3; characteristicsMatrix2(0,2) = 2;
-	characteristicsMatrix2(1,0) = 2; characteristicsMatrix2(1,1) = 4; characteristicsMatrix2(1,2) = 4;
-	characteristicsMatrix2(2,0) = 3; characteristicsMatrix2(2,1) = 5; characteristicsMatrix2(2,2) = 6;
-	
-	Matrix<2,2> characteristicsMatrix3;
-	characteristicsMatrix3(0,0) = 2; characteristicsMatrix3(0,1) = 5; 
-	characteristicsMatrix3(1,0) = 4; characteristicsMatrix3(1,1) = 6; 
-	
-	Matrix<4,4> characteristicsMatrix4;
-	characteristicsMatrix4(0,0) = 1; characteristicsMatrix4(0,1) = 3; characteristicsMatrix4(0,2) = 2; characteristicsMatrix4(0,3) = 6;
-	characteristicsMatrix4(1,0) = 2; characteristicsMatrix4(1,1) = 4; characteristicsMatrix4(1,2) = 4; characteristicsMatrix4(1,3) = 3;
-	characteristicsMatrix4(2,0) = 3; characteristicsMatrix4(2,1) = 5; characteristicsMatrix4(2,2) = 6; characteristicsMatrix4(2,3) = 1;
-	characteristicsMatrix4(3,0) = 7; characteristicsMatrix4(3,1) = 9; characteristicsMatrix4(3,2) = 1; characteristicsMatrix4(3,3) = 4;
+	characteristics33[1].matrix(0,0) = 1; characteristics33[1].matrix(0,1) = 3; characteristics33[1].matrix(0,2) = 2;
+	characteristics33[1].matrix(1,0) = 2; characteristics33[1].matrix(1,1) = 4; characteristics33[1].matrix(1,2) = 4;
+	characteristics33[1].matrix(2,0) = 3; characteristics33[1].matrix(2,1) = 5; characteristics33[1].matrix(2,2) = 6;
+	characteristics33[1].det = 0;
+	characteristics33[1].rank = 2;
+	characteristics33[1].orthogonaly = false;
+	characteristics33[1].invertible = false;
+	characteristics33[1].symetric = false;
+	characteristics33[1].lowerTriangular = false;
+	characteristics33[1].upperTriangular = false;
 
-	Matrix<4,4> characteristicsMatrix5;
-	characteristicsMatrix5(0,0) = 3; characteristicsMatrix5(0,1) = 7; characteristicsMatrix5(0,2) = 3; characteristicsMatrix5(0,3) = 0;
-	characteristicsMatrix5(1,0) = 0; characteristicsMatrix5(1,1) = 2; characteristicsMatrix5(1,2) = -1; characteristicsMatrix5(1,3) = 1;
-	characteristicsMatrix5(2,0) = 5; characteristicsMatrix5(2,1) = 4; characteristicsMatrix5(2,2) = 3; characteristicsMatrix5(2,3) = 2;
-	characteristicsMatrix5(3,0) = 6; characteristicsMatrix5(3,1) = 6; characteristicsMatrix5(3,2) = 4; characteristicsMatrix5(3,3) = -1;
-	    
+	std::array<uuT<2,2>,1> characteristics22;
+	
+	characteristics22[0].matrix(0,0) = 2; characteristics22[0].matrix(0,1) = 5; 
+	characteristics22[0].matrix(1,0) = 4; characteristics22[0].matrix(1,1) = 6; 
+	characteristics22[0].det = -8;
+	characteristics22[0].rank = 2;
+	characteristics22[0].orthogonaly = false;
+	characteristics22[0].invertible = true;
+	characteristics22[0].symetric = false;
+	characteristics22[0].lowerTriangular = false;
+	characteristics22[0].upperTriangular = false;
+
+	std::array<uuT<4,4>,4> characteristics44;
+		
+	characteristics44[0].matrix(0,0) = 1; characteristics44[0].matrix(0,1) = 3; characteristics44[0].matrix(0,2) = 2; characteristics44[0].matrix(0,3) = 6;
+	characteristics44[0].matrix(1,0) = 2; characteristics44[0].matrix(1,1) = 4; characteristics44[0].matrix(1,2) = 4; characteristics44[0].matrix(1,3) = 3;
+	characteristics44[0].matrix(2,0) = 3; characteristics44[0].matrix(2,1) = 5; characteristics44[0].matrix(2,2) = 6; characteristics44[0].matrix(2,3) = 1;
+	characteristics44[0].matrix(3,0) = 7; characteristics44[0].matrix(3,1) = 9; characteristics44[0].matrix(3,2) = 1; characteristics44[0].matrix(3,3) = 4;
+	characteristics44[0].det = -26;
+	characteristics44[0].rank = 4;
+	characteristics44[0].orthogonaly = false;
+	characteristics44[0].invertible = true;
+	characteristics44[0].symetric = false;
+	characteristics44[0].lowerTriangular = false;
+	characteristics44[0].upperTriangular = false;
+		
+	characteristics44[1].matrix(0,0) = 3; characteristics44[1].matrix(0,1) = 7; characteristics44[1].matrix(0,2) = 3; characteristics44[1].matrix(0,3) = 0;
+	characteristics44[1].matrix(1,0) = 0; characteristics44[1].matrix(1,1) = 2; characteristics44[1].matrix(1,2) = -1; characteristics44[1].matrix(1,3) = 1;
+	characteristics44[1].matrix(2,0) = 5; characteristics44[1].matrix(2,1) = 4; characteristics44[1].matrix(2,2) = 3; characteristics44[1].matrix(2,3) = 2;
+	characteristics44[1].matrix(3,0) = 6; characteristics44[1].matrix(3,1) = 6; characteristics44[1].matrix(3,2) = 4; characteristics44[1].matrix(3,3) = -1;
+	characteristics44[1].det = 105;
+	characteristics44[1].rank = 4;
+	characteristics44[1].orthogonaly = false;
+	characteristics44[1].invertible = true;
+	characteristics44[1].symetric = false;
+	characteristics44[1].lowerTriangular = false;
+	characteristics44[1].upperTriangular = false;
+	
+	characteristics44[2].matrix(0,0) = 3; characteristics44[2].matrix(0,1) = 0; characteristics44[2].matrix(0,2) = 0; characteristics44[2].matrix(0,3) = 0;
+	characteristics44[2].matrix(1,0) = 1; characteristics44[2].matrix(1,1) = 2; characteristics44[2].matrix(1,2) = 0; characteristics44[2].matrix(1,3) = 0;
+	characteristics44[2].matrix(2,0) = 2; characteristics44[2].matrix(2,1) = 3; characteristics44[2].matrix(2,2) = 3; characteristics44[2].matrix(2,3) = 0;
+	characteristics44[2].matrix(3,0) = 3; characteristics44[2].matrix(3,1) = 2; characteristics44[2].matrix(3,2) = 4; characteristics44[2].matrix(3,3) = -1;
+	characteristics44[2].det = -18;
+	characteristics44[2].rank = 4;
+	characteristics44[2].orthogonaly = false;
+	characteristics44[2].invertible = true;
+	characteristics44[2].symetric = false;
+	characteristics44[2].lowerTriangular = true;
+	characteristics44[2].upperTriangular = false;
+	
+	
+	characteristics44[3].matrix(0,0) = 3; characteristics44[3].matrix(0,1) = 4.2; characteristics44[3].matrix(0,2) = 1.3; characteristics44[3].matrix(0,3) = 0.34;
+	characteristics44[3].matrix(1,0) = 0; characteristics44[3].matrix(1,1) = 2; characteristics44[3].matrix(1,2) = 1.3; characteristics44[3].matrix(1,3) = 2;
+	characteristics44[3].matrix(2,0) = 0; characteristics44[3].matrix(2,1) = 0; characteristics44[3].matrix(2,2) = 3.1; characteristics44[3].matrix(2,3) = 1.9;
+	characteristics44[3].matrix(3,0) = 0; characteristics44[2].matrix(3,1) = 0; characteristics44[3].matrix(3,2) = 0; characteristics44[3].matrix(3,3) = -0.1;
+	characteristics44[3].det = -1.86;
+	characteristics44[3].rank = 4;
+	characteristics44[3].orthogonaly = false;
+	characteristics44[3].invertible = true;
+	characteristics44[3].symetric = false;
+	characteristics44[3].lowerTriangular = false;
+	characteristics44[3].upperTriangular = true;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	testNo++;
 	std::cout << "Test #" << testNo << ": rank of a matrix" << std::endl;
+	
+	for(uint32_t i = 0; i < characteristics22.size();i++){
+	  if (characteristics22[i].matrix.rank() != characteristics22[i].rank){
+	    std::cout << "  Failure: Matrix22 " << i << " rank not correct" << std::endl;
+	    error++;
+	  }
+	}
+	
+	for(uint32_t i = 0; i <  characteristics33.size();i++){
+	  if (characteristics33[i].matrix.rank() != characteristics33[i].rank){
+	    std::cout << "  Failure: Matrix33 " << i << " rank not correct" << std::endl;
+	    error++;
+	  }
+	}
+	
+	for(uint32_t i = 0; i <  characteristics44.size();i++){
+	  if (characteristics44[i].matrix.rank() != characteristics44[i].rank){
+	    std::cout << "  Failure: Matrix44 " << i << " rank not correct" << std::endl;
+	    error++;
+	  }
+	}
+	
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+		
+	testNo++;
+	std::cout << "Test #" << testNo << ": det of a matrix" << std::endl;
 
-	if (characteristicsMatrix1.rank() != 3){
-	    std::cout << "  Failure: Matrix 1 rank not correct" << std::endl;
+	
+	for(uint32_t i = 0; i < characteristics22.size();i++){
+	  if (characteristics22[i].matrix.det() != characteristics22[i].det){
+	     std::cout << "  Failure: Matrix22 " << i << " det not correct is: "<< characteristics22[i].matrix.det() << std::endl;
 	    error++;
+	  }
 	}
 	
-	if (characteristicsMatrix2.rank() != 2){
-	    std::cout << "  Failure: Matrix 2 rank not correct" << std::endl;
+	for(uint32_t i = 0; i < characteristics33.size();i++){
+	  if (characteristics33[i].matrix.det() != characteristics33[i].det){
+	     std::cout << "  Failure: Matrix33 " << i << " det not correct is: "<< characteristics33[i].matrix.det() << std::endl;
 	    error++;
+	  }
+	}
+	double det = 0;
+	for(uint32_t i = 0; i < characteristics44.size();i++){
+	  if (characteristics44[i].matrix.det() != characteristics44[i].det){
+	    det = characteristics44[i].matrix.det();
+	     std::cout << "  Failure: Matrix44 " << i << " det not correct is: "<< characteristics44[i].matrix.det()<< " should be: " << characteristics44[i].det << std::endl;
+	    error++;
+	  }
 	}
 
-	if (characteristicsMatrix3.rank() != 2){
-	    std::cout << "  Failure: Matrix 3 rank not correct" << std::endl;
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+
+	
+	/********** Functions for checking the matrix characteristics **********/
+	
+	testNo++;
+	std::cout << "Test #" << testNo << ": orthogonaly of a matrix" << std::endl;
+	
+	for(uint32_t i = 0; i < characteristics22.size();i++){
+	  if(characteristics22[i].matrix.isOrthogonal() != characteristics22[i].orthogonaly){
+	    std::cout << "  Failure: Matrix22 " << i << " orthogonaly not detected correctly"<< std::endl;
 	    error++;
+	  }
 	}
 	
-	if (characteristicsMatrix4.rank() != 4){
-	    std::cout << "  Failure: Matrix 4 rank not correct" << std::endl;
+	for(uint32_t i = 0; i < characteristics33.size();i++){
+	  if(characteristics33[i].matrix.isOrthogonal() != characteristics33[i].orthogonaly){
+	    std::cout << "  Failure: Matrix33 " << i << " orthogonaly not detected correctly"<< std::endl;
 	    error++;
+	  }
 	}
 	
-	if (characteristicsMatrix5.rank() != 4){
-	    std::cout << "  Failure: Matrix 4 rank not correct" << std::endl;
+	for(uint32_t i = 0; i < characteristics44.size();i++){
+	  if(characteristics44[i].matrix.isOrthogonal() != characteristics44[i].orthogonaly){
+	    std::cout << "  Failure: Matrix44 " << i << " orthogonaly not detected correctly"<< std::endl;
 	    error++;
+	  }
 	}
+	
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	
 	testNo++;
-	std::cout << "Test #" << testNo << ": det of a matrix" << std::endl;
-
-	double det = characteristicsMatrix1.det();
-	if (det != 1){
-	    std::cout << "  Failure: Matrix 1 det not correct should be: 1 is: "<< det << std::endl;
+	std::cout << "Test #" << testNo << ": if matrix is invertible" << std::endl;
+	
+	for(uint32_t i = 0; i < characteristics22.size();i++){
+	  if(characteristics22[i].matrix.isInvertible() != characteristics22[i].invertible){
+	    std::cout << "  Failure: Matrix22 " << i << " invertibility not detected correctly"<< std::endl;
 	    error++;
+	  }
 	}
 	
-	det = characteristicsMatrix2.det();
-	if (det != 0){
-	    std::cout << "  Failure: Matrix 2 det not correct should be: 0 is: "<< det << std::endl;
+	for(uint32_t i = 0; i < characteristics33.size();i++){
+	  if(characteristics33[i].matrix.isInvertible() != characteristics33[i].invertible){
+	    std::cout << "  Failure: Matrix33 " << i << " invertibility not detected correctly"<< std::endl;
 	    error++;
+	  }
 	}
 	
-	
-	det = characteristicsMatrix3.det();
-	if (characteristicsMatrix3.det() != -8){
-	    std::cout << "  Failure: Matrix 3 det not correct should be: -8 is: "<< det << std::endl;
+	for(uint32_t i = 0; i < characteristics44.size();i++){
+	  if(characteristics44[i].matrix.isInvertible() != characteristics44[i].invertible){
+	    std::cout << "  Failure: Matrix44 " << i << " invertibility not detected correctly"<< std::endl;
 	    error++;
-	}
-	
-	det = characteristicsMatrix4.det();
-	if (det != -26){
-	    std::cout << "  Failure: Matrix 4 det not correct should be: -26 is: "<< det << std::endl;
-	    error++;
-	}
-	
-	det = characteristicsMatrix5.det();
-	if (det != 105){
-	    std::cout << "  Failure: Matrix 5 det not correct should be: 105 is: "<< det << std::endl;
-	    error++;
+	  }
 	}
 	
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
-	/********** Functions for calculating some characteristics of the matrix **********/
+	testNo++;
+	std::cout << "Test #" << testNo << ": if matrix is symetric" << std::endl;
+
+	for(uint32_t i = 0; i < characteristics22.size();i++){
+	  if(characteristics22[i].matrix.isSymmetric() != characteristics22[i].symetric){
+	    std::cout << "  Failure: Matrix22 " << i << " symetrie not detected correctly"<< std::endl;
+	    error++;
+	  }
+	}
+	
+	for(uint32_t i = 0; i < characteristics33.size();i++){
+	  if(characteristics33[i].matrix.isSymmetric() != characteristics33[i].symetric){
+	    std::cout << "  Failure: Matrix33 " << i << " symetrie not detected correctly"<< std::endl;
+	    error++;
+	  }
+	}
+	
+	for(uint32_t i = 0; i < characteristics44.size();i++){
+	  if(characteristics44[i].matrix.isSymmetric() != characteristics44[i].symetric){
+	    std::cout << "  Failure: Matrix44 " << i << " symetrie not detected correctly"<< std::endl;
+	    error++;
+	  }
+	}
+	
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	testNo++;
+	std::cout << "Test #" << testNo << ": if matrix is lower triangular" << std::endl;
+
+	for(uint32_t i = 0; i < characteristics22.size();i++){
+	  if(characteristics22[i].matrix.isLowerTriangular() != characteristics22[i].lowerTriangular){
+	    std::cout << "  Failure: Matrix22 " << i << " lower triangular not detected correctly"<< std::endl;
+	    error++;
+	  }
+	}
+	
+	for(uint32_t i = 0; i < characteristics33.size();i++){
+	  if(characteristics33[i].matrix.isLowerTriangular() != characteristics33[i].lowerTriangular){
+	    std::cout << "  Failure: Matrix33 " << i << " lower triangular not detected correctly"<< std::endl;
+	    error++;
+	  }
+	}
+	
+	for(uint32_t i = 0; i < characteristics44.size();i++){
+	  if(characteristics44[i].matrix.isLowerTriangular() != characteristics44[i].lowerTriangular){
+	    std::cout << "  Failure: Matrix44 " << i << " lower triangular not detected correctly"<< std::endl;
+	    error++;
+	  }
+	}
+	
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	testNo++;
+	std::cout << "Test #" << testNo << ": if matrix is upper triangular" << std::endl;
+
+	for(uint32_t i = 0; i < characteristics22.size();i++){
+	  if(characteristics22[i].matrix.isUpperTriangular() != characteristics22[i].upperTriangular){
+	    std::cout << "  Failure: Matrix22 " << i << " upper triangular not detected correctly"<< std::endl;
+	    error++;
+	  }
+	}
+	
+	for(uint32_t i = 0; i < characteristics33.size();i++){
+	  if(characteristics33[i].matrix.isUpperTriangular() != characteristics33[i].upperTriangular){
+	    std::cout << "  Failure: Matrix33 " << i << " upper triangular not detected correctly"<< std::endl;
+	    error++;
+	  }
+	}
+	
+	for(uint32_t i = 0; i < characteristics44.size();i++){
+	  if(characteristics44[i].matrix.isUpperTriangular() != characteristics44[i].upperTriangular){
+	    std::cout << "  Failure: Matrix44 " << i << " upper triangular not detected correctly"<< std::endl;
+	    error++;
+	  }
+	}
+	
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	
 	
 	
 	
