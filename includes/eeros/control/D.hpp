@@ -4,6 +4,8 @@
 #include <eeros/control/Block1i1o.hpp>
 #include <type_traits>
 
+#include <iostream>
+
 namespace eeros {
 	namespace control {
 
@@ -11,18 +13,33 @@ namespace eeros {
 		class D: public Block1i1o<T> {
 			
 		public:
-			D() { 
-				prev.clear();
-			}
+			D() : first(true) { }
 			
 			virtual void run() {
-				this->out.getSignal().setValue((this->in.getSignal().getValue() - prev.getValue()) / ((this->in.getSignal().getTimestamp() - prev.getTimestamp()) / 1000000000.0));
-				this->out.getSignal().setTimestamp((this->in.getSignal().getTimestamp() - prev.getTimestamp()) / 2);
-				prev = this->out.getSignal();
+				if(first) {  // first run, no previous value available -> set output to zero
+					prev = this->in.getSignal();
+					this->out.getSignal().setValue(0);
+					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+					first = false;
+				}
+				else {
+					double tin = this->in.getSignal().getTimestamp() / 1000000000.0;
+					double tprev = this->prev.getTimestamp() / 1000000000.0;
+					T valin = this->in.getSignal().getValue();
+					T valprev = this->prev.getValue();
+					
+					this->out.getSignal().setValue((valin - valprev) / (tin - tprev));
+					this->out.getSignal().setTimestamp((tin + tprev) / 2);
+					
+//					std::cout << "Tin=" << tin << "\t" << "Tpr=" << tprev << "\t" << " dT=" << tin - tprev << "\t" << "valout=" << (valin - valprev) / (tin - tprev) << std::endl;
+					
+					prev = this->in.getSignal();
+				}
 			}
 			
-		protected:
+//		protected:
 			Signal<T> prev;
+			bool first;
 		};
 
 	};

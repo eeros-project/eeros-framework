@@ -22,13 +22,26 @@ void SequenceA::init() {
 	MyControlSystem& controlSys = MyControlSystem::instance();
 	
 	addStep([&]() {
-		sleep(1);
-		controlSys.setpoint.setValue(angle);
+		double a = 0;
+		sleep(5);
+		for(int i = 0; i < 10; i++) {
+			log.info() << "[" << name << "] " << "setting angle to " << a;
+			controlSys.setpoint.setValue(a);
+			a += angle;
+			sleep(1);
+			log.info() << "[" << name << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
+			sleep(1);
+		}
+		
 	});
 	
 	addStep([&]() {
 		sleep(1);
-		controlSys.setpoint.setValue(2*angle);
+		log.info() << "[" << name << "] " << "setting angle to " << -3.14;
+		controlSys.setpoint.setValue(-3.14);
+		sleep(1);
+		log.info() << "[" << name << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
+		sleep(1);
 	});
 	
 	log.info() << "[" << name << "] " << "Init done!";
@@ -41,7 +54,7 @@ void SequenceA::exit() {
 }
 
 bool SequenceA::checkPreCondition() {
-	log.info() << "[" << name << "] " << "Checking precondition...";
+//	log.info() << "[" << name << "] " << "Checking precondition...";
 	SafetySystem& safetySys = SafetySystem::instance();
 	
 	return safetySys.getCurrentLevel().getId() >= moving;

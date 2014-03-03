@@ -4,9 +4,11 @@ using namespace eeros::control;
 
 MyControlSystem::MyControlSystem() : 
 	setpoint(0.0),
+	setpointV(6),
 	enc("q"),
 	posController(174.5),
 	speedController(565.48),
+//	speedController(0),
 	inertia(14.2e-7),
 	invMotConst(1/15.7e-3 * 2.0),
 	dac("dac"), executor(0.001) {
@@ -38,18 +40,22 @@ MyControlSystem::MyControlSystem() :
 	posController.getIn().connect(sum1.getOut());
 	diff2.getIn().connect(setpoint.getOut());
 	sum2.getIn(0).connect(posController.getOut());
+// 	sum2.getIn(0).connect(setpointV.getOut());
 	sum2.getIn(1).connect(diff1.getOut());
 	sum2.getIn(2).connect(diff2.getOut());
 	speedController.getIn().connect(sum2.getOut());
 	inertia.getIn().connect(speedController.getOut());
 	invMotConst.getIn().connect(inertia.getOut());
 	dac.getIn().connect(invMotConst.getOut());
+// 	dac.getIn().connect(setpointV.getOut());
 	
 	executor.addRunnable(this);
 }
 	
 void MyControlSystem::run() {
 	setpoint.run();
+//	setpointV.run();
+//	diff2.run();
 	enc.run();
 	sum1.run();
 	posController.run();
