@@ -24,6 +24,7 @@ public:
 	void stop();
 	
 	eeros::control::Constant<> setpoint;
+	eeros::control::Constant<> setpointV;
 	eeros::control::PeripheralInput<> enc;
 	eeros::control::D<> diff1;
 	eeros::control::Sum<2> sum1;

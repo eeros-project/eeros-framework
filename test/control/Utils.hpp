@@ -7,10 +7,15 @@ class Utils {
 		 * @param tolerance relative to ref
 		 */
 		static bool compareApprox(double ref, double val, double tolerance) {
-			double diff = (ref - val);
-			if (diff < 0) diff = -diff;
-			if (ref < 0) ref = -ref;
-			return (diff < tolerance*ref);
+			if (ref == val) {
+				return true;
+			}
+			else {
+				double diff = (ref - val);
+				if (diff < 0) diff = -diff;
+				if (ref < 0) ref = -ref;
+				return (diff < tolerance*ref);
+			}
 		}
 };
 		
