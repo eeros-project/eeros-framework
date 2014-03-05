@@ -329,6 +329,16 @@ namespace eeros {
 				return result;
 			}
 			
+			Matrix<N,M,T> multiplyElementWise(const Matrix<N,M,T> right) const{
+			    Matrix<N,M,T> result;
+			    for (uint8_t n = 0; n < N; n++) {
+				for (uint8_t m = 0; m < M; m++) {
+					result(n,m) = (*this)(n,m) * right(n,m);
+				}
+			    }
+			    return result;
+			}
+			
 			Matrix<N,M,T> operator+(const T right) const {
 				Matrix<N,M,T> result;
 				for (uint8_t n = 0; n < N; n++) {

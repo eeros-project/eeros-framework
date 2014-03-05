@@ -552,6 +552,29 @@ int testCrossProduct(){
   return error;
 }
 
+int testMultiplyElementWise(){
+  int error = 0;
+  Matrix<3,3> a;
+  a(0,0) = 1; a(0,1) = 4; a(0,2) = 7;
+  a(1,0) = 2; a(1,1) = 5; a(1,2) = 8;
+  a(2,0) = 3; a(2,1) = 6; a(2,2) = 9;
+  Matrix<3,3> knownResult;
+  knownResult(0,0) = 1; knownResult(0,1) = 16; knownResult(0,2) = 49;
+  knownResult(1,0) = 4; knownResult(1,1) = 25; knownResult(1,2) = 64;
+  knownResult(2,0) = 9; knownResult(2,1) = 36; knownResult(2,2) = 81;
+
+  Matrix<3,3> result;
+  result = a.multiplyElementWise(a);
+
+  if( result != knownResult){
+    std::cout << "  Failure: cross product 2 not returned correctly"<< std::endl;
+    error++;
+  }
+  return error;
+	
+  
+}
+
 int main(int argc, char *argv[]) {
 	int error = 0;
 	int testNo = 1;
@@ -926,7 +949,6 @@ int main(int argc, char *argv[]) {
 	    error++;
 	  }
 	}
-	
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	std::cout << "Test #" << testNo++ << ": test creat skew symmetric matrix" << std::endl;
@@ -937,91 +959,9 @@ int main(int argc, char *argv[]) {
 	error = error + testCrossProduct();
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
-	
-	
-	
-// 	double m2trace = m2.trace();
-// 	if (m2trace != 3) {
-// 		std::cout << stage << ": trace expected to be 3, m2.trace() = " << m2trace << std::endl;
-// 		error++;
-// 	}
-// 	for(int n = 0; n < 3; n++) {
-// 		for(int m = 0; m < 3; m++) {
-// 			if(n == m) {
-// 				if(m2(n,m) != 1) {
-// 					std::cout << stage << ": 1 expected, n = " << n << ", m = " << m << std::endl;
-// 					error++;
-// 				}
-// 			}
-// 			else {
-// 				if (m2(n,m) != 0) {
-// 					std::cout << stage << ": 0 expected, n = " << n << ", m = " << m << std::endl;
-// 					error++;
-// 				}
-// 			}
-// 		}
-// 	}
-// 	if (m1 == m2) {
-// 		std::cout << stage << ": == fails" << std::endl;
-// 		error++;
-// 	}
-// 	if (!(m1 != m2)) {
-// 		std::cout << stage << ": != fails" << std::endl;
-// 		error++;
-// 	}
-// 	std::cout << "Stage " << stage << ":" << " m2 = " << std::endl;
-// 	print(m2);
-// 
-// 	// Stage 3: +
-// 	stage = 3;
-// 	Matrix<3,3> m3 = m1 + m2;
-// 	if (m3 != m2) {
-// 		std::cout << stage << ": eye expected" << std::endl;
-// 		error++;
-// 	}
-// 	std::cout << "Stage " << stage << ":" << " m3 = m1 + m2 = " << std::endl;
-// 	print(m3);
-
-	// Stage 4: rot()
-// 	stage = 4;
-// 	Matrix<3,3> m4;
-// 	for(int j = 0; j < 3; j++) {
-// 		for(int i = 0; i < 360; i++) {
-// 			rot<3,3,double>(j, m4, i*3.14/180);
-// 			Matrix<3,3> m4inv = !m4;
-// 			Matrix<3,3> m4result = (m4 * m4inv);
-// 
-// 			double sum = 0;
-// 			for(int n = 0; n < 3; n++) {
-// 				for (int m = 0; m < 3; m++) {
-// 					double res = m4result(n,m);
-// 					sum += (res > 0 ) ? res : -res;
-// 				}
-// 			}
-// 
-// 			if(sum != 3) {
-// 				std::cout << stage << ": inverse fails, j = " << j << ", i = " << i << ", sum = " << sum << std::endl;
-// 				error++;
-// 
-// 				std::cout << "  m4 " << std::endl;
-// 				print(m4);
-// 
-// 				std::cout << "  m4inv =" << std::endl;
-// 				print(m4inv);
-// 
-// 				std::cout << "  m4result =" << std::endl;
-// 				print(m4result);
-// 				break;
-// 			}
-// 		}
-// 	}
-// 	std::cout << "Stage " << stage << ":" << " m4 = " << std::endl;
-// 	print(m4);
-// 
-// 	// Stage 4: sizeof()
-// 	stage = 5;
-// 	Matrix<2,4> m5;
-// 	std::cout << "Stage " << stage << ":" << " Size of m5 (Matrix<2,4,double>) = " << sizeof(m5) << std::endl;
+	std::cout << "Test #" << testNo++ << ": test multiply element wise" << std::endl;
+	error = error + testMultiplyElementWise();
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	if (error == 0)
 		std::cout << "matrix test succeeded" << std::endl;
