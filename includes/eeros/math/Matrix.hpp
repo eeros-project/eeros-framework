@@ -167,6 +167,14 @@ namespace eeros {
 			
 			/********** Functions for calculating some characteristics of the matrix **********/
 			
+			uint8_t getNrOfRows() const{
+			    return N; 
+			}
+			
+			uint8_t getNrOfColums() const{
+			    return M;
+			}
+					
 			uint32_t rank() const{
 				uint32_t numberOfNonZeroRows = 0;
 				uint32_t i = 0;
@@ -583,14 +591,6 @@ namespace eeros {
 			    }
 			}
 			
-			uint8_t getNrOfRows(){
-			    return N; 
-			}
-			
-			uint8_t getNrOfColums(){
-			    return M;
-			}
-			
 		private:
 			T value[ N * M ];
 			
@@ -613,13 +613,7 @@ namespace eeros {
 					throw EEROSException(msg.str());
 				}
 			}
-			
-			
-			
-			
-			
-			
-			
+					
 			
 		}; // END class Matrix
 		

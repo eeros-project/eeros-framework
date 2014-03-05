@@ -575,6 +575,49 @@ int testMultiplyElementWise(){
   
 }
 
+int testMultiplyMatrixAndScalar(){
+  int error = 0;
+  Matrix<3,3> a;
+  a(0,0) = 1; a(0,1) = 4; a(0,2) = 7;
+  a(1,0) = 2; a(1,1) = 5; a(1,2) = 8;
+  a(2,0) = 3; a(2,1) = 6; a(2,2) = 9;
+  Matrix<3,3> knownResult;
+  knownResult(0,0) = 2; knownResult(0,1) = 8; knownResult(0,2) = 14;
+  knownResult(1,0) = 4; knownResult(1,1) = 10; knownResult(1,2) = 16;
+  knownResult(2,0) = 6; knownResult(2,1) = 12; knownResult(2,2) = 18;
+
+  Matrix<3,3> result;
+  result = a*2.0;
+
+  if( result != knownResult){
+    std::cout << "  Failure: multiplicytion with a scalar failed"<< std::endl;
+    error++;
+  }
+  return error;
+}
+
+int testDivideMatrixAndScalar(){
+  int error = 0;
+  Matrix<3,3> a;
+  a(0,0) = 1; a(0,1) = 4; a(0,2) = 7;
+  a(1,0) = 2; a(1,1) = 5; a(1,2) = 8;
+  a(2,0) = 3; a(2,1) = 6; a(2,2) = 9;
+  Matrix<3,3> knownResult;
+  knownResult(0,0) = 0.5; knownResult(0,1) = 2; knownResult(0,2) = 3.5;
+  knownResult(1,0) = 1; knownResult(1,1) = 2.5; knownResult(1,2) = 4;
+  knownResult(2,0) = 1.5; knownResult(2,1) = 3; knownResult(2,2) = 4.5;
+
+  Matrix<3,3> result;
+  result = a/2.0;
+
+  if( result != knownResult){
+    std::cout << "  Failure: division with a scalar failed"<< std::endl;
+    error++;
+  }
+  return error;
+}
+
+
 int main(int argc, char *argv[]) {
 	int error = 0;
 	int testNo = 1;
@@ -962,6 +1005,16 @@ int main(int argc, char *argv[]) {
 	std::cout << "Test #" << testNo++ << ": test multiply element wise" << std::endl;
 	error = error + testMultiplyElementWise();
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "Test #" << testNo++ << ": test multiply matrix and scalar" << std::endl;
+	error = error + testMultiplyMatrixAndScalar();
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "Test #" << testNo++ << ": test divide matrix and scalar" << std::endl;
+	error = error + testDivideMatrixAndScalar();
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	
 	
 	if (error == 0)
 		std::cout << "matrix test succeeded" << std::endl;
