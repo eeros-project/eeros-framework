@@ -204,7 +204,7 @@ namespace eeros {
 				    return det;
 				  }else{
 				    //use recurcive laplace formula to calculate this
-				    //TODO for big matrices this methods needs a lot of time this could be improved with another algorithm
+				    //for big matrices this methods needs a lot of time this could be improved with another algorithm
 				     double det = 0;
 				     uint8_t  ignoredRow = 0;
 				    for (uint8_t n = 0; n < N; n++) {
@@ -408,6 +408,7 @@ namespace eeros {
 					result(1, 1) = v(0, 0);
 					return (result / determinant);
 				}else {
+				  //This algorithm needs a lot of time maybe this could be replaced
 				  Matrix<N,M,T> result;
 				  Matrix<N-1,M-1,T> smallerPart;
 				  uint8_t ignoredRow = 0;
@@ -497,6 +498,23 @@ namespace eeros {
 				return v;
 			}
 			
+			
+			static  Matrix<3,1,T> crossProduct(Matrix<3,1,T> a,Matrix<3,1,T> b){
+			    Matrix<3,1,T> result;
+			    result(0,0) = a(1,0)*b(2,0) - a(2,0)*b(1,0);
+			    result(1,0) = a(2,0)*b(0,0) - a(0,0)*b(2,0);
+			    result(2,0) = a(0,0)*b(1,0) - a(1,0)*b(0,0); 
+			    return result;
+			  
+			}
+			
+			static Matrix<3,3,T> createSkewSymmetricMatrix(Matrix<3,1,T> a){
+			    Matrix<3,3,T> result;
+			    result(0,0) = 0; result(0,1) = -a(2); result(0,2) = a(1);
+			    result(1,0) = a(2); result(1,1) = 0; result(1,2) = -a(0);
+			    result(2,0) = -a(1); result(2,1) = a(0); result(2,2) = 0;
+			    return result;
+			}
 			
 			void gaussRowElimination(){
 			  uint8_t completedColum = 0;
