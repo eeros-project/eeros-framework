@@ -380,11 +380,11 @@ namespace eeros {
 			}
 			
 			Matrix<N,M,T> operator!() const {
-				T det = det();
+				double determinant = det();
 				if(N!=M){
 				  throw EEROSException("Invert failed: matrix not square");
 				  
-				}else if (det == 0){
+				}else if (determinant == 0){
 				  throw EEROSException("Invert failed: determinat of matrix is 0");
 				}else if (isOrthogonal() == true){
 				  return transpose();
@@ -399,20 +399,59 @@ namespace eeros {
 					result(0, 2) = v(0, 1) * v(1, 2) - v(0, 2) * v(1, 1);
 					result(1, 2) = v(0, 2) * v(1, 0) - v(0, 0) * v(1, 2);
 					result(2, 2) = v(0, 0) * v(1, 1) - v(0, 1) * v(1, 0);
-					return (result / det);
+					return (result / determinant);
 				}else if(N == 2) {
 					Matrix<N,M,T> result;
 					result(0, 0) = v(1, 1);
 					result(1, 0) = -v(1, 0);
 					result(0, 1) = -v(0, 1);
 					result(1, 1) = v(0, 0);
-					return (result / det);
+					return (result / determinant);
 				}else {
-					
-					//TODO
-				  
-				  
-					throw EEROSException("Invert failed: function only implemented for matrices with dimension 2x2 and 3x3 and ortogonal matrices");
+				  Matrix<N,M,T> result;
+				  Matrix<N-1,M-1,T> smallerPart;
+				  uint8_t ignoredRow = 0;
+				  uint8_t ignoredColum = 0;
+				  uint8_t a = 0;
+				  uint8_t b = 0;
+				  for (uint8_t n = 0; n < N; n++) {
+				    for (uint8_t m = 0; m < M; m++) {
+					uint8_t a = 0;
+					uint8_t b = 0;
+					//1.Create "matrix of minors"
+					for (uint8_t u = 0; u < N; u++) {
+					  for (uint8_t w = 0; w < M; w++) {
+					      if(u != n && w != m){
+						smallerPart(a,b) = v(u,w);
+						b++;
+						b = b%(M-1);
+					      }
+					  }
+					  if(u != n){
+					    a++;
+					    a = a&(N-1);
+					  }
+					}
+					//2.Swapp signs 
+					if(n%2 == 0){
+					  if(m%2 != 0){
+					    result(n,m) = -smallerPart.det();
+					  }else{
+					    result(n,m) = smallerPart.det();
+					  }
+					}else{
+					  if(m%2 != 0){
+					    result(n,m) = smallerPart.det();
+					  }else{
+					    result(n,m) = -smallerPart.det();
+					  }
+					}
+					//3.Divide trhoug det of the original matrix
+					result(n,m) = result(n,m)/determinant;
+				    }
+				  }
+				  //4. transpose
+				  return result.transpose();
 				}
 			}
 
