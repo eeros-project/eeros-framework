@@ -47,8 +47,8 @@ void rot(int axis, Matrix<N,M,T> &A, T angle) {
 	  
 	};
 
-const double MAX_DEVIATION = 0.001; //in %	
-const int NUMBER_OF_ROT_TESTING_DATA = 7; 
+const double MAX_DEVIATION = 0.1; //in %	
+constexpr int NUMBER_OF_ROT_TESTING_DATA = 7; 
 	
 	
 double abs(double a){
