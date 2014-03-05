@@ -38,3 +38,16 @@ double ComediFqd::get() {
 	comedi_data_read(deviceHandle, subDeviceNumber, 0, 0, 0, &data);
 	return static_cast<int>(data) * scale + offset;
 }
+
+void ComediFqd::setScale(double scale) {
+// 	lsampl_t data = 0;
+// 	comedi_data_write (deviceHandle, subDeviceNumber, 2, scale, this->offset, devInitValue);
+//     return static_cast<int>(data) * scale + offset;
+	this->scale = scale;
+}
+void ComediFqd::setOffset(double offset) {
+// 	lsampl_t data = 0;
+// 	comedi_data_write (deviceHandle, subDeviceNumber, 2, this->scale, offset, devInitValue);
+//     return static_cast<int>(data) * scale + offset;
+	this->offset = offset;
+}
