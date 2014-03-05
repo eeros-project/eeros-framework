@@ -478,6 +478,79 @@ int testGaussRowElimination(){
   return error;
 }
 
+int testSkewSymetricMatrix(){
+  int error = 0;
+  Matrix<3,1> a;
+  a(0) = 1;
+  a(1) = 2;
+  a(2) = 3;
+  Matrix<3,1> b;
+  b(0) = -5;
+  b(1) = -3;
+  b(2) = 0;
+
+  Matrix<3,3> knownResultA;
+  knownResultA(0,0) = 0; knownResultA(0,1) = -3; knownResultA(0,2) = 2;
+  knownResultA(1,0) = 3; knownResultA(1,1) = 0; knownResultA(1,2) = -1;
+  knownResultA(2,0) = -2; knownResultA(2,1) = 1; knownResultA(2,2) = 0;
+
+  Matrix<3,3> knownResultB;
+  knownResultB(0,0) = 0; knownResultB(0,1) = 0; knownResultB(0,2) = -3;
+  knownResultB(1,0) = 0; knownResultB(1,1) = 0; knownResultB(1,2) = 5;
+  knownResultB(2,0) = 3; knownResultB(2,1) = -5; knownResultB(2,2) = 0;
+
+  Matrix<3,3> result = Matrix<3,3>::createSkewSymmetricMatrix(a);
+  if( result != knownResultA){
+      std::cout << "  Failure: createSkewSymmetricMatrix A not returned correctly"<< std::endl;
+      error++;
+  }
+
+  result = Matrix<3,3>::createSkewSymmetricMatrix(b);
+  if( result != knownResultB){
+      std::cout << "  Failure: createSkewSymmetricMatrix B not returned correctly"<< std::endl;
+      error++;
+  }
+  return error; 
+}
+
+int testCrossProduct(){
+  int error = 0;
+  Matrix<3,1> a;
+  a(0) = 1;
+  a(1) = 2;
+  a(2) = 3;
+  Matrix<3,1> b;
+  b(0) = -5;
+  b(1) = -3;
+  b(2) = 0;
+  
+  Matrix<3,1> c;
+  c(0) = 0;
+  c(1) = -1;
+  c(2) = 9;
+  
+  Matrix<3,1> knownResult1;
+  knownResult1(0) = 9; 
+  knownResult1(1) = -15;
+  knownResult1(2) = 7; 
+  
+  Matrix<3,1> knownResult2;
+  knownResult2(0) = -27; 
+  knownResult2(1) = 45;
+  knownResult2(2) = 5; 
+
+  Matrix<3,1> result = Matrix<3,1>::crossProduct(a,b);
+  if( result != knownResult1){
+      std::cout << "  Failure: cross product 1 not returned correctly"<< std::endl;
+      error++;
+  }
+  result = Matrix<3,1>::crossProduct(b,c);
+  if( result != knownResult2){
+      std::cout << "  Failure: cross product 2 not returned correctly"<< std::endl;
+      error++;
+  }
+  return error;
+}
 
 int main(int argc, char *argv[]) {
 	int error = 0;
@@ -856,7 +929,13 @@ int main(int argc, char *argv[]) {
 	
 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
+	std::cout << "Test #" << testNo++ << ": test creat skew symmetric matrix" << std::endl;
+	error = error + testSkewSymetricMatrix();
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
+	std::cout << "Test #" << testNo++ << ": test cross product" << std::endl;
+	error = error + testCrossProduct();
+	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
 	
 	
 	
