@@ -2,17 +2,22 @@
 #define ORG_EEROS_CONTROL_OUTPUT_HPP_
 
 #include <eeros/types.hpp>
+#include <eeros/control/Signal.hpp>
 
 namespace eeros {
 	namespace control {
 
+		template < typename T = double >
 		class Output {
+		
 		public:
-			virtual void dummy();
-		private:
+			virtual Signal<T>& getSignal() {
+				return signal;
+			}
 			
+		private:
+			Signal<T> signal;
 		};
-
 	};
 };
 

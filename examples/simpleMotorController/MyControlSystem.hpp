@@ -7,8 +7,8 @@
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/Switch.hpp>
 #include <eeros/control/Constant.hpp>
-#include <eeros/control/RealPeripheralInput.hpp>
-#include <eeros/control/RealPeripheralOutput.hpp>
+#include <eeros/control/PeripheralInput.hpp>
+#include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/Mux.hpp>
 #include <eeros/control/DeMux.hpp>
 #include <eeros/core/Executor.hpp>
@@ -23,17 +23,18 @@ public:
 	void start();
 	void stop();
 	
-	eeros::control::Constant setpoint;
-	eeros::control::RealPeripheralInput enc;
-	eeros::control::D diff1;
-	eeros::control::Sum sum1;
-	eeros::control::Gain posController;
-	eeros::control::D diff2;
-	eeros::control::Sum sum2;
-	eeros::control::Gain speedController;
-	eeros::control::Gain inertia;
-	eeros::control::Gain invMotConst;
-	eeros::control::RealPeripheralOutput dac;
+	eeros::control::Constant<> setpoint;
+	eeros::control::Constant<> setpointV;
+	eeros::control::PeripheralInput<> enc;
+	eeros::control::D<> diff1;
+	eeros::control::Sum<2> sum1;
+	eeros::control::Gain<> posController;
+	eeros::control::D<> diff2;
+	eeros::control::Sum<3> sum2;
+	eeros::control::Gain<> speedController;
+	eeros::control::Gain<> inertia;
+	eeros::control::Gain<> invMotConst;
+	eeros::control::PeripheralOutput<> dac;
 	
 private:
 	MyControlSystem();

@@ -8,19 +8,24 @@
 namespace eeros {
 	namespace control {
 
-		class Constant: public Block1o {
+		template < typename T = double >
+		class Constant : public Block1o<T> {
 		public:
-			Constant(double value = 0.0, sigdim_t dim = 1);
-			Constant(const std::vector<double> values, sigdim_t dim);
-			virtual ~Constant();
-
-			virtual void run();
+			Constant(T v) {
+				value = v;
+			}
 			
-			virtual void setValue(double value);
-			virtual void setValue(std::vector<double> values);
+			virtual void run() {
+				this->out.getSignal().setValue(value);
+				this->out.getSignal().setTimestamp(System::getTimeNs());
+			}
+			
+			virtual void setValue(T newValue) {
+				value = newValue;
+			}
 			
 		protected:
-			std::vector<double> val;
+			T value;
 		};
 
 	};

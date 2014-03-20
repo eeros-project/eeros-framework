@@ -15,8 +15,6 @@ namespace eeros {
 	namespace control {
 
 		//Forward Declarations
-		class Signal;
-		class RealSignalOutput;
 		class SignalBufferWriter;
 		
 		enum { 

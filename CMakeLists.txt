@@ -6,6 +6,11 @@ cmake_minimum_required(VERSION 2.8)
 # EEROS Robotic Framework
 project(EEROS)
 
+include_directories(${ADDITIONAL_INCLUDE_DIRS})
+link_directories(${ADDITIONAL_LINK_DIRS})
+
+INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
+
 # Load CMake modules
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
@@ -69,8 +74,8 @@ else()
 	# Cross compile -> use informations form CMAKE_TOOLCHAIN_FILE
 	# TODO
 endif()
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/config.hpp)
-
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
 
 
 # Special settings for different IDEs
@@ -96,7 +101,8 @@ endmacro()
 add_subdirectory(src)
 
 # Unit tests source code
+enable_testing()
 add_subdirectory(test)
 
-# Unit tests source code
+# Examples
 add_subdirectory(examples)

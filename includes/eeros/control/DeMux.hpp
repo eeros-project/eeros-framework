@@ -1,27 +1,37 @@
 #ifndef ORG_EEROS_CONTROL_DEMUX_HPP_
 #define ORG_EEROS_CONTROL_DEMUX_HPP_
 
-#include <vector>
-
 #include <eeros/control/Block.hpp>
-#include <eeros/control/RealSignalInput.hpp>
-#include <eeros/control/RealSignalOutput.hpp>
+#include <eeros/types.hpp>
+#include <vector>
 
 namespace eeros {
 	namespace control {
-
+		
+		template < uint32_t N, typename T = double >
 		class DeMux: public Block {
 		public:
-			DeMux(sigdim_t inputDimension);
+			DeMux() { }
 			
-			virtual void run();
+			virtual void run() {
+				timestamp_t t = in.getSignal().getTimestamp();
+				for(int i = 0; i < N; i++) {
+					out[i].setValue(in.getSignal().getValue()(i));
+					out[i].setTimeStamp(t);
+				}
+			}
 			
-			virtual RealSignalInput& getIn();
-			virtual RealSignalOutput& getOut(uint8_t output = 0);
+			virtual Input<T>& getIn() {
+				return in;
+			}
+			
+			virtual Output<T>& getOut(uint32_t output) {
+				return out[output];
+			}
 			
 		protected:
-			RealSignalInput in;
-			std::vector<RealSignalOutput> out;
+			Input<T> in;
+			Output<T> out[N];
 		};
 
 	};

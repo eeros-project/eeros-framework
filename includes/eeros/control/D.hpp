@@ -1,24 +1,45 @@
 #ifndef ORG_EEROS_CONTROL_D_HPP_
 #define ORG_EEROS_CONTROL_D_HPP_
 
-#include <eeros/control/RealSignalOutput.hpp>
 #include <eeros/control/Block1i1o.hpp>
+#include <type_traits>
 
-#include <vector>
+#include <iostream>
 
 namespace eeros {
 	namespace control {
 
-		class D: public Block1i1o {
-		public:
-			D(sigdim_t dim = 1);
-			virtual ~D();
-
-			virtual void run();
+		template < typename T = double >
+		class D: public Block1i1o<T> {
 			
-		private:
+		public:
+			D() : first(true) { }
+			
+			virtual void run() {
+				if(first) {  // first run, no previous value available -> set output to zero
+					prev = this->in.getSignal();
+					this->out.getSignal().setValue(0);
+					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+					first = false;
+				}
+				else {
+					double tin = this->in.getSignal().getTimestamp() / 1000000000.0;
+					double tprev = this->prev.getTimestamp() / 1000000000.0;
+					T valin = this->in.getSignal().getValue();
+					T valprev = this->prev.getValue();
+					
+					this->out.getSignal().setValue((valin - valprev) / (tin - tprev));
+					this->out.getSignal().setTimestamp((tin + tprev) / 2);
+					
+//					std::cout << "Tin=" << tin << "\t" << "Tpr=" << tprev << "\t" << " dT=" << tin - tprev << "\t" << "valout=" << (valin - valprev) / (tin - tprev) << std::endl;
+					
+					prev = this->in.getSignal();
+				}
+			}
+			
+//		protected:
+			Signal<T> prev;
 			bool first;
-			std::vector<realSignalDatum> prev;
 		};
 
 	};
