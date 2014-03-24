@@ -1,30 +1,43 @@
 #ifndef ORG_EEROS_CONTROL_GAIN_HPP_
 #define ORG_EEROS_CONTROL_GAIN_HPP_
 
-#include <vector>
-
-#include <eeros/control/RealSignalOutput.hpp>
 #include <eeros/control/Block1i1o.hpp>
 
 namespace eeros {
 	namespace control {
 
-		class Gain: public Block1i1o {
-		public:
-			Gain(double c = 1, sigdim_t dim = 1);
-			Gain(const double c[], sigdim_t dim);
-			Gain(const std::vector<double>, sigdim_t dim);
-			virtual ~Gain();
-
-			virtual void run();
+		template < typename Tout = double, typename Tgain = double >
+		class Gain : public Block1i1o<Tout> {
 			
-			virtual void enable();
-			virtual void disable();
-			virtual void setGain(double c);
-			virtual void setGain(sigindex_t index, double c);
-
+		public:
+			Gain(Tgain c) : enabled(true) {
+				gain = c;
+			}
+			
+			virtual void run() {
+				if(enabled) {
+					this->out.getSignal().setValue(gain * this->in.getSignal().getValue());
+				}
+				else {
+					this->out.getSignal().setValue(this->in.getSignal().getValue());
+				}
+				this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+			}
+			
+			virtual void enable() {
+				enabled = true;
+			}
+			
+			virtual void disable() {
+				enabled = false;
+			}
+			
+			virtual void setGain(Tgain c) {
+				gain = c;
+			}
+			
 		protected:
-			std::vector<double> gain;
+			Tgain gain;
 			bool enabled;
 		};
 

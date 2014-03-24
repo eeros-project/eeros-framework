@@ -1,6 +1,6 @@
 #include <eeros/control/SignalBufferWriter.hpp>
+#include <eeros/control/Signal.hpp>
 #include <eeros/core/RingBuffer.hpp>
-#include <eeros/control/RealSignalOutput.hpp>
 
 #include <iostream>
 
@@ -23,13 +23,12 @@ void SignalBufferWriter::removeSignal(sigid_t id) {
 }
 
 void SignalBufferWriter::appendData() {
-	for(std::list<sigid_t>::iterator i = observedSignalIds.begin(); i != observedSignalIds.end(); i++) {
-		Signal* signal = Signal::getSignalById(*i);
-		if (signal) {
-			RealSignalOutput* realSignalOutput = dynamic_cast<RealSignalOutput*>(signal);
-			uint64_t timestamp = realSignalOutput->getTimestamp((sigindex_t)*i);
+	for(auto id : observedSignalIds) {
+		Signal<double>* doubleSignal = dynamic_cast<Signal<double>*>(Signal<double>::getSignalById(id));
+		if(doubleSignal != nullptr) {
+			uint64_t timestamp = doubleSignal->getTimestamp();
 			buffer->write(&timestamp, sizeof(timestamp));
-			double value = realSignalOutput->getValue((sigindex_t)*i);
+			double value = doubleSignal->getValue();
 			buffer->write(&value, sizeof(value));
 		}
 	}
@@ -39,15 +38,14 @@ void SignalBufferWriter::updateHeader() { // TODO implement with mutex in shm
 	header->nofObservedSignals = 0;
 	uint32_t signalCounter = 0;
 	int currentIndex = 0;
-	for(std::list<sigid_t>::iterator i = observedSignalIds.begin(); i != observedSignalIds.end(); i++) {
+	for(auto id : observedSignalIds) {
 		if(currentIndex < kMaxNofObservableSignals * 2) {
-			Signal* signal = Signal::getSignalById(*i);
-			if (signal == NULL) {
+			SignalInterface* signal = Signal<double>::getSignalById(id);
+			if(signal == nullptr) {
 				throw "SignalBufferWriter::updateHeader(): Signal not found";
 			}
-			sigid_t id = signal->getSignalId((sigindex_t)*i);
 			header->signalInfo[currentIndex++] = id;
-			header->signalInfo[currentIndex++] = signal->getType();
+			header->signalInfo[currentIndex++] = kSignalTypeReal;
 			signalCounter++;
 		}
 	}

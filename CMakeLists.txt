@@ -105,6 +105,7 @@ endmacro()
 add_subdirectory(src)
 
 # Unit tests source code
+#enable_testing()
 #add_subdirectory(test)
 
 # Examples

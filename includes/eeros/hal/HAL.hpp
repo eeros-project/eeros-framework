@@ -13,8 +13,10 @@ namespace eeros {
 		
 		class HAL {
 		public:
+			SystemOutputInterface* getSystemOutput(std::string name, bool exclusive = false);
 			SystemOutput<bool>* getLogicSystemOutput(std::string name, bool exclusive = false);
 			SystemOutput<double>* getRealSystemOutput(std::string name, bool exclusive = false);
+			SystemInputInterface* getSystemInput(std::string name, bool exclusive = false);
 			SystemInput<bool>* getLogicSystemInput(std::string name, bool exclusive = false);
 			SystemInput<double>* getRealSystemInput(std::string name, bool exclusive = false);
 			

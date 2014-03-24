@@ -46,6 +46,7 @@ int main() {
 	std::cout << "Simple Motor Controller Demo started..." << std::endl;
 
 	StreamLogWriter w(std::cout);
+	Logger<LogWriter>::setDefaultWriter(&w);
 	
 	std::cout << "Initializing Hardware..." << std::endl;
 	initHardware();
@@ -71,12 +72,12 @@ int main() {
 	// Start control system
 	controlSys.start();
 	
-	SequenceA mainSequence("Main Sequence", 2*3.14);
+	SequenceA mainSequence("Main Sequence", 3.14/5);
 	Sequencer sequencer("Example sequencer", mainSequence);
 	
 	while(!sequencer.done());
 	
-	sleep(10);
+	sleep(100);
 	
 	controlSys.stop();
 	safetySysExecutor.stop();

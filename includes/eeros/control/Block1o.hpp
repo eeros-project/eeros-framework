@@ -2,19 +2,23 @@
 #define ORG_EEROS_CONTROL_BLOCK1O_HPP_
 
 #include <eeros/control/Block.hpp>
-#include <eeros/control/RealSignalOutput.hpp>
+#include <eeros/control/Output.hpp>
+#include <eeros/control/Signal.hpp>
 
 namespace eeros {
 	namespace control {
 
-		class Block1o: public Block {
+		template < typename T = double >
+		class Block1o : public Block {
 		public:
-			Block1o(sigdim_t dim);
+			Block1o() { }
 			
-			RealSignalOutput& getOut();
+			virtual Output<T>& getOut() {
+				return out;
+			}
 			
 		protected:
-			RealSignalOutput out;
+			Output<T> out;
 		};
 
 	};
