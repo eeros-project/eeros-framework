@@ -41,6 +41,11 @@ namespace eeros {
 			
 			void callSubSequence(Sequence* sequence);
 			
+			template < typename T, typename ... Targs >
+			void callSubSequence(T& sequence, Targs ... args) {
+				sequence.run(args...);
+			}
+			
 			void startParallelSequence(Sequence* sequence);
 			
 			static Sequence* getSequence(std::string name);
