@@ -6,8 +6,7 @@
 #include <unordered_set>
 
 #include <eeros/hal/SystemInput.hpp>
-#include <eeros/hal/SystemOutput.hpp>
-#include "ComediDevice.hpp"
+#include <eeros/hal/SystemOutput.hpp
 
 namespace eeros {
 	namespace hal {

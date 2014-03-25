@@ -32,9 +32,7 @@ link_directories(${EEROS_BINARY_DIR}/src/logger)
 
 add_library(eeros SHARED ${EEROS_SRCS})
 
-#target_link_libraries(eeros ${EXTERNAL_LIBS} -lrt)
-target_link_libraries(eeros comedi flink -lrt)
-#target_link_libraries(eeros comedi /usr/local/lib/libflink.so -lrt)
+target_link_libraries(eeros ${EXTERNAL_LIBS} -lrt)
 
 INSTALL(TARGETS eeros LIBRARY DESTINATION lib)
 
