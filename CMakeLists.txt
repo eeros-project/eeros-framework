@@ -85,7 +85,6 @@ else()
 	# TODO
 endif()
 
-# Configure file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
 
@@ -100,4 +99,4 @@ enable_testing()
 add_subdirectory(test)
 
 # Examples
-add_subdirectory(examples)
+#add_subdirectory(examples)

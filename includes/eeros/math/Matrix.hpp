@@ -259,7 +259,7 @@ namespace eeros {
 			
 			/********** Operators **********/
 			
-			Matrix<N,M,T>& operator= (T right) const {
+			Matrix<N,M,T>& operator= (T right) {
 				for(uint8_t n = 0; n < N; n++) {
 					for(uint8_t m = 0; m < M; m++) {
 						v(m,n) = right;
