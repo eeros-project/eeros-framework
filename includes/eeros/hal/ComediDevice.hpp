@@ -2,7 +2,6 @@
 #define ORG_EEROS_HAL_COMEDIDEVICE_HPP_
 
 #include <string>
-#include <vector>
 
 #include <comedilib.h>
 
