@@ -2,12 +2,15 @@
 
 using namespace eeros::hal;
 
-FlinkPwm::FlinkPwm(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale, double offset) : SystemOutput<double>(id) {
+FlinkPwm::FlinkPwm(std::string id,
+				   FlinkDevice* device,
+				   uint32_t subDeviceNumber,
+				   uint32_t channel,
+				   double scale,
+				   double offset) : ScalablePeripheralOutput<double>(id, scale, offset) {
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channel = channel;
-	this->scale = scale;
-	this->offset = offset;
 }
 
 void FlinkPwm::set(double frequency, double dutyCycle) {

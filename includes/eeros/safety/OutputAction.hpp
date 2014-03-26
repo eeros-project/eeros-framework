@@ -16,30 +16,30 @@ namespace eeros {
 		template < typename T >
 		class LeaveOutputAction : public OutputAction {
 		public:
-			LeaveOutputAction(eeros::hal::SystemOutput<T>& output) : output(output) { }
+			LeaveOutputAction(eeros::hal::PeripheralOutput<T>& output) : output(output) { }
 			virtual ~LeaveOutputAction() { }
 			virtual void set() { }
 		private:
-			eeros::hal::SystemOutput<T>& output;
+			eeros::hal::PeripheralOutput<T>& output;
 		};
 
 		template < typename T >
 		class SetOutputAction : public OutputAction {
 		public:
-			SetOutputAction(eeros::hal::SystemOutput<T>& output, T value) : output(output), value(value) { }
+			SetOutputAction(eeros::hal::PeripheralOutput<T>& output, T value) : output(output), value(value) { }
 			virtual ~SetOutputAction() { }
 			virtual void set() { 
 				output.set(value);
 			}
 		private:
-			eeros::hal::SystemOutput<T>& output;
+			eeros::hal::PeripheralOutput<T>& output;
 			T value;
 		};
 	
 		template < typename T >
 		class ToggleOutputAction : public OutputAction {
 		public:
-			ToggleOutputAction(eeros::hal::SystemOutput<T>& output, T low, T high) : output(output), value(low), low(low), high(high) { }
+			ToggleOutputAction(eeros::hal::PeripheralOutput<T>& output, T low, T high) : output(output), value(low), low(low), high(high) { }
 			virtual ~ToggleOutputAction() { }
 			virtual void set() {
 				output.set(value);
@@ -49,44 +49,34 @@ namespace eeros {
 					value = low;
 			}
 		private:
-			eeros::hal::SystemOutput<bool>& output;
+			eeros::hal::PeripheralOutput<bool>& output;
 			T value;
 			T low;
 			T high;
 		};
 
 		template <typename T>
-		SetOutputAction<T>* set(eeros::hal::SystemOutput<T>& output, T value) {
+		SetOutputAction<T>* set(eeros::hal::PeripheralOutput<T>& output, T value) {
 			return new SetOutputAction<T>(output, value);
 		}
 		
 		template <typename T>
-		SetOutputAction<T>* set(eeros::hal::SystemOutput<T>* output, T value) {
+		SetOutputAction<T>* set(eeros::hal::PeripheralOutput<T>* output, T value) {
 			return new SetOutputAction<T>(*output, value);
 		}
 
 		template <typename T>
-		LeaveOutputAction<T>* leave(eeros::hal::SystemOutput<T>& output) {
+		LeaveOutputAction<T>* leave(eeros::hal::PeripheralOutput<T>& output) {
 			return new LeaveOutputAction<T>(output);
 		}
 		
 		template <typename T>
-		LeaveOutputAction<T>* leave(eeros::hal::SystemOutput<T>* output) {
+		LeaveOutputAction<T>* leave(eeros::hal::PeripheralOutput<T>* output) {
 			return new LeaveOutputAction<T>(*output);
 		}
 		
-//		template <typename T>
-// 		ToggleOutputAction* toggle(eeros::hal::SystemOutput<bool>& output) {
-// 			return new ToggleOutputAction(output);
-// 		}
-		
-//		template <typename T>
-// 		ToggleOutputAction* toggle(eeros::hal::SystemOutput<bool>* output) {
-// 			return new ToggleOutputAction(*output);
-// 		}
-		
 		template <typename T>
-		ToggleOutputAction<T>* toggle(eeros::hal::SystemOutput<T>* output, T low = false, T high = true) {
+		ToggleOutputAction<T>* toggle(eeros::hal::PeripheralOutput<T>* output, T low = false, T high = true) {
 			return new ToggleOutputAction<T>(*output, low, high );
 		}
 	};

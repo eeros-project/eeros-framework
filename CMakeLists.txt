@@ -99,4 +99,4 @@ enable_testing()
 add_subdirectory(test)
 
 # Examples
-#add_subdirectory(examples)
+add_subdirectory(examples)

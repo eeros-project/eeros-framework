@@ -2,11 +2,7 @@
 #define ORG_EEROS_HAL_FLINKDEVICE_HPP_
 
 #include <string>
-
 #include <flinklib.h>
-
-#include <eeros/hal/SystemInput.hpp>
-#include <eeros/hal/SystemOutput.hpp>
 
 namespace eeros {
 	namespace hal {
@@ -21,7 +17,6 @@ namespace eeros {
 		private:
 			flink_t *it;
 		};
-
 	};
 };
 

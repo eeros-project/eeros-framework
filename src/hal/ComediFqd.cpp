@@ -2,14 +2,21 @@
 
 using namespace eeros::hal;
 
-ComediFqd::ComediFqd(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channelA, uint32_t channelB, uint32_t channelZ, double scale, double offset, double initValue) : SystemInput<double>(id) {
+ComediFqd::ComediFqd(std::string id, 
+					 ComediDevice* device,
+					 uint32_t subDeviceNumber,
+					 uint32_t channelA,
+					 uint32_t channelB,
+					 uint32_t channelZ,
+					 double scale,
+					 double offset,
+					 double initValue) : 
+					 ScalablePeripheralInput<double>(id, scale, offset) {
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channelA = channelA;
 	this->channelB = channelB;
 	this->channelZ = channelZ;
-	this->scale = scale;
-	this->offset = offset;
 	
 	comedi_reset(deviceHandle, subDeviceNumber);
 	

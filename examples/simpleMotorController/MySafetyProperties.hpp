@@ -36,11 +36,11 @@ class MySafetyProperties : public eeros::safety::SafetyProperties {
 		virtual ~MySafetyProperties();
 	
 		// critical outputs
-		eeros::hal::SystemOutput<bool>* enable;
+		eeros::hal::PeripheralOutput<bool>* enable;
 		
 		// critical inputs
-		eeros::hal::SystemInput<bool>* emergency;
-		eeros::hal::SystemInput<double>* q;
+		eeros::hal::PeripheralInput<bool>* emergency;
+		eeros::hal::PeripheralInput<double>* q;
 };
 
 #endif // MYSAFETYPROPERTIES_HPP_

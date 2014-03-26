@@ -2,8 +2,8 @@
 #define EXAMPLESAFETYPROPERTIES_HPP
 
 #include <eeros/safety/SafetyProperties.hpp>
-#include <eeros/hal/SystemOutput.hpp>
-#include <eeros/hal/SystemInput.hpp>
+#include <eeros/hal/PeripheralOutput.hpp>
+#include <eeros/hal/PeripheralInput.hpp>
 
 class ExampleSafetyProperties : public eeros::safety::SafetyProperties {
 
@@ -54,17 +54,17 @@ public:
     virtual ~ExampleSafetyProperties();
 	
 	// criticcal outputs
-	eeros::hal::SystemOutput<bool>* power;
-	eeros::hal::SystemOutput<bool>* wd;
-	eeros::hal::SystemOutput<bool>* enable0;
-	eeros::hal::SystemOutput<bool>* enable1;
-	eeros::hal::SystemOutput<bool>* brake0;
-	eeros::hal::SystemOutput<bool>* brake1;
+	eeros::hal::PeripheralOutput<bool>* power;
+	eeros::hal::PeripheralOutput<bool>* wd;
+	eeros::hal::PeripheralOutput<bool>* enable0;
+	eeros::hal::PeripheralOutput<bool>* enable1;
+	eeros::hal::PeripheralOutput<bool>* brake0;
+	eeros::hal::PeripheralOutput<bool>* brake1;
 	
 	// criticcal inputs
-	eeros::hal::SystemInput<bool>* emergencyStop;
-	eeros::hal::SystemInput<double>* q0;
-	eeros::hal::SystemInput<double>* q1;
+	eeros::hal::PeripheralInput<bool>* emergencyStop;
+	eeros::hal::PeripheralInput<double>* q0;
+	eeros::hal::PeripheralInput<double>* q1;
 };
 
 #endif // EXAMPLESAFETYPROPERTIES_HPP

@@ -2,12 +2,15 @@
 
 using namespace eeros::hal;
 
-ComediDac::ComediDac(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale, double offset) : SystemOutput<double>(id) {
+ComediDac::ComediDac(std::string id,
+					 ComediDevice* device,
+					 uint32_t subDeviceNumber,
+					 uint32_t channel,
+					 double scale,
+					 double offset) : ScalablePeripheralOutput<double>(id, scale, offset) {
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channel = channel;
-	this->scale = scale;
-	this->offset = offset;
 	this->minVoltage = -10.0; // default +/-10V
 	this->maxVoltage = 10.0;
 	this->maxValue = 65535; // default 16bit

@@ -31,8 +31,8 @@ namespace eeros {
 			virtual SafetyLevel& level(uint32_t levelId);
 			
 			std::vector<SafetyLevel> levels;
-			std::vector<eeros::hal::SystemOutputInterface*> criticalOutputs;
-			std::vector<eeros::hal::SystemInputInterface*> criticalInputs;
+			std::vector<eeros::hal::PeripheralOutputInterface*> criticalOutputs;
+			std::vector<eeros::hal::PeripheralInputInterface*> criticalInputs;
 			uint32_t entryLevel;
 		};
 		

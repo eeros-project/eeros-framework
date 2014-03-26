@@ -35,10 +35,10 @@ void initHardware() {
 	ComediDevice* comedi0 = new ComediDevice("/dev/comedi0");
 
 	std::cout << "  Registering I/Os in the HAL..." << std::endl;
-	hal.addSystemInput(new ComediFqd("q", comedi0, 11, 8, 10, 9, 6.28318530718 / (4 * 500.0), 0, 0));
-	hal.addSystemInput(new ComediDigIn("emergency", comedi0, 2, 1, true));
-	hal.addSystemOutput(new ComediDigOut("enable", comedi0, 2, 0));
-	hal.addSystemOutput(new ComediDac("dac", comedi0, 1, 0));
+	hal.addPeripheralInput(new ComediFqd("q", comedi0, 11, 8, 10, 9, 6.28318530718 / (4 * 500.0), 0, 0));
+	hal.addPeripheralInput(new ComediDigIn("emergency", comedi0, 2, 1, true));
+	hal.addPeripheralOutput(new ComediDigOut("enable", comedi0, 2, 0));
+	hal.addPeripheralOutput(new ComediDac("dac", comedi0, 1, 0));
 }
 
 
