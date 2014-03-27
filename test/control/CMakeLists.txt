@@ -7,3 +7,4 @@
 # Blocks
 add_subdirectory(sum)
 add_subdirectory(d)
+add_subdirectory(demux)

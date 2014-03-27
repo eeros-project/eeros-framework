@@ -2,35 +2,34 @@
 #define ORG_EEROS_CONTROL_DEMUX_HPP_
 
 #include <eeros/control/Block.hpp>
-#include <eeros/types.hpp>
-#include <vector>
+#include <eeros/math/Matrix.hpp>
+#include <eeros/control/Input.hpp>
+#include <eeros/control/Output.hpp>
 
 namespace eeros {
 	namespace control {
 		
-		template < uint32_t N, typename T = double >
+		template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T> >
 		class DeMux: public Block {
 		public:
 			DeMux() { }
 			
 			virtual void run() {
-				timestamp_t t = in.getSignal().getTimestamp();
 				for(int i = 0; i < N; i++) {
-					out[i].setValue(in.getSignal().getValue()(i));
-					out[i].setTimeStamp(t);
+					out[i].getSignal().setValue(in.getSignal().getValue()(i));
 				}
 			}
 			
-			virtual Input<T>& getIn() {
+			virtual Input<C>& getIn() {
 				return in;
 			}
 			
-			virtual Output<T>& getOut(uint32_t output) {
-				return out[output];
+			virtual Output<T>& getOut(uint32_t index) {
+				return out[index];
 			}
 			
 		protected:
-			Input<T> in;
+			Input<C> in;
 			Output<T> out[N];
 		};
 

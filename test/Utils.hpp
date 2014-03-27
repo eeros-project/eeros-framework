@@ -17,6 +17,15 @@ class Utils {
 				return (diff < tolerance*ref);
 			}
 		}
+		
+		static double abs(double a) {
+			if(a >= 0) {
+				return a;
+			}
+			else {
+				return -a;
+			}
+		}
 };
 		
 #endif // ORG_EEROS_TEST_CONTROL_UTILS_HPP_

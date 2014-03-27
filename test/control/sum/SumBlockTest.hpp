@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "../Utils.hpp"
+#include "../../Utils.hpp"
 
 template <int N, typename T = double>
 class SumBlockTest {

@@ -15,10 +15,6 @@ add_test(control/sum/double/10inputs/random sum 10 "${TEST_DATA_DIR}/control/sum
 # add_test(control/sum/vector3/3inputs/random sum_vector 3 "${TEST_DATA_DIR}/control/sum/sum-vector3-3inputs-random.csv")
 # add_test(control/sum/vector3/10inputs/random sum_vector 10 "${TEST_DATA_DIR}/control/sum/sum-vector3-10inputs-random.csv")
 
-# add_test(control/sum/vector100/2inputs/random sum_vector 2 "${TEST_DATA_DIR}/control/sum/sum-vector100-2inputs-random.csv")
-# add_test(control/sum/vector100/3inputs/random sum_vector 3 "${TEST_DATA_DIR}/control/sum/sum-vector100-3inputs-random.csv")
-# add_test(control/sum/vector100/10inputs/random sum_vector 10 "${TEST_DATA_DIR}/control/sum/sum-vector100-10inputs-random.csv")
-
 # add_test(control/sum/matrix3x3/2inputs/random sum_vector 2 "${TEST_DATA_DIR}/control/sum/sum-matrix3x3-2inputs-random.csv")
 # add_test(control/sum/matrix3x3/3inputs/random sum_vector 3 "${TEST_DATA_DIR}/control/sum/sum-matrix3x3-3inputs-random.csv")
 # add_test(control/sum/matrix3x3/10inputs/random sum_vector 10 "${TEST_DATA_DIR}/control/sum/sum-matrix3x3-10inputs-random.csv")

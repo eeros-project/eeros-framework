@@ -1,7 +1,6 @@
 #ifndef ORG_EEROS_CONTROL_MUX_HPP_
 #define ORG_EEROS_CONTROL_MUX_HPP_
 
-#include <vector>
 #include <eeros/control/Block.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/control/Input.hpp>
@@ -26,7 +25,7 @@ namespace eeros {
 			}
 			
 			virtual Input<T>& getIn(uint32_t index) {
-				return out[index];
+				return in[index];
 			}
 			
 			virtual Output<T>& getOut() {

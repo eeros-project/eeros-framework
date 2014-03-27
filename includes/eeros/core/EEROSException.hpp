@@ -2,18 +2,20 @@
 #define ORG_EEROS_CORE_EEROSEXCEPTION_HPP
 
 #include <string>
+#include <sstream>
 #include <exception>
 
 namespace eeros {
 	class EEROSException : public std::exception {
 
 	public:
-		EEROSException(std::string message);
+		EEROSException();
+		explicit EEROSException(std::string m);
 		virtual ~EEROSException() throw();
 		
 		virtual const char* what() const throw();
 		
-	private:
+	protected:
 		std::string message;
 	};
 };

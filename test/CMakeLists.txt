@@ -8,6 +8,7 @@ set(TEST_DATA_DIR ${CMAKE_SOURCE_DIR}/test/data)
 # Framework components
 
 #add_subdirectory(core)
+add_subdirectory(math)
 add_subdirectory(control)
 #add_subdirectory(safety)
 #add_subdirectory(sequencer)
@@ -17,5 +18,4 @@ add_subdirectory(control)
 # Misc tests of the EEROS developers
 
 add_subdirectory(martin)
-add_subdirectory(math)
 #add_subdirectory(vinci)

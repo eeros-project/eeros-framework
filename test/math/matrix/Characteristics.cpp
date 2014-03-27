@@ -2,9 +2,9 @@
 #include <iostream>
 #include <cmath>
 #include <array>
-
-
 #include <eeros/math/Matrix.hpp>
+#include "../../Utils.hpp"
+
 using namespace eeros::math;
 
 template < uint8_t N, uint8_t M, typename T >
@@ -47,254 +47,48 @@ void rot(int axis, Matrix<N,M,T> &A, T angle) {
 	  
 	};
 
-const double MAX_DEVIATION = 0.1; //in %	
+const double MAX_DEVIATION = 0.0001; // relative
 constexpr int NUMBER_OF_ROT_TESTING_DATA = 7; 
-	
-	
-double abs(double a){
-  if(a>=0){
-    return a;
-  }else{
-    return -a;
-  }
-  
-}
-	
-int testZero(){
-  int error = 0;;
-  Matrix<3,3> mZero;
-  mZero.zero();
-  for(int n = 0; n < 3; n++) {
-	  for(int m = 0; m < 3; m++) {
-		  if(mZero(n,m) != 0) {
-			  std::cout << "  Failure: M(" << m << ',' << n << ") = " << mZero(m,n) << ", but should be 0!" << std::endl;
-			  error++;
-		  }
-	  }
-  }
-  return error;
-  
-}
-	
-int testElementalAccess(){
-  int error = 0;;
-  Matrix<3,3> m123;
-  m123.zero();
-  int i = 1;
-  for(int n = 0; n < 3; n++) {
-	  for(int m = 0; m < 3; m++) {
-		  m123(m,n) = i++;
-	  }
-  }
-  i = 1;
-  for(int n = 0; n < 3; n++) {
-	  for(int m = 0; m < 3; m++) {
-		  if(i++ != m123(m,n)) {
-			  std::cout << "  Failure: M(" << m << ',' << n << ") = " << m123(m,n) << ", but should be " << i << '!' << std::endl;
-			  error++;
-		  }
-	  }
-  }
-  return error;
-  
-}
-		
-int testEye(){
-  int error = 0;
-  Matrix<3,3> mEye;
-  mEye.eye();
-  for(int n = 0; n < 3; n++) {
-	  for(int m = 0; m < 3; m++) {
-		  if(n == m) { // value should be 1
-			  if(mEye(n,m) != 1) {
-				  std::cout << "  Failure: M(" << m << ',' << n << ") = " << mEye(m,n) << ", but should be 1!" << std::endl;
-				  error++;
-			  }
-		  }
-		  else { // value should be 0
-			  if(mEye(n,m) != 0) {
-				  std::cout << "  Failure: M(" << m << ',' << n << ") = " << mEye(m,n) << ", but should be 0!" << std::endl;
-				  error++;
-			  }
-		  }
-	  }
-  }
-  return error;
-}
-	
-int testRot(std::array<rotTesting,NUMBER_OF_ROT_TESTING_DATA> testingData){
-    int error = 0;
-    for(uint32_t i = 0; i < testingData.size();i++){
-	  for(uint32_t n = 0; n < testingData[i].uuT.getNrOfRows();n++){
-	    for(uint32_t m = 0; m < testingData[i].uuT.getNrOfColums();m++){
-	       double maxDeviation = 0;
-	       if (testingData[i].result(n,m) == 0){
-		maxDeviation = 10e-15; 
-	       }else{
-		maxDeviation = abs(testingData[i].result(n,m)*MAX_DEVIATION/100);
-	       }
-	       
-		if (testingData[i].uuT(n,m) < (testingData[i].result(n,m) -  maxDeviation) || 
-		  testingData[i].uuT(n,m) > (testingData[i].result(n,m) +  maxDeviation) ){
-		  std::cout << "  Failure: rotx " << i << n << m << " not like solution" << std::endl;
-		error++;
-	      }
 
-	    }
-	    
-	  }
-	}
-  return error;
-}
-	
-int testRotX(){
-  std::array<rotTesting,NUMBER_OF_ROT_TESTING_DATA> rotData;
-  rotData[0].uuT.rotx(0);
-  rotData[1].uuT.rotx(M_PI/4);
-  rotData[2].uuT.rotx(M_PI/2);
-  rotData[3].uuT.rotx(M_PI);
-  rotData[4].uuT.rotx(2*M_PI);
-  rotData[5].uuT.rotx(3*M_PI);
-  rotData[6].uuT.rotx(-0.4);
-  
-  rotData[0].result.eye();
-  
-  rotData[1].result(0,0) = 1; rotData[1].result(0,1) = 0; rotData[1].result(0,2) = 0;
-  rotData[1].result(1,0) = 0; rotData[1].result(1,1) = 0.707106781186548; rotData[1].result(1,2) = -0.707106781186547;
-  rotData[1].result(2,0) = 0; rotData[1].result(2,1) = 0.707106781186547; rotData[1].result(2,2) = 0.707106781186548;
-  
-  rotData[2].result(0,0) = 1; rotData[2].result(0,1) = 0; rotData[2].result(0,2) = 0;
-  rotData[2].result(1,0) = 0; rotData[2].result(1,1) = 0; rotData[2].result(1,2) = -1;
-  rotData[2].result(2,0) = 0; rotData[2].result(2,1) = 1; rotData[2].result(2,2) = 0;
-  
-  rotData[3].result(0,0) = 1; rotData[3].result(0,1) = 0; rotData[3].result(0,2) = 0;
-  rotData[3].result(1,0) = 0; rotData[3].result(1,1) = -1; rotData[3].result(1,2) = 0;
-  rotData[3].result(2,0) = 0; rotData[3].result(2,1) = 0; rotData[3].result(2,2) = -1;
-  
-  rotData[4].result.eye();
-  
-  rotData[5].result = rotData[3].result;
-  
-  rotData[6].result(0,0) = 1; rotData[6].result(0,1) = 0; rotData[6].result(0,2) = 0;
-  rotData[6].result(1,0) = 0; rotData[6].result(1,1) = 0.921060994002885; rotData[6].result(1,2) = 0.389418342308651;
-  rotData[6].result(2,0) = 0; rotData[6].result(2,1) = -0.389418342308651; rotData[6].result(2,2) = 0.921060994002885;
-  
-  return testRot(rotData);
-  
-}
-	
-int testRotY(){
-  std::array<rotTesting,NUMBER_OF_ROT_TESTING_DATA> rotData;
-  rotData[0].uuT.roty(0);
-  rotData[1].uuT.roty(M_PI/4);
-  rotData[2].uuT.roty(M_PI/2);
-  rotData[3].uuT.roty(M_PI);
-  rotData[4].uuT.roty(2*M_PI);
-  rotData[5].uuT.roty(3*M_PI);
-  rotData[6].uuT.roty(-0.4);
-
-  
-  rotData[0].result.eye();
-  
-  rotData[1].result(0,0) = 0.707106781186548 ; rotData[1].result(0,1) = 0; rotData[1].result(0,2) = 0.707106781186547;
-  rotData[1].result(1,0) = 0; rotData[1].result(1,1) = 1; rotData[1].result(1,2) = 0;
-  rotData[1].result(2,0) = -0.707106781186547; rotData[1].result(2,1) = 0; rotData[1].result(2,2) = 0.707106781186548;
-
-  rotData[2].result(0,0) = 0; rotData[2].result(0,1) = 0; rotData[2].result(0,2) = 1;
-  rotData[2].result(1,0) = 0; rotData[2].result(1,1) = 1; rotData[2].result(1,2) = 0;
-  rotData[2].result(2,0) = -1; rotData[2].result(2,1) = 0; rotData[2].result(2,2) = 0;
-  
-  rotData[3].result(0,0) = -1; rotData[3].result(0,1) = 0; rotData[3].result(0,2) = 0;
-  rotData[3].result(1,0) = 0; rotData[3].result(1,1) = 1; rotData[3].result(1,2) = 0;
-  rotData[3].result(2,0) = 0; rotData[3].result(2,1) = 0; rotData[3].result(2,2) = -1;
-  
-  rotData[4].result.eye();
-  
-  rotData[5].result = rotData[3].result;
-  
-  rotData[6].result(0,0) = 0.921060994002885 ; rotData[6].result(0,1) = 0; rotData[6].result(0,2) = -0.389418342308651;
-  rotData[6].result(1,0) = 0; rotData[6].result(1,1) = 1; rotData[6].result(1,2) = 0;
-  rotData[6].result(2,0) = 0.389418342308651; rotData[6].result(2,1) = 0; rotData[6].result(2,2) = 0.921060994002885;
-  
-  return testRot(rotData);
-}
-	
-int testRotZ(){
-  std::array<rotTesting,NUMBER_OF_ROT_TESTING_DATA> rotData;
-  rotData[0].uuT.rotz(0);
-  rotData[1].uuT.rotz(M_PI/4);
-  rotData[2].uuT.rotz(M_PI/2);
-  rotData[3].uuT.rotz(M_PI);
-  rotData[4].uuT.rotz(2*M_PI);
-  rotData[5].uuT.rotz(3*M_PI);
-  rotData[6].uuT.rotz(-0.4);
-  
-  rotData[0].result.eye();
-  
-  rotData[1].result(0,0) = 0.707106781186548 ; rotData[1].result(0,1) = -0.707106781186547 ; rotData[1].result(0,2) = 0;
-  rotData[1].result(1,0) = 0.707106781186547; rotData[1].result(1,1) = 0.707106781186548; rotData[1].result(1,2) = 0;
-  rotData[1].result(2,0) = 0; rotData[1].result(2,1) = 0; rotData[1].result(2,2) = 1;
-  
-  rotData[2].result(0,0) = 0; rotData[2].result(0,1) = -1; rotData[2].result(0,2) = 0;
-  rotData[2].result(1,0) = 1; rotData[2].result(1,1) = 0; rotData[2].result(1,2) = 0;
-  rotData[2].result(2,0) = 0; rotData[2].result(2,1) = 0; rotData[2].result(2,2) = 1;
-  
-  rotData[3].result(0,0) = -1; rotData[3].result(0,1) = 0; rotData[3].result(0,2) = 0;
-  rotData[3].result(1,0) = 0; rotData[3].result(1,1) = -1; rotData[3].result(1,2) = 0;
-  rotData[3].result(2,0) = 0; rotData[3].result(2,1) = 0; rotData[3].result(2,2) = 1;                  
-                   
-  rotData[4].result.eye();
-  
-  rotData[5].result = rotData[3].result;
-  
-  rotData[6].result(0,0) = 0.921060994002885 ; rotData[6].result(0,1) = 0.389418342308651; rotData[6].result(0,2) = 0;
-  rotData[6].result(1,0) = -0.389418342308651; rotData[6].result(1,1) = 0.921060994002885; rotData[6].result(1,2) = 0;
-  rotData[6].result(2,0) = 0; rotData[6].result(2,1) = 0; rotData[6].result(2,2) = 1;
-  
-  return testRot(rotData);
-  
-  return 0;
-}
-	
 int testSwapingRows(){
-  int error = 0;
-  
-  Matrix<3,3> swapMatrix1;
-  swapMatrix1(0,0) = 1; swapMatrix1(0,1) = 1; swapMatrix1(0,2) = 0;
-  swapMatrix1(1,0) = 0; swapMatrix1(1,1) = 0; swapMatrix1(1,2) = 2;
-  swapMatrix1(2,0) = 1; swapMatrix1(2,1) = 0; swapMatrix1(2,2) = 0;
-  Matrix<3,3> swapSolutionMatrix1;
-  swapSolutionMatrix1(0,0) = 0; swapSolutionMatrix1(0,1) = 0; swapSolutionMatrix1(0,2) = 2;
-  swapSolutionMatrix1(1,0) = 1; swapSolutionMatrix1(1,1) = 1; swapSolutionMatrix1(1,2) = 0;
-  swapSolutionMatrix1(2,0) = 1; swapSolutionMatrix1(2,1) = 0; swapSolutionMatrix1(2,2) = 0;
-  
-  
-  Matrix<4,3> swapMatrix2;
-  swapMatrix2(0,0) = 1; swapMatrix2(0,1) = 1; swapMatrix2(0,2) = 0;
-  swapMatrix2(1,0) = 0; swapMatrix2(1,1) = 0; swapMatrix2(1,2) = 2;
-  swapMatrix2(2,0) = 1; swapMatrix2(2,1) = 0; swapMatrix2(2,2) = 0;
-  swapMatrix2(3,0) = 4; swapMatrix2(3,1) = 5; swapMatrix2(3,2) = 6;
-  
-  Matrix<4,3> swapSolutionMatrix2;
-  swapSolutionMatrix2(0,0) = 4; swapSolutionMatrix2(0,1) = 5; swapSolutionMatrix2(0,2) = 6;
-  swapSolutionMatrix2(1,0) = 0; swapSolutionMatrix2(1,1) = 0; swapSolutionMatrix2(1,2) = 2;
-  swapSolutionMatrix2(2,0) = 1; swapSolutionMatrix2(2,1) = 0; swapSolutionMatrix2(2,2) = 0;
-  swapSolutionMatrix2(3,0) = 1; swapSolutionMatrix2(3,1) = 1; swapSolutionMatrix2(3,2) = 0;
-  
-  swapMatrix1.swapRows(0,1);
-  swapMatrix2.swapRows(0,3);
-  
-  if (swapMatrix1 != swapSolutionMatrix1){
-      std::cout << "  Failure: Matrix 1 rows not correctly swaped" << std::endl;
-      error++;
-  }
-  
-  if (swapMatrix2 != swapSolutionMatrix2){
-      std::cout << "  Failure: Matrix 2 rows not correctly swaped" << std::endl;
-      error++;
-  }
-  return error;
-  
+	int error = 0;
+	
+	Matrix<3,3> swapMatrix1;
+	swapMatrix1(0,0) = 1; swapMatrix1(0,1) = 1; swapMatrix1(0,2) = 0;
+	swapMatrix1(1,0) = 0; swapMatrix1(1,1) = 0; swapMatrix1(1,2) = 2;
+	swapMatrix1(2,0) = 1; swapMatrix1(2,1) = 0; swapMatrix1(2,2) = 0;
+	
+	Matrix<3,3> swapSolutionMatrix1;
+	swapSolutionMatrix1(0,0) = 0; swapSolutionMatrix1(0,1) = 0; swapSolutionMatrix1(0,2) = 2;
+	swapSolutionMatrix1(1,0) = 1; swapSolutionMatrix1(1,1) = 1; swapSolutionMatrix1(1,2) = 0;
+	swapSolutionMatrix1(2,0) = 1; swapSolutionMatrix1(2,1) = 0; swapSolutionMatrix1(2,2) = 0;
+
+	Matrix<4,3> swapMatrix2;
+	swapMatrix2(0,0) = 1; swapMatrix2(0,1) = 1; swapMatrix2(0,2) = 0;
+	swapMatrix2(1,0) = 0; swapMatrix2(1,1) = 0; swapMatrix2(1,2) = 2;
+	swapMatrix2(2,0) = 1; swapMatrix2(2,1) = 0; swapMatrix2(2,2) = 0;
+	swapMatrix2(3,0) = 4; swapMatrix2(3,1) = 5; swapMatrix2(3,2) = 6;
+	
+	Matrix<4,3> swapSolutionMatrix2;
+	swapSolutionMatrix2(0,0) = 4; swapSolutionMatrix2(0,1) = 5; swapSolutionMatrix2(0,2) = 6;
+	swapSolutionMatrix2(1,0) = 0; swapSolutionMatrix2(1,1) = 0; swapSolutionMatrix2(1,2) = 2;
+	swapSolutionMatrix2(2,0) = 1; swapSolutionMatrix2(2,1) = 0; swapSolutionMatrix2(2,2) = 0;
+	swapSolutionMatrix2(3,0) = 1; swapSolutionMatrix2(3,1) = 1; swapSolutionMatrix2(3,2) = 0;
+	
+	
+	swapMatrix1.swapRows(0,1);
+	swapMatrix2.swapRows(0,3);
+	
+	if(swapMatrix1 != swapSolutionMatrix1) {
+		std::cout << "    -> Failure: Matrix 1 rows not correctly swaped" << std::endl;
+		error++;
+	}
+	
+	if (swapMatrix2 != swapSolutionMatrix2){
+		std::cout << "    -> Failure: Matrix 2 rows not correctly swaped" << std::endl;
+		error++;
+	}
+	return error;
 }
 
 int testGaussSorting(){
@@ -619,63 +413,37 @@ int testDivideMatrixAndScalar(){
 
 
 int main(int argc, char *argv[]) {
-	int error = 0;
+	int error = 0, errorSum = 0;
 	int testNo = 1;
-
-	/********** A) Creating and inizializing **********/
 	
-	// zero()
-	std::cout << "Test #" << testNo++ << ": zero()" << std::endl;
-	error = error + testZero();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	// Element access
-	std::cout << "Test #" << testNo++ << ": Element access" << std::endl;
-	error = error + testElementalAccess();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	// eye()
-	std::cout << "Test #" << testNo++ << ": eye()" << std::endl;
-	error = error + testEye();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	// rotx()
-	std::cout << "Test #" << testNo++ << ": rotx()" << std::endl;
-	error = error + testRotX();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	// roty()
-	std::cout << "Test #" << testNo++ << ": roty()" << std::endl;
-	error = error + testRotY();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	// rotz()
-	std::cout << "Test #" << testNo++ << ": rotz()" << std::endl;
-	error = error + testRotZ();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
+	std::cout << "Testing functions for calculating characteristics of a Matrix" << std::endl;
 	
 	/********** Functions for helping to calculating the rank of a matrixl **********/
 	
-	//swaping rows
-	std::cout << "Test #" << testNo++ << ": swaping Rows" << std::endl;
-	error = error + testSwapingRows();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	std::cout << "[A] Testing helper functions" << std::endl;
 	
-	//gauss sorting matrix
-	std::cout << "Test #" << testNo++ << ": Gauss sorting Matrix" << std::endl;
-	error = error + testGaussSorting();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	// Swaping rows
+	std::cout << "    #" << testNo++ << ": Swaping rows: swapRows(a, b)" << std::endl;
+	error = testSwapingRows();
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	// Gauss sorting matrix
+	std::cout << "    #" << testNo++ << ": Gauss sorting Matrix" << std::endl;
+	error = testGaussSorting();
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
 	//gauss row elimination
-	std::cout << "Test #" << testNo++ << ": gaus row elimination" << std::endl;
-	error = error + testGaussRowElimination();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	
+	std::cout << "    #" << testNo++ << ": Gaus row elimination" << std::endl;
+	error = testGaussRowElimination();
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
 	
 	/********** Functions for calculating some characteristics of the matrix **********/
+	
+	std::cout << "[B] Testing functions for calculating characteristics of a Matrix" << std::endl;
 	
 	std::array<uuT<3,3>,2> characteristics33;
 	
@@ -771,127 +539,128 @@ int main(int argc, char *argv[]) {
 	characteristics44[3].lowerTriangular = false;
 	characteristics44[3].upperTriangular = true;
 	
-
-	std::cout << "Test #" << testNo++ << ": rank of a matrix" << std::endl;
+	std::cout << "    #" << testNo++ << ": Rank of a matrix: rank()" << std::endl;
+	error = 0;
 	
-	for(uint32_t i = 0; i < characteristics22.size();i++){
-	  if (characteristics22[i].matrix.rank() != characteristics22[i].rank){
-	    std::cout << "  Failure: Matrix22 " << i << " rank not correct" << std::endl;
-	    error++;
-	  }
+	for(uint32_t i = 0; i < characteristics22.size(); i++) {
+		double res = characteristics22[i].matrix.rank();
+		if(res != characteristics22[i].rank) {
+			std::cout << "    -> Failure: Matrix 2x2 #" << i << ": rank not correct calculated " << res << ", but should be " << characteristics22[i].rank << ")." << std::endl;
+			error++;
+		}
 	}
 	
-	for(uint32_t i = 0; i <  characteristics33.size();i++){
-	  if (characteristics33[i].matrix.rank() != characteristics33[i].rank){
-	    std::cout << "  Failure: Matrix33 " << i << " rank not correct" << std::endl;
-	    error++;
-	  }
+	for(uint32_t i = 0; i <  characteristics33.size(); i++) {
+		double res = characteristics33[i].matrix.rank();
+		if(res != characteristics33[i].rank) {
+			std::cout << "    -> Failure: Matrix 3x3 #" << i << ": rank not correct calculated " << res << ", but should be " << characteristics33[i].rank << ")." << std::endl;
+			error++;
+		}
 	}
 	
-	for(uint32_t i = 0; i <  characteristics44.size();i++){
-	  if (characteristics44[i].matrix.rank() != characteristics44[i].rank){
-	    std::cout << "  Failure: Matrix44 " << i << " rank not correct" << std::endl;
-	    error++;
-	  }
+	for(uint32_t i = 0; i <  characteristics44.size(); i++) {
+		double res = characteristics44[i].matrix.rank();
+		if(res != characteristics44[i].rank){
+			std::cout << "    -> Failure: Matrix 4x4 #" << i << ": rank not correct calculated " << res << ", but should be " << characteristics44[i].rank << ")." << std::endl;
+			error++;
+		}
 	}
 	
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-		
-	std::cout << "Test #" << testNo++ << ": det of a matrix" << std::endl;
-
-	for(uint32_t i = 0; i < characteristics22.size();i++){
-	  double maxDeviation = abs(characteristics22[i].det*MAX_DEVIATION/100);
-	  if ( characteristics22[i].matrix.det() < (characteristics22[i].det - maxDeviation ) || 
-	      characteristics22[i].matrix.det() > (characteristics22[i].det +  maxDeviation) ){
-		std::cout << "  Failure: Matrix22 " << i << " det not correct is: "<< characteristics22[i].matrix.det() << std::endl;
-		error++;
-	      }
-	}
-	      
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	for(uint32_t i = 0; i < characteristics33.size();i++){
-	  double maxDeviation = abs(characteristics33[i].det*MAX_DEVIATION/100);
-	  if ( characteristics33[i].matrix.det() < (characteristics33[i].det -  maxDeviation) || 
-	      characteristics33[i].matrix.det() > (characteristics33[i].det +  maxDeviation) ){
-		std::cout << "  Failure: Matrix33 " << i << " det not correct is: "<< characteristics33[i].matrix.det() << std::endl;
-		error++;
-	      }
-	}
+	std::cout << "    #" << testNo++ << ": Determinant of a matrix: det()" << std::endl;
+	error = 0;
 	
-	for(uint32_t i = 0; i < characteristics44.size();i++){
-	   double maxDeviation = abs(characteristics44[i].det*MAX_DEVIATION/100);
-	  if ( characteristics44[i].matrix.det() < (characteristics44[i].det -  maxDeviation) || 
-	      characteristics44[i].matrix.det() > (characteristics44[i].det +  maxDeviation) ){
-		std::cout << "  Failure: Matrix44 " << i << " det not correct is: "<< characteristics44[i].matrix.det() << std::endl;
-		error++;
-	      }
-	}
-
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-
-	
-	
-	std::cout << "Test #" << testNo++ << ": trace of a matrix" << std::endl;
-
-	for(uint32_t i = 0; i < characteristics22.size();i++){
-	  double maxDeviation = abs(characteristics22[i].trace*MAX_DEVIATION/100);
-	  if ( characteristics22[i].matrix.trace() < (characteristics22[i].trace - maxDeviation ) || 
-	      characteristics22[i].matrix.trace() > (characteristics22[i].trace +  maxDeviation) ){
-		std::cout << "  Failure: Matrix22 " << i << " trace not correct is: "<< characteristics22[i].matrix.trace() << std::endl;
-		error++;
-	      }
+	for(uint32_t i = 0; i < characteristics22.size(); i++) {
+		double res = characteristics22[i].matrix.det();
+		if(!Utils::compareApprox(characteristics22[i].det, res , MAX_DEVIATION)) {
+			std::cout << "    -> Failure: Matrix 2x2 #" << i << ": determinant not correct calculated " << res << ", but should be " << characteristics22[i].det << ")." << std::endl;
+			error++;
+		}
 	}
 	      
 	
-	for(uint32_t i = 0; i < characteristics33.size();i++){
-	  double maxDeviation = abs(characteristics33[i].trace*MAX_DEVIATION/100);
-	  if ( characteristics33[i].matrix.trace() < (characteristics33[i].trace -  maxDeviation) || 
-	      characteristics33[i].matrix.trace() > (characteristics33[i].trace +  maxDeviation) ){
-		std::cout << "  Failure: Matrix33 " << i << " trace not correct is: "<< characteristics33[i].matrix.trace() << std::endl;
-		error++;
-	      }
+	for(uint32_t i = 0; i < characteristics33.size(); i++) {
+		double res = characteristics33[i].matrix.det();
+		if(!Utils::compareApprox(characteristics33[i].det, res , MAX_DEVIATION)) {
+			std::cout << "    -> Failure: Matrix 3x3 #" << i << ": determinant not correct calculated " << res << ", but should be " << characteristics33[i].det << ")." << std::endl;
+			error++;
+		}
 	}
 	
-	for(uint32_t i = 0; i < characteristics44.size();i++){
-	   double maxDeviation = abs(characteristics44[i].trace*MAX_DEVIATION/100);
-	  if ( characteristics44[i].matrix.trace() < (characteristics44[i].trace -  maxDeviation) || 
-	      characteristics44[i].matrix.trace() > (characteristics44[i].trace +  maxDeviation) ){
-		std::cout << "  Failure: Matrix44 " << i << " trace not correct is: "<< characteristics44[i].matrix.trace() << std::endl;
-		error++;
-	      }
+	for(uint32_t i = 0; i < characteristics44.size(); i++) {
+		double res = characteristics44[i].matrix.det();
+		if(!Utils::compareApprox(characteristics44[i].det, res , MAX_DEVIATION)) {
+			std::cout << "    -> Failure: Matrix 4x4 #" << i << ": determinant not correct calculated " << res << ", but should be " << characteristics44[i].det << ")." << std::endl;
+			error++;
+		}
+	}
+	
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Trace of a matrix: trace()" << std::endl;
+	error = 0;
+	
+	for(uint32_t i = 0; i < characteristics22.size(); i++) {
+		double res = characteristics22[i].matrix.trace();
+		if(!Utils::compareApprox(characteristics22[i].trace, res , MAX_DEVIATION)) {
+			std::cout << "    -> Failure: Matrix 2x2 #" << i << ": trace not correct calculated " << res << ", but should be " << characteristics22[i].trace << ")." << std::endl;
+			error++;
+		}
+	}
+	      
+	
+	for(uint32_t i = 0; i < characteristics33.size(); i++) {
+		double res = characteristics33[i].matrix.trace();
+		if(!Utils::compareApprox(characteristics33[i].trace, res , MAX_DEVIATION)) {
+			std::cout << "    -> Failure: Matrix 3x3 #" << i << ": trace not correct calculated " << res << ", but should be " << characteristics33[i].trace << ")." << std::endl;
+			error++;
+		}
+	}
+	
+	for(uint32_t i = 0; i < characteristics44.size(); i++) {
+		double res = characteristics44[i].matrix.trace();
+		if(!Utils::compareApprox(characteristics44[i].trace, res , MAX_DEVIATION)) {
+			std::cout << "    -> Failure: Matrix 4x4 #" << i << ": trace not correct calculated " << res << ", but should be " << characteristics44[i].trace << ")." << std::endl;
+			error++;
+		}
 	}
 
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
 	/********** Functions for checking the matrix characteristics **********/
 	
-	std::cout << "Test #" << testNo++ << ": orthogonaly of a matrix" << std::endl;
+	std::cout << "    #" << testNo++ << ": Check if matrix is orhogonal: orthogonaly()" << std::endl;
+	error = 0;
 	
-	for(uint32_t i = 0; i < characteristics22.size();i++){
-	  if(characteristics22[i].matrix.isOrthogonal() != characteristics22[i].orthogonaly){
-	    std::cout << "  Failure: Matrix22 " << i << " orthogonaly not detected correctly"<< std::endl;
-	    error++;
-	  }
+	for(uint32_t i = 0; i < characteristics22.size(); i++) {
+		if(characteristics22[i].matrix.isOrthogonal() != characteristics22[i].orthogonaly) {
+			std::cout << "    -> Failure: Matrix 2x2 #" << i << ": orthogonality not correctly detected" << std::endl;
+			error++;
+		}
 	}
 	
-	for(uint32_t i = 0; i < characteristics33.size();i++){
-	  if(characteristics33[i].matrix.isOrthogonal() != characteristics33[i].orthogonaly){
-	    std::cout << "  Failure: Matrix33 " << i << " orthogonaly not detected correctly"<< std::endl;
-	    error++;
-	  }
+	for(uint32_t i = 0; i < characteristics33.size(); i++) {
+		if(characteristics33[i].matrix.isOrthogonal() != characteristics33[i].orthogonaly) {
+			std::cout << "    -> Failure: Matrix 3x3 #" << i << ": orthogonality not correctly detected" << std::endl;
+			error++;
+		}
 	}
 	
-	for(uint32_t i = 0; i < characteristics44.size();i++){
-	  if(characteristics44[i].matrix.isOrthogonal() != characteristics44[i].orthogonaly){
-	    std::cout << "  Failure: Matrix44 " << i << " orthogonaly not detected correctly"<< std::endl;
-	    error++;
-	  }
+	for(uint32_t i = 0; i < characteristics44.size(); i++) {
+		if(characteristics44[i].matrix.isOrthogonal() != characteristics44[i].orthogonaly) {
+			std::cout << "    -> Failure: Matrix 4x4 #" << i << ": orthogonality not correctly detected" << std::endl;
+			error++;
+		}
 	}
 	
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	
+	// TODO clean up rest of code...
 
 	std::cout << "Test #" << testNo++ << ": if matrix is invertible" << std::endl;
 	
