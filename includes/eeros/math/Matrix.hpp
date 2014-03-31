@@ -423,6 +423,16 @@ namespace eeros {
 				return result;
 			}
 			
+			Matrix<M, N, T> operator-(const T right) const {
+				Matrix<M, N, T> result;
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						result(m, n) = (*this)(m, n) - right;
+					}
+				}
+				return result;
+			}
+			
 			Matrix<M, N, T> operator/(T right) const {
 				Matrix<M, N, T> result;
 				for(uint8_t m = 0; m < M; m++) {

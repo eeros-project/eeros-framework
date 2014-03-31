@@ -322,11 +322,12 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	
-	if (errorSum == 0)
+	if(errorSum == 0) {
 		std::cout << "Matrix element access test succeeded" << std::endl;
-	else
+	}
+	else {
 		std::cout << "Matrix element access test failed with " << errorSum << " error(s)" << std::endl;
-
+	}
+	
 	return errorSum;
 }

@@ -418,7 +418,7 @@ int main(int argc, char *argv[]) {
 	
 	std::cout << "Testing functions for calculating characteristics of a Matrix" << std::endl;
 	
-	/********** Functions for helping to calculating the rank of a matrixl **********/
+	/********** Functions for helping to calculating the rank of a matrix **********/
 	
 	std::cout << "[A] Testing helper functions" << std::endl;
 	
@@ -633,7 +633,7 @@ int main(int argc, char *argv[]) {
 	
 	/********** Functions for checking the matrix characteristics **********/
 	
-	std::cout << "    #" << testNo++ << ": Check if matrix is orhogonal: orthogonaly()" << std::endl;
+	std::cout << "    #" << testNo++ << ": Check if matrix is orhogonal: isOrthogonal()" << std::endl;
 	error = 0;
 	
 	for(uint32_t i = 0; i < characteristics22.size(); i++) {
@@ -660,135 +660,134 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	// TODO clean up rest of code...
+	std::cout << "    #" << testNo++ << ": Check if matrix is invertible: isInvertible()" << std::endl;
+	error = 0;
+	
+	for(uint32_t i = 0; i < characteristics22.size(); i++) {
+		if(characteristics22[i].matrix.isInvertible() != characteristics22[i].invertible) {
+			std::cout << "    -> Failure: Matrix 2x2 #" << i << ": invertibility not correctly detected" << std::endl;
+			error++;
+		}
+	}
+	
+	for(uint32_t i = 0; i < characteristics33.size(); i++) {
+		if(characteristics33[i].matrix.isInvertible() != characteristics33[i].invertible) {
+			std::cout << "    -> Failure: Matrix 3x3 #" << i << ": invertibility not correctly detected" << std::endl;
+			error++;
+		}
+	}
+	
+	for(uint32_t i = 0; i < characteristics44.size(); i++) {
+		if(characteristics44[i].matrix.isInvertible() != characteristics44[i].invertible) {
+			std::cout << "    -> Failure: Matrix 4x4 #" << i << ": invertibility not correctly detected" << std::endl;
+			error++;
+		}
+	}
+	
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Check if matrix is symetric: isSymmetric()" << std::endl;
+	error = 0;
 
-	std::cout << "Test #" << testNo++ << ": if matrix is invertible" << std::endl;
-	
-	for(uint32_t i = 0; i < characteristics22.size();i++){
-	  if(characteristics22[i].matrix.isInvertible() != characteristics22[i].invertible){
-	    std::cout << "  Failure: Matrix22 " << i << " invertibility not detected correctly"<< std::endl;
-	    error++;
-	  }
+	for(uint32_t i = 0; i < characteristics22.size(); i++) {
+		if(characteristics22[i].matrix.isSymmetric() != characteristics22[i].symetric) {
+			std::cout << "    -> Failure: Matrix 2x2 #" << i << ": symmetry not correctly detected" << std::endl;
+			error++;
+		}
 	}
 	
-	for(uint32_t i = 0; i < characteristics33.size();i++){
-	  if(characteristics33[i].matrix.isInvertible() != characteristics33[i].invertible){
-	    std::cout << "  Failure: Matrix33 " << i << " invertibility not detected correctly"<< std::endl;
-	    error++;
-	  }
+	for(uint32_t i = 0; i < characteristics33.size(); i++) {
+		if(characteristics33[i].matrix.isSymmetric() != characteristics33[i].symetric) {
+			std::cout << "    -> Failure: Matrix 3x3 #" << i << ": symmetry not correctly detected" << std::endl;
+			error++;
+		}
 	}
 	
-	for(uint32_t i = 0; i < characteristics44.size();i++){
-	  if(characteristics44[i].matrix.isInvertible() != characteristics44[i].invertible){
-	    std::cout << "  Failure: Matrix44 " << i << " invertibility not detected correctly"<< std::endl;
-	    error++;
-	  }
+	for(uint32_t i = 0; i < characteristics44.size(); i++) {
+		if(characteristics44[i].matrix.isSymmetric() != characteristics44[i].symetric) {
+			std::cout << "    -> Failure: Matrix 4x4 #" << i << ": symmetry not correctly detected" << std::endl;
+			error++;
+		}
 	}
 	
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
+	std::cout << "    #" << testNo++ << ": Check if matrix is lower triagular: isLowerTriangular()" << std::endl;
+	error = 0;
+	
+	for(uint32_t i = 0; i < characteristics22.size(); i++) {
+		if(characteristics22[i].matrix.isLowerTriangular() != characteristics22[i].lowerTriangular) {
+			std::cout << "    -> Failure: Matrix 2x2 #" << i << ": detection if matrix is lower triangular failed" << std::endl;
+			error++;
+		}
+	}
+	
+	for(uint32_t i = 0; i < characteristics33.size(); i++) {
+		if(characteristics33[i].matrix.isLowerTriangular() != characteristics33[i].lowerTriangular) {
+			std::cout << "    -> Failure: Matrix 3x3 #" << i << ": detection if matrix is lower triangular failed" << std::endl;
+			error++;
+		}
+	}
+	
+	for(uint32_t i = 0; i < characteristics44.size(); i++) {
+		if(characteristics44[i].matrix.isLowerTriangular() != characteristics44[i].lowerTriangular) {
+			std::cout << "    -> Failure: Matrix 4x4 #" << i << ": detection if matrix is lower triangular failed" << std::endl;
+			error++;
+		}
+	}
+	
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Check if matrix is upper triagular: isUpperTriangular()" << std::endl;
+	
+	for(uint32_t i = 0; i < characteristics22.size(); i++) {
+		if(characteristics22[i].matrix.isUpperTriangular() != characteristics22[i].upperTriangular) {
+			std::cout << "    -> Failure: Matrix 2x2 #" << i << ": detection if matrix is upper triangular failed" << std::endl;
+			error++;
+		}
+	}
+	
+	for(uint32_t i = 0; i < characteristics33.size(); i++) {
+		if(characteristics33[i].matrix.isUpperTriangular() != characteristics33[i].upperTriangular) {
+			std::cout << "    -> Failure: Matrix 3x3 #" << i << ": detection if matrix is upper triangular failed" << std::endl;
+			error++;
+		}
+	}
+	
+	for(uint32_t i = 0; i < characteristics44.size(); i++) {
+		if(characteristics44[i].matrix.isUpperTriangular() != characteristics44[i].upperTriangular) {
+			std::cout << "    -> Failure: Matrix 4x4 #" << i << ": detection if matrix is upper triangular failed" << std::endl;
+			error++;
+		}
+	}
+	
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 
-	std::cout << "Test #" << testNo++ << ": if matrix is symetric" << std::endl;
-
-	for(uint32_t i = 0; i < characteristics22.size();i++){
-	  if(characteristics22[i].matrix.isSymmetric() != characteristics22[i].symetric){
-	    std::cout << "  Failure: Matrix22 " << i << " symetrie not detected correctly"<< std::endl;
-	    error++;
-	  }
+	// TODO move to initialization tests
+// 	std::cout << "Test #" << testNo++ << ": test creat skew symmetric matrix" << std::endl;
+// 	error = error + testSkewSymetricMatrix();
+// 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	// TODO move to matrix operation tests
+// 	std::cout << "Test #" << testNo++ << ": test cross product" << std::endl;
+// 	error = error + testCrossProduct();
+// 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	// TODO move to matrix operation tests
+// 	std::cout << "Test #" << testNo++ << ": test multiply element wise" << std::endl;
+// 	error = error + testMultiplyElementWise();
+// 	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
+	
+	if(errorSum == 0) {
+		std::cout << "Matrix characteristics test succeeded" << std::endl;
+	}
+	else {
+		std::cout << "Matrix characteristics test failed with " << errorSum << " error(s)" << std::endl;
 	}
 	
-	for(uint32_t i = 0; i < characteristics33.size();i++){
-	  if(characteristics33[i].matrix.isSymmetric() != characteristics33[i].symetric){
-	    std::cout << "  Failure: Matrix33 " << i << " symetrie not detected correctly"<< std::endl;
-	    error++;
-	  }
-	}
-	
-	for(uint32_t i = 0; i < characteristics44.size();i++){
-	  if(characteristics44[i].matrix.isSymmetric() != characteristics44[i].symetric){
-	    std::cout << "  Failure: Matrix44 " << i << " symetrie not detected correctly"<< std::endl;
-	    error++;
-	  }
-	}
-	
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	
-	std::cout << "Test #" << testNo++ << ": if matrix is lower triangular" << std::endl;
-
-	for(uint32_t i = 0; i < characteristics22.size();i++){
-	  if(characteristics22[i].matrix.isLowerTriangular() != characteristics22[i].lowerTriangular){
-	    std::cout << "  Failure: Matrix22 " << i << " lower triangular not detected correctly"<< std::endl;
-	    error++;
-	  }
-	}
-	
-	for(uint32_t i = 0; i < characteristics33.size();i++){
-	  if(characteristics33[i].matrix.isLowerTriangular() != characteristics33[i].lowerTriangular){
-	    std::cout << "  Failure: Matrix33 " << i << " lower triangular not detected correctly"<< std::endl;
-	    error++;
-	  }
-	}
-	
-	for(uint32_t i = 0; i < characteristics44.size();i++){
-	  if(characteristics44[i].matrix.isLowerTriangular() != characteristics44[i].lowerTriangular){
-	    std::cout << "  Failure: Matrix44 " << i << " lower triangular not detected correctly"<< std::endl;
-	    error++;
-	  }
-	}
-	
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-
-	std::cout << "Test #" << testNo++ << ": if matrix is upper triangular" << std::endl;
-
-	for(uint32_t i = 0; i < characteristics22.size();i++){
-	  if(characteristics22[i].matrix.isUpperTriangular() != characteristics22[i].upperTriangular){
-	    std::cout << "  Failure: Matrix22 " << i << " upper triangular not detected correctly"<< std::endl;
-	    error++;
-	  }
-	}
-	
-	for(uint32_t i = 0; i < characteristics33.size();i++){
-	  if(characteristics33[i].matrix.isUpperTriangular() != characteristics33[i].upperTriangular){
-	    std::cout << "  Failure: Matrix33 " << i << " upper triangular not detected correctly"<< std::endl;
-	    error++;
-	  }
-	}
-	
-	for(uint32_t i = 0; i < characteristics44.size();i++){
-	  if(characteristics44[i].matrix.isUpperTriangular() != characteristics44[i].upperTriangular){
-	    std::cout << "  Failure: Matrix44 " << i << " upper triangular not detected correctly"<< std::endl;
-	    error++;
-	  }
-	}
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	std::cout << "Test #" << testNo++ << ": test creat skew symmetric matrix" << std::endl;
-	error = error + testSkewSymetricMatrix();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	std::cout << "Test #" << testNo++ << ": test cross product" << std::endl;
-	error = error + testCrossProduct();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	std::cout << "Test #" << testNo++ << ": test multiply element wise" << std::endl;
-	error = error + testMultiplyElementWise();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	std::cout << "Test #" << testNo++ << ": test multiply matrix and scalar" << std::endl;
-	error = error + testMultiplyMatrixAndScalar();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	std::cout << "Test #" << testNo++ << ": test divide matrix and scalar" << std::endl;
-	error = error + testDivideMatrixAndScalar();
-	std::cout << "  Test finished with " << error << " error(s)" << std::endl;
-	
-	
-	
-	if (error == 0)
-		std::cout << "matrix test succeeded" << std::endl;
-	else
-		std::cout << "matrix test failed: " << error << " errors" << std::endl;
-
-	return error;
+	return errorSum;
 }
