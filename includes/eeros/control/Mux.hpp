@@ -18,17 +18,17 @@ namespace eeros {
 			virtual void run() {
 				C newValue;
 				for(int i = 0; i < N; i++) {
-					newValue(i) = in[i];
+					newValue(i) = in[i].getSignal().getValue();
 				}
 				out.getSignal().setValue(newValue);
-				out.getSignal().setTimestamp(in[0].getSignal().getTimeStamp());
+				out.getSignal().setTimestamp(in[0].getSignal().getTimestamp());
 			}
 			
 			virtual Input<T>& getIn(uint32_t index) {
 				return in[index];
 			}
 			
-			virtual Output<T>& getOut() {
+			virtual Output<C>& getOut() {
 				return out;
 			}
 			
