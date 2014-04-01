@@ -2,9 +2,6 @@
 #define ORG_EEROS_CONTROL_D_HPP_
 
 #include <eeros/control/Block1i1o.hpp>
-#include <type_traits>
-
-#include <iostream>
 
 namespace eeros {
 	namespace control {
@@ -18,7 +15,7 @@ namespace eeros {
 			virtual void run() {
 				if(first) {  // first run, no previous value available -> set output to zero
 					prev = this->in.getSignal();
-					this->out.getSignal().setValue(0);
+					this->out.getSignal() = 0;
 					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
 					first = false;
 				}
@@ -31,17 +28,14 @@ namespace eeros {
 					this->out.getSignal().setValue((valin - valprev) / (tin - tprev));
 					this->out.getSignal().setTimestamp((tin + tprev) / 2);
 					
-//					std::cout << "Tin=" << tin << "\t" << "Tpr=" << tprev << "\t" << " dT=" << tin - tprev << "\t" << "valout=" << (valin - valprev) / (tin - tprev) << std::endl;
-					
 					prev = this->in.getSignal();
 				}
 			}
 			
-//		protected:
+		protected:
 			Signal<T> prev;
 			bool first;
 		};
-
 	};
 };
 #endif /* ORG_EEROS_CONTROL_D_HPP_ */
