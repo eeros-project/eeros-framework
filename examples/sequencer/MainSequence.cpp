@@ -21,13 +21,6 @@ void MainSequence::init() {
 	});
 	
 	addStep([&]() {
-		log.info() << "[" << name << "] " << "Step  " << var++;
-		log.info() << "[" << name << "] " << "Starting parallel sequence (c)";
-		startParallelSequence(getSequence("Sequence C"));
-		sleep(1);
-	});
-	
-	addStep([&]() {
 		log.info() << "[" << name << "] " << "Step " << var++;
 		sleep(1);
 		for(int i = 0; i < 10; i++) {
