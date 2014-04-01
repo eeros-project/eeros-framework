@@ -15,6 +15,20 @@ namespace eeros {
 		class Matrix {
 		public:
 			
+			template < unsigned int IM, unsigned int IN, typename IT >
+			class MatrixInitializer {
+			public:
+				MatrixInitializer(Matrix<IM, IN, IT>& mat, unsigned int index = 0) : mat(mat), index(index) { }
+				
+				MatrixInitializer<IM, IN, IT> operator,(IT right) {
+					mat(index / M, index % N) = right;
+					return MatrixInitializer<IM, IN, IT>(mat, index + 1);
+				}
+				
+				Matrix<IM, IN, IT>& mat;
+				unsigned int index;
+			}; // END class MatrixInitializer
+		
 			Matrix() { }
 			
 			/********** Initializing the matrix **********/
@@ -91,6 +105,11 @@ namespace eeros {
 				else {
 					throw EEROSException("rotz(double) is only implemented for 3x3 matrices");
 				}
+			}
+			
+			MatrixInitializer<M,N,T> operator<<(T right) {
+				(*this)[0] = right;
+				return MatrixInitializer<M, N, T>(*this, 1);
 			}
 			
 			/********** Element access **********/

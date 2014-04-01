@@ -236,8 +236,8 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	// ********** Part D: static create methods **********
-	std::cout << "[D] Testing static methods for creating matrices" << std::endl;
+	// ********** Part D: Other initialization methods **********
+	std::cout << "[D] Testing other initialization methods" << std::endl;
 	
 	std::cout << "    #" << testNo++ << ": Testing createDiag()" << std::endl;
 	error = 0;
@@ -257,6 +257,25 @@ int main(int argc, char *argv[]) {
 					error++;
 				}
 			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Testing << operator" << std::endl;
+	error = 0;
+	Matrix<3, 3, int> sMat;
+	sMat << 1, 4, 7,
+	        2, 5, 8,
+	        3, 6, 9;
+	int j = 1;
+	for(unsigned int n = 0; n < 3; n++) {
+		for(unsigned int m = 0; m < 3; m++) {
+			if(j != sMat(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << sMat(m, n) << ", but should be " << j << '!' << std::endl;
+				error++;
+			}
+			j++;
 		}
 	}
 	errorSum += error;
