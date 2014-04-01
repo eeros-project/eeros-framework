@@ -85,7 +85,7 @@ namespace eeros {
 					if (ia->check(&privateContext)) {
 						SafetyLevel* newLevel = currentLevel;
 						using namespace eeros::logger;
-						eeros::hal::SystemInputInterface* action = (eeros::hal::SystemInputInterface*)(ia->inputInterface); // TODO make getId() const
+						eeros::hal::PeripheralInputInterface* action = (eeros::hal::PeripheralInputInterface*)(ia->inputInterface); // TODO make getId() const
 						if (oldLevel != newLevel) {
 							log.warn()	<< "level changed due to input action: " << action->getId() << endl
 										<< "  previous level: [" << oldLevel->getId() << "] " << oldLevel->getDescription() << endl

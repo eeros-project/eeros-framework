@@ -2,14 +2,21 @@
 
 using namespace eeros::hal;
 
-ComediFqd::ComediFqd(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channelA, uint32_t channelB, uint32_t channelZ, double scale, double offset, double initValue) : SystemInput<double>(id) {
+ComediFqd::ComediFqd(std::string id, 
+					 ComediDevice* device,
+					 uint32_t subDeviceNumber,
+					 uint32_t channelA,
+					 uint32_t channelB,
+					 uint32_t channelZ,
+					 double scale,
+					 double offset,
+					 double initValue) : 
+					 ScalablePeripheralInput<double>(id, scale, offset) {
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channelA = channelA;
 	this->channelB = channelB;
 	this->channelZ = channelZ;
-	this->scale = scale;
-	this->offset = offset;
 	
 	comedi_reset(deviceHandle, subDeviceNumber);
 	
@@ -39,15 +46,3 @@ double ComediFqd::get() {
 	return static_cast<int>(data) * scale + offset;
 }
 
-void ComediFqd::setScale(double scale) {
-// 	lsampl_t data = 0;
-// 	comedi_data_write (deviceHandle, subDeviceNumber, 2, scale, this->offset, devInitValue);
-//     return static_cast<int>(data) * scale + offset;
-	this->scale = scale;
-}
-void ComediFqd::setOffset(double offset) {
-// 	lsampl_t data = 0;
-// 	comedi_data_write (deviceHandle, subDeviceNumber, 2, this->scale, offset, devInitValue);
-//     return static_cast<int>(data) * scale + offset;
-	this->offset = offset;
-}

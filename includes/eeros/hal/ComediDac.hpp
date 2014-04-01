@@ -2,17 +2,14 @@
 #define ORG_EEROS_HAL_COMEDIDAC_HPP_
 
 #include <string>
-#include <vector>
-
 #include <comedilib.h>
-
-#include <eeros/hal/SystemOutput.hpp>
+#include <eeros/hal/ScalablePeripheralOutput.hpp>
 #include <eeros/hal/ComediDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class ComediDac : public SystemOutput<double> {
+		class ComediDac : public ScalablePeripheralOutput<double> {
 		public:
 			ComediDac(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0);
 			virtual double get();
@@ -30,9 +27,6 @@ namespace eeros {
 			double minVoltage;
 			
 			uint32_t maxValue;
-			
-			double scale;
-			double offset;
 		};
 
 	};

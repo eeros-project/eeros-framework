@@ -23,15 +23,15 @@ void initHardware() {
 	ComediDevice* comedi0 = new ComediDevice("/dev/comedi0");
 	
 	// Add system in- and outputs to the HAL
-	hal.addSystemInput(new ComediFqd("q0", comedi0, 11, 8, 10, 9, 6.28318530718 / 2000.0, 0, 0));
-	hal.addSystemInput(new ComediFqd("q1", comedi0, 11, 3, 11, 4, 6.28318530718 / 2000.0, 0, 0));
-	hal.addSystemInput(new ComediDigIn("emergencyStop", comedi0, 2, 0));
-	hal.addSystemOutput(new ComediDigOut("enable0", comedi0, 2, 8));
-	hal.addSystemOutput(new ComediDigOut("enable1", comedi0, 2, 9));
-	hal.addSystemOutput(new ComediDigOut("brake0", comedi0, 2, 10));
-	hal.addSystemOutput(new ComediDigOut("brake1", comedi0, 2, 11));
-	hal.addSystemOutput(new ComediDigOut("power", comedi0, 2, 12));
-	hal.addSystemOutput(new ComediDigOut("wd", comedi0, 2, 13));
+	hal.addPeripheralInput(new ComediFqd("q0", comedi0, 11, 8, 10, 9, 6.28318530718 / 2000.0, 0, 0));
+	hal.addPeripheralInput(new ComediFqd("q1", comedi0, 11, 3, 11, 4, 6.28318530718 / 2000.0, 0, 0));
+	hal.addPeripheralInput(new ComediDigIn("emergencyStop", comedi0, 2, 0));
+	hal.addPeripheralOutput(new ComediDigOut("enable0", comedi0, 2, 8));
+	hal.addPeripheralOutput(new ComediDigOut("enable1", comedi0, 2, 9));
+	hal.addPeripheralOutput(new ComediDigOut("brake0", comedi0, 2, 10));
+	hal.addPeripheralOutput(new ComediDigOut("brake1", comedi0, 2, 11));
+	hal.addPeripheralOutput(new ComediDigOut("power", comedi0, 2, 12));
+	hal.addPeripheralOutput(new ComediDigOut("wd", comedi0, 2, 13));
 }
 
 int main() {

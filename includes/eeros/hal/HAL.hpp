@@ -4,25 +4,23 @@
 #include <string>
 #include <map>
 #include <unordered_set>
-
-#include <eeros/hal/SystemInput.hpp>
-#include <eeros/hal/SystemOutput.hpp>
-#include "ComediDevice.hpp"
+#include <eeros/hal/PeripheralInput.hpp>
+#include <eeros/hal/PeripheralOutput.hpp>
 
 namespace eeros {
 	namespace hal {
 		
 		class HAL {
 		public:
-			SystemOutputInterface* getSystemOutput(std::string name, bool exclusive = false);
-			SystemOutput<bool>* getLogicSystemOutput(std::string name, bool exclusive = false);
-			SystemOutput<double>* getRealSystemOutput(std::string name, bool exclusive = false);
-			SystemInputInterface* getSystemInput(std::string name, bool exclusive = false);
-			SystemInput<bool>* getLogicSystemInput(std::string name, bool exclusive = false);
-			SystemInput<double>* getRealSystemInput(std::string name, bool exclusive = false);
+			PeripheralOutputInterface* getPeripheralOutput(std::string name, bool exclusive = false);
+			PeripheralOutput<bool>* getLogicPeripheralOutput(std::string name, bool exclusive = false);
+			PeripheralOutput<double>* getRealPeripheralOutput(std::string name, bool exclusive = false);
+			PeripheralInputInterface* getPeripheralInput(std::string name, bool exclusive = false);
+			PeripheralInput<bool>* getLogicPeripheralInput(std::string name, bool exclusive = false);
+			PeripheralInput<double>* getRealPeripheralInput(std::string name, bool exclusive = false);
 			
-			bool addSystemInput(SystemInputInterface* systemInput);
-			bool addSystemOutput(SystemOutputInterface* systemOutput);
+			bool addPeripheralInput(PeripheralInputInterface* systemInput);
+			bool addPeripheralOutput(PeripheralOutputInterface* systemOutput);
 			
 			bool readConfigFromFile(std::string file);
 			
@@ -35,11 +33,11 @@ namespace eeros {
 			
 			bool loadModule(std::string moduleName);
 			
-			std::unordered_set<SystemOutputInterface*> exclusiveReservedOutputs;
-			std::unordered_set<SystemInputInterface*> exclusiveReservedInputs;
+			std::unordered_set<PeripheralOutputInterface*> exclusiveReservedOutputs;
+			std::unordered_set<PeripheralInputInterface*> exclusiveReservedInputs;
 			
-			std::map<std::string, SystemInputInterface*> inputs;
-			std::map<std::string, SystemOutputInterface*> outputs;
+			std::map<std::string, PeripheralInputInterface*> inputs;
+			std::map<std::string, PeripheralOutputInterface*> outputs;
 		};
 
 	};

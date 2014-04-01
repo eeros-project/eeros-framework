@@ -3,7 +3,6 @@
 
 #include <eeros/control/Block1i.hpp>
 #include <eeros/hal/HAL.hpp>
-#include <eeros/hal/SystemOutput.hpp>
 #include <eeros/core/EEROSException.hpp>
 
 namespace eeros {
@@ -14,8 +13,8 @@ namespace eeros {
 
 		public:
 			PeripheralOutput(std::string id) : hal(hal::HAL::instance()) {
-				systemOutput = dynamic_cast<hal::SystemOutput<T>*>(hal.getSystemOutput(id));
-				if(systemOutput == nullptr) throw EEROSException("System output '" + id + "' not found!");
+				systemOutput = dynamic_cast<hal::PeripheralOutput<T>*>(hal.getPeripheralOutput(id));
+				if(systemOutput == nullptr) throw EEROSException("Peripheral output '" + id + "' not found!");
 			}
 			
 			virtual void run() {
@@ -24,7 +23,7 @@ namespace eeros {
 			
 		private:
 			hal::HAL& hal;
-			hal::SystemOutput<T>* systemOutput;
+			hal::PeripheralOutput<T>* systemOutput;
 		};
 
 	};

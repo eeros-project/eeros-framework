@@ -14,19 +14,19 @@ ExampleSafetyProperties::ExampleSafetyProperties() {
 	HAL& hal = HAL::instance();
 	
 	// ############ Define criticcal outputs ############
-	power = hal.getLogicSystemOutput("power");
-	wd = hal.getLogicSystemOutput("wd");
-	enable0 = hal.getLogicSystemOutput("enable0");
-	enable1 = hal.getLogicSystemOutput("enable1");
-	brake0 = hal.getLogicSystemOutput("brake0");
-	brake1 = hal.getLogicSystemOutput("brake1");
+	power = hal.getLogicPeripheralOutput("power");
+	wd = hal.getLogicPeripheralOutput("wd");
+	enable0 = hal.getLogicPeripheralOutput("enable0");
+	enable1 = hal.getLogicPeripheralOutput("enable1");
+	brake0 = hal.getLogicPeripheralOutput("brake0");
+	brake1 = hal.getLogicPeripheralOutput("brake1");
 	
 	criticalOutputs = { power, enable0, enable1, brake0, brake1 };
 	
 	// ############ Define criticcal inputs ############
-	emergencyStop = hal.getLogicSystemInput("emergencyStop");
-	q0 = hal.getRealSystemInput("q0");
-	q1 = hal.getRealSystemInput("q1");
+	emergencyStop = hal.getLogicPeripheralInput("emergencyStop");
+	q0 = hal.getRealPeripheralInput("q0");
+	q1 = hal.getRealPeripheralInput("q1");
 	
 	criticalInputs = { emergencyStop, q0, q1 };
 	

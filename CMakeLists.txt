@@ -58,6 +58,16 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 			
 			# Check for libraries
 			CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
+			CHECK_INCLUDE_FILES ("flinklib.h" LIBFLINK)
+			
+			if(LIBCOMEDI)
+				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
+				#list (APPEND EXTERNAL_LIBS "comedi ")
+			endif()
+			if(LIBFLINK)
+				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
+				#list (APPEND EXTERNAL_LIBS "flink")
+			endif()
 			
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") # FreeBSD
 			set(FREEBSD TRUE)
@@ -74,33 +84,17 @@ else()
 	# Cross compile -> use informations form CMAKE_TOOLCHAIN_FILE
 	# TODO
 endif()
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
-
 
 # Special settings for different IDEs
 SET(CMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT ON)
 
-# Macros
-macro (add_test_sources)
-    file (RELATIVE_PATH _relPath "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
-    foreach (_src ${ARGN})
-        if(_relPath)
-            list (APPEND TEST_SRCS "${_relPath}/${_src}")
-        else()
-            list (APPEND TEST_SRCS "${_src}")
-        endif()
-    endforeach()
-    if (_relPath)
-        # propagate TEST_SRCS to parent directory
-        set(TEST_SRCS ${TEST_SRCS} PARENT_SCOPE)
-    endif()
-endmacro()
-
-# EEROS framework source code
+# EEROS framework
 add_subdirectory(src)
 
-# Unit tests source code
+# Unit tests
 enable_testing()
 add_subdirectory(test)
 

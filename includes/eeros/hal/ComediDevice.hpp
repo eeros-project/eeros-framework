@@ -2,12 +2,7 @@
 #define ORG_EEROS_HAL_COMEDIDEVICE_HPP_
 
 #include <string>
-#include <vector>
-
 #include <comedilib.h>
-
-#include <eeros/hal/SystemInput.hpp>
-#include <eeros/hal/SystemOutput.hpp>
 
 namespace eeros {
 	namespace hal {
@@ -22,7 +17,6 @@ namespace eeros {
 		private:
 			comedi_t *it;
 		};
-
 	};
 };
 

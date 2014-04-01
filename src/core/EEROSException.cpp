@@ -2,7 +2,11 @@
 
 using namespace eeros;
 
-EEROSException::EEROSException(std::string message) : message(message) { }
+EEROSException::EEROSException() { }
+
+EEROSException::EEROSException(std::string m) : message(m) {
+	
+}
 
 EEROSException::~EEROSException() throw() { }
 

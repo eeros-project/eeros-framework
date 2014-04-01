@@ -2,6 +2,7 @@
 #define ORG_EEROS_MATH_MATRIX_HPP_
 
 #include <eeros/core/EEROSException.hpp>
+#include "MatrixIndexOutOfBoundException.hpp"
 
 #include <sstream>
 #include <cstdlib>
@@ -10,30 +11,31 @@
 
 namespace eeros {
 	namespace math {
-		template < uint8_t N, uint8_t M = 1, typename T = double >
+		template < uint8_t M, uint8_t N = 1, typename T = double >
 		class Matrix {
 		public:
+			
 			Matrix() { }
 			
-			/********** Functions for initializing the matrix **********/
+			/********** Initializing the matrix **********/
 			
 			void zero() {
-				for(uint8_t i = 0; i < N * M; i++) {
+				for(uint8_t i = 0; i < M * N; i++) {
 					value[i] = 0;
 				}
 			}
 			
 			void eye() {
 				zero();
-				uint8_t j = (N < M) ? N : M;
+				uint8_t j = (M < N) ? M : N;
 				for(uint8_t i = 0; i < j; i++) {
 					(*this)(i, i) = 1;
 				}
 			}
 			
 			void rotx(double angle) {
-				Matrix<N,M,T>& m = *this;
-				if(N == 3 && M == 3) {
+				Matrix<M, N, T>& m = *this;
+				if(M == 3 && N == 3) {
 					m(0,0) = 1;
 					m(1,0) = 0;
 					m(2,0) = 0;
@@ -52,8 +54,8 @@ namespace eeros {
 			}
 			
 			void roty(double angle) {
-				Matrix<N,M,T>& m = *this;
-				if(N == 3 && M == 3) {
+				Matrix<M, N, T>& m = *this;
+				if(M == 3 && N == 3) {
 					m(0,0) = std::cos(angle);
 					m(1,0) = 0;
 					m(2,0) = -std::sin(angle);
@@ -72,8 +74,8 @@ namespace eeros {
 			}
 			
 			void rotz(double angle) {
-				Matrix<N,M,T>& m = *this;
-				if(N == 3 && M == 3) {
+				Matrix<M, N, T>& m = *this;
+				if(M == 3 && N == 3) {
 					m(0,0) = std::cos(angle);
 					m(1,0) = std::sin(angle);
 					m(2,0) = 0;
@@ -91,25 +93,93 @@ namespace eeros {
 				}
 			}
 			
-			/********** Functions for checking the matrix characteristics **********/
+			/********** Element access **********/
+			
+			const T get(uint8_t m, uint8_t n) const {
+				return (*this)(m, n);
+			}
+			
+			void set(uint8_t m, uint8_t n, T value) {
+				(*this)(m, n) = value;
+			}
+			
+			T& operator()(uint8_t m, uint8_t n) {
+				if(m >= 0 && m < M && n >= 0 && n < N) {
+					return value[M * n + m];
+				}
+				else {
+					throw MatrixIndexOutOfBoundException(m, M, n, N);
+				}
+			}
+			
+			const T operator()(uint8_t m, uint8_t n) const {
+				if(m >= 0 && m < M && n >= 0 && n < N) {
+					return value[M * n + m];
+				}
+				else {
+					throw MatrixIndexOutOfBoundException(m, M, n, N);
+				}
+			}
+			
+			T& operator()(unsigned int i) {
+				if(i >= 0 && i < M * N) {
+					return value[i];
+				}
+				else {
+					throw MatrixIndexOutOfBoundException(i, M * N);
+				}
+			}
+			
+			const T operator()(unsigned int i) const {
+				if(i >= 0 && i < M * N) {
+					return value[i];
+				}
+				else {
+					throw MatrixIndexOutOfBoundException(i, M * N);
+				}
+			}
+			
+			T& operator[](unsigned int i) {
+				if(i >= 0 && i < M * N) {
+					return value[i];
+				}
+				else {
+					throw MatrixIndexOutOfBoundException(i, M * N);
+				}
+			}
+			
+			const T operator[](unsigned int i) const {
+				if(i >= 0 && i < M * N) {
+					return value[i];
+				}
+				else {
+					throw MatrixIndexOutOfBoundException(i, M * N);
+				}
+			}
+			
+			/********** Matrix characteristics **********/
+			
+			bool isSquare() const {
+				return M == N;
+			}
 			
 			bool isOrthogonal() const {
-				Matrix<N,M,T> result,transposed,eye;
+				Matrix<N, M, T> result, transposed, eye;
 				eye.eye();
-				transposed = transpose();
-				result = (*this)*transposed;
+				transposed = this->transpose();
+				result = (*this) * transposed;
 				return result == eye;
 			}
 			
 			bool isSymmetric() const {
-				return (*this) == transpose();
+				return (*this) == this->transpose();
 			}
 			
 			bool isDiagonal() const {
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						if(n!=m){
-							if(v(n,m)!=0){
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if(m != n){
+							if((*this)(m, n) != 0){
 								return false;
 							}
 						}
@@ -119,10 +189,10 @@ namespace eeros {
 			}
 			
 			bool isLowerTriangular() const {
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						if(n<m){
-							if(v(n,m)!=0){
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if(m < n){
+							if((*this)(m, n) != 0){
 								return false;
 							}
 						}
@@ -132,10 +202,10 @@ namespace eeros {
 			}
 			
 			bool isUpperTriangular() const {
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						if(n>m){
-							if(v(n,m)!=0){
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if(m > n){
+							if((*this)(m, n) != 0){
 								return false;
 							}
 						}
@@ -146,86 +216,79 @@ namespace eeros {
 			
 			bool isInvertible() const {
 				// non square matrices can't be inverted, if the determinat of a matrix is zero it is not invertible
-				return (N == M) && (this->det() != 0);
+				return (M == N) && (this->det() != 0);
 			}
 			
-			/********** Functions for calculating some characteristics of the matrix **********/
-			
-			uint8_t getNrOfRows() const {
-				return N;
-			}
-			
-			uint8_t getNrOfColums() const {
+			uint8_t getNofRows() const {
 				return M;
 			}
 			
-			uint32_t rank() const {
-				uint32_t numberOfNonZeroRows = 0;
-				uint32_t i = 0;
-				Matrix<N,M,T> matrix;
-				for (uint8_t n = 0; n < N; n++) {
-					for (uint8_t m = 0; m < M; m++) {
-						matrix(n,m) = v(n,m);
-					}
-				}
-				matrix.gaussRowElimination();
-				for (uint8_t n = 0; n < N; n++) {
-					for (uint8_t m = 0; m < M; m++) {
-						if(matrix(n,m)!=0){
+			uint8_t getNofColums() const {
+				return N;
+			}
+			
+			unsigned int rank() const {
+				unsigned int numberOfNonZeroRows = 0;
+				Matrix<M, N, T> temp = (*this);
+				temp.gaussRowElimination();
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if(temp(m, n) != 0){
 							numberOfNonZeroRows++;
 							break;
-						}    
+						}
 					}
 				}
 				return numberOfNonZeroRows;
 			}
 			
 			T det() const {
-				if (N==M) {
-					if(N==2) { // 2x2 Matrix
-						return (v(0,0)*v(1,1)-v(0,1)*v(1,0));
+				if(M == N) { // Determinat can only be calculated of a square matrix
+					if(M == 2) { // 2x2 matrix
+						return (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1,0);
 					}
-					else if(N==3) { // 3x3 Matrix
-						T det = 0; 
-						det = v(0, 0) * v(1, 1) * v(2, 2) +
-						v(0, 1) * v(1, 2) * v(2, 0) +
-						v(0, 2) * v(1, 0) * v(2, 1) -
-						v(0, 2) * v(1, 1) * v(2, 0) -
-						v(0, 0) * v(1, 2) * v(2, 1) -
-						v(0, 1) * v(1, 0) * v(2, 2);
+					else if(M == 3) { // 3x3 matrix
+						T det = 0;
+						det = (*this)(0, 0) * (*this)(1, 1) * (*this)(2, 2) +
+						      (*this)(0, 1) * (*this)(1, 2) * (*this)(2, 0) +
+						      (*this)(0, 2) * (*this)(1, 0) * (*this)(2, 1) -
+						      (*this)(0, 2) * (*this)(1, 1) * (*this)(2, 0) -
+						      (*this)(0, 0) * (*this)(1, 2) * (*this)(2, 1) -
+						      (*this)(0, 1) * (*this)(1, 0) * (*this)(2, 2);
 						return det;
 					}
-					else {
-						//use recurcive laplace formula to calculate this
-						//for big matrices this methods needs a lot of time this could be improved with another algorithm
+					else { // 4x4 and bigger square matrices
+						   // Use recurcive laplace formula to calculate the determinat.
+						   // For big matrices this method needs a lot of time, this 
+						   // could be improved with another algorithm.
 						T det = 0;
 						uint8_t  ignoredRow = 0;
-						for (uint8_t n = 0; n < N; n++) {
-							Matrix<N-1,M-1,T> smallerPart;
-							uint8_t x = 0,y = 0;
-							uint8_t b = 1,a = 0;
-							while(a < N) {
-								while(b < M) {
+						for(uint8_t m = 0; m < M; m++) {
+							Matrix<M - 1, N - 1, T> subMatrix;
+							uint8_t x = 0, y = 0;
+							uint8_t a = 0, b = 1;
+							while(a < M) {
+								while(b < N) {
 									if(a != ignoredRow) {
-										smallerPart(y,x) = v(a,b);
+										subMatrix(y, x) = (*this)(a, b);
 										x++;
 									}
 									b++;
 								}
 								b = 1;
 								x = 0;
-								if (a != ignoredRow) {
+								if(a != ignoredRow) {
 									y++; 
 								}
 								a++;
 							}
 							ignoredRow++;
-							T detSmallerPart = smallerPart.det();
-							if(n%2 == 0) { // even
-								det = det + v(n,0)*detSmallerPart;
+							T detSubMatrix = subMatrix.det();
+							if(m % 2 == 0) { // even
+								det = det + (*this)(m, 0) * detSubMatrix;
 							}
 							else { // odd
-								det = det - v(n,0)*detSmallerPart; 
+								det = det - (*this)(m, 0) * detSubMatrix; 
 							}
 						}
 						return det;
@@ -239,145 +302,39 @@ namespace eeros {
 			
 			T trace() const {
 				T result = 0;
-				uint8_t j = (N < M) ? N : M;
+				uint8_t j = (M < N) ? M : N;
 				for(uint8_t i = 0; i < j; i++) {
-					result += v(i,i);
+					result += (*this)(i, i);
 				}
 				return result;
 			}
 			
-			Matrix<M,N,T> transpose() const {
-				Matrix<M,N,T> result;
-				Matrix<N-1,M-1,T> smallerPart;
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						result(m,n) = (*this)(n,m);
-					}
-				}
-				return result;
-			}
-			
-			/********** Operators **********/
-			
-			Matrix<N,M,T>& operator= (T right) const {
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						v(m,n) = right;
-					}
-				}
-				return *this;
-			}
-			
-			T& operator()(uint8_t n, uint8_t m = 0) {
-				if(n >= 0 && n < N && m >= 0 && m < M) {
-					return value[M * n + m];
-				}
-				else {
-					std::stringstream msg;
-					msg << "Access to element failed: Index out of bound: n = " << n << ", m = "<< m;
-					throw EEROSException(msg.str());
-				}
-			}
-
-			const T operator()(uint8_t n, uint8_t m = 0) const {
-				if(n >= 0 && n < N && m >= 0 && m < M) {
-					return value[M * n + m];
-				}
-				else {
-					std::stringstream msg;
-					msg << "Access to element failed: Index out of bound: n = " << n << ", m = "<< m;
-					throw EEROSException(msg.str());
-				}
-			}
-
-			template < uint8_t K >
-			Matrix<N,K,T> operator*(const Matrix<M,K,T> right) const {
-				Matrix<N,K,T> result;
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t k = 0; k < K; k++) {
-						result(n, k) = 0;
-						for(uint8_t m = 0; m < M; m++) {
-							result(n,k) += (*this)(n, m) * right(m, k);
-						}
+			Matrix<M, N, T> transpose() const {
+				Matrix<M, N, T> result;
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						result(m, n) = (*this)(n, m);
 					}
 				}
 				return result;
 			}
 			
-			Matrix<N,M,T> operator*(T right) const {
-				Matrix<N,M,T> result;
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						result(n,m) = (*this)(n,m) * right;
-					}
-				}
-				return result;
-			}
+			/********** Base operations **********/
 			
-			Matrix<N,M,T> operator+(const Matrix<N,M,T> right) const {
-				Matrix<N,M,T> result;
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						result(n,m) = (*this)(n,m) + right(n,m);
-					}
-				}
-				return result;
-			}
-			
-			Matrix<N,M,T> multiplyElementWise(const Matrix<N,M,T> right) const {
-			    Matrix<N,M,T> result;
-			    for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						result(n,m) = (*this)(n,m) * right(n,m);
-					}
-			    }
-			    return result;
-			}
-			
-			Matrix<N,M,T> operator+(const T right) const {
-				Matrix<N,M,T> result;
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						result(n,m) = (*this)(n,m) + right;
-					}
-				}
-				return result;
-			}
-
-			Matrix<N,M,T> operator-(const Matrix<N,M,T> right) const {
-				Matrix<N,M,T> result;
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						result(n,m) = (*this)(n,m) - right(n,m);
-					}
-				}
-				return result;
-			}
-			
-			Matrix<N,M,T> operator/(T right) const {
-				Matrix<N,M,T> result;
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						result(n,m) = (*this)(n,m) / right;
-					}
-				}
-				return result;
-			}
-
-			bool operator==(const Matrix<N,M,T> right) const {
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						if(v(n,m) != right(n,m))
+			bool operator==(const Matrix<M, N, T> right) const {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if((*this)(m, n) != right(m, n))
 							return false;
 					}
 				}
 				return true;
 			}
 
-			bool operator!=(const Matrix<N,M,T> right) const {
-				for(uint8_t n = 0; n < N; n++) {
-					for(uint8_t m = 0; m < M; m++) {
-						if(v(n,m) != right(n,m)) {
+			bool operator!=(const Matrix<M, N, T> right) const {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if((*this)(m, n) != right(m, n)) {
 							return true;
 						}
 					}
@@ -385,165 +342,267 @@ namespace eeros {
 				return false;
 			}
 			
-			Matrix<N,M,T> operator!() const {
-				T determinant = det();
-				if(N!=M) {
+			Matrix<M, N, T>& operator=(T right) {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						(*this)(m, n) = right;
+					}
+				}
+				return *this;
+			}
+			
+			template < uint8_t K >
+			Matrix<M, K, T> operator*(const Matrix<N, K, T> right) const {
+				Matrix<M, K, T> result;
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t k = 0; k < K; k++) {
+						result(m, k) = 0;
+						for(uint8_t n = 0; n < N; n++) {
+							result(m, k) += (*this)(m, n) * right(n, k);
+						}
+					}
+				}
+				return result;
+			}
+			
+			Matrix<M, N, T> operator*(T right) const {
+				Matrix<M, N, T> result;
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						result(m,n) = (*this)(m,n) * right;
+					}
+				}
+				return result;
+			}
+			
+			Matrix<M, N, T> multiplyElementWise(const Matrix<M, N, T> right) const {
+			    Matrix<M, N, T> result;
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						result(m, n) = (*this)(m, n) * right(m, n);
+					}
+			    }
+			    return result;
+			}
+			
+			Matrix<M, N, T> operator+(const Matrix<M, N, T> right) const {
+				Matrix<M, N, T> result;
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						result(m, n) = (*this)(m, n) + right(m, n);
+					}
+				}
+				return result;
+			}
+			
+			Matrix<M, N, T> operator+(const T right) const {
+				Matrix<M, N, T> result;
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						result(m, n) = (*this)(m, n) + right;
+					}
+				}
+				return result;
+			}
+
+			Matrix<M, N, T> operator-(const Matrix<M, N, T> right) const {
+				Matrix<M, N, T> result;
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						result(m, n) = (*this)(m, n) - right(m, n);
+					}
+				}
+				return result;
+			}
+			
+			Matrix<M, N, T> operator-(const T right) const {
+				Matrix<M, N, T> result;
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						result(m, n) = (*this)(m, n) - right;
+					}
+				}
+				return result;
+			}
+			
+			Matrix<M, N, T> operator/(T right) const {
+				Matrix<M, N, T> result;
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						result(m, n) = (*this)(m, n) / right;
+					}
+				}
+				return result;
+			}
+			
+			Matrix<M, N, T> operator!() const {
+				T determinant = this->det();
+				if(N != M) {
 					throw EEROSException("Invert failed: matrix not square");
 				}
 				else if(determinant == 0) {
 					throw EEROSException("Invert failed: determinat of matrix is 0");
 				}
-				else if(isOrthogonal() == true) {
+				else if(this->isOrthogonal() == true) {
 					return transpose();
 				}
-				else if(N == 3) {
-					Matrix<N,M,T> result;
-					result(0, 0) = v(1, 1) * v(2, 2) - v(1, 2) * v(2, 1);
-					result(1, 0) = v(1, 2) * v(2, 0) - v(1, 0) * v(2, 2);
-					result(2, 0) = v(1, 0) * v(2, 1) - v(1, 1) * v(2, 0);
-					result(0, 1) = v(0, 2) * v(2, 1) - v(0, 1) * v(2, 2);
-					result(1, 1) = v(0, 0) * v(2, 2) - v(0, 2) * v(2, 0);
-					result(2, 1) = v(0, 1) * v(2, 0) - v(0, 0) * v(2, 1);
-					result(0, 2) = v(0, 1) * v(1, 2) - v(0, 2) * v(1, 1);
-					result(1, 2) = v(0, 2) * v(1, 0) - v(0, 0) * v(1, 2);
-					result(2, 2) = v(0, 0) * v(1, 1) - v(0, 1) * v(1, 0);
-					return (result / determinant);
+				else if(M == 2) { // 2x2 matrix
+					Matrix<M, N, T> result;
+					result(0, 0) =  (*this)(1, 1);
+					result(1, 0) = -(*this)(1, 0);
+					result(0, 1) = -(*this)(0, 1);
+					result(1, 1) =  (*this)(0, 0);
+					return result / determinant;
 				}
-				else if(N == 2) {
-					Matrix<N,M,T> result;
-					result(0, 0) = v(1, 1);
-					result(1, 0) = -v(1, 0);
-					result(0, 1) = -v(0, 1);
-					result(1, 1) = v(0, 0);
-					return (result / determinant);
+				else if(M == 3) { // 3x3 matrix
+					Matrix<M, N, T> result;
+					result(0, 0) = (*this)(1, 1) * (*this)(2, 2) - (*this)(1, 2) * (*this)(2, 1);
+					result(1, 0) = (*this)(1, 2) * (*this)(2, 0) - (*this)(1, 0) * (*this)(2, 2);
+					result(2, 0) = (*this)(1, 0) * (*this)(2, 1) - (*this)(1, 1) * (*this)(2, 0);
+					result(0, 1) = (*this)(0, 2) * (*this)(2, 1) - (*this)(0, 1) * (*this)(2, 2);
+					result(1, 1) = (*this)(0, 0) * (*this)(2, 2) - (*this)(0, 2) * (*this)(2, 0);
+					result(2, 1) = (*this)(0, 1) * (*this)(2, 0) - (*this)(0, 0) * (*this)(2, 1);
+					result(0, 2) = (*this)(0, 1) * (*this)(1, 2) - (*this)(0, 2) * (*this)(1, 1);
+					result(1, 2) = (*this)(0, 2) * (*this)(1, 0) - (*this)(0, 0) * (*this)(1, 2);
+					result(2, 2) = (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1, 0);
+					return result / determinant;
 				}
 				else {
-					// This algorithm needs a lot of time maybe this could be replaced
-					Matrix<N,M,T> result;
-					Matrix<N-1,M-1,T> smallerPart;
-					uint8_t ignoredRow = 0;
-					uint8_t ignoredColum = 0;
-					uint8_t a = 0;
-					uint8_t b = 0;
-					for(uint8_t n = 0; n < N; n++) {
-						for(uint8_t m = 0; m < M; m++) {
-							uint8_t a = 0;
-							uint8_t b = 0;
-							// 1.Create "matrix of minors"
-							for(uint8_t u = 0; u < N; u++) {
-								for(uint8_t w = 0; w < M; w++) {
-									if(u != n && w != m){
-										smallerPart(a,b) = v(u,w);
+					// This algorithm needs a lot of time maybe there is a better one?
+					Matrix<M, N, T> result;
+					Matrix<M - 1, N - 1, T> smallerPart;
+					uint8_t ignoredRow = 0, ignoredColum = 0;
+					for(uint8_t m = 0; m < M; m++) {
+						for(uint8_t n = 0; n < N; n++) {
+							uint8_t a = 0, b = 0;
+							// 1. Create "matrix of minors"
+							for(uint8_t u = 0; u < M; u++) {
+								for(uint8_t w = 0; w < N; w++) {
+									if(u != m && w != n){
+										smallerPart(a, b) = (*this)(u, w);
 										b++;
-										b = b%(M-1);
+										b = b % (N - 1);
 									}
 								}
-								if(u != n) {
+								if(u != m) {
 									a++;
-									a = a&(N-1);
+									a = a&(M - 1);
 								}
 							}
-							// 2.Swapp signs 
-							if(n%2 == 0) {
-								if(m%2 != 0) {
-									result(n,m) = -smallerPart.det();
+							// 2. Swapp signs 
+							if(m % 2 == 0) {
+								if(n % 2 != 0) {
+									result(m,n) = -smallerPart.det();
 								}
 								else {
-									result(n,m) = smallerPart.det();
+									result(m, n) = smallerPart.det();
 								}
 							}
 							else {
-								if(m%2 != 0){
-									result(n,m) = smallerPart.det();
+								if(n % 2 != 0){
+									result(m, n) = smallerPart.det();
 								}
 								else {
-									result(n,m) = -smallerPart.det();
+									result(m, n) = -smallerPart.det();
 								}
 							}
-							// 3.Divide trhoug det of the original matrix
-							result(n,m) = result(n,m)/determinant;
+							// 3. Divide throu det of the original matrix
+							result(m, n) = result(m, n) / determinant;
 						}
 					}
 					// 4. transpose
 					return result.transpose();
 				}
 			}
-
-			operator T () const {
-				if(N == 1 && M == 1)
+			
+			/********** Cast operations **********/
+			
+			operator T() const {
+				if(M == 1 && N == 1)
 					return value[0];
 				else 
-					throw EEROSException("Dimension is not 1x1");
+					throw EEROSException("Cast failed, dimension is not 1x1");
 			}
-
+			
 			/********** Static functions **********/
 			
-			static Matrix<N,M,T> createRotX(double angle) {
-				Matrix<N,M,T> m;
+			static Matrix<M, N, T> createRotX(double angle) {
+				Matrix<M, N, T> m;
 				m.rotx(angle);
 				return m;
 			}
 			
-			static Matrix<N,M,T> createRotY(double angle) {
-				Matrix<N,M,T> m;
+			static Matrix<M, N, T> createRotY(double angle) {
+				Matrix<M, N, T> m;
 				m.roty(angle);
 				return m;
 			}
 			
-			static Matrix<N,M,T> createRotZ(double angle) {
-				Matrix<N,M,T> m;
+			static Matrix<M, N, T> createRotZ(double angle) {
+				Matrix<M, N, T> m;
 				m.rotz(angle);
 				return m;
 			}
 			
-			static Matrix<2,1,T> createVector2(T x, T y) {
-				Matrix<2,1,T> v;
+			static Matrix<2, 1, T> createVector2(T x, T y) {
+				Matrix<2, 1, T> v;
 				v(0) = x;
 				v(1) = y;
 				return v;
 			}
 			
-			static Matrix<3,1,T> createVector3(T x, T y, T z) {
-				Matrix<3,1,T> v;
+			static Matrix<3, 1, T> createVector3(T x, T y, T z) {
+				Matrix<3, 1, T> v;
 				v(0) = x;
 				v(1) = y;
 				v(2) = z;
 				return v;
 			}
 			
+			static Matrix<M, N, T> createDiag(T v) {
+				Matrix<M, N, T> d;
+				d.eye();
+				return d * v;
+			}
 			
-			static Matrix<3,1,T> crossProduct(Matrix<3,1,T> a,Matrix<3,1,T> b) {
-			    Matrix<3,1,T> result;
-			    result(0,0) = a(1,0)*b(2,0) - a(2,0)*b(1,0);
-			    result(1,0) = a(2,0)*b(0,0) - a(0,0)*b(2,0);
-			    result(2,0) = a(0,0)*b(1,0) - a(1,0)*b(0,0); 
+			static Matrix<3, 3, T> createSkewSymmetricMatrix(Matrix<3, 1, T> a) {
+				Matrix<3, 3, T> result;
+				result(0, 0) =  0;
+				result(0, 1) = -a(2);
+				result(0, 2) =  a(1);
+				result(1, 0) =  a(2);
+				result(1, 1) =  0;
+				result(1, 2) = -a(0);
+				result(2, 0) = -a(1);
+				result(2, 1) =  a(0);
+				result(2, 2) =  0;
+				return result;
+			}
+			
+			static Matrix<3, 1, T> crossProduct(Matrix<3, 1, T> a, Matrix<3, 1, T> b) {
+			    Matrix<3, 1, T> result;
+			    result(0, 0) = a(1, 0) * b(2, 0) - a(2, 0) * b(1, 0);
+			    result(1, 0) = a(2, 0) * b(0, 0) - a(0, 0) * b(2, 0);
+			    result(2, 0) = a(0, 0) * b(1, 0) - a(1, 0) * b(0, 0); 
 			    return result;
 			}
 			
-			static Matrix<3,3,T> createSkewSymmetricMatrix(Matrix<3,1,T> a) {
-			    Matrix<3,3,T> result;
-			    result(0,0) = 0; result(0,1) = -a(2); result(0,2) = a(1);
-			    result(1,0) = a(2); result(1,1) = 0; result(1,2) = -a(0);
-			    result(2,0) = -a(1); result(2,1) = a(0); result(2,2) = 0;
-			    return result;
-			}
+			/********** Helper functions **********/
 			
 			void gaussRowElimination() {
-				uint8_t completedColum = 0;
-				uint8_t completedRow = 0;
-				uint8_t checkingRow = 0;
-				uint8_t rootRow = 0;
+				uint8_t completedColum = 0, completedRow = 0;
+				uint8_t checkingRow = 0, rootRow = 0;
 				T rowFactor = 0;
 				
 				sortForGaussAlgorithm();
-				while(completedColum < M) {
+				while(completedColum < N) {
 					rootRow = completedRow;
 					checkingRow = rootRow + 1;
-					while(checkingRow < N && v(rootRow,completedColum) != 0) {
-						if(v(checkingRow,completedColum) != 0) {
-							rowFactor = v(checkingRow,completedColum)/v(rootRow,completedColum); 
-							for(uint8_t m = completedColum; m < M; m++) {
-								(*this)(checkingRow,m) = v(checkingRow,m) - rowFactor*v(rootRow,m);
+					while(checkingRow < M && (*this)(rootRow, completedColum) != 0) {
+						if((*this)(checkingRow, completedColum) != 0) {
+							rowFactor = (*this)(checkingRow, completedColum) / (*this)(rootRow, completedColum); 
+							for(uint8_t n = completedColum; n < N; n++) {
+								(*this)(checkingRow, n) = (*this)(checkingRow, n) - rowFactor * (*this)(rootRow, n);
 							}
 						}
 						checkingRow++;
@@ -553,15 +612,14 @@ namespace eeros {
 				}
 			}
 			
-			void  sortForGaussAlgorithm() {
-				uint8_t completedColum = 0;
-				uint8_t completedRow = 0;
+			void sortForGaussAlgorithm() {
+				uint8_t completedColum = 0, completedRow = 0;
 				uint8_t swapRow = completedRow + 1;
 				
-				while(completedColum < M) {
-					while(completedRow < N) {
-						if(v(completedRow,completedColum) == 0 && swapRow < N && completedRow <N-1) {
-							swapRows(completedRow,swapRow);
+				while(completedColum < N) {
+					while(completedRow < M) {
+						if((*this)(completedRow, completedColum) == 0 && swapRow < M && completedRow < M - 1) {
+							swapRows(completedRow, swapRow);
 							swapRow++;
 						}
 						else {
@@ -573,54 +631,34 @@ namespace eeros {
 				}
 			}
 			
-			void swapRows(uint8_t row1, uint8_t row2) {
-				Matrix<1,M,T> temp;
-				temp.zero();
-				for(uint8_t m = 0; m < M; m++) {
-					temp(0,m) = v(row1,m);
-					(*this)(row1,m) = v(row2,m);
-					(*this)(row2,m) =  temp(0,m);
+			void swapRows(uint8_t rowA, uint8_t rowB) {
+				for(uint8_t n = 0; n < N; n++) {
+					T t = (*this)(rowA, n);
+					(*this)(rowA, n) = (*this)(rowB, n);
+					(*this)(rowB, n) =  t;
 				}
 			}
 			
-		private:
-			T value[ N * M ];
+		protected:
 			
-			T& v(uint8_t n, uint8_t m = 0) {
-				if (n >= 0 && n < N && m >= 0 && m < M)
-					return value[M * n + m ];
-				else {
-					std::stringstream msg;
-					msg << "v(): Index out of bound: n = " << n << ", m = "<< m;
-					throw EEROSException(msg.str());
-				}
-			}
-			
-			const T& v(uint8_t n, uint8_t m = 0) const {
-				if (n >= 0 && n < N && m >= 0 && m < M)
-					return value[M * n + m];
-				else {
-					std::stringstream msg;
-					msg << "v(): Index out of bound: n = " << n << ", m = "<< m;
-					throw EEROSException(msg.str());
-				}
-			}
-					
+			T value[M * N];
 			
 		}; // END class Matrix
 		
 		/********** Operators **********/
 		
-		template < uint8_t N, uint8_t M = 1, typename T = double >
-		Matrix<N,M,T> operator*(T left, Matrix<N,M,T> right) {
-			Matrix<N,M,T> result;
-			for(uint8_t n = 0; n < N; n++) {
-				for(uint8_t m = 0; m < M; m++) {
-					result(n,m) = right(n,m) * left;
+		template < uint8_t M, uint8_t N = 1, typename T = double >
+		Matrix<M, N, T> operator*(T left, Matrix<M, N, T> right) {
+			Matrix<M, N, T> result;
+			for(uint8_t m = 0; m < M; m++) {
+				for(uint8_t n = 0; n < N; n++) {
+					result(m, n) = right(m, n) * left;
 				}
 			}
 			return result;
 		}
+		
+		/********** Type definitions **********/
 		
 		typedef Matrix<2,1> Vector2;
 		typedef Matrix<3,1> Vector3;

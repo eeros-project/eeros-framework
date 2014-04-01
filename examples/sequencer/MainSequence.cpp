@@ -33,11 +33,11 @@ void MainSequence::init() {
 		for(int i = 0; i < 10; i++) {
 			if(i%2 == 0) {
 				log.info() << "[" << name << "] " << "Calling sequence A1: ";
-				callSubSequence(getSequence("Sequence A1"));
+				call(getSequence("Sequence A1"));
 			}
 			else {
 				log.info() << "[" << name << "] " << "Calling sequence A2: ";
-				callSubSequence(getSequence("Sequence A2"));
+				call(getSequence("Sequence A2"));
 			}
 		}
 		sleep(1);

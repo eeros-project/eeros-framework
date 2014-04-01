@@ -2,12 +2,15 @@
 
 using namespace eeros::hal;
 
-ComediAdc::ComediAdc(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale, double offset) : SystemInput<double>(id) {
+ComediAdc::ComediAdc(std::string id,
+					 ComediDevice* device,
+					 uint32_t subDeviceNumber,
+					 uint32_t channel,
+					 double scale,
+					 double offset) : ScalablePeripheralInput<double>(id, scale, offset) {
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channel = channel;
-	this->scale = scale;
-	this->offset = offset;
 }
 
 double ComediAdc::get() {
