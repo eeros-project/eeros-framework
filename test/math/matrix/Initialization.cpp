@@ -236,6 +236,33 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
+	// ********** Part D: static create methods **********
+	std::cout << "[D] Testing static methods for creating matrices" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Testing createDiag()" << std::endl;
+	error = 0;
+	int diagV = 9;
+	Matrix<5, 5, int> diagM = Matrix<5, 5, int>::createDiag(diagV);
+	for(unsigned int m = 0; m < 5; m++) {
+		for(unsigned int n = 0; n < 5; n++) {
+			if(m ==n) {
+				if(diagM(m, n) != diagV) {
+					std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << diagM(m, n) << ", but should be " << diagV << "!" << std::endl;
+					error++;
+				}
+			}
+			else {
+				if(diagM(m, n) != 0) {
+					std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << diagM(m, n) << ", but should be 0!" << std::endl;
+					error++;
+				}
+			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	
 	if (errorSum == 0)
 		std::cout << "Matrix element access test succeeded" << std::endl;
 	else

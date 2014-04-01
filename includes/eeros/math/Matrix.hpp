@@ -126,9 +126,7 @@ namespace eeros {
 					return value[i];
 				}
 				else {
-					std::stringstream msg;
-					msg << "Access to element failed: Index out of bound: i = " << i;
-					throw EEROSException(msg.str());
+					throw MatrixIndexOutOfBoundException(i, M * N);
 				}
 			}
 			
@@ -137,9 +135,7 @@ namespace eeros {
 					return value[i];
 				}
 				else {
-					std::stringstream msg;
-					msg << "Access to element failed: Index out of bound: i = " << i;
-					throw EEROSException(msg.str());
+					throw MatrixIndexOutOfBoundException(i, M * N);
 				}
 			}
 			
@@ -148,9 +144,7 @@ namespace eeros {
 					return value[i];
 				}
 				else {
-					std::stringstream msg;
-					msg << "Access to element failed: Index out of bound: i = " << i;
-					throw EEROSException(msg.str());
+					throw MatrixIndexOutOfBoundException(i, M * N);
 				}
 			}
 			
@@ -159,9 +153,7 @@ namespace eeros {
 					return value[i];
 				}
 				else {
-					std::stringstream msg;
-					msg << "Access to element failed: Index out of bound: i = " << i;
-					throw EEROSException(msg.str());
+					throw MatrixIndexOutOfBoundException(i, M * N);
 				}
 			}
 			
@@ -567,12 +559,10 @@ namespace eeros {
 				return v;
 			}
 			
-			static Matrix<3, 1, T> crossProduct(Matrix<3, 1, T> a, Matrix<3, 1, T> b) {
-			    Matrix<3, 1, T> result;
-			    result(0, 0) = a(1, 0) * b(2, 0) - a(2, 0) * b(1, 0);
-			    result(1, 0) = a(2, 0) * b(0, 0) - a(0, 0) * b(2, 0);
-			    result(2, 0) = a(0, 0) * b(1, 0) - a(1, 0) * b(0, 0); 
-			    return result;
+			static Matrix<M, N, T> createDiag(T v) {
+				Matrix<M, N, T> d;
+				d.eye();
+				return d * v;
 			}
 			
 			static Matrix<3, 3, T> createSkewSymmetricMatrix(Matrix<3, 1, T> a) {
@@ -588,6 +578,16 @@ namespace eeros {
 				result(2, 2) =  0;
 				return result;
 			}
+			
+			static Matrix<3, 1, T> crossProduct(Matrix<3, 1, T> a, Matrix<3, 1, T> b) {
+			    Matrix<3, 1, T> result;
+			    result(0, 0) = a(1, 0) * b(2, 0) - a(2, 0) * b(1, 0);
+			    result(1, 0) = a(2, 0) * b(0, 0) - a(0, 0) * b(2, 0);
+			    result(2, 0) = a(0, 0) * b(1, 0) - a(1, 0) * b(0, 0); 
+			    return result;
+			}
+			
+			/********** Helper functions **********/
 			
 			void gaussRowElimination() {
 				uint8_t completedColum = 0, completedRow = 0;
