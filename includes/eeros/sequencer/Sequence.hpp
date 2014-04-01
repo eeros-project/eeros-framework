@@ -39,18 +39,16 @@ namespace eeros {
 			
 			virtual void reset();
 			
-			void callSubSequence(Sequence* sequence);
+			void call(Sequence* sequence);
 			
 			template < typename T, typename ... Targs >
-			void callSubSequence(T& sequence, Targs ... args) {
+			void call(T& sequence, Targs ... args) {
 				sequence.run(args...);
 			}
 			
-			void startParallelSequence(Sequence* sequence);
+			void start(Sequence* sequence);
 			
 			static Sequence* getSequence(std::string name);
-			
-			eeros::logger::Logger<eeros::logger::LogWriter> log;
 			
 		protected:
 			virtual void addStep(std::function<void(void)> action);
@@ -59,6 +57,7 @@ namespace eeros {
 			std::string name;
 			std::vector<std::function<void(void)>> actionList;
 			uint32_t exceptionRetryCounter;
+			eeros::logger::Logger<eeros::logger::LogWriter> log;
 			
 		private:
 			static std::map<std::string, Sequence*> allSequences;

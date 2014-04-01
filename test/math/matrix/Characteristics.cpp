@@ -766,7 +766,7 @@ int main(int argc, char *argv[]) {
 	
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
-
+	
 	// TODO move to initialization tests
 // 	std::cout << "Test #" << testNo++ << ": test creat skew symmetric matrix" << std::endl;
 // 	error = error + testSkewSymetricMatrix();

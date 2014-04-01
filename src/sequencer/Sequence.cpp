@@ -82,7 +82,7 @@ void Sequence::run() {
 				break;
 			case kNewSequence:
 				state = kSequenceFinished;
-				callSubSequence(e.getEnsuingSequence());
+				call(e.getEnsuingSequence());
 				break;
 			default:
 				log.error() << "Illegal return behavior '" << (int)returnBehavior << "' in exception '" << e.what() << "'!";
@@ -115,7 +115,7 @@ void Sequence::reset() {
 	exceptionRetryCounter = 0;
 }
 
-void Sequence::callSubSequence(Sequence* sequence) {
+void Sequence::call(Sequence* sequence) {
 	if(sequence != nullptr) {
 		sequence->run();
 	}
@@ -124,7 +124,7 @@ void Sequence::callSubSequence(Sequence* sequence) {
 	}
 }
 
-void Sequence::startParallelSequence(Sequence* sequence) {
+void Sequence::start(Sequence* sequence) {
 	// TODO
 }
 
