@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	std::cout << "    #" << testNo++ << ": Testing << operator" << std::endl;
+	std::cout << "    #" << testNo++ << ": Testing << operator with a 3x3 integer matrix" << std::endl;
 	error = 0;
 	Matrix<3, 3, int> sMat;
 	sMat << 1, 4, 7,
@@ -277,6 +277,21 @@ int main(int argc, char *argv[]) {
 			}
 			j++;
 		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Testing << operator with a 4x1 double matrix" << std::endl;
+	error = 0;
+	Matrix<4, 1, double> tMat;
+	tMat << 0.1, 0.2, 0.3, 0.4;
+	double l = 0.1;
+	for(unsigned int m = 0; m < 4; m++) {
+		if(!Utils::compareApprox(l, tMat(m, 0), DEFAULT_TOL)) {
+			std::cout << "    -> Failure: M(" << m << ", 0) = " << tMat(m, 0) << ", but should be " << l << '!' << std::endl;
+			error++;
+		}
+		l += 0.1;
 	}
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;

@@ -21,7 +21,7 @@ namespace eeros {
 				MatrixInitializer(Matrix<IM, IN, IT>& mat, unsigned int index = 0) : mat(mat), index(index) { }
 				
 				MatrixInitializer<IM, IN, IT> operator,(IT right) {
-					mat(index / M, index % N) = right;
+					mat(index / N, index % N) = right;
 					return MatrixInitializer<IM, IN, IT>(mat, index + 1);
 				}
 				
@@ -111,7 +111,7 @@ namespace eeros {
 				}
 			}
 			
-			MatrixInitializer<M,N,T> operator<<(T right) {
+			MatrixInitializer<M, N, T> operator<<(T right) {
 				(*this)[0] = right;
 				return MatrixInitializer<M, N, T>(*this, 1);
 			}
