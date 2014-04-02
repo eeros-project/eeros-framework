@@ -281,6 +281,39 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
+	std::cout << "    #" << testNo++ << ": Testing = operator with an integer for a integer matrix" << std::endl;
+	error = 0;
+	Matrix<3, 3, int> aMat1;
+	for(int k = -4; k < 5; k++) {
+		aMat1 = k;
+		for(unsigned int n = 0; n < 3; n++) {
+			for(unsigned int m = 0; m < 3; m++) {
+				if(aMat1(m, n) != k) {
+					std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << aMat1(m, n) << ", but should be " << k << '!' << std::endl;
+					error++;
+				}
+			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Testing = operator with an integer for a double matrix" << std::endl;
+	error = 0;
+	Matrix<3, 3, double> aMat2;
+	for(int k = -4; k < 5; k++) {
+		aMat2 = k;
+		for(unsigned int n = 0; n < 3; n++) {
+			for(unsigned int m = 0; m < 3; m++) {
+				if(aMat2(m, n) != k) {
+					std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << aMat2(m, n) << ", but should be " << k << '!' << std::endl;
+					error++;
+				}
+			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
 	if (errorSum == 0)
 		std::cout << "Matrix element access test succeeded" << std::endl;

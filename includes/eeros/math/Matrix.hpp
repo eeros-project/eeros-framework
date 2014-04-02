@@ -31,6 +31,10 @@ namespace eeros {
 		
 			Matrix() { }
 			
+			Matrix(const T v) {
+				(*this) = v;
+			}
+			
 			/********** Initializing the matrix **********/
 			
 			void zero() {
@@ -423,7 +427,12 @@ namespace eeros {
 				}
 				return result;
 			}
-
+			
+			Matrix<M, N, T>& operator+=(const Matrix<M, N, T> right) {
+				(*this) = (*this) + right;
+				return (*this);
+			}
+			
 			Matrix<M, N, T> operator-(const Matrix<M, N, T> right) const {
 				Matrix<M, N, T> result;
 				for(uint8_t m = 0; m < M; m++) {
@@ -442,6 +451,16 @@ namespace eeros {
 					}
 				}
 				return result;
+			}
+			
+			Matrix<M, N, T>& operator-=(const Matrix<M, N, T> right) {
+				(*this) = (*this) - right;
+				return (*this);
+			}
+			
+			Matrix<M, N, T>& operator-() {
+				(*this) = 0 - (*this);
+				return (*this);
 			}
 			
 			Matrix<M, N, T> operator/(T right) const {
@@ -534,7 +553,7 @@ namespace eeros {
 				}
 			}
 			
-			/********** Cast operations **********/
+			/********** Cast/conversation operations **********/
 			
 			operator T() const {
 				if(M == 1 && N == 1)
