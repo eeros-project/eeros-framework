@@ -1,1 +1,1 @@
-add_eeros_sources(MatrixIndexOutOfBoundException.cpp)
+add_eeros_sources(MatrixIndexOutOfBoundException.cpp Frame.cpp CoordinateSystem.cpp)
