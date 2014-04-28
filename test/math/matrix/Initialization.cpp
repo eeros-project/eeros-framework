@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	// ********** Part D: Other initialization methods **********
+	
 	std::cout << "[D] Testing other initialization methods" << std::endl;
 	
 	std::cout << "    #" << testNo++ << ": Testing createDiag()" << std::endl;
@@ -245,7 +245,7 @@ int main(int argc, char *argv[]) {
 	Matrix<5, 5, int> diagM = Matrix<5, 5, int>::createDiag(diagV);
 	for(unsigned int m = 0; m < 5; m++) {
 		for(unsigned int n = 0; n < 5; n++) {
-			if(m ==n) {
+			if(m == n) {
 				if(diagM(m, n) != diagV) {
 					std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << diagM(m, n) << ", but should be " << diagV << "!" << std::endl;
 					error++;
@@ -256,6 +256,39 @@ int main(int argc, char *argv[]) {
 					std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << diagM(m, n) << ", but should be 0!" << std::endl;
 					error++;
 				}
+			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Testing createSkewSymmetric()" << std::endl;
+	error = 0;
+	Matrix<3, 1, int> ssMatA, ssMatB;
+	ssMatA(0) = 1; ssMatA(1) = 2; ssMatA(2) = 3;
+	ssMatB(0) = -5; ssMatB(1) = -3; ssMatB(2) = 0;
+	Matrix<3, 3, int> ssRefResA, ssRefResB, ssRes;
+	ssRefResA(0, 0) =  0; ssRefResA(0, 1) = -3; ssRefResA(0, 2) =  2;
+	ssRefResA(1, 0) =  3; ssRefResA(1, 1) =  0; ssRefResA(1, 2) = -1;
+	ssRefResA(2, 0) = -2; ssRefResA(2, 1) =  1; ssRefResA(2, 2) =  0;
+	ssRefResB(0, 0) =  0; ssRefResB(0, 1) =  0; ssRefResB(0, 2) = -3;
+	ssRefResB(1, 0) =  0; ssRefResB(1, 1) =  0; ssRefResB(1, 2) =  5;
+	ssRefResB(2, 0) =  3; ssRefResB(2, 1) = -5; ssRefResB(2, 2) =  0;
+	ssRes = Matrix<3, 3, int>::createSkewSymmetric(ssMatA);
+	for(unsigned int m = 0; m < 3; m++) {
+		for(unsigned int n = 0; n < 3; n++) {
+			if(ssRes(m, n) != ssRefResA(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << ssRes(m, n) << ", but should be " << ssRefResA(m, n) << "!" << std::endl;
+				error++;
+			}
+		}
+	}
+	ssRes = Matrix<3, 3, int>::createSkewSymmetric(ssMatB);
+	for(unsigned int m = 0; m < 3; m++) {
+		for(unsigned int n = 0; n < 3; n++) {
+			if(ssRes(m, n) != ssRefResB(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << ssRes(m, n) << ", but should be " << ssRefResB(m, n) << "!" << std::endl;
+				error++;
 			}
 		}
 	}

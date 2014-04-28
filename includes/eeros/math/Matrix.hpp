@@ -344,7 +344,7 @@ namespace eeros {
 			
 			/********** Base operations **********/
 			
-			bool operator==(const Matrix<M, N, T> right) const {
+			bool operator==(const Matrix<M, N, T>& right) const {
 				for(uint8_t m = 0; m < M; m++) {
 					for(uint8_t n = 0; n < N; n++) {
 						if((*this)(m, n) != right(m, n))
@@ -354,7 +354,7 @@ namespace eeros {
 				return true;
 			}
 
-			bool operator!=(const Matrix<M, N, T> right) const {
+			bool operator!=(const Matrix<M, N, T>& right) const {
 				for(uint8_t m = 0; m < M; m++) {
 					for(uint8_t n = 0; n < N; n++) {
 						if((*this)(m, n) != right(m, n)) {
@@ -363,6 +363,50 @@ namespace eeros {
 					}
 				}
 				return false;
+			}
+			
+			bool operator<(const Matrix<M, N, T>& right) const {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if((*this)(m, n) >= right(m, n)) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+			
+			bool operator<=(const Matrix<M, N, T>& right) const {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if((*this)(m, n) > right(m, n)) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+			
+			bool operator>(const Matrix<M, N, T>& right) const {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if((*this)(m, n) <= right(m, n)) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+			
+			bool operator>=(const Matrix<M, N, T>& right) const {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if((*this)(m, n) < right(m, n)) {
+							return false;
+						}
+					}
+				}
+				return true;
 			}
 			
 			Matrix<M, N, T>& operator=(T right) {
@@ -603,7 +647,7 @@ namespace eeros {
 				return d * v;
 			}
 			
-			static Matrix<3, 3, T> createSkewSymmetricMatrix(Matrix<3, 1, T> a) {
+			static Matrix<3, 3, T> createSkewSymmetric(Matrix<3, 1, T> a) {
 				Matrix<3, 3, T> result;
 				result(0, 0) =  0;
 				result(0, 1) = -a(2);
