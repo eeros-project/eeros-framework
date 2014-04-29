@@ -22,8 +22,11 @@ int main(int argc, char *argv[]) {
 	int error = 0, errorSum = 0;
 	int testNo = 1;
 	
-	Matrix<3, 3, int> i123;
-	Matrix<3, 3, double> d123;
+	Matrix<3, 3, int> mat3x3i;
+	Matrix<3, 1, int> mat3x3i_col[3];
+	Matrix<1, 3, int> mat3x3i_row[3];
+	
+	Matrix<3, 3, double> mat3x3d;
 	
 	int i;
 	double d;
@@ -36,7 +39,7 @@ int main(int argc, char *argv[]) {
 	i = -4;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			i123(m, n) = i++;
+			mat3x3i(m, n) = i++;
 		}
 	}
 	
@@ -45,8 +48,8 @@ int main(int argc, char *argv[]) {
 	i = -4;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			if(i != i123(m, n)) {
-				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << i123(m, n) << ", but should be " << i << '!' << std::endl;
+			if(i != mat3x3i(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3i(m, n) << ", but should be " << i << '!' << std::endl;
 				error++;
 			}
 			i++;
@@ -59,8 +62,8 @@ int main(int argc, char *argv[]) {
 	error = 0;
 	i = -4;
 	for(unsigned int x = 0; x < 9; x++) {
-		if(i != i123(x)) {
-			std::cout << "    -> Failure: M(" << x << ") = " << i123(x) << ", but should be " << i << '!' << std::endl;
+		if(i != mat3x3i(x)) {
+			std::cout << "    -> Failure: M(" << x << ") = " << mat3x3i(x) << ", but should be " << i << '!' << std::endl;
 			error++;
 		}
 		i++;
@@ -72,8 +75,8 @@ int main(int argc, char *argv[]) {
 	error = 0;
 	i = -4;
 	for(unsigned int x = 0; x < 9; x++) {
-		if(i != i123[x]) {
-			std::cout << "    -> Failure: M(" << x << ") = " << i123[x] << ", but should be " << i << '!' << std::endl;
+		if(i != mat3x3i[x]) {
+			std::cout << "    -> Failure: M(" << x << ") = " << mat3x3i[x] << ", but should be " << i << '!' << std::endl;
 			error++;
 		}
 		i++;
@@ -86,8 +89,8 @@ int main(int argc, char *argv[]) {
 	i = -4;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			if(i != i123.get(m, n)) {
-				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << i123.get(m, n) << ", but should be " << i << '!' << std::endl;
+			if(i != mat3x3i.get(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3i.get(m, n) << ", but should be " << i << '!' << std::endl;
 				error++;
 			}
 			i++;
@@ -102,7 +105,7 @@ int main(int argc, char *argv[]) {
 	error = 0;
 	i = 100;
 	for(unsigned int x = 0; x < 9; x++) {
-			i123(x) = i++;
+			mat3x3i(x) = i++;
 	}
 	
 	std::cout << "    #" << testNo++ << ": Reading integer values from matrix, using operator (m, n)" << std::endl;
@@ -110,8 +113,8 @@ int main(int argc, char *argv[]) {
 	i = 100;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			if(i != i123(m, n)) {
-				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << i123(m, n) << ", but should be " << i << '!' << std::endl;
+			if(i != mat3x3i(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3i(m, n) << ", but should be " << i << '!' << std::endl;
 				error++;
 			}
 			i++;
@@ -124,8 +127,8 @@ int main(int argc, char *argv[]) {
 	error = 0;
 	i = 100;
 	for(unsigned int x = 0; x < 9; x++) {
-		if(i != i123(x)) {
-			std::cout << "    -> Failure: M(" << x << ") = " << i123(x) << ", but should be " << i << '!' << std::endl;
+		if(i != mat3x3i(x)) {
+			std::cout << "    -> Failure: M(" << x << ") = " << mat3x3i(x) << ", but should be " << i << '!' << std::endl;
 			error++;
 		}
 		i++;
@@ -137,8 +140,8 @@ int main(int argc, char *argv[]) {
 	error = 0;
 	i = 100;
 	for(unsigned int x = 0; x < 9; x++) {
-		if(i != i123[x]) {
-			std::cout << "    -> Failure: M(" << x << ") = " << i123[x] << ", but should be " << i << '!' << std::endl;
+		if(i != mat3x3i[x]) {
+			std::cout << "    -> Failure: M(" << x << ") = " << mat3x3i[x] << ", but should be " << i << '!' << std::endl;
 			error++;
 		}
 		i++;
@@ -151,8 +154,8 @@ int main(int argc, char *argv[]) {
 	i = 100;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			if(i != i123.get(m, n)) {
-				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << i123.get(m, n) << ", but should be " << i << '!' << std::endl;
+			if(i != mat3x3i.get(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3i.get(m, n) << ", but should be " << i << '!' << std::endl;
 				error++;
 			}
 			i++;
@@ -167,7 +170,7 @@ int main(int argc, char *argv[]) {
 	error = 0;
 	i = -10;
 	for(unsigned int x = 0; x < 9; x++) {
-			i123[x] = i++;
+			mat3x3i[x] = i++;
 	}
 	
 	std::cout << "    #" << testNo++ << ": Reading integer values from matrix, using operator (m, n)" << std::endl;
@@ -175,8 +178,8 @@ int main(int argc, char *argv[]) {
 	i = -10;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			if(i != i123(m, n)) {
-				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << i123(m, n) << ", but should be " << i << '!' << std::endl;
+			if(i != mat3x3i(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3i(m, n) << ", but should be " << i << '!' << std::endl;
 				error++;
 			}
 			i++;
@@ -189,8 +192,8 @@ int main(int argc, char *argv[]) {
 	error = 0;
 	i = -10;
 	for(unsigned int x = 0; x < 9; x++) {
-		if(i != i123(x)) {
-			std::cout << "    -> Failure: M(" << x << ") = " << i123(x) << ", but should be " << i << '!' << std::endl;
+		if(i != mat3x3i(x)) {
+			std::cout << "    -> Failure: M(" << x << ") = " << mat3x3i(x) << ", but should be " << i << '!' << std::endl;
 			error++;
 		}
 		i++;
@@ -202,8 +205,8 @@ int main(int argc, char *argv[]) {
 	error = 0;
 	i = -10;
 	for(unsigned int x = 0; x < 9; x++) {
-		if(i != i123[x]) {
-			std::cout << "    -> Failure: M(" << x << ") = " << i123[x] << ", but should be " << i << '!' << std::endl;
+		if(i != mat3x3i[x]) {
+			std::cout << "    -> Failure: M(" << x << ") = " << mat3x3i[x] << ", but should be " << i << '!' << std::endl;
 			error++;
 		}
 		i++;
@@ -216,8 +219,8 @@ int main(int argc, char *argv[]) {
 	i = -10;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			if(i != i123.get(m, n)) {
-				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << i123.get(m, n) << ", but should be " << i << '!' << std::endl;
+			if(i != mat3x3i.get(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3i.get(m, n) << ", but should be " << i << '!' << std::endl;
 				error++;
 			}
 			i++;
@@ -233,7 +236,7 @@ int main(int argc, char *argv[]) {
 	i = 1000;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			i123.set(m, n, i++);
+			mat3x3i.set(m, n, i++);
 		}
 	}
 	
@@ -242,8 +245,8 @@ int main(int argc, char *argv[]) {
 	i = 1000;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			if(i != i123(m, n)) {
-				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << i123(m, n) << ", but should be " << i << '!' << std::endl;
+			if(i != mat3x3i(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3i(m, n) << ", but should be " << i << '!' << std::endl;
 				error++;
 			}
 			i++;
@@ -256,8 +259,8 @@ int main(int argc, char *argv[]) {
 	error = 0;
 	i = 1000;
 	for(unsigned int x = 0; x < 9; x++) {
-		if(i != i123(x)) {
-			std::cout << "    -> Failure: M(" << x << ") = " << i123(x) << ", but should be " << i << '!' << std::endl;
+		if(i != mat3x3i(x)) {
+			std::cout << "    -> Failure: M(" << x << ") = " << mat3x3i(x) << ", but should be " << i << '!' << std::endl;
 			error++;
 		}
 		i++;
@@ -269,8 +272,8 @@ int main(int argc, char *argv[]) {
 	error = 0;
 	i = 1000;
 	for(unsigned int x = 0; x < 9; x++) {
-		if(i != i123[x]) {
-			std::cout << "    -> Failure: M(" << x << ") = " << i123[x] << ", but should be " << i << '!' << std::endl;
+		if(i != mat3x3i[x]) {
+			std::cout << "    -> Failure: M(" << x << ") = " << mat3x3i[x] << ", but should be " << i << '!' << std::endl;
 			error++;
 		}
 		i++;
@@ -283,8 +286,8 @@ int main(int argc, char *argv[]) {
 	i = 1000;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			if(i != i123.get(m, n)) {
-				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << i123.get(m, n) << ", but should be " << i << '!' << std::endl;
+			if(i != mat3x3i.get(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3i.get(m, n) << ", but should be " << i << '!' << std::endl;
 				error++;
 			}
 			i++;
@@ -300,20 +303,18 @@ int main(int argc, char *argv[]) {
 	d = -4;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			d123(m, n) = d;
+			mat3x3d(m, n) = d;
 			d += 1.0;
 		}
 	}
-	errorSum += error;
-	std::cout << "    Test finished with " << error << " error(s)" << std::endl;
 	
 	std::cout << "    #" << testNo++ << ": Reading double values from matrix, using operator (m, n)" << std::endl;
 	error = 0;
 	d = -4;
 	for(unsigned int n = 0; n < 3; n++) {
 		for(unsigned int m = 0; m < 3; m++) {
-			if(!Utils::compareApprox(d, d123(m, n), DEFAULT_TOL)) {
-				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << d123(m, n) << ", but should be " << d << '!' << std::endl;
+			if(!Utils::compareApprox(d, mat3x3d(m, n), DEFAULT_TOL)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3d(m, n) << ", but should be " << d << '!' << std::endl;
 				error++;
 			}
 			d += 1.0;
@@ -321,6 +322,115 @@ int main(int argc, char *argv[]) {
 	}
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	// ********** Part F **********
+	
+	std::cout << "[F] Writing integer values (-4..+4) into a 3x3 matrix, using setCol()" << std::endl;
+	error = 0;
+
+	mat3x3i_col[0] << -4, -3, -2;
+	mat3x3i_col[1] << -1,  0,  1;
+	mat3x3i_col[2] <<  2,  3,  4;
+	mat3x3i_row[0] << -4, -1,  2;
+	mat3x3i_row[1] << -3,  0,  3;
+	mat3x3i_row[2] << -2,  1,  4;
+
+	
+	for(int c = 0; c < 3; c++) {
+		mat3x3i.setCol(c, mat3x3i_col[c]);
+	}
+	
+	std::cout << "    #" << testNo++ << ": Reading integer values from matrix, using operator (m, n)" << std::endl;
+	error = 0;
+	i = -4;
+	for(unsigned int n = 0; n < 3; n++) {
+		for(unsigned int m = 0; m < 3; m++) {
+			if(!Utils::compareApprox(i, mat3x3i(m, n), DEFAULT_TOL)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3i(m, n) << ", but should be " << i << '!' << std::endl;
+				error++;
+			}
+			i++;
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Reading integer values from matrix, using getCol()" << std::endl;
+	error = 0;
+	for(int c = 0; c < 3; c++) {
+		if(mat3x3i.getCol(c) != mat3x3i_col[c]) {
+			std::cout << "    -> Failure: getCol(" << c << ") != col[" << c << "]!" << std::endl;
+			error++;
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Reading integer values from matrix, using getRow()" << std::endl;
+	error = 0;
+	for(int r = 0; r < 3; r++) {
+		if(mat3x3i.getRow(r) != mat3x3i_row[r]) {
+			std::cout << "    -> Failure: getRow(" << r << ") != row[" << r << "]!" << std::endl;
+			error++;
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	// ********** Part G **********
+	
+	std::cout << "[G] Writing integer values (-4..+4) into a 3x3 matrix, using setRow()" << std::endl;
+	error = 0;
+
+	mat3x3i_col[0] << -4, -3, -2;
+	mat3x3i_col[1] << -1,  0,  1;
+	mat3x3i_col[2] <<  2,  3,  4;
+	mat3x3i_row[0] << -4, -1,  2;
+	mat3x3i_row[1] << -3,  0,  3;
+	mat3x3i_row[2] << -2,  1,  4;
+	
+	for(int r = 0; r < 3; r++) {
+		mat3x3i.setRow(r, mat3x3i_row[r]);
+	}
+	
+	std::cout << "    #" << testNo++ << ": Reading integer values from matrix, using operator (m, n)" << std::endl;
+	error = 0;
+	i = -4;
+	for(unsigned int n = 0; n < 3; n++) {
+		for(unsigned int m = 0; m < 3; m++) {
+			if(!Utils::compareApprox(i, mat3x3i(m, n), DEFAULT_TOL)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << mat3x3i(m, n) << ", but should be " << i << '!' << std::endl;
+				error++;
+			}
+			i++;
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Reading integer values from matrix, using getCol()" << std::endl;
+	error = 0;
+	for(int c = 0; c < 3; c++) {
+		if(mat3x3i.getCol(c) != mat3x3i_col[c]) {
+			std::cout << "    -> Failure: getCol(" << c << ") != col[" << c << "]!" << std::endl;
+			error++;
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Reading integer values from matrix, using getRow()" << std::endl;
+	error = 0;
+	for(int r = 0; r < 3; r++) {
+		if(mat3x3i.getRow(r) != mat3x3i_row[r]) {
+			std::cout << "    -> Failure: getRow(" << r << ") != row[" << r << "]!" << std::endl;
+			error++;
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	// ********** END **********
 	
 	if(errorSum == 0) {
 		std::cout << "Matrix element access test succeeded" << std::endl;

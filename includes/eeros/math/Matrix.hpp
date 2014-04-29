@@ -122,8 +122,36 @@ namespace eeros {
 				return (*this)(m, n);
 			}
 			
+			Matrix<M, 1, T> getCol(uint8_t n) const {
+				Matrix<M, 1, T> col;
+				for(uint8_t m = 0; m < M; m++) {
+					col(m, 0) = (*this)(m, n);
+				}
+				return col;
+			}
+			
+			Matrix<1, N, T> getRow(uint8_t m) const {
+				Matrix<1, N, T> row;
+				for(uint8_t n = 0; n < N; n++) {
+					row(0, n) = (*this)(m, n);
+				}
+				return row;
+			}
+			
 			void set(uint8_t m, uint8_t n, T value) {
 				(*this)(m, n) = value;
+			}
+			
+			void setCol(uint8_t n, const Matrix<M, 1, T>& col) {
+				for(uint8_t m = 0; m < M; m++) {
+					(*this)(m, n) = col(m, 0);
+				}
+			}
+			
+			void setRow(uint8_t m, const Matrix<1, N, T>& row) {
+				for(uint8_t n = 0; n < N; n++) {
+					(*this)(m, n) = row(0, n);
+				}
 			}
 			
 			T& operator()(uint8_t m, uint8_t n) {
