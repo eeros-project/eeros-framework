@@ -51,6 +51,11 @@ namespace eeros {
 				value = newValue;
 			}
 			
+			template < typename VT >
+			void setValue(VT newValue) {
+				value = newValue;
+			}
+			
 			virtual timestamp_t getTimestamp() const {
 				return timestamp;
 			}

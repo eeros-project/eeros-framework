@@ -21,7 +21,7 @@ namespace eeros {
 				MatrixInitializer(Matrix<IM, IN, IT>& mat, unsigned int index = 0) : mat(mat), index(index) { }
 				
 				MatrixInitializer<IM, IN, IT> operator,(IT right) {
-					mat(index / M, index % N) = right;
+					mat(index / N, index % N) = right;
 					return MatrixInitializer<IM, IN, IT>(mat, index + 1);
 				}
 				
@@ -30,6 +30,10 @@ namespace eeros {
 			}; // END class MatrixInitializer
 		
 			Matrix() { }
+			
+			Matrix(const T v) {
+				(*this) = v;
+			}
 			
 			/********** Initializing the matrix **********/
 			
@@ -107,7 +111,7 @@ namespace eeros {
 				}
 			}
 			
-			MatrixInitializer<M,N,T> operator<<(T right) {
+			MatrixInitializer<M, N, T> operator<<(T right) {
 				(*this)[0] = right;
 				return MatrixInitializer<M, N, T>(*this, 1);
 			}
@@ -118,8 +122,36 @@ namespace eeros {
 				return (*this)(m, n);
 			}
 			
+			Matrix<M, 1, T> getCol(uint8_t n) const {
+				Matrix<M, 1, T> col;
+				for(uint8_t m = 0; m < M; m++) {
+					col(m, 0) = (*this)(m, n);
+				}
+				return col;
+			}
+			
+			Matrix<1, N, T> getRow(uint8_t m) const {
+				Matrix<1, N, T> row;
+				for(uint8_t n = 0; n < N; n++) {
+					row(0, n) = (*this)(m, n);
+				}
+				return row;
+			}
+			
 			void set(uint8_t m, uint8_t n, T value) {
 				(*this)(m, n) = value;
+			}
+			
+			void setCol(uint8_t n, const Matrix<M, 1, T>& col) {
+				for(uint8_t m = 0; m < M; m++) {
+					(*this)(m, n) = col(m, 0);
+				}
+			}
+			
+			void setRow(uint8_t m, const Matrix<1, N, T>& row) {
+				for(uint8_t n = 0; n < N; n++) {
+					(*this)(m, n) = row(0, n);
+				}
 			}
 			
 			T& operator()(uint8_t m, uint8_t n) {
@@ -340,7 +372,7 @@ namespace eeros {
 			
 			/********** Base operations **********/
 			
-			bool operator==(const Matrix<M, N, T> right) const {
+			bool operator==(const Matrix<M, N, T>& right) const {
 				for(uint8_t m = 0; m < M; m++) {
 					for(uint8_t n = 0; n < N; n++) {
 						if((*this)(m, n) != right(m, n))
@@ -350,7 +382,7 @@ namespace eeros {
 				return true;
 			}
 
-			bool operator!=(const Matrix<M, N, T> right) const {
+			bool operator!=(const Matrix<M, N, T>& right) const {
 				for(uint8_t m = 0; m < M; m++) {
 					for(uint8_t n = 0; n < N; n++) {
 						if((*this)(m, n) != right(m, n)) {
@@ -359,6 +391,50 @@ namespace eeros {
 					}
 				}
 				return false;
+			}
+			
+			bool operator<(const Matrix<M, N, T>& right) const {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if((*this)(m, n) >= right(m, n)) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+			
+			bool operator<=(const Matrix<M, N, T>& right) const {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if((*this)(m, n) > right(m, n)) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+			
+			bool operator>(const Matrix<M, N, T>& right) const {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if((*this)(m, n) <= right(m, n)) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+			
+			bool operator>=(const Matrix<M, N, T>& right) const {
+				for(uint8_t m = 0; m < M; m++) {
+					for(uint8_t n = 0; n < N; n++) {
+						if((*this)(m, n) < right(m, n)) {
+							return false;
+						}
+					}
+				}
+				return true;
 			}
 			
 			Matrix<M, N, T>& operator=(T right) {
@@ -423,7 +499,12 @@ namespace eeros {
 				}
 				return result;
 			}
-
+			
+			Matrix<M, N, T>& operator+=(const Matrix<M, N, T> right) {
+				(*this) = (*this) + right;
+				return (*this);
+			}
+			
 			Matrix<M, N, T> operator-(const Matrix<M, N, T> right) const {
 				Matrix<M, N, T> result;
 				for(uint8_t m = 0; m < M; m++) {
@@ -442,6 +523,16 @@ namespace eeros {
 					}
 				}
 				return result;
+			}
+			
+			Matrix<M, N, T>& operator-=(const Matrix<M, N, T> right) {
+				(*this) = (*this) - right;
+				return (*this);
+			}
+			
+			Matrix<M, N, T>& operator-() {
+				(*this) = 0 - (*this);
+				return (*this);
 			}
 			
 			Matrix<M, N, T> operator/(T right) const {
@@ -534,7 +625,7 @@ namespace eeros {
 				}
 			}
 			
-			/********** Cast operations **********/
+			/********** Cast/conversation operations **********/
 			
 			operator T() const {
 				if(M == 1 && N == 1)
@@ -584,7 +675,7 @@ namespace eeros {
 				return d * v;
 			}
 			
-			static Matrix<3, 3, T> createSkewSymmetricMatrix(Matrix<3, 1, T> a) {
+			static Matrix<3, 3, T> createSkewSymmetric(Matrix<3, 1, T> a) {
 				Matrix<3, 3, T> result;
 				result(0, 0) =  0;
 				result(0, 1) = -a(2);

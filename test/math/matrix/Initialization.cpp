@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	// ********** Part D: Other initialization methods **********
+	
 	std::cout << "[D] Testing other initialization methods" << std::endl;
 	
 	std::cout << "    #" << testNo++ << ": Testing createDiag()" << std::endl;
@@ -245,7 +245,7 @@ int main(int argc, char *argv[]) {
 	Matrix<5, 5, int> diagM = Matrix<5, 5, int>::createDiag(diagV);
 	for(unsigned int m = 0; m < 5; m++) {
 		for(unsigned int n = 0; n < 5; n++) {
-			if(m ==n) {
+			if(m == n) {
 				if(diagM(m, n) != diagV) {
 					std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << diagM(m, n) << ", but should be " << diagV << "!" << std::endl;
 					error++;
@@ -262,7 +262,40 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	std::cout << "    #" << testNo++ << ": Testing << operator" << std::endl;
+	std::cout << "    #" << testNo++ << ": Testing createSkewSymmetric()" << std::endl;
+	error = 0;
+	Matrix<3, 1, int> ssMatA, ssMatB;
+	ssMatA(0) = 1; ssMatA(1) = 2; ssMatA(2) = 3;
+	ssMatB(0) = -5; ssMatB(1) = -3; ssMatB(2) = 0;
+	Matrix<3, 3, int> ssRefResA, ssRefResB, ssRes;
+	ssRefResA(0, 0) =  0; ssRefResA(0, 1) = -3; ssRefResA(0, 2) =  2;
+	ssRefResA(1, 0) =  3; ssRefResA(1, 1) =  0; ssRefResA(1, 2) = -1;
+	ssRefResA(2, 0) = -2; ssRefResA(2, 1) =  1; ssRefResA(2, 2) =  0;
+	ssRefResB(0, 0) =  0; ssRefResB(0, 1) =  0; ssRefResB(0, 2) = -3;
+	ssRefResB(1, 0) =  0; ssRefResB(1, 1) =  0; ssRefResB(1, 2) =  5;
+	ssRefResB(2, 0) =  3; ssRefResB(2, 1) = -5; ssRefResB(2, 2) =  0;
+	ssRes = Matrix<3, 3, int>::createSkewSymmetric(ssMatA);
+	for(unsigned int m = 0; m < 3; m++) {
+		for(unsigned int n = 0; n < 3; n++) {
+			if(ssRes(m, n) != ssRefResA(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << ssRes(m, n) << ", but should be " << ssRefResA(m, n) << "!" << std::endl;
+				error++;
+			}
+		}
+	}
+	ssRes = Matrix<3, 3, int>::createSkewSymmetric(ssMatB);
+	for(unsigned int m = 0; m < 3; m++) {
+		for(unsigned int n = 0; n < 3; n++) {
+			if(ssRes(m, n) != ssRefResB(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << ssRes(m, n) << ", but should be " << ssRefResB(m, n) << "!" << std::endl;
+				error++;
+			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Testing << operator with a 3x3 integer matrix" << std::endl;
 	error = 0;
 	Matrix<3, 3, int> sMat;
 	sMat << 1, 4, 7,
@@ -281,6 +314,54 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
+	std::cout << "    #" << testNo++ << ": Testing << operator with a 4x1 double matrix" << std::endl;
+	error = 0;
+	Matrix<4, 1, double> tMat;
+	tMat << 0.1, 0.2, 0.3, 0.4;
+	double l = 0.1;
+	for(unsigned int m = 0; m < 4; m++) {
+		if(!Utils::compareApprox(l, tMat(m, 0), DEFAULT_TOL)) {
+			std::cout << "    -> Failure: M(" << m << ", 0) = " << tMat(m, 0) << ", but should be " << l << '!' << std::endl;
+			error++;
+		}
+		l += 0.1;
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Testing = operator with an integer for a integer matrix" << std::endl;
+	error = 0;
+	Matrix<3, 3, int> aMat1;
+	for(int k = -4; k < 5; k++) {
+		aMat1 = k;
+		for(unsigned int n = 0; n < 3; n++) {
+			for(unsigned int m = 0; m < 3; m++) {
+				if(aMat1(m, n) != k) {
+					std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << aMat1(m, n) << ", but should be " << k << '!' << std::endl;
+					error++;
+				}
+			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Testing = operator with an integer for a double matrix" << std::endl;
+	error = 0;
+	Matrix<3, 3, double> aMat2;
+	for(int k = -4; k < 5; k++) {
+		aMat2 = k;
+		for(unsigned int n = 0; n < 3; n++) {
+			for(unsigned int m = 0; m < 3; m++) {
+				if(aMat2(m, n) != k) {
+					std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << aMat2(m, n) << ", but should be " << k << '!' << std::endl;
+					error++;
+				}
+			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
 	if (errorSum == 0)
 		std::cout << "Matrix element access test succeeded" << std::endl;
