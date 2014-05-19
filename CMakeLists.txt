@@ -57,8 +57,12 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 			set(PREEMPT_RT FALSE)
 			
 			# Check for libraries
-			CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
-			CHECK_INCLUDE_FILES ("flinklib.h" LIBFLINK)
+			if(NOT LIBFLINK)
+				CHECK_INCLUDE_FILES ("flinklib.h" LIBFLINK)
+			endif()
+			if(NOT LIBCOMEDI)
+				CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
+			endif()
 			
 			if(LIBCOMEDI)
 				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
