@@ -5,10 +5,10 @@
 
 using namespace eeros::safety;
 
-SafetyContext::SafetyContext(SafetySystem& parent) : parent(parent) { }
+SafetyContext::SafetyContext(SafetySystem* parent) : parent(parent) { }
 
 
 void SafetyContext::triggerEvent(int32_t event) {	
 	// Trigger event in private context
-	parent.triggerEvent(event, this);
+	parent->triggerEvent(event, this);
 }

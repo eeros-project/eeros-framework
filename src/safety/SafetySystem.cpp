@@ -6,7 +6,8 @@ namespace eeros {
 		
 		uint8_t SafetySystem::instCount = 0;
 		
-		SafetySystem::SafetySystem(SafetyProperties properties, double period) : properties(properties), log('X'), currentLevel(nullptr), privateContext(*this),PeriodicThread(period, 0, PeriodicThread::isRealtimeSupported()) {
+		SafetySystem::SafetySystem(SafetyProperties properties, double period) : properties(properties), log('X'), currentLevel(nullptr), privateContext(this),PeriodicThread(period, 0, PeriodicThread::isRealtimeSupported()) {
+			currentLevel = properties.entryLevelPtr();
 			if(++instCount > 1) { // only one instance is allowed
 				throw EEROSException("only one instance of the safety system is allowed");
 			}
@@ -76,39 +77,43 @@ namespace eeros {
 		}
 
 		void SafetySystem::run() {
-			
-			// 1) Make local copy of currentLevel
-			SafetyLevel* level = currentLevel;
-			
-			// 2) Read inputs
-			for(auto ia : level->inputAction) {
-				if(ia != nullptr) {
-					SafetyLevel* oldLevel = currentLevel;
-					if (ia->check(&privateContext)) {
-						SafetyLevel* newLevel = currentLevel;
-						using namespace eeros::logger;
-						eeros::hal::PeripheralInputInterface* action = (eeros::hal::PeripheralInputInterface*)(ia->inputInterface); // TODO make getId() const
-						if (oldLevel != newLevel) {
-							log.warn()	<< "level changed due to input action: " << action->getId() << endl
-										<< "  previous level: [" << oldLevel->getId() << "] " << oldLevel->getDescription() << endl
-										<< "  new level:      [" << newLevel->getId() << "] " << newLevel->getDescription();
-						} else {
-//							log.warn()	<< "no change by input action: " << action->getId();
+			if(currentLevel != nullptr) {
+				// 1) Make local copy of currentLevel
+				SafetyLevel* level = currentLevel;
+				
+				// 2) Read inputs
+				for(auto ia : level->inputAction) {
+					if(ia != nullptr) {
+						SafetyLevel* oldLevel = currentLevel;
+						if (ia->check(&privateContext)) {
+							SafetyLevel* newLevel = currentLevel;
+							using namespace eeros::logger;
+							eeros::hal::PeripheralInputInterface* action = (eeros::hal::PeripheralInputInterface*)(ia->inputInterface); // TODO make getId() const
+							if (oldLevel != newLevel) {
+								log.info()	<< "level changed due to input action: " << action->getId() << endl
+											<< "  previous level: [" << oldLevel->getId() << "] " << oldLevel->getDescription() << endl
+											<< "  new level:      [" << newLevel->getId() << "] " << newLevel->getDescription();
+							} else {
+	//							log.trace()	<< "no change by input action: " << action->getId();
+							}
 						}
 					}
 				}
-			}
-			
-			// 3) Execute level action
-			if(level->action != nullptr) {
-				level->action(&privateContext);
-			}
 				
-			// 4) Set outputs
-			for(auto oa : level->outputAction) {
-				if(oa != nullptr) {
-					oa->set();
+				// 3) Execute level action
+				if(level->action != nullptr) {
+					level->action(&privateContext);
 				}
+					
+				// 4) Set outputs
+				for(auto oa : level->outputAction) {
+					if(oa != nullptr) {
+						oa->set();
+					}
+				}
+			}
+			else {
+				log.error() << "current level is null!";
 			}
 		}
 	};

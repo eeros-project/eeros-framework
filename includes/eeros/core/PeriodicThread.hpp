@@ -23,7 +23,7 @@ namespace eeros {
 		virtual void stop();
 		
 		static constexpr bool isRealtimeSupported() {
-			#if defined(REALTIME_SUPPORT) 
+			#ifdef REALTIME_SUPPORT
 				return true;
 			#else
 				return false;
@@ -31,7 +31,7 @@ namespace eeros {
 		}
 		
 	private:
-		double period;
+		double period, delay;
 		bool rt;
 		std::atomic<status> s;
 		

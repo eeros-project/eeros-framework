@@ -16,15 +16,17 @@ void stack_prefault() {
 PeriodicThread::PeriodicThread(double period, double delay, bool realtime) : 
 	rt(realtime),
 	period(period),
+	delay(delay),
 	s(running),
-	Thread([&]() {
+	Thread([this]() {
 		struct timespec time;
-		uint64_t period_ns = to_ns(period);
+		uint64_t period_ns = to_ns(this->period);
 		
 		clock_gettime(CLOCK_MONOTONIC, &time);
-		time.tv_nsec += to_ns(delay);
+		time.tv_nsec += to_ns(this->delay);
 		
-		if(realtime) {
+		if(this->rt) {
+			log.info() << "configuring thread as realtime thread!";
 			struct sched_param schedulingParam;
 			schedulingParam.sched_priority = RT_PRIORITY;
 			if(sched_setscheduler(0, SCHED_FIFO, &schedulingParam) == -1) {
