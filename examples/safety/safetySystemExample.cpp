@@ -37,29 +37,20 @@ void initHardware() {
 int main() {
 	std::cout << "Safety System Example started..." << std::endl;
 	
-	// Get Safety System instance
-	SafetySystem& safetySys = SafetySystem::instance();
-	
 	// Get HAL instance
 	HAL& hal = HAL::instance();
 	
 	// Initialize Hardware
 	initHardware();
 	
-	// Initialize Safety System
+	// Create and initialize safety system
 	ExampleSafetyProperties properties;
-	safetySys.setProperties(properties);
-	
-	std::cout << "Starting executor..." << std::endl;
-	Executor e(1);
-	e.addRunnable(safetySys);
-	e.start();
+	SafetySystem safetySys(properties, 1);
 	
 	sleep(20);
 	
-	std::cout << "Stopping executor..." << std::endl;
-	e.stop();
-	while(!e.isTerminated());
+	std::cout << "Stopping safety system..." << std::endl;
+	safetySys.stop();
 	
 	std::cout << "Example done..." << std::endl;
 }

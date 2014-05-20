@@ -2,6 +2,7 @@
 #define ORG_EEROS_CORE_PERIODICTHREAD_HPP_
 
 #include <eeros/core/Thread.hpp>
+#include <eeros/config.hpp>
 
 #include <atomic>
 
@@ -21,7 +22,13 @@ namespace eeros {
 		virtual void pause();
 		virtual void stop();
 		
-		static constexpr bool isRealtimeSupported();
+		static constexpr bool isRealtimeSupported() {
+			#if defined(REALTIME_SUPPORT) 
+				return true;
+			#else
+				return false;
+			#endif
+		}
 		
 	private:
 		double period;

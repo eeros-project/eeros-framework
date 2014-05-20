@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <eeros/core/Executor.hpp>
 #include <eeros/hal/HAL.hpp>
 #include <eeros/hal/ComediFqd.hpp>
 #include <eeros/hal/ComediDac.hpp>
@@ -18,8 +17,6 @@
 #include "MySafetyProperties.hpp"
 #include "MyControlSystem.hpp"
 #include "SequenceA.hpp"
-
-#define TIMETOWAIT 30
 
 using namespace eeros;
 using namespace eeros::hal;
@@ -51,20 +48,10 @@ int main() {
 	std::cout << "Initializing Hardware..." << std::endl;
 	initHardware();
 	
-	// Get Safety System instance
-	SafetySystem& safetySys = SafetySystem::instance();
-	safetySys.log.set(w);
-	
-	// Initialize Safety System
+	// Create and initialize a safety system
 	MySafetyProperties properties;
-	safetySys.setProperties(properties);
-	
-	std::cout << "Creating executors..." << std::endl;
-	Executor safetySysExecutor(0.01); // safety system -> 10 ms period time
-	safetySysExecutor.addRunnable(safetySys);
-
-	// Start safety system
-	safetySysExecutor.start();
+	if(!properties.verify()) throw -1;
+	SafetySystem safetySys(properties, 0.01);
 	
 	// Get control System instance
 	MyControlSystem& controlSys = MyControlSystem::instance();
@@ -72,7 +59,7 @@ int main() {
 	// Start control system
 	controlSys.start();
 	
-	SequenceA mainSequence("Main Sequence", 3.14/5);
+	SequenceA mainSequence("Main Sequence", safetySys, 3.14/5);
 	Sequencer sequencer("Example sequencer", mainSequence);
 	
 	while(!sequencer.done());
@@ -80,9 +67,7 @@ int main() {
 	sleep(100);
 	
 	controlSys.stop();
-	safetySysExecutor.stop();
-	
-	sleep(1);
+	safetySys.stop();
 	
 	std::cout << "Example finished..." << std::endl;
 }

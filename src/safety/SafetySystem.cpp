@@ -3,14 +3,25 @@
 
 namespace eeros {
 	namespace safety {
-
-		SafetySystem::~SafetySystem() {}
-
-		SafetySystem::SafetySystem() : log('X'), currentLevel(nullptr) { }
-
-		SafetySystem::SafetySystem(const SafetySystem&) : log('X'), currentLevel(nullptr) { }
-		SafetySystem& SafetySystem::operator=(const SafetySystem&) { return *this; }
-
+		
+		uint8_t SafetySystem::instCount = 0;
+		
+		SafetySystem::SafetySystem(SafetyProperties properties, double period) : properties(properties), log('X'), currentLevel(nullptr), privateContext(*this),PeriodicThread(period, 0, PeriodicThread::isRealtimeSupported()) {
+			if(++instCount > 1) { // only one instance is allowed
+				throw EEROSException("only one instance of the safety system is allowed");
+			}
+		}
+		
+		SafetySystem::~SafetySystem() {
+			stop();
+			join();
+			instCount--;
+		}
+		
+		void SafetySystem::stop() {
+			stop();
+		}
+		
 		SafetyLevel& SafetySystem::getCurrentLevel(void) {
 			if(currentLevel) {
 				return *currentLevel;
@@ -59,15 +70,6 @@ namespace eeros {
 				throw EEROSException("current level not defined"); // TODO define error number and send error message to logger
 			}
 		}
-
-		bool SafetySystem::setProperties(SafetyProperties safetyProperties) {
-			if(safetyProperties.verify()) {
-				properties = safetyProperties;
-				currentLevel = properties.entryLevelPtr();
-				return true;
-			}
-			return false;
-		}
 		
 		const SafetyProperties* SafetySystem::getProperties() const {
 			return &properties;
@@ -109,11 +111,5 @@ namespace eeros {
 				}
 			}
 		}
-
-		SafetySystem& SafetySystem::instance() {
-			static SafetySystem safetySystemInstance;
-			return safetySystemInstance;
-		}
-
 	};
 };

@@ -83,7 +83,3 @@ void PeriodicThread::pause() {
 void PeriodicThread::stop() {
 	s = stopping;
 }
-
-constexpr bool PeriodicThread::isRealtimeSupported() {
-	return false;
-}

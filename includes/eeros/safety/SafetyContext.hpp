@@ -15,7 +15,8 @@ namespace eeros {
 			void triggerEvent(int32_t event);
 			
 		private:
-			SafetyContext();
+			SafetyContext(SafetySystem& parent);
+			SafetySystem& parent;
 		};
 
 	};
