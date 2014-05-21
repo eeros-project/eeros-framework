@@ -6,36 +6,41 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/core/Executor.hpp>
 #include <eeros/core/EEROSException.hpp>
-#include <eeros/hal/ComediDigIn.hpp>
-#include <eeros/hal/ComediDigOut.hpp>
-#include <eeros/hal/ComediFqd.hpp>
+#include <eeros/hal/DummyRealInput.hpp>
+#include <eeros/hal/DummyLogicInput.hpp>
+#include <eeros/hal/DummyLogicOutput.hpp>
+#include <eeros/logger/StreamLogWriter.hpp>
+#include <eeros/logger/Logger.hpp>
 
 #include "ExampleSafetyProperties.hpp"
 
 using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;
+using namespace eeros::logger;
 
 void initHardware() {
 	HAL& hal = HAL::instance();
 	
-	// Define system in- and outputs
-	ComediDevice* comedi0 = new ComediDevice("/dev/comedi0");
-	
 	// Add system in- and outputs to the HAL
-	hal.addPeripheralInput(new ComediFqd("q0", comedi0, 11, 8, 10, 9, 6.28318530718 / 2000.0, 0, 0));
-	hal.addPeripheralInput(new ComediFqd("q1", comedi0, 11, 3, 11, 4, 6.28318530718 / 2000.0, 0, 0));
-	hal.addPeripheralInput(new ComediDigIn("emergencyStop", comedi0, 2, 0));
-	hal.addPeripheralOutput(new ComediDigOut("enable0", comedi0, 2, 8));
-	hal.addPeripheralOutput(new ComediDigOut("enable1", comedi0, 2, 9));
-	hal.addPeripheralOutput(new ComediDigOut("brake0", comedi0, 2, 10));
-	hal.addPeripheralOutput(new ComediDigOut("brake1", comedi0, 2, 11));
-	hal.addPeripheralOutput(new ComediDigOut("power", comedi0, 2, 12));
-	hal.addPeripheralOutput(new ComediDigOut("wd", comedi0, 2, 13));
+	hal.addPeripheralInput(new DummyRealInput("q0", 6.28318530718 / 2000.0, 0));
+	hal.addPeripheralInput(new DummyRealInput("q1", 6.28318530718 / 2000.0, 0));
+	hal.addPeripheralInput(new DummyLogicInput("emergencyStop"));
+	hal.addPeripheralOutput(new DummyLogicOutput("enable0"));
+	hal.addPeripheralOutput(new DummyLogicOutput("enable1"));
+	hal.addPeripheralOutput(new DummyLogicOutput("brake0"));
+	hal.addPeripheralOutput(new DummyLogicOutput("brake1"));
+	hal.addPeripheralOutput(new DummyLogicOutput("power"));
+	hal.addPeripheralOutput(new DummyLogicOutput("wd"));
 }
 
 int main() {
-	std::cout << "Safety System Example started..." << std::endl;
+	StreamLogWriter w(std::cout);
+	Logger<LogWriter>::setDefaultWriter(&w);
+	
+	Logger<LogWriter> log;
+	
+	log.info() << "Safety System Example started...";
 	
 	// Get HAL instance
 	HAL& hal = HAL::instance();
@@ -49,8 +54,8 @@ int main() {
 	
 	sleep(20);
 	
-	std::cout << "Stopping safety system..." << std::endl;
-	safetySys.stop();
+	log.info() << "Stopping safety system...";
+	safetySys.shutdown();
 	
-	std::cout << "Example done..." << std::endl;
+	log.info() << "Example done...";
 }

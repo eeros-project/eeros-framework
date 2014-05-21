@@ -13,11 +13,11 @@ void stack_prefault() {
 	unsigned char dummy[MAX_SAFE_STACK] = {};
 }
 
-PeriodicThread::PeriodicThread(double period, double delay, bool realtime) : 
+PeriodicThread::PeriodicThread(double period, double delay, bool realtime, status start) : 
 	rt(realtime),
 	period(period),
 	delay(delay),
-	s(running),
+	s(start),
 	Thread([this]() {
 		struct timespec time;
 		uint64_t period_ns = to_ns(this->period);

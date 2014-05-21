@@ -13,7 +13,7 @@ namespace eeros {
 	public:
 		enum status { running = 0, stopping = 1, stopped = 2, paused = 3 };
 		
-		PeriodicThread(double period, double delay = 0, bool realtime = false);
+		PeriodicThread(double period, double delay = 0, bool realtime = false, status start = running);
 		virtual ~PeriodicThread();
 		
 		virtual status getStatus() const;

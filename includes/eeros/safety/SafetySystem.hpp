@@ -25,13 +25,16 @@ namespace eeros {
 			SafetyLevel& operator[](unsigned levelId);
 			
 			void triggerEvent(uint32_t event, SafetyContext* context = nullptr);
-			void run();
-			void stop();
+			void shutdown();
 			const SafetyProperties* getProperties() const;
 			
 			logger::Logger<logger::LogWriter> log;
 			
+		protected:
+			void run();
 		private:
+			bool setProperties(SafetyProperties safetyProperties);
+			
 			SafetyProperties properties;
 			SafetyLevel* currentLevel;
 			SafetyContext privateContext;

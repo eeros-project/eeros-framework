@@ -67,7 +67,7 @@ int main() {
 	sleep(100);
 	
 	controlSys.stop();
-	safetySys.stop();
+	safetySys.shutdown();
 	
 	std::cout << "Example finished..." << std::endl;
 }

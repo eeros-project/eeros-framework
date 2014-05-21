@@ -6,21 +6,31 @@ namespace eeros {
 		
 		uint8_t SafetySystem::instCount = 0;
 		
-		SafetySystem::SafetySystem(SafetyProperties properties, double period) : properties(properties), log('X'), currentLevel(nullptr), privateContext(this),PeriodicThread(period, 0, PeriodicThread::isRealtimeSupported()) {
-			currentLevel = properties.entryLevelPtr();
+		SafetySystem::SafetySystem(SafetyProperties safetyProperties, double period) :
+		log('S'),
+		currentLevel(nullptr),
+		privateContext(this),
+		PeriodicThread(period, 0, PeriodicThread::isRealtimeSupported(), PeriodicThread::paused) {
 			if(++instCount > 1) { // only one instance is allowed
 				throw EEROSException("only one instance of the safety system is allowed");
 			}
+			if(!setProperties(safetyProperties)) {
+				throw EEROSException("verification of safety properties failed!");
+			}
+			start();
 		}
 		
 		SafetySystem::~SafetySystem() {
-			stop();
-			join();
+			if(getStatus() != stopped) {
+				stop();
+				join();
+			}
 			instCount--;
 		}
 		
-		void SafetySystem::stop() {
+		void SafetySystem::shutdown() {
 			stop();
+			join();
 		}
 		
 		SafetyLevel& SafetySystem::getCurrentLevel(void) {
@@ -31,7 +41,16 @@ namespace eeros {
 				throw EEROSException("currentLevel not defiend"); // TODO define error number and send error message to logger
 			}
 		}
-
+		
+		bool SafetySystem::setProperties(SafetyProperties safetyProperties) {
+				if(safetyProperties.verify()) {
+						properties = safetyProperties;
+						currentLevel = properties.entryLevelPtr();
+						return true;
+				}
+				return false;
+		}
+		
 		SafetyLevel& SafetySystem::getLevelById(int32_t levelId) {
 			for(auto& level : properties.levels) {
 				if(level.getId() == levelId) return level;
