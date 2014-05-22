@@ -2,7 +2,7 @@
 
 using namespace eeros::control;
 
-MyControlSystem::MyControlSystem() : 
+MyControlSystem::MyControlSystem(double ts) : 
 	setpoint(0.0),
 	setpointV(6),
 	enc("q"),
@@ -12,7 +12,7 @@ MyControlSystem::MyControlSystem() :
 	inertia(14.2e-7),
 	invMotConst(1/15.7e-3 * 2.0),
 	dac("dac"),
-	timedomain("Main time domain", 0.001, 0.1, true) {
+	timedomain("Main time domain", ts, true) {
 	
 	setpoint.getOut().getSignal().setName("phi_desired");
 
@@ -64,14 +64,9 @@ MyControlSystem::MyControlSystem() :
 }
 
 void MyControlSystem::start() {
-	timedomain.start();
+	timedomain.enable();
 }
 
 void MyControlSystem::stop() {
-	timedomain.stop();
-}
-
-MyControlSystem& MyControlSystem::instance() {
-	static MyControlSystem controlSystemInstance;
-	return controlSystemInstance;
+	timedomain.disable();
 }

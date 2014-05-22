@@ -3,12 +3,12 @@
 
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/safety/SafetySystem.hpp>
+#include "MyControlSystem.hpp"
 
 class SequenceA : public eeros::sequencer::Sequence {
 
 public:
-	SequenceA(std::string name, eeros::safety::SafetySystem& safetySys, double angle);
-	virtual ~SequenceA();
+	SequenceA(std::string name, eeros::safety::SafetySystem& safetySys, MyControlSystem& controlSys, double angle);
 	
 	virtual bool checkPreCondition();
 	virtual bool checkPostCondition();
@@ -19,6 +19,7 @@ public:
 private:
 	double angle;
 	eeros::safety::SafetySystem& safetySys;
+	MyControlSystem& controlSys;
 };
 
 #endif // ORG_EEROS_EXAMPLES_SEQUENCER_SEQUENCEA_HPP_ 

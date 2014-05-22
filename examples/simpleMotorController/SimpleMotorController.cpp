@@ -48,18 +48,15 @@ int main() {
 	std::cout << "Initializing Hardware..." << std::endl;
 	initHardware();
 	
+	// Create the control system
+	MyControlSystem controlSys(0.001);
+	
 	// Create and initialize a safety system
-	MySafetyProperties properties;
+	MySafetyProperties properties(controlSys);
 	if(!properties.verify()) throw -1;
 	SafetySystem safetySys(properties, 0.01);
 	
-	// Get control System instance
-	MyControlSystem& controlSys = MyControlSystem::instance();
-
-	// Start control system
-	controlSys.start();
-	
-	SequenceA mainSequence("Main Sequence", safetySys, 3.14/5);
+	SequenceA mainSequence("Main Sequence", safetySys, controlSys, 3.14/5);
 	Sequencer sequencer("Example sequencer", mainSequence);
 	
 	while(!sequencer.done());

@@ -14,7 +14,7 @@ using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;
 
-MySafetyProperties::MySafetyProperties() {
+MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) : controlSys(controlSys) {
 	
 	HAL& hal = HAL::instance();
 
@@ -73,12 +73,12 @@ MySafetyProperties::MySafetyProperties() {
 		});
 		
 		level(startingControl).setLevelAction([&](SafetyContext* privateContext) {
-			MyControlSystem::instance().start();
+			controlSys.start();
 			privateContext->triggerEvent(startControlDone);
 		});
 		
 		level(stoppingControl).setLevelAction([&](SafetyContext* privateContext) {
-			MyControlSystem::instance().stop();
+			controlSys.stop();
 			privateContext->triggerEvent(stopControlDone);
 		});
 		
