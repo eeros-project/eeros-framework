@@ -3,6 +3,7 @@
 
 #include <eeros/safety/SafetyProperties.hpp>
 #include <eeros/hal/HAL.hpp>
+#include "MyControlSystem.hpp"
 
 	// Name all levels
 	enum {
@@ -30,17 +31,20 @@
 	};
 
 class MySafetyProperties : public eeros::safety::SafetyProperties {
-			
-	public:
-		MySafetyProperties();
-		virtual ~MySafetyProperties();
 	
-		// critical outputs
-		eeros::hal::PeripheralOutput<bool>* enable;
-		
-		// critical inputs
-		eeros::hal::PeripheralInput<bool>* emergency;
-		eeros::hal::PeripheralInput<double>* q;
+public:
+	MySafetyProperties(MyControlSystem& controlSys);
+	virtual ~MySafetyProperties();
+	
+protected:
+	// critical outputs
+	eeros::hal::PeripheralOutput<bool>* enable;
+	
+	// critical inputs
+	eeros::hal::PeripheralInput<bool>* emergency;
+	eeros::hal::PeripheralInput<double>* q;
+	
+	MyControlSystem& controlSys;
 };
 
 #endif // MYSAFETYPROPERTIES_HPP_

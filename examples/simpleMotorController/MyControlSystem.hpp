@@ -12,9 +12,7 @@
 class MyControlSystem {
 
 public:
-	void run();
-	
-	static MyControlSystem& instance();
+	MyControlSystem(double ts);
 	
 	void start();
 	void stop();
@@ -33,10 +31,6 @@ public:
 	eeros::control::PeripheralOutput<> dac;
 	
 private:
-	MyControlSystem();
-	MyControlSystem(const MyControlSystem&);
-	MyControlSystem& operator=(const MyControlSystem&);
-	
 	eeros::control::TimeDomain timedomain;
 };
 
