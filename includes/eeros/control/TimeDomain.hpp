@@ -3,29 +3,22 @@
 
 #include <list>
 #include <string>
-#include <eeros/core/Runnable.hpp>
+#include <eeros/core/PeriodicThread.hpp>
 #include <eeros/control/Block.hpp>
 
 namespace eeros {
 	namespace control {
 
-		class TimeDomain : public Runnable {
+		class TimeDomain : public PeriodicThread {
 		public:
-			TimeDomain();
-			TimeDomain(int divisor);
+			TimeDomain(std::string name, double period, double delay, bool realtime);
 			virtual void addBlock(Block* block);
 			virtual void sortBlocks();
 			virtual void run();
 			
-			static void setMaster(TimeDomain* masterTimeDomain);
-			
 		private:
 			std::string name;
-			int divisor;
 			std::list<Block*> blocks;
-			
-			static TimeDomain* masterTimeDomain;
-			static std::list<TimeDomain*> timeDomains;
 		};
 
 	};

@@ -13,9 +13,9 @@ namespace eeros {
 		class Switch : public Block {
 		public:
 			Switch(uint8_t initInputIndex) : currentInput(initInputIndex), maxDeviation(defaultDeviation) { }
-
+			
 			virtual void run() {
-				this->out.getSignal().setValue(this->in[currentInput].getSignal.getValue());
+				this->out.getSignal().setValue(this->in[currentInput].getSignal().getValue());
 				this->out.getSignal().setTimestamp(this->in[currentInput].getSignal().getTimestamp());
 			}
 			
@@ -45,7 +45,7 @@ namespace eeros {
 				T inValC, inValN;
 				uint8_t i = 0;
 				while(i < N && checkOK) {
-					inValC = this->in[currentInput].getSignal.getValue();
+					inValC = this->in[currentInput].getSignal().getValue();
 					inValN = this->in[index].getSignal().getValue();
 					checkOK = (inValN < inValC + maxDeviation * inValC) && (inValN > inValC - maxDeviation * inValC);
 					i++;
@@ -64,7 +64,6 @@ namespace eeros {
 			double maxDeviation;
 			const double defaultDeviation = 0.1; // 10%
 		};
-
 	};
 };
 

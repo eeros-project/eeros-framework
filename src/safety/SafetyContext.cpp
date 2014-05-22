@@ -5,13 +5,10 @@
 
 using namespace eeros::safety;
 
-SafetyContext::SafetyContext() { }
+SafetyContext::SafetyContext(SafetySystem* parent) : parent(parent) { }
 
 
-void SafetyContext::triggerEvent(int32_t event) {
-	// Get Safety System instance
-	SafetySystem& safetySys = SafetySystem::instance();
-	
+void SafetyContext::triggerEvent(int32_t event) {	
 	// Trigger event in private context
-	safetySys.triggerEvent(event, this);
+	parent->triggerEvent(event, this);
 }

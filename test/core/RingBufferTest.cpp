@@ -14,7 +14,7 @@
 #include <eeros/core/RingBuffer.hpp>
 
 #define MEM_SIZE 12
-#define TIMETOWAIT 15
+#define TIMETOWAIT 1
 #define SHM 1
 
 namespace eeros {
@@ -85,8 +85,8 @@ int main() {
 #endif
 	
 	std::cout << "Creating executors..." << std::endl;
-	Executor e1(0.1); // 100 ms period time
-	Executor e2(1); // 1s period time
+	Executor e1(0.01); // 10 ms period time
+	Executor e2(0.1); // 100ms period time
 	
 	std::cout << "Creating reader and add them to executor 1..." << std::endl;
 	Reader r(memory, MEM_SIZE);
