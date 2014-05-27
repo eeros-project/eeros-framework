@@ -2,7 +2,6 @@
 #define ORG_EEROS_HAL_DUMMYLOGICOUTPUT_HPP_
 
 #include <string>
-#include <comedilib.h>
 #include <eeros/hal/PeripheralOutput.hpp>
 
 namespace eeros {
