@@ -360,11 +360,11 @@ namespace eeros {
 				return result;
 			}
 			
-			Matrix<M, N, T> transpose() const {
-				Matrix<M, N, T> result;
+			Matrix<N, M, T> transpose() const {
+				Matrix<N, M, T> result;
 				for(uint8_t m = 0; m < M; m++) {
 					for(uint8_t n = 0; n < N; n++) {
-						result(m, n) = (*this)(n, m);
+						result(n, m) = (*this)(m, n);
 					}
 				}
 				return result;
