@@ -19,11 +19,3 @@ void TimeDomain::addBlock(Block* block) {
 // void TimeDomain::sortBlocks() {
 // 	// TODO
 // }
-
-void TimeDomain::enable() {
-	start();
-}
-
-void TimeDomain::disable() {
-	pause();
-}

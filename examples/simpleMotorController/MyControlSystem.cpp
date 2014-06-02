@@ -64,9 +64,9 @@ MyControlSystem::MyControlSystem(double ts) :
 }
 
 void MyControlSystem::start() {
-	timedomain.enable();
+	timedomain.start();
 }
 
 void MyControlSystem::stop() {
-	timedomain.disable();
+	timedomain.stop();
 }
