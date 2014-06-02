@@ -19,6 +19,9 @@ target_link_libraries(scalarOperations eeros)
 add_executable(matrixOperations MatrixOperations.cpp)
 target_link_libraries(matrixOperations eeros)
 
+add_executable(matrixOperations2 MatrixOperations2.cpp)
+target_link_libraries(matrixOperations2 eeros)
+
 # Add tests
 add_test(math/Matrix/elementAccess elementAccess)
 add_test(math/Matrix/initialization initialization "${TEST_DATA_DIR}/math/matrix/matrix-rotx.csv" "${TEST_DATA_DIR}/math/matrix/matrix-roty.csv" "${TEST_DATA_DIR}/math/matrix/matrix-rotz.csv")
@@ -31,3 +34,4 @@ add_test(math/Matrix/scalar-operations/3x2/double/random scalarOperations 3 2 "$
 add_test(math/Matrix/matrix-operations/1x3/double/random matrixOperations 2 2 2 2 "${TEST_DATA_DIR}/math/matrix/test22.dat")
 add_test(math/Matrix/matrix-operations/3x3/double/random matrixOperations 3 3 3 3 "${TEST_DATA_DIR}/math/matrix/test33.dat")
 add_test(math/Matrix/matrix-operations/4x4/double/random matrixOperations 4 4 4 4 "${TEST_DATA_DIR}/math/matrix/test44.dat")
+add_test(math/Matrix/matrix-operations/misc matrixOperations2)
