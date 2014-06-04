@@ -1,4 +1,5 @@
 #include <eeros/sequencer/Sequence.hpp>
+#include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/core/EEROSException.hpp>
 
 using namespace eeros::sequencer;
@@ -125,7 +126,12 @@ void Sequence::call(Sequence* sequence) {
 }
 
 void Sequence::start(Sequence* sequence) {
-	// TODO
+	if(sequence != nullptr) {
+		new Sequencer("parallelSequencer", *sequence); // TODO improve this!
+	}
+	else {
+		log.warn() << "Parallel start of NULL sequence ignored!" << endl;
+	}
 }
 
 void Sequence::addStep(std::function<void(void)> action) {

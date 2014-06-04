@@ -45,3 +45,4 @@ double ComediFqd::get() {
 	comedi_data_read(deviceHandle, subDeviceNumber, 0, 0, 0, &data);
 	return static_cast<int>(data) * scale + offset;
 }
+
