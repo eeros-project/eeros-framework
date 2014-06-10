@@ -4,16 +4,39 @@
 using namespace eeros;
 using namespace eeros::math;
 
+std::list<Frame*> Frame::list;
+
 Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b) : a(a), b(b) {
 	T.eye();
+	if(getFrame(a, b) != nullptr) {
+		std::stringstream msg;
+		msg << "Frame with a = '" << a << "' and b = '" << b << "' exists already!";
+		throw EEROSException(msg.str());
+	}
+	list.push_back(this);
 }
 
 Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b, eeros::math::Matrix<4, 4, double> T) : a(a), b(b), T(T) {
-	// nothing to do
+	if(getFrame(a, b) != nullptr) {
+		std::stringstream msg;
+		msg << "Frame with a = '" << a << "' and b = '" << b << "' exists already!";
+		throw EEROSException(msg.str());
+	}
+	list.push_back(this);
 }
 
 Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b, eeros::math::Matrix<3, 3, double> R, eeros::math::Matrix<3, 1, double> r) : a(a), b(b) {
 	set(R, r);
+	if(getFrame(a, b) != nullptr) {
+		std::stringstream msg;
+		msg << "Frame with a = '" << a << "' and b = '" << b << "' exists already!";
+		throw EEROSException(msg.str());
+	}
+	list.push_back(this);
+}
+
+Frame::~Frame() {
+	list.remove(this);
 }
 
 void Frame::set(eeros::math::Matrix<4, 4, double> T) {
@@ -51,4 +74,11 @@ Frame Frame::operator*(const Frame& right) const {
 	}
 	Frame result(a, right.b, T * right.T);
 	return result;
+}
+
+Frame* Frame::getFrame(const CoordinateSystem& a, const CoordinateSystem& b) {
+	for(auto f : list) {
+		if(f->getFromCoordinateSystem() == a && f->getToCoordinateSystem() == b) return f;
+	}
+	return nullptr;
 }
