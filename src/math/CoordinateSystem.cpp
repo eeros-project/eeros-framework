@@ -8,6 +8,14 @@ CoordinateSystem::CoordinateSystem(std::string id) : id(id) {
 	// nothing to do
 }
 
+CoordinateSystem::CoordinateSystem(const CoordinateSystem&) {
+	// nothing to do
+}
+
+CoordinateSystem& CoordinateSystem::operator=(const CoordinateSystem&) {
+	// nothing to do
+}
+
 bool CoordinateSystem::operator==(const CoordinateSystem& right) const {
 	return this == &right;
 }

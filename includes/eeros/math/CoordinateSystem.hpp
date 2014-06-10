@@ -14,6 +14,9 @@ namespace eeros {
 			bool operator!=(const CoordinateSystem& right) const;
 		
 		private:
+			CoordinateSystem(const CoordinateSystem&);
+			CoordinateSystem& operator=(const CoordinateSystem&);
+			
 			std::string id;
 		
 		}; // END class CoordinateSystem

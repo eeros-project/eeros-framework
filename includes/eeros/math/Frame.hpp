@@ -18,6 +18,8 @@ namespace eeros {
 			void set(eeros::math::Matrix<4, 4, double> T);
 			void set(eeros::math::Matrix<3, 3, double> R, eeros::math::Matrix<3, 1, double> r);
 			eeros::math::Matrix<4, 4, double> get() const;
+			const CoordinateSystem& getFromCoordinateSystem() const;
+			const CoordinateSystem& getToCoordinateSystem() const;
 			
 		private:
 			const CoordinateSystem& a;

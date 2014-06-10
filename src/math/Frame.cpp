@@ -37,6 +37,14 @@ eeros::math::Matrix<4, 4, double> Frame::get() const {
 	return T;
 }
 
+const CoordinateSystem& Frame::getFromCoordinateSystem() const {
+	return a;
+}
+
+const CoordinateSystem& Frame::getToCoordinateSystem() const {
+	return b;
+}
+
 Frame Frame::operator*(const Frame& right) const {
 	if(b != right.a) {
 		throw EEROSException("Frame coordinate systems incompatible!");
