@@ -33,3 +33,8 @@ bool CoordinateSystem::operator!=(const CoordinateSystem& right) const {
 CoordinateSystem* CoordinateSystem::getCoordinateSystem(std::string id) {
 	return CoordinateSystem::list[id];
 }
+
+std::ostream& eeros::math::operator<<(std::ostream& os, const CoordinateSystem& cs) {
+	os << cs.id;
+	return os;
+}
