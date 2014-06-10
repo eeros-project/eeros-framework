@@ -3,32 +3,79 @@
 using namespace eeros;
 using namespace eeros::sequencer;
 
-std::map<std::string, Sequencer*> Sequencer::allSequencers;
-
-Sequence& Sequencer::getMainSequence(){
-	return mainSequence;
+Sequencer::Sequencer(Sequence* startSequence) {
+	if(registerSequence(startSequence)) {
+		setStartSequence(startSequence);
+	}
+	else {
+		log.error() << "Sequence '" << startSequence->name << "' already registered, please choose a unique name!";
+	}
 }
 
-Sequencer::Sequencer(std::string name, Sequence& mainSequence) : mainSequence(mainSequence), sequenceExecutor(0), timeoutExecutor(timeoutExecutorPeriod), name(name) {
-	sequenceExecutor.addRunnable(mainSequence);
-	sequenceExecutor.start();
-	
-	// add the sequencer to the list with all sequencers
-	Sequencer::allSequencers.insert( {name, this} );
+Sequencer::Sequencer(Sequence& startSequence) {
+	if(registerSequence(&startSequence)) {
+		setStartSequence(&startSequence);
+	}
+	else {
+		log.error() << "Sequence '" << startSequence.name << "' already registered, please choose a unique name!";
+	}
 }
 
-Sequencer::~Sequencer() {
-	sequenceExecutor.stop();
+bool Sequencer::registerSequence(Sequence* sequence) {
+	if(sequence != nullptr && sequences.insert( {sequence->name, sequence} ).second) {
+		sequence->setSequencer(this);
+		return true;
+	}
+	else {
+		log.error() << "Sequence '" << sequence->name << "' already registered, please choose a unique name!";
+	}
+	return false;
 }
 
-std::string Sequencer::getName(){
-	return name;
+Sequence* Sequencer::getRegisteredSequence(std::string name) {
+	return sequences[name];
 }
 
-bool Sequencer::done(){
-	return sequenceExecutor.isTerminated();
+bool Sequencer::isSequenceRegistered(Sequence* sequence) {
+	for(auto s : sequences) {
+		if(s.second == sequence) return true;
+	}
+	return false;
 }
 
-Sequencer* Sequencer::getSequencer(std::string name){
-	return Sequencer::allSequencers[name];
+bool Sequencer::setStartSequence(Sequence* s) {
+	startSequence = s;
+}
+
+void Sequencer::run() {
+	while(s == notStarted);
+	try {
+		startSequence->run();
+	}
+	catch(...) {
+		log.warn() << "Uncatched exception, switching to step mode.";
+		stepMode(true);
+	}
+}
+
+void Sequencer::start(bool stepMode) {
+	if(stepMode) s = stepping;
+	else s = running;
+}
+
+void Sequencer::stepMode(bool on) {
+	if(on) s = stepping;
+	else s = running;
+}
+
+void Sequencer::yield() {
+	std::unique_lock<std::mutex> lck(mtx);
+	go = false;
+	while(!go) cv.wait(lck);
+}
+
+void Sequencer::proceed() {
+	std::unique_lock<std::mutex> lck(mtx);
+	go = true;
+	cv.notify_one();
 }

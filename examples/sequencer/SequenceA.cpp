@@ -13,10 +13,10 @@ SequenceA::~SequenceA(){
 }
 
 void SequenceA::init() {
-	log.info() << "[" << name << "] " << "Init started...";
+	log.info() << "[" << getName() << "] " << "Init started...";
 	
 	addStep([&]() {
-		log.info() << "[" << name << "] " << "Param = " << param;
+		log.info() << "[" << getName() << "] " << "Param = " << param;
 		switch(param) {
 			case 101:
 				param++;
@@ -37,29 +37,29 @@ void SequenceA::init() {
 		sleep(1);
 	});
 	
-	log.info() << "[" << name << "] " << "Init done!";
+	log.info() << "[" << getName() << "] " << "Init done!";
 }
 
 void SequenceA::exit() {
-	log.info() << "[" << name << "] " << "Exit started...";
+	log.info() << "[" << getName() << "] " << "Exit started...";
 	
-	log.info() << "[" << name << "] " << "Exit done!";
+	log.info() << "[" << getName() << "] " << "Exit done!";
 }
 
 bool SequenceA::checkPreCondition() {
-	log.info() << "[" << name << "] " << "Checking precondition...";
+	log.info() << "[" << getName() << "] " << "Checking precondition...";
 	if(param < 100) {
-		log.warn() << "[" << name << "] " << "param < 100, adding 1000";
+		log.warn() << "[" << getName() << "] " << "param < 100, adding 1000";
 		param += 1000;
 	}
 	return true;
 }
 
 bool SequenceA::checkPostCondition() {
-	log.info() << "[" << name << "] " << "Checking postcondition...";
+	log.info() << "[" << getName() << "] " << "Checking postcondition...";
 	bool error = param < 100;
 	if(error) {
-		log.error() << "[" << name << "] " << "param < 100!";
+		log.error() << "[" << getName() << "] " << "param < 100!";
 		
 	}
 	return !error;

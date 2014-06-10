@@ -3,7 +3,6 @@
 
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/LogWriter.hpp>
-#include <eeros/core/Runnable.hpp>
 
 #include <thread>
 #include <functional>

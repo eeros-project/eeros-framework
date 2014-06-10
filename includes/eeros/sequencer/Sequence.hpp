@@ -5,6 +5,8 @@
 #include <map>
 #include <functional>
 #include <vector>
+#include <mutex>
+#include <condition_variable>
 
 #include <eeros/core/Runnable.hpp>
 #include <eeros/sequencer/SequenceException.hpp>
@@ -14,56 +16,53 @@
 namespace eeros {
 	namespace sequencer {
 
+		// Forward declarations
+		class Sequencer;
+
 		enum SequenceState { kSequenceRunning, kSequenceFinished, kSequenceNotStarted, kSequenceException };
 		
 
-		class Sequence : public Runnable {
-		
+		class Sequence {
+			
+			friend class eeros::sequencer::Sequencer;
+			
 		public:
-			Sequence(std::string name);
-			virtual ~Sequence();
+			Sequence(std::string name, Sequencer* sequencer = nullptr);
 			
 			virtual std::string getName();
-			
 			virtual int getState();
-			
-			virtual void run();
-			
-			virtual void init();
-			
-			virtual bool checkPreCondition();
-			
-			virtual bool checkPostCondition();
-			
-			virtual void exit();
 			
 			virtual void reset();
 			
-			void call(Sequence* sequence);
-			
-			template < typename T, typename ... Targs >
-			void call(T& sequence, Targs ... args) {
-				sequence.run(args...);
-			}
-			
-			void start(Sequence* sequence);
-			
-			static Sequence* getSequence(std::string name);
+			virtual void run();
 			
 		protected:
+			void call(Sequence* sequence);
+			void call(std::string sequenceName);
+			void start(Sequence* sequence);
+			void start(std::string sequenceName);
+			virtual void init();
+			virtual bool checkPreCondition();
+			virtual bool checkPostCondition();
+			virtual void exit();
+			
+			virtual void yield();
+			
 			virtual void addStep(std::function<void(void)> action);
-			SequenceState state;
-			uint32_t currentStep;
-			std::string name;
-			std::vector<std::function<void(void)>> actionList;
-			uint32_t exceptionRetryCounter;
+			
 			eeros::logger::Logger<eeros::logger::LogWriter> log;
 			
 		private:
-			static std::map<std::string, Sequence*> allSequences;
+			virtual void setSequencer(Sequencer* sequencer);
 
+			Sequencer* sequencer;
+			std::string name;
+			SequenceState state;
+			uint32_t currentStep;
+			std::vector<std::function<void(void)>> steps;
+			uint32_t exceptionRetryCounter;
+			
 		}; // class Sequence
-
 	}; // namespace sequencer
 }; // namespace eeros
 

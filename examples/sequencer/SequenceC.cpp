@@ -13,18 +13,18 @@ SequenceC::~SequenceC(){
 }
 
 void SequenceC::init() {
-	log.info() << "[" << name << "] " << "Init started...";
+	log.info() << "[" << getName() << "] " << "Init started...";
 	
 	addStep([&]() {
-		log.info() << "[" << name << "] " << "Lalala... I'm doing something...";
+		log.info() << "[" << getName() << "] " << "Lalala... I'm doing something...";
 		sleep(1);
 	});
 		
-	log.info() << "[" << name << "] " << "Init done!";
+	log.info() << "[" << getName() << "] " << "Init done!";
 }
 
 void SequenceC::exit() {
-	log.info() << "[" << name << "] " << "Exit started...";
+	log.info() << "[" << getName() << "] " << "Exit started...";
 	
-	log.info() << "[" << name << "] " << "Exit done!";
+	log.info() << "[" << getName() << "] " << "Exit done!";
 }

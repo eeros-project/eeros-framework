@@ -22,7 +22,7 @@ const char* SequenceException::what() const throw() {
 }
 
 void SequenceException::handle() const {
-	exceptionHandler->run();
+//	exceptionHandler->run(); TODO
 }
 
 ExceptionReturnBehavior SequenceException::getReturnBehavior() const throw() {

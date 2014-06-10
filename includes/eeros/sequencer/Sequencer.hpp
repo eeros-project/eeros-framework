@@ -2,34 +2,45 @@
 #define ORG_EEROS_SEQUENCER_SEQUENCER_HPP_
 
 #include <string>
-#include <eeros/core/Executor.hpp>
+#include <atomic>
+#include <eeros/core/Thread.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 
 namespace eeros {
 	namespace sequencer {
 
-		class Sequencer {
+		class Sequencer : public Thread {
 		public:
-			Sequencer(std::string name, Sequence& mainSequence);
-			virtual ~Sequencer();
 			
-			Sequence& getMainSequence();
-			std::string getName();
+			enum status { running, stepping, notStarted};
 			
-			bool done();
+			Sequencer(Sequence* startSequence = nullptr);
+			Sequencer(Sequence& startSequence);
 			
-			static Sequencer* getSequencer(std::string name);
+			virtual bool registerSequence(Sequence* sequence);
+			virtual Sequence* getRegisteredSequence(std::string name);
+			virtual bool isSequenceRegistered(Sequence* sequence);
+
+			virtual bool setStartSequence(Sequence* s);
+			
+			virtual void start(bool stepMode = false);
+			virtual void stepMode(bool on);
+		
+			virtual void yield();
+			virtual void proceed();
+			
+		protected:
+			virtual void run();
 			
 		private:
-            eeros::Executor sequenceExecutor;
-			eeros::Executor timeoutExecutor;
-			Sequence& mainSequence;
-			std::string name;
+			std::map<std::string, Sequence*> sequences;
+			Sequence* startSequence;
+			std::atomic<status> s;
+			std::mutex mtx;
+			std::condition_variable cv;
+			bool go;
 			
-			static std::map<std::string, Sequencer*> allSequencers;
-			static constexpr double timeoutExecutorPeriod = 0.001;
 		}; // class Sequence
-
 	}; // namespace sequencer
 }; // namespace eeros
 

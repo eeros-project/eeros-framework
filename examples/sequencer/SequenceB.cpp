@@ -13,28 +13,28 @@ SequenceB::~SequenceB(){
 }
 
 void SequenceB::init() {
-	log.info() << "[" << name << "] " << "Init started...";
+	log.info() << "[" << getName() << "] " << "Init started...";
 	
 	addStep([&]() {
-		log.info() << "[" << name << "] " << "First step...";
+		log.info() << "[" << getName() << "] " << "First step...";
 		sleep(1);
 	});
 	
 	addStep([&]() {
-		log.info() << "[" << name << "] " << "Second step...";
+		log.info() << "[" << getName() << "] " << "Second step...";
 		sleep(1);
 	});
 	
 	addStep([&]() {
-		log.info() << "[" << name << "] " << "Third step...";
+		log.info() << "[" << getName() << "] " << "Third step...";
 		sleep(1);
 	});
 	
-	log.info() << "[" << name << "] " << "Init done!";
+	log.info() << "[" << getName() << "] " << "Init done!";
 }
 
 void SequenceB::exit() {
-	log.info() << "[" << name << "] " << "Exit started...";
+	log.info() << "[" << getName() << "] " << "Exit started...";
 	
-	log.info() << "[" << name << "] " << "Exit done!";
+	log.info() << "[" << getName() << "] " << "Exit done!";
 }

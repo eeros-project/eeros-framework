@@ -5,21 +5,11 @@
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
-std::map<std::string, Sequence*> Sequence::allSequences;
-
-Sequence::Sequence(std::string name) : name(name) {
-	// reset sequence
-	reset();
-	
-	// add the sequence to the list with all sequences
-	if(!Sequence::allSequences.insert( {name, this} ).second) {
-		log.error() << "Sequence '" << name << "' already exists, please choose a unique name!";
+Sequence::Sequence(std::string name, Sequencer* sequencer) : name(name), sequencer(sequencer) {
+	if(sequencer != nullptr) {
+		sequencer->registerSequence(this);
 	}
-}
-
-Sequence::~Sequence() {
-	// remove the sequence from the list with all sequeces
-	Sequence::allSequences.erase(name);
+	reset(); // reset sequence
 }
 
 std::string Sequence::getName(){
@@ -27,11 +17,11 @@ std::string Sequence::getName(){
 }
 
 int Sequence::getState() {
-    return state;
+	return state;
 }
 
 void Sequence::run() {
-	try{
+	try {
 		switch(state) {
 			case kSequenceFinished:
 				reset();
@@ -49,21 +39,25 @@ void Sequence::run() {
 				init();
 				break;
 		}
+		yield();
 		
-		while(!checkPreCondition()); // TODO add abort condition
+		while(!checkPreCondition()) {
+			yield();
+		};
 		
 		// execute action lambdas
-		while(currentStep < actionList.size()) {
-			actionList[currentStep]();
+		while(currentStep < steps.size()) {
+			yield();
+			steps[currentStep]();
 			currentStep++;
 		}
 		
 		// check postcondition
+		yield();
 		if(!checkPostCondition()) throw -715; // TODO
 		
 		// cleanup and exit
 		exit();
-        
 	}
 	catch(SequenceException const &e) {
 		log.info() << e.what();
@@ -90,24 +84,22 @@ void Sequence::run() {
 				break;
 		}
 	}
-	// TODO catch(EEROSException)
-	// TODO catch(std::exception)
 }
 
 void Sequence::init() {
-    
+	// nothing to do
 }
 
 bool Sequence::checkPreCondition() {
-    return true;
+	return true;
 }
 
 bool Sequence::checkPostCondition() {
-    return true;
+	return true;
 }
 
 void Sequence::exit() {
-    
+	// nothing to do
 }
 
 void Sequence::reset() {
@@ -117,27 +109,43 @@ void Sequence::reset() {
 }
 
 void Sequence::call(Sequence* sequence) {
+	if(sequencer->isSequenceRegistered(sequence)) {
+		sequence->run();
+	}
+	else {
+		log.warn() << "Call to unregistered sequence ignored!" << endl;
+	}
+}
+
+void Sequence::call(std::string sequenceName) {
+	Sequence* sequence = sequencer->getRegisteredSequence(sequenceName);
 	if(sequence != nullptr) {
 		sequence->run();
 	}
 	else {
-		log.warn() << "Call to NULL sequence ignored!" << endl;
+		log.warn() << "Call to unregistered sequence ignored!" << endl;
 	}
 }
 
 void Sequence::start(Sequence* sequence) {
-	if(sequence != nullptr) {
-		new Sequencer("parallelSequencer", *sequence); // TODO improve this!
-	}
-	else {
-		log.warn() << "Parallel start of NULL sequence ignored!" << endl;
-	}
+// 	if(sequence != nullptr) {
+// 		new Sequencer("parallelSequencer", *sequence); // TODO improve this!
+// 	}
+// 	else {
+// 		log.warn() << "Parallel start of NULL sequence ignored!" << endl;
+// 	}
 }
 
 void Sequence::addStep(std::function<void(void)> action) {
-	actionList.push_back(action);
+	steps.push_back(action);
 }
 
-Sequence* Sequence::getSequence(std::string name){
-	return Sequence::allSequences[name];
+void Sequence::yield() {
+	if(sequencer != nullptr) {
+		sequencer->yield();
+	}
+}
+
+void Sequence::setSequencer(Sequencer* sequencer) {
+	this->sequencer = sequencer;
 }

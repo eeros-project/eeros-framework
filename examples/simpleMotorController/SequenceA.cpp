@@ -13,17 +13,17 @@ SequenceA::SequenceA(std::string name, SafetySystem& safetySys, MyControlSystem&
 }
 
 void SequenceA::init() {
-	log.info() << "[" << name << "] " << "Init started...";
+	log.info() << "[" << getName() << "] " << "Init started...";
 	
 	addStep([&]() {
 		double a = 0;
 		sleep(5);
 		for(int i = 0; i < 10; i++) {
-			log.info() << "[" << name << "] " << "setting angle to " << a;
+			log.info() << "[" << getName() << "] " << "setting angle to " << a;
 			controlSys.setpoint.setValue(a);
 			a += angle;
 			sleep(1);
-			log.info() << "[" << name << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
+			log.info() << "[" << getName() << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
 			sleep(1);
 		}
 		
@@ -31,20 +31,20 @@ void SequenceA::init() {
 	
 	addStep([&]() {
 		sleep(1);
-		log.info() << "[" << name << "] " << "setting angle to " << -3.14;
+		log.info() << "[" << getName() << "] " << "setting angle to " << -3.14;
 		controlSys.setpoint.setValue(-3.14);
 		sleep(1);
-		log.info() << "[" << name << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
+		log.info() << "[" << getName() << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
 		sleep(1);
 	});
 	
-	log.info() << "[" << name << "] " << "Init done!";
+	log.info() << "[" << getName() << "] " << "Init done!";
 }
 
 void SequenceA::exit() {
-	log.info() << "[" << name << "] " << "Exit started...";
+	log.info() << "[" << getName() << "] " << "Exit started...";
 	
-	log.info() << "[" << name << "] " << "Exit done!";
+	log.info() << "[" << getName() << "] " << "Exit done!";
 }
 
 bool SequenceA::checkPreCondition() {
@@ -52,6 +52,6 @@ bool SequenceA::checkPreCondition() {
 }
 
 bool SequenceA::checkPostCondition() {
-	log.info() << "[" << name << "] " << "Checking postcondition...";
+	log.info() << "[" << getName() << "] " << "Checking postcondition...";
 	return true;
 }

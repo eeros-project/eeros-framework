@@ -37,9 +37,9 @@ int main(int argc, char* argv[]) {
 // 	subSequenceC.log.set(w);
 	
 	log.info() << "Creating and starting sequencer...";
-	Sequencer sequencer("Example sequencer", mainSequence);
+	Sequencer sequencer(mainSequence);
 	
-	while(!sequencer.done());
+	sequencer.join();
 	
 	log.info() << "Sequencer Example done...";
 	

@@ -6,14 +6,6 @@ using namespace eeros::logger;
 
 MainSequence::MainSequence(std::string name) : var(0), Sequence(name) {
 	log.info() << "Sequence created: " << name;
-}
-
-MainSequence::~MainSequence(){
-
-}
-
-void MainSequence::init() {
-	log.info() << "[" << name << "] " << "Init started...";
 	
 	addStep([&]() {
 		log.info() << "[" << name << "] " << "Step  " << var++;
@@ -35,12 +27,20 @@ void MainSequence::init() {
 		}
 		sleep(1);
 	});
+}
+
+MainSequence::~MainSequence(){
+
+}
+
+void MainSequence::init() {
+	log.info() << "[" << getName() << "] " << "Init started...";
 	
-	log.info() << "[" << name << "] " << "Init done!";
+	log.info() << "[" << getName() << "] " << "Init done!";
 }
 
 void MainSequence::exit() {
-	log.info() << "[" << name << "] " << "Exit started...";
+	log.info() << "[" << getName() << "] " << "Exit started...";
 	
-	log.info() << "[" << name << "] " << "Exit done!";
+	log.info() << "[" << getName() << "] " << "Exit done!";
 }
