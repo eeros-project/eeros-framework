@@ -11,34 +11,35 @@ using namespace eeros::logger;
 class MainSequence : public Sequence {
 public:
 	MainSequence(std::string name) : Sequence(name), counter(0) {
-		log.info() << "Creating new Sequence '" << name << "'";
+		log.trace() << "Creating new Sequence '" << name << "'";
 		
 		addStep([&]() {
-			log.info() << "Sequence '" << getName() << "': " << "Step " << counter++;
+			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
+			sleep(1);
+			throw -1;
+		});
+		
+		addStep([&]() {
+			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
 			sleep(1);
 		});
 		
 		addStep([&]() {
-			log.info() << "Sequence '" << getName() << "': " << "Step " << counter++;
-			sleep(1);
-		});
-		
-		addStep([&]() {
-			log.info() << "Sequence '" << getName() << "': " << "Step " << counter++;
+			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
 			sleep(1);
 		});
 	}
 	
 	void init() {
-		log.info() << "Sequence '" << getName() << "': " << "Init started";
+		log.trace() << "Sequence '" << getName() << "': " << "Init started";
 		sleep(1);
-		log.info() << "Sequence '" << getName() << "': " << "Init done";
+		log.trace() << "Sequence '" << getName() << "': " << "Init done";
 	}
 	
 	void exit() {
-		log.info() << "Sequence '" << getName() << "': " << "Exit started";
+		log.trace() << "Sequence '" << getName() << "': " << "Exit started";
 		sleep(1);
-		log.info() << "Sequence '" << getName() << "': " << "Exit done";
+		log.trace() << "Sequence '" << getName() << "': " << "Exit done";
 	}
 
 private:
@@ -50,14 +51,13 @@ int main() {
 	StreamLogWriter w(std::cout);
 	Logger<LogWriter>::setDefaultWriter(&w);
 	Logger<LogWriter> log;
+	w.show(~0);
 	
 	log.info() << "Martin Test 2 started...";
 	
 	MainSequence mainSeq("Main Sequence");
-	Sequencer sequencer(mainSeq);
-// 	sequencer.registerSequence(mainSeq);
-// 	sequencer.setStartSequence(mainSeq);
-	sequencer.start(true);
+	Sequencer sequencer(&mainSeq);
+	sequencer.start();
 	
 	char k;
 	bool stop = false;

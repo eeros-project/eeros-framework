@@ -33,12 +33,15 @@ namespace eeros {
 			virtual void run();
 			
 		private:
+			int id;
 			std::map<std::string, Sequence*> sequences;
 			Sequence* startSequence;
 			std::atomic<status> s;
 			std::mutex mtx;
 			std::condition_variable cv;
 			bool go;
+			
+			static int instanceCounter;
 			
 		}; // class Sequence
 	}; // namespace sequencer

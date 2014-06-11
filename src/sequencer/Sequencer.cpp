@@ -3,27 +3,18 @@
 using namespace eeros;
 using namespace eeros::sequencer;
 
-Sequencer::Sequencer(Sequence* startSequence) {
-	if(registerSequence(startSequence)) {
-		setStartSequence(startSequence);
-	}
-	else {
-		log.error() << "Sequence '" << startSequence->name << "' already registered, please choose a unique name!";
-	}
-}
+int Sequencer::instanceCounter = 0;
 
-Sequencer::Sequencer(Sequence& startSequence) {
-	if(registerSequence(&startSequence)) {
-		setStartSequence(&startSequence);
-	}
-	else {
-		log.error() << "Sequence '" << startSequence.name << "' already registered, please choose a unique name!";
+Sequencer::Sequencer(Sequence* startSequence) : id(instanceCounter++), s(notStarted) {
+	if(startSequence != nullptr && registerSequence(startSequence)) {
+		setStartSequence(startSequence);
 	}
 }
 
 bool Sequencer::registerSequence(Sequence* sequence) {
 	if(sequence != nullptr && sequences.insert( {sequence->name, sequence} ).second) {
 		sequence->setSequencer(this);
+		log.trace() << "Sequencer #" << id << ": Sequence '" << sequence->getName() << "' registered.";
 		return true;
 	}
 	else {
@@ -44,7 +35,12 @@ bool Sequencer::isSequenceRegistered(Sequence* sequence) {
 }
 
 bool Sequencer::setStartSequence(Sequence* s) {
-	startSequence = s;
+	if(s != nullptr) {
+		startSequence = s;
+		log.trace() << "Sequencer #" << id << ": Sequence '" << s->getName() << "' set as start sequence.";
+		return true;
+	}
+	return false;
 }
 
 void Sequencer::run() {
@@ -69,9 +65,11 @@ void Sequencer::stepMode(bool on) {
 }
 
 void Sequencer::yield() {
-	std::unique_lock<std::mutex> lck(mtx);
-	go = false;
-	while(!go) cv.wait(lck);
+	if(s == stepping) {
+		std::unique_lock<std::mutex> lck(mtx);
+		go = false;
+		while(!go) cv.wait(lck);
+	}
 }
 
 void Sequencer::proceed() {
