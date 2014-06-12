@@ -12,19 +12,21 @@ namespace eeros {
 		class Sequencer : public Thread {
 		public:
 			
-			enum status { running, stepping, notStarted};
+			enum status { running, stepping, stopping, stopped, waiting };
 			
 			Sequencer(Sequence* startSequence = nullptr);
 			Sequencer(Sequence& startSequence);
 			
 			virtual bool registerSequence(Sequence* sequence);
 			virtual Sequence* getRegisteredSequence(std::string name);
-			virtual bool isSequenceRegistered(Sequence* sequence);
+			virtual bool isRegistered(const Sequence* sequence);
 
-			virtual bool setStartSequence(Sequence* s);
+// 			virtual bool setStartSequence(Sequence* s);
 			
 			virtual void start(bool stepMode = false);
+			virtual void start(Sequence* sequence, bool stepMode = false);
 			virtual void stepMode(bool on);
+			virtual void shutdown();
 		
 			virtual void yield();
 			virtual void proceed();
@@ -35,7 +37,7 @@ namespace eeros {
 		private:
 			int id;
 			std::map<std::string, Sequence*> sequences;
-			Sequence* startSequence;
+			std::atomic<Sequence*> currentSequence;
 			std::atomic<status> s;
 			std::mutex mtx;
 			std::condition_variable cv;

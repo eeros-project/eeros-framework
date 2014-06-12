@@ -5,9 +5,9 @@ using namespace eeros::sequencer;
 
 int Sequencer::instanceCounter = 0;
 
-Sequencer::Sequencer(Sequence* startSequence) : id(instanceCounter++), s(notStarted) {
+Sequencer::Sequencer(Sequence* startSequence) : id(instanceCounter++), s(waiting) {
 	if(startSequence != nullptr && registerSequence(startSequence)) {
-		setStartSequence(startSequence);
+		currentSequence = startSequence;
 	}
 }
 
@@ -27,36 +27,53 @@ Sequence* Sequencer::getRegisteredSequence(std::string name) {
 	return sequences[name];
 }
 
-bool Sequencer::isSequenceRegistered(Sequence* sequence) {
+bool Sequencer::isRegistered(const Sequence* sequence) {
 	for(auto s : sequences) {
 		if(s.second == sequence) return true;
 	}
 	return false;
 }
 
-bool Sequencer::setStartSequence(Sequence* s) {
-	if(s != nullptr) {
-		startSequence = s;
-		log.trace() << "Sequencer #" << id << ": Sequence '" << s->getName() << "' set as start sequence.";
-		return true;
-	}
-	return false;
-}
-
 void Sequencer::run() {
-	while(s == notStarted);
-	try {
-		startSequence->run();
+	while(s != stopping) {
+		if(s != waiting && currentSequence != nullptr) {
+			try {
+				currentSequence.load()->run();
+				currentSequence = nullptr;
+			}
+			catch(...) {
+				log.warn() << "Uncatched exception, switching to step mode.";
+				currentSequence = nullptr;
+				stepMode(true);
+			}
+		}
 	}
-	catch(...) {
-		log.warn() << "Uncatched exception, switching to step mode.";
-		stepMode(true);
-	}
+	s = stopped;
+	log.trace() << "Sequencer #" << id << ": has stopped";
 }
 
 void Sequencer::start(bool stepMode) {
-	if(stepMode) s = stepping;
-	else s = running;
+	if(currentSequence != nullptr) {
+		if(stepMode) s = stepping;
+		else s = running;
+	}
+	else {
+		log.error() << "Sequencer #" << id << ": failed to start, no sequence specified!";
+	}
+}
+
+void Sequencer::start(Sequence* sequence, bool stepMode) {
+	if(isRegistered(sequence)) {
+		currentSequence = sequence;
+		start(stepMode);
+	}
+	else {
+		log.error() << "Sequencer #" << id << ": failed to start, sequence not registered!";
+	}
+}
+
+void Sequencer::shutdown() {
+	s = stopping;
 }
 
 void Sequencer::stepMode(bool on) {

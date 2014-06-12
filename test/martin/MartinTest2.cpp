@@ -8,16 +8,10 @@ using namespace eeros;
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
-class MainSequence : public Sequence {
+class ExampleSequence : public Sequence {
 public:
-	MainSequence(std::string name) : Sequence(name), counter(0) {
-		log.trace() << "Creating new Sequence '" << name << "'";
-		
-		addStep([&]() {
-			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
-			sleep(1);
-			throw -1;
-		});
+	ExampleSequence(std::string name, Sequence* next = nullptr) : Sequence(name), counter(0), next(next) {
+		log.trace() << "Creating new sequence '" << name << "'...";
 		
 		addStep([&]() {
 			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
@@ -27,7 +21,14 @@ public:
 		addStep([&]() {
 			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
 			sleep(1);
+			if(next != nullptr) call(next);
 		});
+		
+		addStep([&]() {
+			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
+			sleep(1);
+		});
+		
 	}
 	
 	void init() {
@@ -44,6 +45,7 @@ public:
 
 private:
 	int counter;
+	Sequence* next;
 };
 
 int main() {
@@ -55,9 +57,15 @@ int main() {
 	
 	log.info() << "Martin Test 2 started...";
 	
-	MainSequence mainSeq("Main Sequence");
-	Sequencer sequencer(&mainSeq);
-	sequencer.start();
+	ExampleSequence subSeqB("Sub Sequence B");
+	ExampleSequence subSeqA("Sub Sequence A", &subSeqB);
+	ExampleSequence mainSeq("Main Sequence", &subSeqA);
+	Sequencer sequencer;
+	sequencer.registerSequence(&mainSeq);
+	sequencer.registerSequence(&subSeqA);
+	sequencer.registerSequence(&subSeqB);
+	
+	sequencer.start(&mainSeq);
 	
 	char k;
 	bool stop = false;
@@ -70,6 +78,7 @@ int main() {
 				sequencer.proceed();
 				break;
 			case 'e':
+				sequencer.shutdown();
 				stop = true;
 				break;
 			default:

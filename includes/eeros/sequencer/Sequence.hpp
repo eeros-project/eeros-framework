@@ -39,8 +39,8 @@ namespace eeros {
 		protected:
 			void call(Sequence* sequence);
 			void call(std::string sequenceName);
-			void start(Sequence* sequence);
-			void start(std::string sequenceName);
+// 			void start(Sequence* sequence);
+// 			void start(std::string sequenceName);
 			virtual void init();
 			virtual bool checkPreCondition();
 			virtual bool checkPostCondition();

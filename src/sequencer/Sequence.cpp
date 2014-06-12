@@ -109,7 +109,8 @@ void Sequence::reset() {
 }
 
 void Sequence::call(Sequence* sequence) {
-	if(sequencer->isSequenceRegistered(sequence)) {
+	if(sequence != nullptr) log.trace() << "Call to sequence '" << sequence->getName() << "'.";
+	if(sequencer->isRegistered(sequence)) {
 		sequence->run();
 	}
 	else {
@@ -127,14 +128,14 @@ void Sequence::call(std::string sequenceName) {
 	}
 }
 
-void Sequence::start(Sequence* sequence) {
+// void Sequence::start(Sequence* sequence) {
 // 	if(sequence != nullptr) {
 // 		new Sequencer("parallelSequencer", *sequence); // TODO improve this!
 // 	}
 // 	else {
 // 		log.warn() << "Parallel start of NULL sequence ignored!" << endl;
 // 	}
-}
+// }
 
 void Sequence::addStep(std::function<void(void)> action) {
 	steps.push_back(action);
