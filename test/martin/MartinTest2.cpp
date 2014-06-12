@@ -10,7 +10,7 @@ using namespace eeros::logger;
 
 class ExampleSequence : public Sequence {
 public:
-	ExampleSequence(std::string name, Sequence* next = nullptr) : Sequence(name), counter(0), next(next) {
+	ExampleSequence(std::string name, Sequence* nextSequence = nullptr) : Sequence(name), counter(0), next(nextSequence) {
 		log.trace() << "Creating new sequence '" << name << "'...";
 		
 		addStep([&]() {
@@ -21,7 +21,8 @@ public:
 		addStep([&]() {
 			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
 			sleep(1);
-			if(next != nullptr) call(next);
+			std::cout << "next pointer: " << this->next << std::endl;
+			if(this->next != nullptr) call(this->next);
 		});
 		
 		addStep([&]() {
@@ -65,7 +66,12 @@ int main() {
 	sequencer.registerSequence(&subSeqA);
 	sequencer.registerSequence(&subSeqB);
 	
+	std::cout << "main sequence:  " << &mainSeq << std::endl;
+	std::cout << "sub sequence A: " << &subSeqA << std::endl;
+	std::cout << "sub sequence B: " << &subSeqB << std::endl;
+	
 	sequencer.start(&mainSeq);
+	sequencer.stepMode(true);
 	
 	char k;
 	bool stop = false;
@@ -78,6 +84,7 @@ int main() {
 				sequencer.proceed();
 				break;
 			case 'e':
+				std::cout << "Stopping sequencer and exiting..." << std::endl;
 				sequencer.shutdown();
 				stop = true;
 				break;

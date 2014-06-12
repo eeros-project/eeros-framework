@@ -109,23 +109,22 @@ void Sequence::reset() {
 }
 
 void Sequence::call(Sequence* sequence) {
-	if(sequence != nullptr) log.trace() << "Call to sequence '" << sequence->getName() << "'.";
-	if(sequencer->isRegistered(sequence)) {
-		sequence->run();
+	if(sequence != nullptr) {
+		if(sequencer->isRegistered(sequence)) {
+			log.trace() << "Call to sequence '" << sequence->getName() << "'.";
+			sequence->run();
+		}
+		else {
+			log.warn() << "Call to unregistered sequence ignored!" << endl;
+		}
 	}
 	else {
-		log.warn() << "Call to unregistered sequence ignored!" << endl;
+		log.warn() << "Call to NULL sequence ignored!" << endl;
 	}
 }
 
 void Sequence::call(std::string sequenceName) {
-	Sequence* sequence = sequencer->getRegisteredSequence(sequenceName);
-	if(sequence != nullptr) {
-		sequence->run();
-	}
-	else {
-		log.warn() << "Call to unregistered sequence ignored!" << endl;
-	}
+	call(sequencer->getRegisteredSequence(sequenceName));
 }
 
 // void Sequence::start(Sequence* sequence) {
