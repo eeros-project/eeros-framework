@@ -24,6 +24,7 @@ namespace eeros {
 			const CoordinateSystem& getToCoordinateSystem() const;
 			
 			static Frame* getFrame(const CoordinateSystem& a, const CoordinateSystem& b);
+			static uint32_t getNofFrames();
 			
 		private:
 			const CoordinateSystem& a;

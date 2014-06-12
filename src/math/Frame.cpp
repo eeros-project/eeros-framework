@@ -82,3 +82,7 @@ Frame* Frame::getFrame(const CoordinateSystem& a, const CoordinateSystem& b) {
 	}
 	return nullptr;
 }
+
+uint32_t Frame::getNofFrames() {
+	return list.size();
+}
