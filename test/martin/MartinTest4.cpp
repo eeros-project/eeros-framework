@@ -1,101 +1,37 @@
-#include <iostream>
-#include <stdlib.h>
-#include <unistd.h>
+#include <eeros/logger/SysLogWriter.hpp>
+#include <eeros/logger/Logger.hpp>
+#include <string>
 
-#include <eeros/core/Runnable.hpp>
-#include <eeros/core/Executor.hpp>
-#include <eeros/hal/HAL.hpp>
-#include <eeros/hal/ComediDevice.hpp>
-#include <eeros/hal/ComediDac.hpp>
-#include <eeros/hal/ComediAdc.hpp>
-#include <eeros/hal/ComediFqd.hpp>
-#include <eeros/hal/ComediDigIn.hpp>
-#include <eeros/hal/ComediDigOut.hpp>
-
-#define TIMETOWAIT 5
-
-namespace eeros {
-	namespace test {
-		namespace martin {
-			
-			using namespace eeros::hal;
-			
-			class TestRunner : public Runnable {
-			
-			public:
-				int adcVal;
-				int fqdVal;
-				bool dinVal;
-				
-				TestRunner() :
-				hal(HAL::instance()),
-				comediDev0("/dev/comedi0"),
-				dout("dout", &comediDev0, 2, 0),
-				din("din", &comediDev0, 2, 1),
-				dac("dac", &comediDev0, 1, 1),
-				adc("adc", &comediDev0, 0, 0),
-				fqd("fqd", &comediDev0, 11, 8, 10, 9),
-				counter(0), doutVal(false) {
-					// nothing to do
-				}
-				
-				void run() {
-					adcVal = adc.get();
-					fqdVal = fqd.get();
-					dinVal = din.get();
-
-					dout.set(doutVal);
-					doutVal = !doutVal;
-					dac.set(counter);
-					counter += 0.1;
-				}
-
-			private:
-				HAL& hal;
-				ComediDevice comediDev0;
-				ComediDigOut dout;
-				ComediDigIn din;
-				ComediDac dac;
-				ComediAdc adc;
-				ComediFqd fqd;
-				double counter;
-				bool doutVal;
-			};
-
-		};
-	};
-};
+using namespace eeros;
+using namespace eeros::logger;
 
 int main() {
-	using namespace eeros;
-	using namespace eeros::test::martin;
+	// Create and initialize logger
+	SysLogWriter w("martinTest4");
+	Logger<LogWriter>::setDefaultWriter(&w);
+	Logger<LogWriter> log;
+	w.show(~0);
 	
-	std::cout << "Martin Test 4 started..." << std::endl;
+	log.info() << "Martin Test 4 started...";
 	
-	std::cout << "Creating executor..." << std::endl;
-	Executor e(0.1); // 100 ms period time
+	log.trace() << "This is a debug message...";
+	log.info() << "This is a info message...";
+	log.warn() << "This is a warning message...";
+	log.error() << "This is a error message...";
+	log.fatal() << "This is a fatal error message...";
 	
-	std::cout << "Creating test runner..." << std::endl;
-	TestRunner t;
+	log.info() << "First line" << endl << "second line";
 	
-	std::cout << "Starting executor..." << std::endl;
-	e.addRunnable(t);
-	e.start();
+	int i = -4458;
+	uint32_t u = 3423;
+	char c = 'c';
+	double d = 1.23456789;
+	std::string s("Hello World");
 	
-	std::cout << "Waiting for " << TIMETOWAIT << " seconds while executor is running" << std::endl;
-	sleep(TIMETOWAIT);
- 
-	std::cout << "Stopping executor..." << std::endl;
-	e.stop();
+	log.info() << "Integer: " << i;
+	log.info() << "Unsigned integer: " << u;
+	log.info() << "Double: " << d;
+	log.info() << "String: " << s;
 	
-	std::cout << "Waiting for executor to terminate..." << std::endl;
-	while(!e.isTerminated());
-	
-	std::cout << "ADC value: " << t.adcVal << std::endl;
-	
-	std::cout << "FQD value: " << t.fqdVal << std::endl;
-	
-	std::cout << "Digital Input value: " << t.dinVal << std::endl;
-
-	std::cout << "Martin Test 4 done!" << std::endl;
+	log.info() << "Martin Test 4 finished...";
 }
