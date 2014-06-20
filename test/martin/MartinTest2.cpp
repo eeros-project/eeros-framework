@@ -1,7 +1,8 @@
 #include <iostream>
-#include <eeros/logger/StreamLogWriter.hpp>
+#include <eeros/logger/SysLogWriter.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
+#include <eeros/sequencer/TUI.hpp>
 #include <unistd.h>
 
 using namespace eeros;
@@ -21,7 +22,7 @@ public:
 		addStep([&]() {
 			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
 			sleep(1);
-			std::cout << "next pointer: " << this->next << std::endl;
+// 			std::cout << "next pointer: " << this->next << std::endl;
 			if(this->next != nullptr) call(this->next);
 		});
 		
@@ -51,7 +52,7 @@ private:
 
 int main() {
 	// Create and initialize logger
-	StreamLogWriter w(std::cout);
+	SysLogWriter w("martinTest2");
 	Logger<LogWriter>::setDefaultWriter(&w);
 	Logger<LogWriter> log;
 	w.show(~0);
@@ -62,38 +63,21 @@ int main() {
 	ExampleSequence subSeqA("Sub Sequence A", &subSeqB);
 	ExampleSequence mainSeq("Main Sequence", &subSeqA);
 	Sequencer sequencer;
+	TUI ui(sequencer);
 	sequencer.registerSequence(&mainSeq);
 	sequencer.registerSequence(&subSeqA);
 	sequencer.registerSequence(&subSeqB);
 	
-	std::cout << "main sequence:  " << &mainSeq << std::endl;
-	std::cout << "sub sequence A: " << &subSeqA << std::endl;
-	std::cout << "sub sequence B: " << &subSeqB << std::endl;
+// 	std::cout << "main sequence:  " << &mainSeq << std::endl;
+// 	std::cout << "sub sequence A: " << &subSeqA << std::endl;
+// 	std::cout << "sub sequence B: " << &subSeqB << std::endl;
 	
+	ui.dispay();
 	sequencer.start(&mainSeq);
-	sequencer.stepMode(true);
+//	sequencer.stepMode(true);
 	
-	char k;
-	bool stop = false;
-	
-	while(!stop) {
-		std::cout << "Press 'g' for next step or 'e' for exit" << std::endl;
-		std::cin >> k;
-		switch(k) {
-			case 'g':
-				sequencer.proceed();
-				break;
-			case 'e':
-				std::cout << "Stopping sequencer and exiting..." << std::endl;
-				sequencer.shutdown();
-				stop = true;
-				break;
-			default:
-				// do nothing
-				break;
-		}
-	}
 	sequencer.join();
+	ui.exit();
 	
 	log.info() << "Martin Test 2 finished...";
 }

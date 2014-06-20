@@ -7,6 +7,7 @@
 #include <vector>
 #include <mutex>
 #include <condition_variable>
+#include <atomic>
 
 #include <eeros/core/Runnable.hpp>
 #include <eeros/sequencer/SequenceException.hpp>
@@ -52,12 +53,15 @@ namespace eeros {
 			
 			eeros::logger::Logger<eeros::logger::LogWriter> log;
 			
+			
 		private:
 			virtual void setSequencer(Sequencer* sequencer);
+			virtual void abort();
 
 			Sequencer* sequencer;
 			std::string name;
 			SequenceState state;
+			std::atomic<bool> abortRequest;
 			uint32_t currentStep;
 			std::vector<std::function<void(void)>> steps;
 			uint32_t exceptionRetryCounter;

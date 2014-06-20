@@ -60,6 +60,7 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 			# Check for libraries
 			CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
 			CHECK_INCLUDE_FILES ("flinklib.h" LIBFLINK)
+			CHECK_INCLUDE_FILES ("curses.h" LIBCURSES)
 			
 			if(LIBCOMEDI)
 				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
@@ -67,7 +68,9 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 			endif()
 			if(LIBFLINK)
 				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
-				#list (APPEND EXTERNAL_LIBS "flink")
+			endif()
+			if(LIBCURSES)
+				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} ncurses)
 			endif()
 			
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") # FreeBSD

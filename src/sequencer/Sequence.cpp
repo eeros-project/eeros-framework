@@ -2,10 +2,11 @@
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/core/EEROSException.hpp>
 
+using namespace eeros;
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
-Sequence::Sequence(std::string name, Sequencer* sequencer) : name(name), sequencer(sequencer) {
+Sequence::Sequence(std::string name, Sequencer* sequencer) : name(name), sequencer(sequencer), abortRequest(false) {
 	if(sequencer != nullptr) {
 		sequencer->registerSequence(this);
 	}
@@ -106,6 +107,7 @@ void Sequence::reset() {
 	state = kSequenceNotStarted;
 	currentStep = 0;
 	exceptionRetryCounter = 0;
+	abortRequest = false;
 }
 
 void Sequence::call(Sequence* sequence) {
@@ -144,8 +146,15 @@ void Sequence::yield() {
 	if(sequencer != nullptr) {
 		sequencer->yield();
 	}
+	if(abortRequest) {
+		throw EEROSException("Sequence aborted by user");
+	}
 }
 
 void Sequence::setSequencer(Sequencer* sequencer) {
 	this->sequencer = sequencer;
+}
+
+void Sequence::abort() {
+	abortRequest = true;
 }
