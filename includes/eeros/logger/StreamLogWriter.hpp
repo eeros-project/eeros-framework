@@ -21,12 +21,13 @@ namespace eeros
 
 			virtual void endl();
 
-			virtual LogWriter& operator <<(int value);
+			virtual LogWriter& operator<<(int value);
 			virtual LogWriter& operator<<(unsigned int value);
-			virtual LogWriter& operator <<(double value);
-			virtual LogWriter& operator <<(const std::string& value);
+			virtual LogWriter& operator<<(long value);
+			virtual LogWriter& operator<<(double value);
+			virtual LogWriter& operator<<(const std::string& value);
 			virtual LogWriter& operator<<(std::ostream& os);
-			virtual LogWriter& operator <<(void (*f)(LogWriter&));
+			virtual LogWriter& operator<<(void (*f)(LogWriter&));
 
 		private:
 			Mutex mutex;

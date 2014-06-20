@@ -98,6 +98,13 @@ LogWriter& SysLogWriter::operator <<(unsigned int value) {
 	return *this;
 }
 
+LogWriter& SysLogWriter::operator<<(long value) {
+	if(enabled)
+		out << value;
+	
+	return *this;
+}
+
 LogWriter& SysLogWriter::operator <<(double value) {
 	if(enabled)
 		out << value;

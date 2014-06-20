@@ -24,6 +24,7 @@ namespace eeros
 
 			virtual LogWriter& operator<<(int value);
 			virtual LogWriter& operator<<(unsigned int value);
+			virtual LogWriter& operator<<(long value);
 			virtual LogWriter& operator<<(double value);
 			virtual LogWriter& operator<<(const std::string& value);
 			virtual LogWriter& operator<<(std::ostream& os);
