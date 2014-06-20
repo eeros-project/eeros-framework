@@ -13,11 +13,11 @@ Sequence::Sequence(std::string name, Sequencer* sequencer) : name(name), sequenc
 	reset(); // reset sequence
 }
 
-std::string Sequence::getName(){
+std::string Sequence::getName() const {
 	return name;
 }
 
-int Sequence::getState() {
+int Sequence::getState() const {
 	return state;
 }
 
@@ -146,7 +146,7 @@ void Sequence::yield() {
 	if(sequencer != nullptr) {
 		sequencer->yield();
 	}
-	if(abortRequest) {
+	if(abortRequest.load() == true) {
 		throw EEROSException("Sequence aborted by user");
 	}
 }

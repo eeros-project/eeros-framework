@@ -5,7 +5,7 @@
 #define MAX_NOF_COMMANDS 6
 #define HEADER_LINES 3
 #define FOOTER_LINES 2
-#define STATUS_LINES 3
+#define STATUS_LINES 4
 
 using namespace eeros;
 using namespace eeros::sequencer;
@@ -34,7 +34,7 @@ void TUI::dispay() {
 	clear();
 	noecho();
 	cbreak();
-	timeout(50);
+	timeout(100);
 	
 	init_pair(1, COLOR_WHITE, COLOR_BLACK); // Default
 	init_pair(2, COLOR_BLACK, COLOR_WHITE);   // Title
@@ -66,7 +66,7 @@ void TUI::printHeader() {
 		}
 	}
 	attron(A_BOLD);
-	mvprintw(headerStart + 1, 1, "User interface for sequencer #%u", sequencer.getId());
+	mvprintw(headerStart + 1, 1, "User interface for sequencer ", sequencer.getName().c_str());
 	color_set(1, nullptr);
 	attrset(A_NORMAL);
 }
@@ -97,40 +97,61 @@ void TUI::printSequenceList(unsigned int first) {
 	unsigned int i = 0;
 	printTitle("Registered sequences", sequenceListStart);
 	for(auto entry : list) {
-		mvprintw(sequenceListStart + 1 + i, 1, "%i. %s", i, entry.second->getName().c_str());
+		mvprintw(sequenceListStart + 1 + i, 1, "%i. %s (%p)", i, entry.second->getName().c_str(), entry.second);
 		i++;
 	}
 }
 
 void TUI::printStatus() {
 	printTitle("Status", statusStart);
-	mvprintw(statusStart + 1, 1, "Status:");
-	Sequencer::status s = sequencer.getStatus();
+	mvprintw(statusStart + 1, 1, "State:");
+	Sequencer::State s = sequencer.getState();
 	switch(s) {
-		case Sequencer::automatic:
-			mvprintw(statusStart + 1, 9, "running (auto mode)");
-			break;
-		case Sequencer::stepping:
-			mvprintw(statusStart + 1, 9, "stepping (step mode)");
-			break;
-		case Sequencer::terminating:
-			mvprintw(statusStart + 1, 9, "stopping");
-			break;
-		case Sequencer::terminated:
-			mvprintw(statusStart + 1, 9, "stopped");
+		case Sequencer::executing:
+			mvprintw(statusStart + 1, 9, "executing  ");
 			break;
 		case Sequencer::waiting:
-			mvprintw(statusStart + 1, 9, "waiting");
+			mvprintw(statusStart + 1, 9, "waiting    ");
+			break;
+		case Sequencer::terminating:
+			mvprintw(statusStart + 1, 9, "terminating");
+			break;
+		case Sequencer::terminated:
+			mvprintw(statusStart + 1, 9, "terminated ");
+			break;
+		case Sequencer::idle:
+			mvprintw(statusStart + 1, 9, "idle       ");
 			break;
 		default:
 			mvprintw(statusStart + 1, 9, "unknown (%u)", static_cast<unsigned int>(s));
 			break;
 	}
+	
+	mvprintw(statusStart + 1, COLS / 2 + 1, "Mode:");
+	Sequencer::Mode m = sequencer.getMode();
+	switch(m) {
+		case Sequencer::automatic:
+			mvprintw(statusStart + 1, COLS / 2 + 7, "automatic   ");
+			break;
+		case Sequencer::stepping:
+			mvprintw(statusStart + 1, COLS / 2 + 7, "stepping    ");
+			break;
+		default:
+			mvprintw(statusStart + 1, COLS / 2 + 7, "unknown (%u)", static_cast<unsigned int>(s));
+			break;
+	}
+	
+	mvprintw(statusStart + 2, 1, "Current Sequence:");
+	const Sequence* cs = sequencer.getCurrentSequence();
+	move(statusStart + 2, 19); clrtoeol();
+//	if(cs != nullptr) addstr(cs->getName().c_str());
+	printw("%p", cs);
+	
 }
 
 void TUI::printCommandList() {
 	printTitle("Commands", commandListStart);
-	printCommand("F1 ", "display help", true, 0);
+	printCommand("F1 ", "help", true, 0);
 	printCommand("F2 ", "toggle step mode", checkCmdToggleIsActive(), 1);
 	printCommand("F3 ", "proceed", checkCmdProceedIsActive(), 2);
 	printCommand("F5 ", "choose sequence", checkCmdChooseSeqIsActive(), 3);
@@ -151,46 +172,46 @@ void TUI::printCommand(std::string cmd, std::string description, bool active, un
 }
 
 void TUI::updateScreen() {
+	static unsigned int x = 0;
 	printHeader();
 	printSequenceList(0);
 	printStatus();
 	printCommandList();
 	printFooter();
+	mvprintw(LINES - 1, 1, "x = %u", x++);
 	refresh();
 }
 
 void TUI::run() {
-	unsigned int x = 0;
 	while(displayed) {
-		mvprintw(LINES - 1, 1, "x = %u", x++);
-		
 		char c = getch();
 		switch(c) {
 			case 'h':
 				beep();
 				break;
 			case 't':
-				if(sequencer.getStatus() == Sequencer::stepping) sequencer.stepMode(false);
-				else if(sequencer.getStatus() == Sequencer::automatic) sequencer.stepMode(true);
+				if(checkCmdToggleIsActive()) sequencer.toggleMode();
 				break;
 			case 'c':
-				if(sequencer.getStatus() == Sequencer::stepping) sequencer.proceed();
+				if(checkCmdProceedIsActive()) sequencer.proceed();
 				break;
 			case 's':
 				flash();
 				break;
 			case 'a':
-				if(sequencer.getStatus() == Sequencer::stepping) sequencer.shutdown();
+				if(checkCmdAbortIsActive()) sequencer.abort();
 				break;
 			case 'e':
-				
+				sequencer.stepMode();
+				sequencer.abort();
 				sequencer.shutdown();
 				exit();
 				break;
 			default:
-				if(sequencer.getStatus() != cachedStatus) {
+				if(sequencer.getState() != cachedState || sequencer.getMode() != cachedMode) {
 					updateScreen();
-					cachedStatus = sequencer.getStatus();
+					cachedState = sequencer.getState();
+					cachedMode = sequencer.getMode();
 				}
 				break;
 		}
@@ -198,17 +219,17 @@ void TUI::run() {
 }
 
 bool TUI::checkCmdToggleIsActive() {
-	return sequencer.getStatus() == Sequencer::automatic || sequencer.getStatus() == Sequencer::stepping;
+	return sequencer.getState() == Sequencer::executing || sequencer.getState() == Sequencer::waiting;
 }
 
 bool TUI::checkCmdAbortIsActive() {
-	return sequencer.getStatus() == Sequencer::stepping;
+	return sequencer.getState() == Sequencer::executing || sequencer.getState() == Sequencer::waiting;
 }
 
 bool TUI::checkCmdProceedIsActive() {
-	return sequencer.getStatus() == Sequencer::stepping;
+	return sequencer.getState() == Sequencer::waiting && sequencer.getMode() == Sequencer::stepping;
 }
 
 bool TUI::checkCmdChooseSeqIsActive() {
-	return sequencer.getStatus() == Sequencer::waiting;
+	return sequencer.getState() == Sequencer::idle && sequencer.getMode() == Sequencer::stepping;
 }

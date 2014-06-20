@@ -68,13 +68,13 @@ int main() {
 	sequencer.registerSequence(&subSeqA);
 	sequencer.registerSequence(&subSeqB);
 	
-// 	std::cout << "main sequence:  " << &mainSeq << std::endl;
-// 	std::cout << "sub sequence A: " << &subSeqA << std::endl;
-// 	std::cout << "sub sequence B: " << &subSeqB << std::endl;
+// 	log.trace() << "main sequence:  " << reinterpret_cast<long>(&mainSeq);
+// 	log.trace() << "sub sequence A: " << reinterpret_cast<long>(&subSeqA);
+// 	log.trace() << "sub sequence B: " << reinterpret_cast<long>(&subSeqB);
 	
 	ui.dispay();
+	sequencer.stepMode();
 	sequencer.start(&mainSeq);
-//	sequencer.stepMode(true);
 	
 	sequencer.join();
 	ui.exit();

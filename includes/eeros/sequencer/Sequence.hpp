@@ -30,8 +30,8 @@ namespace eeros {
 		public:
 			Sequence(std::string name, Sequencer* sequencer = nullptr);
 			
-			virtual std::string getName();
-			virtual int getState();
+			virtual std::string getName() const;
+			virtual int getState() const;
 			
 			virtual void reset();
 			
@@ -52,7 +52,6 @@ namespace eeros {
 			virtual void addStep(std::function<void(void)> action);
 			
 			eeros::logger::Logger<eeros::logger::LogWriter> log;
-			
 			
 		private:
 			virtual void setSequencer(Sequencer* sequencer);

@@ -23,7 +23,8 @@ namespace eeros {
 			
 		private:
 			Sequencer& sequencer;
-			Sequencer::status cachedStatus;
+			Sequencer::State cachedState;
+			Sequencer::Mode cachedMode;
 			std::atomic<bool> displayed;
 			unsigned int headerStart;
 			unsigned int sequenceListStart;

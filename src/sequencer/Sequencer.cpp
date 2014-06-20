@@ -5,7 +5,7 @@ using namespace eeros::sequencer;
 
 int Sequencer::instanceCounter = 0;
 
-Sequencer::Sequencer(Sequence* startSequence) : id(instanceCounter++), s(notStarted) {
+Sequencer::Sequencer(Sequence* startSequence) : id(instanceCounter++), state(idle), mode(automatic) {
 	if(startSequence != nullptr && registerSequence(startSequence)) {
 		currentSequence = startSequence;
 	}
@@ -14,11 +14,11 @@ Sequencer::Sequencer(Sequence* startSequence) : id(instanceCounter++), s(notStar
 bool Sequencer::registerSequence(Sequence* sequence) {
 	if(sequence != nullptr && sequences.insert( {sequence->name, sequence} ).second) {
 		sequence->setSequencer(this);
-		log.trace() << "Sequencer #" << id << ": Sequence '" << sequence->getName() << "' registered (as #" << static_cast<unsigned int>(sequences.size() - 1) << ").";
+		log.trace() << "Sequencer " << getName() << ": Sequence '" << sequence->getName() << "' registered (as #" << static_cast<unsigned int>(sequences.size() - 1) << ").";
 		return true;
 	}
 	else {
-		log.error() << "Sequence '" << sequence->name << "' already registered, please choose a unique name!";
+		log.error() << "Sequencer " << getName() << ": Sequence '" << sequence->name << "' already registered, please choose a unique name!";
 	}
 	return false;
 }
@@ -35,61 +35,78 @@ bool Sequencer::isRegistered(const Sequence* sequence) const {
 }
 
 void Sequencer::run() {
-	while(s != terminating) {
-		if(s != notStarted && currentSequence != nullptr) {
+	while(state != terminating) {
+		if(state != idle && currentSequence != nullptr) {
 			try {
 				currentSequence.load()->run();
 				currentSequence = nullptr;
-				if(s != stepping) shutdown();
+				if(mode == automatic) shutdown();
+				else state = idle;
 			}
 			catch(...) {
 				log.warn() << "Uncatched exception, switching to step mode.";
 				currentSequence = nullptr;
-				stepMode(true);
+				stepMode();
+				state = idle;
 			}
 		}
 	}
-	s = terminated;
-	log.trace() << "Sequencer #" << id << ": has stopped";
+	state = terminated;
+	log.trace() << "Sequencer " << getName() << " has stopped";
 }
 
-void Sequencer::start(bool stepMode) {
+void Sequencer::start() {
 	if(currentSequence != nullptr) {
-		if(stepMode) s = stepping;
-		else s = automatic;
+		state = executing;
 	}
 	else {
-		log.error() << "Sequencer #" << id << ": failed to start, no sequence specified!";
+		log.error() << "Sequencer " << getName() << " failed to start: no sequence specified!";
 	}
 }
 
-void Sequencer::start(Sequence* sequence, bool stepMode) {
+void Sequencer::start(Sequence* sequence) {
 	if(isRegistered(sequence)) {
 		currentSequence = sequence;
-		start(stepMode);
+		start();
 	}
 	else {
-		log.error() << "Sequencer #" << id << ": failed to start, sequence not registered!";
+		log.error() << "Sequencer " << getName() << " failed to start: sequence not registered!";
 	}
 }
 
 void Sequencer::shutdown() {
-	s = terminating;
+	state = terminating;
 }
 
 void Sequencer::stepMode(bool on) {
-	if(on) s = stepping;
-	else s = automatic;
+	if(on) {
+		mode = stepping;
+		log.trace() << "Sequencer " << getName() << ": mode set to 'stepping'";
+	}
+	else {
+		mode = automatic;
+		log.trace() << "Sequencer " << getName() << ": mode set to 'automatic'";
+	}
+}
+
+void Sequencer::toggleMode() {
+	if(mode == stepping) {
+		mode == automatic;
+		log.trace() << "Sequencer " << getName() << ": mode toggled to 'automatic'";
+	}
+	else {
+		mode == stepping;
+		log.trace() << "Sequencer " << getName() << ": mode toggled to 'stepping'";
+	}
 }
 
 void Sequencer::yield() {
-	status store = s;
-	if(s == stepping) {
+	if(mode == stepping) {
 		std::unique_lock<std::mutex> lck(mtx);
-		s = waiting;
+		state = waiting;
 		go = false;
 		while(!go) cv.wait(lck);
-		s = store;
+		state = executing;
 	}
 }
 
@@ -101,7 +118,9 @@ void Sequencer::proceed() {
 
 void Sequencer::abort() {
 	if(currentSequence != nullptr) {
+		log.info() << "Sequencer " << getName() << ": stopping execution of sequence '" << currentSequence.load()->getName() << "'";
 		currentSequence.load()->abort();
+		proceed();
 	}
 }
 
@@ -109,6 +128,19 @@ const std::map<std::string, Sequence*>& Sequencer::getListOfRegisteredSequences(
 	return sequences;
 }
 
-Sequencer::status Sequencer::getStatus() const {
-	return s;
+Sequencer::State Sequencer::getState() const {
+	return state;
+}
+
+Sequencer::Mode Sequencer::getMode() const {
+	return mode;
+}
+
+
+std::string Sequencer::getName() const {
+	return std::to_string(id);
+}
+
+const Sequence* Sequencer::getCurrentSequence() const {
+	return currentSequence;
 }
