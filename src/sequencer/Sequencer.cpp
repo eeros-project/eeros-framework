@@ -12,24 +12,24 @@ Sequencer::Sequencer(Sequence* startSequence) : id(instanceCounter++), state(idl
 }
 
 bool Sequencer::registerSequence(Sequence* sequence) {
-	if(sequence != nullptr && sequences.insert( {sequence->name, sequence} ).second) {
-		sequence->setSequencer(this);
-		log.trace() << "Sequencer " << getName() << ": Sequence '" << sequence->getName() << "' registered (as #" << static_cast<unsigned int>(sequences.size() - 1) << ").";
-		return true;
+	for(auto s : sequences) { // check if sequence is already registered
+		if(s == sequence) {
+			log.error() << "Sequencer " << getName() << ": Registration failed, sequence '" << sequence->name << "' is already registered!";
+			return false;
+		}
 	}
-	else {
-		log.error() << "Sequencer " << getName() << ": Sequence '" << sequence->name << "' already registered, please choose a unique name!";
-	}
-	return false;
-}
-
-Sequence* Sequencer::getRegisteredSequence(std::string name) {
-	return sequences[name];
+	unsigned int index = sequences.size();
+	sequences.push_back(sequence);
+	sequence->setSequencer(this);
+	
+	log.trace() << "Sequencer " << getName() << ": Sequence '" << sequence->getName() << "' registered (#" << index << ").";
+	
+	return true;
 }
 
 bool Sequencer::isRegistered(const Sequence* sequence) const {
 	for(auto s : sequences) {
-		if(s.second == sequence) return true;
+		if(s == sequence) return true;
 	}
 	return false;
 }
@@ -64,6 +64,16 @@ void Sequencer::start() {
 	}
 }
 
+void Sequencer::start(unsigned int index) {
+	if(index < sequences.size()) {
+		currentSequence = sequences[index];
+		start();
+	}
+	else {
+		log.error() << "Sequencer " << getName() << " failed to start: sequence index (" << index << ") out of bound!";
+	}
+}
+
 void Sequencer::start(Sequence* sequence) {
 	if(isRegistered(sequence)) {
 		currentSequence = sequence;
@@ -92,6 +102,7 @@ void Sequencer::stepMode(bool on) {
 void Sequencer::toggleMode() {
 	if(mode == stepping) {
 		mode == automatic;
+		proceed();
 		log.trace() << "Sequencer " << getName() << ": mode toggled to 'automatic'";
 	}
 	else {
@@ -113,7 +124,7 @@ void Sequencer::yield() {
 void Sequencer::proceed() {
 	std::unique_lock<std::mutex> lck(mtx);
 	go = true;
-	cv.notify_one();
+	cv.notify_all();
 }
 
 void Sequencer::abort() {
@@ -124,7 +135,7 @@ void Sequencer::abort() {
 	}
 }
 
-const std::map<std::string, Sequence*>& Sequencer::getListOfRegisteredSequences() {
+const std::vector<Sequence*>& Sequencer::getListOfRegisteredSequences() {
 	return sequences;
 }
 

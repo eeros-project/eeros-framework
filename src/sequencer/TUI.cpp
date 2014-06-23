@@ -1,7 +1,10 @@
 #include <eeros/sequencer/TUI.hpp>
 #include <curses.h>
 #include <sstream>
+#include <thread>
+#include <chrono>
 
+#define INPUT_TIMEOUT 100
 #define MAX_NOF_COMMANDS 6
 #define HEADER_LINES 3
 #define FOOTER_LINES 2
@@ -12,11 +15,11 @@ using namespace eeros::sequencer;
 
 unsigned int TUI::instanceCounter = 0;
 
-void quit() {
+void closeUI() {
 	endwin();
 }
 
-TUI::TUI(Sequencer& sequencer) : sequencer(sequencer), displayed(false) {
+TUI::TUI(Sequencer& sequencer) : sequencer(sequencer), state(idle) {
 	if(++instanceCounter > 1) {
 		throw EEROSException("Only a single user interface can exist at the same time!");
 	}
@@ -27,34 +30,17 @@ TUI::~TUI() {
 }
 
 void TUI::dispay() {
-	initscr();
-	atexit(quit);
-	curs_set(0);
-	start_color();
-	clear();
-	noecho();
-	cbreak();
-	timeout(100);
+	cachedMode = sequencer.getMode();
+	cachedState = sequencer.getState();
 	
-	init_pair(1, COLOR_WHITE, COLOR_BLACK); // Default
-	init_pair(2, COLOR_BLACK, COLOR_WHITE);   // Title
-	init_pair(3, COLOR_GREEN, COLOR_BLACK); // Available
-	init_pair(4, COLOR_RED, COLOR_BLACK);   // Not available
-	init_pair(5, COLOR_BLACK, COLOR_BLUE);   // Header and footer
-	
-	headerStart = 0;
-	footerStart = LINES - FOOTER_LINES;
-	sequenceListStart = HEADER_LINES + 1;
-	commandListStart = footerStart - MAX_NOF_COMMANDS / 2 - 1;
-	statusStart = commandListStart - STATUS_LINES;
-	
-	updateScreen();
-	displayed = true;
+	state = active;
 }
 
 void TUI::exit() {
-	displayed = false;
-	quit();
+	state = stopping;
+	clear();
+	refresh();
+	closeUI();
 }
 
 void TUI::printHeader() {
@@ -65,20 +51,23 @@ void TUI::printHeader() {
 			addch(' ');
 		}
 	}
-	attron(A_BOLD);
-	mvprintw(headerStart + 1, 1, "User interface for sequencer ", sequencer.getName().c_str());
+//	attron(A_BOLD);
+	std::stringstream title;
+	title << "User interface for sequencer " << sequencer.getName();
+	mvprintw(headerStart + 1, (COLS - title.str().size()) / 2, "%s", title.str().c_str());
 	color_set(1, nullptr);
 	attrset(A_NORMAL);
 }
 
-void TUI::printFooter() {
+void TUI::printFooter(std::string msg) {
 	color_set(5, nullptr);
-	for(int j = 0; j < FOOTER_LINES; j++) {
+	for(int j = 1; j < FOOTER_LINES; j++) {
 		for(int i = 0; i < COLS; i++) {
 			move(footerStart + j, i);
 			addch(' ');
 		}
 	}
+	mvprintw(LINES - 1, 1, "%s", msg.c_str());
 	color_set(1, nullptr);
 }
 
@@ -93,11 +82,11 @@ void TUI::printTitle(std::string text, unsigned int line) {
 }
 
 void TUI::printSequenceList(unsigned int first) {
-	const std::map<std::string, Sequence*>& list = sequencer.getListOfRegisteredSequences();
+	const std::vector<Sequence*>& list = sequencer.getListOfRegisteredSequences();
 	unsigned int i = 0;
 	printTitle("Registered sequences", sequenceListStart);
 	for(auto entry : list) {
-		mvprintw(sequenceListStart + 1 + i, 1, "%i. %s (%p)", i, entry.second->getName().c_str(), entry.second);
+		mvprintw(sequenceListStart + 1 + i, 1, "%i. %s (%p)", i, entry->getName().c_str(), entry);
 		i++;
 	}
 }
@@ -144,18 +133,17 @@ void TUI::printStatus() {
 	mvprintw(statusStart + 2, 1, "Current Sequence:");
 	const Sequence* cs = sequencer.getCurrentSequence();
 	move(statusStart + 2, 19); clrtoeol();
-//	if(cs != nullptr) addstr(cs->getName().c_str());
-	printw("%p", cs);
+	if(cs != nullptr) addstr(cs->getName().c_str());
+//	printw("%p", cs);
 	
 }
 
 void TUI::printCommandList() {
 	printTitle("Commands", commandListStart);
-	printCommand("F1 ", "help", true, 0);
-	printCommand("F2 ", "toggle step mode", checkCmdToggleIsActive(), 1);
+	printCommand("F2 ", "toggle step mode", checkCmdToggleIsActive(), 0);
+	printCommand("F5 ", "choose sequence", checkCmdChooseSeqIsActive(), 1);
 	printCommand("F3 ", "proceed", checkCmdProceedIsActive(), 2);
-	printCommand("F5 ", "choose sequence", checkCmdChooseSeqIsActive(), 3);
-	printCommand("F9 ", "abort", checkCmdAbortIsActive(), 4);
+	printCommand("F4 ", "abort", checkCmdAbortIsActive(), 4);
 	printCommand("F10", "exit", true, 5);
 }
 
@@ -172,38 +160,84 @@ void TUI::printCommand(std::string cmd, std::string description, bool active, un
 }
 
 void TUI::updateScreen() {
-	static unsigned int x = 0;
+//	static unsigned int x = 0;
 	printHeader();
 	printSequenceList(0);
 	printStatus();
 	printCommandList();
-	printFooter();
-	mvprintw(LINES - 1, 1, "x = %u", x++);
+	printFooter("");
+//	mvprintw(LINES - 1, 1, "x = %u", x++);
 	refresh();
 }
 
+void TUI::initScreen() {
+	initscr();
+	atexit(closeUI);
+	curs_set(0);
+	start_color();
+	clear();
+	raw();
+	keypad(stdscr, TRUE);
+	noecho();
+	cbreak();
+	timeout(INPUT_TIMEOUT);
+	
+	init_pair(1, COLOR_WHITE, COLOR_BLACK); // Default
+	init_pair(2, COLOR_BLACK, COLOR_WHITE);   // Title
+	init_pair(3, COLOR_GREEN, COLOR_BLACK); // Available
+	init_pair(4, COLOR_RED, COLOR_BLACK);   // Not available
+	init_pair(5, COLOR_WHITE, COLOR_RED);   // Header and footer
+	
+	headerStart = 0;
+	footerStart = LINES - FOOTER_LINES;
+	sequenceListStart = HEADER_LINES + 1;
+	commandListStart = footerStart - MAX_NOF_COMMANDS / 2 - 1;
+	statusStart = commandListStart - STATUS_LINES;
+}
+
 void TUI::run() {
-	while(displayed) {
-		char c = getch();
+	
+	// idle state
+	std::chrono::milliseconds sleepDuration(100);
+	while(state == idle) {
+		std::this_thread::sleep_for(sleepDuration);
+	}
+	
+	// active state
+	initScreen();
+	while(state == active) {
+		int c = getch();
+		char input[10];
 		switch(c) {
-			case 'h':
-				beep();
-				break;
-			case 't':
+			case KEY_F(2):
 				if(checkCmdToggleIsActive()) sequencer.toggleMode();
+				updateScreen();
 				break;
-			case 'c':
+			case KEY_F(3):
 				if(checkCmdProceedIsActive()) sequencer.proceed();
+				updateScreen();
 				break;
-			case 's':
-				flash();
-				break;
-			case 'a':
+			case KEY_F(4):
 				if(checkCmdAbortIsActive()) sequencer.abort();
+				updateScreen();
 				break;
-			case 'e':
+			case KEY_F(5):
+				printFooter("Enter sequence number:");
+				nocbreak();
+				timeout(-1);
+				echo();
+				mvgetstr(LINES - 1, 24, input);
+				mvprintw(LINES - 1, COLS / 2, "You entered: %i", atoi(input));
+				sequencer.start(atoi(input));
+				cbreak();
+				noecho();
+				timeout(INPUT_TIMEOUT);
+				break;
+			case 27: // Esc
+			case KEY_F(10):
 				sequencer.stepMode();
 				sequencer.abort();
+				while(sequencer.getState() != Sequencer::idle);
 				sequencer.shutdown();
 				exit();
 				break;
@@ -216,6 +250,9 @@ void TUI::run() {
 				break;
 		}
 	}
+	
+	// stopping
+	state = stopped;
 }
 
 bool TUI::checkCmdToggleIsActive() {

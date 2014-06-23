@@ -12,6 +12,8 @@ namespace eeros {
 		class TUI : public eeros::Thread {
 			
 		public:
+			enum State { idle, active, stopping, stopped };
+			
 			TUI(Sequencer& sequencer);
 			virtual ~TUI();
 			
@@ -25,17 +27,18 @@ namespace eeros {
 			Sequencer& sequencer;
 			Sequencer::State cachedState;
 			Sequencer::Mode cachedMode;
-			std::atomic<bool> displayed;
+			std::atomic<State> state;
 			unsigned int headerStart;
 			unsigned int sequenceListStart;
 			unsigned int statusStart;
 			unsigned int commandListStart;
 			unsigned int footerStart;
 			
+			void initScreen();
 			void updateScreen();
 			void printTitle(std::string text, unsigned int line);
 			void printHeader();
-			void printFooter();
+			void printFooter(std::string msg);
 			void printSequenceList(unsigned int first);
 			void printStatus();
 			void printCommandList();

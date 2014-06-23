@@ -125,9 +125,9 @@ void Sequence::call(Sequence* sequence) {
 	}
 }
 
-void Sequence::call(std::string sequenceName) {
-	call(sequencer->getRegisteredSequence(sequenceName));
-}
+// void Sequence::call(std::string sequenceName) {
+// 	call(sequencer->getRegisteredSequence(sequenceName));
+// }
 
 // void Sequence::start(Sequence* sequence) {
 // 	if(sequence != nullptr) {
@@ -147,7 +147,7 @@ void Sequence::yield() {
 		sequencer->yield();
 	}
 	if(abortRequest.load() == true) {
-		throw EEROSException("Sequence aborted by user");
+		throw EEROSException("Sequence aborted by user"); // TODO use SequenceAbortedException
 	}
 }
 

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <atomic>
+#include <vector>
 #include <eeros/core/Thread.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 
@@ -19,13 +20,13 @@ namespace eeros {
 			Sequencer(Sequence& startSequence);
 			
 			virtual bool registerSequence(Sequence* sequence);
-			virtual Sequence* getRegisteredSequence(std::string name);
 			virtual bool isRegistered(const Sequence* sequence) const;
-			virtual const std::map<std::string, Sequence*>& getListOfRegisteredSequences();
+			virtual const std::vector<Sequence*>& getListOfRegisteredSequences();
 			virtual const Sequence* getCurrentSequence() const;
 			
 			virtual void start();
 			virtual void start(Sequence* sequence);
+			virtual void start(unsigned int index);
 			virtual void stepMode(bool on = true);
 			virtual void toggleMode();
 			virtual void shutdown();
@@ -43,7 +44,7 @@ namespace eeros {
 			
 		private:
 			unsigned int id;
-			std::map<std::string, Sequence*> sequences;
+			std::vector<Sequence*> sequences;
 			std::atomic<Sequence*> currentSequence;
 			std::atomic<State> state;
 			std::atomic<Mode> mode;
