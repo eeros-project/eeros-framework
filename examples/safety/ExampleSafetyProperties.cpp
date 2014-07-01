@@ -4,7 +4,6 @@
 #include <eeros/safety/inputActions.hpp>
 #include <eeros/safety/OutputAction.hpp>
 
-
 using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;

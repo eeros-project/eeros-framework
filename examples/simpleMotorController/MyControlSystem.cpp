@@ -2,7 +2,7 @@
 
 using namespace eeros::control;
 
-MyControlSystem::MyControlSystem() : 
+MyControlSystem::MyControlSystem(double ts) : 
 	setpoint(0.0),
 	setpointV(6),
 	enc("q"),
@@ -11,7 +11,8 @@ MyControlSystem::MyControlSystem() :
 //	speedController(0),
 	inertia(14.2e-7),
 	invMotConst(1/15.7e-3 * 2.0),
-	dac("dac"), executor(0.001) {
+	dac("dac"),
+	timedomain("Main time domain", ts, true) {
 	
 	setpoint.getOut().getSignal().setName("phi_desired");
 
@@ -49,33 +50,23 @@ MyControlSystem::MyControlSystem() :
 	dac.getIn().connect(invMotConst.getOut());
 // 	dac.getIn().connect(setpointV.getOut());
 	
-	executor.addRunnable(this);
-}
-	
-void MyControlSystem::run() {
-	setpoint.run();
-//	setpointV.run();
-//	diff2.run();
-	enc.run();
-	sum1.run();
-	posController.run();
-	diff1.run();
-	sum2.run();
-	speedController.run();
-	inertia.run();
-	invMotConst.run();
-	dac.run();
+	timedomain.addBlock(&setpoint);
+// 	timedomain.addBlock(&setpointV);
+//	timedomain.addBlock(&diff2);
+	timedomain.addBlock(&enc);
+	timedomain.addBlock(&sum1);
+	timedomain.addBlock(&posController);
+	timedomain.addBlock(&sum2);
+	timedomain.addBlock(&speedController);
+	timedomain.addBlock(&inertia);
+	timedomain.addBlock(&invMotConst);
+	timedomain.addBlock(&dac);
 }
 
 void MyControlSystem::start() {
-	executor.start();
+	timedomain.start();
 }
 
 void MyControlSystem::stop() {
-	executor.stop();
-}
-
-MyControlSystem& MyControlSystem::instance() {
-	static MyControlSystem controlSystemInstance;
-	return controlSystemInstance;
+	timedomain.stop();
 }

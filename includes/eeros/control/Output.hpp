@@ -1,7 +1,6 @@
 #ifndef ORG_EEROS_CONTROL_OUTPUT_HPP_
 #define ORG_EEROS_CONTROL_OUTPUT_HPP_
 
-#include <eeros/types.hpp>
 #include <eeros/control/Signal.hpp>
 
 namespace eeros {

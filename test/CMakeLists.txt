@@ -7,7 +7,7 @@ set(TEST_DATA_DIR ${CMAKE_SOURCE_DIR}/test/data)
 
 # Framework components
 
-#add_subdirectory(core)
+add_subdirectory(core)
 add_subdirectory(math)
 add_subdirectory(control)
 #add_subdirectory(safety)

@@ -5,7 +5,7 @@
 #include <fstream>
 #include "../../Utils.hpp"
 
-#define nofOperations 4
+#define nofOperations 8
 
 template <int M, int N, typename T = double>
 class ScalarOpsTest {
@@ -30,7 +30,7 @@ class ScalarOpsTest {
 				
 				file >> scalar; // first value is the scalar
 				
-				for(int n = 0; n < N; n++) { // next MxN values is the matrix
+				for(int n = 0; n < N; n++) { // next MxN values are the test matrix
 					for(int m = 0; m < M; m++) {
 						double in;
 						file >> in;
@@ -39,7 +39,7 @@ class ScalarOpsTest {
  				}
 				if(file.eof()) break;
 
-				for(int i = 0; i < nofOperations; i++) { // the last values are the reference results
+				for(int i = 0; i < nofOperations; i++) { // the last values are the reference result
 					for(int n = 0; n < N; n++) {
 						for(int m = 0; m < M; m++) {
 							double in;
@@ -52,15 +52,19 @@ class ScalarOpsTest {
 				if(file.eof()) break;
 				
 				calcRes[0] = testMatrix + scalar;
-				calcRes[1] = testMatrix - scalar;
-				calcRes[2] = testMatrix * scalar;
-				calcRes[3] = testMatrix / scalar;
+				calcRes[1] = scalar + testMatrix;
+				calcRes[2] = testMatrix - scalar;
+				calcRes[3] = scalar - testMatrix;
+				calcRes[4] = testMatrix * scalar;
+				calcRes[5] = scalar * testMatrix;
+				calcRes[6] = testMatrix / scalar;
+				calcRes[7] = scalar / testMatrix;
 				
 				for(int i = 0; i < nofOperations; i++) {
 					for(int x = 0; x < N * M; x++) {
 						if(!Utils::compareApprox(refRes[i][x], calcRes[i][x], 0.001)) {
 							error++;
-							std::cout << "line " << line << " expecting " << refRes[i](x) << " calculated " << calcRes[i](x) << std::endl;
+							std::cout << "line " << line << " (operation '" << i << "'): expecting " << refRes[i](x) << " calculated " << calcRes[i](x) << std::endl;
 						}
 					}
 				}

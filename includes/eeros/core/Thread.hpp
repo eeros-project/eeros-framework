@@ -1,0 +1,31 @@
+#ifndef ORG_EEROS_CORE_THREAD_HPP_
+#define ORG_EEROS_CORE_THREAD_HPP_
+
+#include <eeros/logger/Logger.hpp>
+#include <eeros/logger/LogWriter.hpp>
+#include <eeros/core/Runnable.hpp>
+
+#include <thread>
+#include <functional>
+
+namespace eeros {
+	
+	class Thread {
+	
+	public:
+		Thread();
+		Thread(std::function<void ()> t);
+		virtual ~Thread();
+		
+		virtual std::thread::id getId() const;
+		virtual void join();
+		
+	protected:
+		virtual void run() = 0;
+		
+		std::thread t;
+		eeros::logger::Logger<eeros::logger::LogWriter> log;
+	};
+};
+
+#endif // ORG_EEROS_CORE_THREAD_HPP_

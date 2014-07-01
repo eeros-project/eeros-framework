@@ -10,7 +10,6 @@
 #include <eeros/core/RingBuffer.hpp>
 
 #define MEM_SIZE 32
-#define TIMETOWAIT 5
 
 namespace eeros {
 	namespace test {
@@ -84,7 +83,7 @@ int main() {
 		Writer w(shm->getMemoryPointer(), MEM_SIZE);
  		for (int i = 0; i < 5; i++) {
  			w.run();
-			sleep(1);
+			usleep(10000);
 		}
 		std::cout << "terminating writer process, pid=" << getpid() << std::endl;
 		exit(EXIT_SUCCESS);
@@ -101,7 +100,8 @@ int main() {
 		}
 		Reader r(shm->getMemoryPointer(), MEM_SIZE);
   		for (int i = 0; i < 7; i++) {
-  			 r.run(); 			 sleep(1);
+			r.run();
+			usleep(10000);
   		}
 		wait(NULL);
 		std::cout << "terminating reader process, pid=" << getpid() << std::endl;

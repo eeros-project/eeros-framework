@@ -8,18 +8,12 @@ using namespace eeros::sequencer;
 using namespace eeros::safety;
 using namespace eeros::logger;
 
-SequenceA::SequenceA(std::string name, double angle) : angle(angle), Sequence(name) {
+SequenceA::SequenceA(std::string name, SafetySystem& safetySys, MyControlSystem& controlSys, double angle) : safetySys(safetySys), angle(angle), Sequence(name), controlSys(controlSys) {
 	log.info() << "Sequence created: " << name;
-}
-
-SequenceA::~SequenceA(){
-
 }
 
 void SequenceA::init() {
 	log.info() << "[" << name << "] " << "Init started...";
-	
-	MyControlSystem& controlSys = MyControlSystem::instance();
 	
 	addStep([&]() {
 		double a = 0;
@@ -54,9 +48,6 @@ void SequenceA::exit() {
 }
 
 bool SequenceA::checkPreCondition() {
-//	log.info() << "[" << name << "] " << "Checking precondition...";
-	SafetySystem& safetySys = SafetySystem::instance();
-	
 	return safetySys.getCurrentLevel().getId() >= moving;
 }
 

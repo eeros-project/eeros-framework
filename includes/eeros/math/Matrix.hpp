@@ -360,11 +360,11 @@ namespace eeros {
 				return result;
 			}
 			
-			Matrix<M, N, T> transpose() const {
-				Matrix<M, N, T> result;
+			Matrix<N, M, T> transpose() const {
+				Matrix<N, M, T> result;
 				for(uint8_t m = 0; m < M; m++) {
 					for(uint8_t n = 0; n < N; n++) {
-						result(m, n) = (*this)(n, m);
+						result(n, m) = (*this)(m, n);
 					}
 				}
 				return result;
@@ -758,11 +758,44 @@ namespace eeros {
 		/********** Operators **********/
 		
 		template < uint8_t M, uint8_t N = 1, typename T = double >
+		Matrix<M, N, T> operator+(T left, Matrix<M, N, T> right) {
+			Matrix<M, N, T> result;
+			for(uint8_t m = 0; m < M; m++) {
+				for(uint8_t n = 0; n < N; n++) {
+					result(m, n) = left + right(m, n);
+				}
+			}
+			return result;
+		}
+		
+		template < uint8_t M, uint8_t N = 1, typename T = double >
+		Matrix<M, N, T> operator-(T left, Matrix<M, N, T> right) {
+			Matrix<M, N, T> result;
+			for(uint8_t m = 0; m < M; m++) {
+				for(uint8_t n = 0; n < N; n++) {
+					result(m, n) = left - right(m, n);
+				}
+			}
+			return result;
+		}
+		
+		template < uint8_t M, uint8_t N = 1, typename T = double >
 		Matrix<M, N, T> operator*(T left, Matrix<M, N, T> right) {
 			Matrix<M, N, T> result;
 			for(uint8_t m = 0; m < M; m++) {
 				for(uint8_t n = 0; n < N; n++) {
-					result(m, n) = right(m, n) * left;
+					result(m, n) = left * right(m, n);
+				}
+			}
+			return result;
+		}
+		
+		template < uint8_t M, uint8_t N = 1, typename T = double >
+		Matrix<M, N, T> operator/(T left, Matrix<M, N, T> right) {
+			Matrix<M, N, T> result;
+			for(uint8_t m = 0; m < M; m++) {
+				for(uint8_t n = 0; n < N; n++) {
+					result(m, n) = left / right(m, n);
 				}
 			}
 			return result;

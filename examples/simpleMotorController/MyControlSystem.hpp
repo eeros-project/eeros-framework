@@ -1,24 +1,18 @@
 #ifndef MYCONTROLSYSTEM_HPP_
 #define MYCONTROLSYSTEM_HPP_
 
-#include <eeros/core/Runnable.hpp>
 #include <eeros/control/Sum.hpp>
 #include <eeros/control/D.hpp>
 #include <eeros/control/Gain.hpp>
-#include <eeros/control/Switch.hpp>
 #include <eeros/control/Constant.hpp>
 #include <eeros/control/PeripheralInput.hpp>
 #include <eeros/control/PeripheralOutput.hpp>
-#include <eeros/control/Mux.hpp>
-#include <eeros/control/DeMux.hpp>
-#include <eeros/core/Executor.hpp>
+#include <eeros/control/TimeDomain.hpp>
 
-class MyControlSystem : public eeros::Runnable {
+class MyControlSystem {
 
 public:
-	void run();
-	
-	static MyControlSystem& instance();
+	MyControlSystem(double ts);
 	
 	void start();
 	void stop();
@@ -37,11 +31,7 @@ public:
 	eeros::control::PeripheralOutput<> dac;
 	
 private:
-	MyControlSystem();
-	MyControlSystem(const MyControlSystem&);
-	MyControlSystem& operator=(const MyControlSystem&);
-	
-	eeros::Executor executor;
+	eeros::control::TimeDomain timedomain;
 };
 
 #endif // MYCONTROLSYSTEM_HPP_

@@ -18,12 +18,15 @@ namespace eeros {
 			
 			bool done();
 			
+			static Sequencer* getSequencer(std::string name);
+			
 		private:
             eeros::Executor sequenceExecutor;
 			eeros::Executor timeoutExecutor;
 			Sequence& mainSequence;
 			std::string name;
 			
+			static std::map<std::string, Sequencer*> allSequencers;
 			static constexpr double timeoutExecutorPeriod = 0.001;
 		}; // class Sequence
 
