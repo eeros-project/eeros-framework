@@ -2,12 +2,13 @@
 #include <eeros/logger/SysLogWriter.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
-#include <eeros/sequencer/TUI.hpp>
+#include <eeros/ui/CursesUI.hpp>
 #include <unistd.h>
 
 using namespace eeros;
 using namespace eeros::sequencer;
 using namespace eeros::logger;
+using namespace eeros::ui;
 
 class ExampleSequence : public Sequence {
 public:
@@ -63,7 +64,7 @@ int main() {
 	ExampleSequence subSeqA("Sub Sequence A", &subSeqB);
 	ExampleSequence mainSeq("Main Sequence", &subSeqA);
 	Sequencer sequencer;
-	TUI ui(sequencer);
+	CursesUI ui(sequencer);
 	sequencer.registerSequence(&mainSeq);
 	sequencer.registerSequence(&subSeqA);
 	sequencer.registerSequence(&subSeqB);

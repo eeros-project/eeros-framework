@@ -1,32 +1,37 @@
-#ifndef ORG_EEROS_SEQUENCER_TUI_HPP_
-#define ORG_EEROS_SEQUENCER_TUI_HPP_
+#ifndef ORG_EEROS_UI_TUI_HPP_
+#define ORG_EEROS_UI_TUI_HPP_
 
 #include <atomic>
 
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/core/Thread.hpp>
+#include <eeros/logger/UILogWriter.hpp>
+#include <eeros/ui/BaseUI.hpp>
 
 namespace eeros {
-	namespace sequencer {
+	namespace ui {
 		
-		class TUI : public eeros::Thread {
+		class CursesUI : public eeros::Thread, public BaseUI {
 			
 		public:
 			enum State { idle, active, stopping, stopped };
 			
-			TUI(Sequencer& sequencer);
-			virtual ~TUI();
+			CursesUI(eeros::sequencer::Sequencer& sequencer);
+			virtual ~CursesUI();
 			
 			virtual void dispay();
 			virtual void exit();
+			
+			virtual void addMessage(unsigned level, std::string message);
 			
 		protected:
 			virtual void run();
 			
 		private:
-			Sequencer& sequencer;
-			Sequencer::State cachedState;
-			Sequencer::Mode cachedMode;
+			eeros::logger::UILogWriter log;
+			eeros::sequencer::Sequencer& sequencer;
+			eeros::sequencer::Sequencer::State cachedState;
+			eeros::sequencer::Sequencer::Mode cachedMode;
 			std::atomic<State> state;
 			unsigned int headerStart;
 			unsigned int sequenceListStart;
@@ -52,7 +57,7 @@ namespace eeros {
 			static unsigned int instanceCounter;
 			
 		}; // class TUI
-	}; // namespace sequencer
+	}; // namespace ui
 }; // namespace eeros
 
-#endif // ORG_EEROS_SEQUENCER_TUI_HPP_
+#endif // ORG_EEROS_UI_TUI_HPP_

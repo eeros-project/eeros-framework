@@ -1,4 +1,4 @@
-#include <eeros/sequencer/TUI.hpp>
+#include <eeros/ui/CursesUI.hpp>
 #include <curses.h>
 #include <sstream>
 #include <thread>
@@ -12,38 +12,43 @@
 
 using namespace eeros;
 using namespace eeros::sequencer;
+using namespace eeros::ui;
 
-unsigned int TUI::instanceCounter = 0;
+unsigned int CursesUI::instanceCounter = 0;
 
 void closeUI() {
 	endwin();
 }
 
-TUI::TUI(Sequencer& sequencer) : sequencer(sequencer), state(idle) {
+CursesUI::CursesUI(Sequencer& sequencer) : sequencer(sequencer), state(idle), log(this) {
 	if(++instanceCounter > 1) {
 		throw EEROSException("Only a single user interface can exist at the same time!");
 	}
 }
 
-TUI::~TUI() {
+CursesUI::~CursesUI() {
 	exit();
 }
 
-void TUI::dispay() {
+void CursesUI::dispay() {
 	cachedMode = sequencer.getMode();
 	cachedState = sequencer.getState();
 	
 	state = active;
 }
 
-void TUI::exit() {
+void CursesUI::exit() {
 	state = stopping;
 	clear();
 	refresh();
 	closeUI();
 }
 
-void TUI::printHeader() {
+void CursesUI::addMessage(unsigned level, std::string message) {
+	// TODO
+}
+
+void CursesUI::printHeader() {
 	color_set(5, nullptr);
 	for(int j = headerStart; j < HEADER_LINES; j++) {
 		for(int i = 0; i < COLS; i++) {
@@ -59,7 +64,7 @@ void TUI::printHeader() {
 	attrset(A_NORMAL);
 }
 
-void TUI::printFooter(std::string msg) {
+void CursesUI::printFooter(std::string msg) {
 	color_set(5, nullptr);
 	for(int j = 1; j < FOOTER_LINES; j++) {
 		for(int i = 0; i < COLS; i++) {
@@ -71,7 +76,7 @@ void TUI::printFooter(std::string msg) {
 	color_set(1, nullptr);
 }
 
-void TUI::printTitle(std::string text, unsigned int line) {
+void CursesUI::printTitle(std::string text, unsigned int line) {
 	color_set(2, nullptr);
 	for(int i = 0; i < COLS; i++) {
 		move(line, i);
@@ -81,7 +86,7 @@ void TUI::printTitle(std::string text, unsigned int line) {
 	color_set(1, nullptr);
 }
 
-void TUI::printSequenceList(unsigned int first) {
+void CursesUI::printSequenceList(unsigned int first) {
 	const std::vector<Sequence*>& list = sequencer.getListOfRegisteredSequences();
 	unsigned int i = 0;
 	printTitle("Registered sequences", sequenceListStart);
@@ -91,7 +96,7 @@ void TUI::printSequenceList(unsigned int first) {
 	}
 }
 
-void TUI::printStatus() {
+void CursesUI::printStatus() {
 	printTitle("Status", statusStart);
 	mvprintw(statusStart + 1, 1, "State:");
 	Sequencer::State s = sequencer.getState();
@@ -138,7 +143,7 @@ void TUI::printStatus() {
 	
 }
 
-void TUI::printCommandList() {
+void CursesUI::printCommandList() {
 	printTitle("Commands", commandListStart);
 	printCommand("F2 ", "toggle step mode", checkCmdToggleIsActive(), 0);
 	printCommand("F5 ", "choose sequence", checkCmdChooseSeqIsActive(), 1);
@@ -147,7 +152,7 @@ void TUI::printCommandList() {
 	printCommand("F10", "exit", true, 5);
 }
 
-void TUI::printCommand(std::string cmd, std::string description, bool active, unsigned int index) {
+void CursesUI::printCommand(std::string cmd, std::string description, bool active, unsigned int index) {
 	if(active) color_set(3, nullptr);
 	else color_set(4, nullptr);
 	
@@ -159,7 +164,7 @@ void TUI::printCommand(std::string cmd, std::string description, bool active, un
 	color_set(1, nullptr);
 }
 
-void TUI::updateScreen() {
+void CursesUI::updateScreen() {
 //	static unsigned int x = 0;
 	printHeader();
 	printSequenceList(0);
@@ -170,7 +175,7 @@ void TUI::updateScreen() {
 	refresh();
 }
 
-void TUI::initScreen() {
+void CursesUI::initScreen() {
 	initscr();
 	atexit(closeUI);
 	curs_set(0);
@@ -195,7 +200,7 @@ void TUI::initScreen() {
 	statusStart = commandListStart - STATUS_LINES;
 }
 
-void TUI::run() {
+void CursesUI::run() {
 	
 	// idle state
 	std::chrono::milliseconds sleepDuration(100);
@@ -255,18 +260,18 @@ void TUI::run() {
 	state = stopped;
 }
 
-bool TUI::checkCmdToggleIsActive() {
+bool CursesUI::checkCmdToggleIsActive() {
 	return sequencer.getState() == Sequencer::executing || sequencer.getState() == Sequencer::waiting;
 }
 
-bool TUI::checkCmdAbortIsActive() {
+bool CursesUI::checkCmdAbortIsActive() {
 	return sequencer.getState() == Sequencer::executing || sequencer.getState() == Sequencer::waiting;
 }
 
-bool TUI::checkCmdProceedIsActive() {
+bool CursesUI::checkCmdProceedIsActive() {
 	return sequencer.getState() == Sequencer::waiting && sequencer.getMode() == Sequencer::stepping;
 }
 
-bool TUI::checkCmdChooseSeqIsActive() {
+bool CursesUI::checkCmdChooseSeqIsActive() {
 	return sequencer.getState() == Sequencer::idle && sequencer.getMode() == Sequencer::stepping;
 }
