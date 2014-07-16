@@ -6,18 +6,22 @@ cmake_minimum_required(VERSION 2.8)
 # EEROS Robotic Framework
 project(EEROS)
 
+# Additional include and link directories
 include_directories(${ADDITIONAL_INCLUDE_DIRS})
 link_directories(${ADDITIONAL_LINK_DIRS})
 
+# Install directive for the header files
 INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
 
 # Load CMake modules
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
 include(CheckLibraryExists)
+include(CheckCXXCompilerFlag)
 
 # Determine the target plattform
 if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
+
 	# Compile for this platform -> use informations form running system
 	if(WIN32 AND NOT CYGWIN) # Windows (native)
 		set(WINDOWS TRUE)
@@ -25,11 +29,6 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 		set(POSIX TRUE)
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Linux") # Linux
 			set(LINUX TRUE) # Linux operating system
-			
-			## Compiler flags
-			if(CMAKE_COMPILER_IS_GNUCXX)
-				set(CMAKE_CXX_FLAGS "-std=c++0x")
-			endif()
 			
 			# Check for Xenomai
 			set(XENOMAI_SEARCH_PATH /usr/xenomai /usr) # set the search path
@@ -57,14 +56,13 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 			# TODO
 			set(PREEMPT_RT FALSE)
 			
-			# Check for libraries
+			# Check for additional libraries
 			CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
 			CHECK_INCLUDE_FILES ("flinklib.h" LIBFLINK)
 			CHECK_INCLUDE_FILES ("curses.h" LIBCURSES)
 			
 			if(LIBCOMEDI)
 				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
-				#list (APPEND EXTERNAL_LIBS "comedi ")
 			endif()
 			if(LIBFLINK)
 				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
@@ -78,17 +76,30 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") # Mac OS X
 			set(MACOSX TRUE)
 		else()
-			 # Unkown UNIX
-			 # TODO
+			# Unkown UNIX
+			# nothing to do
 		endif()
 	else()
 		 # Unkown OS
+		 # nothing to do
 	endif()
 else()
 	# Cross compile -> use informations form CMAKE_TOOLCHAIN_FILE
-	# TODO
+	# nothing to do
 endif()
 
+## Check and set C++ compiler flags
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+	message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler!")
+endif()
+
+## Config include file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
 
