@@ -34,6 +34,10 @@ namespace eeros {
 				return false;
 			}
 			
+			virtual uint8_t getCurrentInput() const {
+				return currentInput;
+			}
+			
 		protected:
 			Input<T> in[N];
 			Output<T> out;
