@@ -627,12 +627,12 @@ namespace eeros {
 			
 			/********** Cast/conversation operations **********/
 			
-			operator T() const {
-				if(M == 1 && N == 1)
-					return value[0];
-				else 
-					throw EEROSException("Cast failed, dimension is not 1x1");
-			}
+// 			operator T() const {
+// 				if(M == 1 && N == 1)
+// 					return value[0];
+// 				else 
+// 					throw EEROSException("Cast failed, dimension is not 1x1");
+// 			}
 			
 			/********** Static functions **********/
 			
@@ -799,6 +799,23 @@ namespace eeros {
 				}
 			}
 			return result;
+		}
+		
+		/********** Print functions **********/
+		
+		template < uint8_t M, uint8_t N = 1, typename T = double >
+		std::ostream& operator<<(std::ostream& os, const Matrix<M, N, T>& right) {
+			if(N > 1) os << "[ ";
+			for(uint8_t n = 0; n < N; n++) {
+				os << '[';
+				for(uint8_t m = 0; m < M; m++) {
+					os << right(m, n);
+					if(m < M - 1) os << ' ';
+				}
+				os << "]' ";
+			}
+			if(N > 1) os << "]";
+			return os;
 		}
 		
 		/********** Type definitions **********/
