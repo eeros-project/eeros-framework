@@ -1,39 +1,59 @@
 #ifndef ORG_EEROS_CONTROL_SATURATION_HPP_
 #define ORG_EEROS_CONTROL_SATURATION_HPP_
 
-#include <vector>
-
-#include <eeros/control/RealSignalOutput.hpp>
 #include <eeros/control/Block1i1o.hpp>
+#include <eeros/math/Matrix.hpp>
 
 namespace eeros {
 	namespace control {
-
-		class Saturation: public Block1i1o {
-		public:
-			Saturation(double lim, sigdim_t dim = 1);
-			Saturation(double lowLimit, double upLimit, sigdim_t dim = 1);
-			Saturation(const double lim[], sigdim_t dim);
-			Saturation(const double lowLimit[], const double upLimit[], sigdim_t dim);
-			Saturation(const std::vector<double>, sigdim_t dim);
-			Saturation(const std::vector<double> lowLimit, const std::vector<double> upLimit, sigdim_t dim);
-			virtual ~Saturation();
-
-			virtual void run();
+		
+		template<typename T = double>
+		class Saturation : public Block1i1o<T> {
 			
-			virtual void enable();
-			virtual void disable();
-			virtual void setSaturationLimit(double lim);
-			virtual void setSaturationLimit(double lowLim, double upLim);
-			virtual void setSaturationLimit(sigindex_t index, double lim);
-			virtual void setSaturationLimit(sigindex_t index, double lowLim, double upLimit);
+		public:
+			Saturation() : enabled(false) {
+				lowerLimit = 0;
+				upperLimit = 0;
+			}
+			
+			Saturation(T sym) : enabled(true) {
+				lowerLimit = -sym;
+				upperLimit = sym;
+			}
+			
+			Saturation(T lower, T upper) : enabled(true) {
+				lowerLimit = lower;
+				upperLimit = upper;
+			}
+			
+			virtual void run() {
+				T outVal = this->in.getSignal().getValue();
+				if(enabled) {
+					if(outVal > upperLimit) outVal = upperLimit;
+					if(outVal < lowerLimit) outVal = lowerLimit;
+				}
+				this->out.getSignal().setValue(outVal);
+				this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+			}
+			
+			virtual void enable() {
+				enabled = true;
+			}
+			
+			virtual void disable() {
+				enabled = false;
+			}
+			
+			virtual void setLimit(T lower, T upper) {
+				lowerLimit = lower;
+				upperLimit = upper;
+			}
 			
 		protected:
-			std::vector<double> upLimit;
-			std::vector<double> lowLimit;
+			T lowerLimit, upperLimit;
 			bool enabled;
 		};
-
+		
 	};
 };
 
