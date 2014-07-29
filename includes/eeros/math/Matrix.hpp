@@ -210,7 +210,7 @@ namespace eeros {
 			
 			/********** Matrix characteristics **********/
 			
-			bool isSquare() const {
+			constexpr bool isSquare() const {
 				return M == N;
 			}
 			
@@ -270,11 +270,11 @@ namespace eeros {
 				return (M == N) && (this->det() != 0);
 			}
 			
-			uint8_t getNofRows() const {
+			constexpr uint8_t getNofRows() const {
 				return M;
 			}
 			
-			uint8_t getNofColums() const {
+			constexpr uint8_t getNofColums() const {
 				return N;
 			}
 			
@@ -624,15 +624,6 @@ namespace eeros {
 					return result.transpose();
 				}
 			}
-			
-			/********** Cast/conversation operations **********/
-			
-// 			operator T() const {
-// 				if(M == 1 && N == 1)
-// 					return value[0];
-// 				else 
-// 					throw EEROSException("Cast failed, dimension is not 1x1");
-// 			}
 			
 			/********** Static functions **********/
 			
