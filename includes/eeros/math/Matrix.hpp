@@ -142,6 +142,23 @@ namespace eeros {
 				return row;
 			}
 			
+			template<unsigned int U, unsigned int V>
+			Matrix<U, V, T> getSubMatrix(unsigned int m, unsigned int n) const {
+				static_assert(U <= M && V <= N, "Dimension of the sub matrix must be lower or equal than of the origin!");
+				if(m + U <= M && n + V <= N) {
+					Matrix<U, V, T> sub;
+					for(unsigned int u = 0; u < U; u++) {
+						for(unsigned int v = 0; v < V; v++) {
+							sub(u, v) = (*this)(m + u, n + v);
+						}
+					}
+					return sub;
+				}
+				else {
+					throw MatrixIndexOutOfBoundException(m + U - 1, M, n + V - 1, N);
+				}
+			}
+			
 			void set(unsigned int m, unsigned int n, T value) {
 				(*this)(m, n) = value;
 			}
