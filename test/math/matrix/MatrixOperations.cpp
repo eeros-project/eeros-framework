@@ -10,7 +10,7 @@
 using namespace eeros::math;
 using namespace std;
 
-template < uint8_t N, uint8_t M, uint8_t U, uint8_t V > struct uuT {
+template < unsigned int N, unsigned int M, unsigned int U, unsigned int V > struct uuT {
 	  Matrix<N,M> A;
 	  Matrix<U,V> B;
 	  Matrix<N,M> Ainv;
@@ -28,10 +28,10 @@ const int MAX_NR_OF_TEST_CASES = 150;
 const double MAX_DEVIATION = 0.001; //in %
 std::ifstream file;
 
-template < uint8_t N, uint8_t M> int testMatrices(Matrix<N,M> result, Matrix<N,M> uuT){
+template < unsigned int N, unsigned int M> int testMatrices(Matrix<N,M> result, Matrix<N,M> uuT){
     int error = 0;
-    for(uint8_t m = 0; m < M; m++){
-	  for(uint8_t n = 0; n < N; n++){ 
+    for(unsigned int m = 0; m < M; m++){
+	  for(unsigned int n = 0; n < N; n++){ 
 	    double maxDeviation = 0;
 	    if(result(n,m) == 0){
 	      maxDeviation = 10e-15;
@@ -52,13 +52,13 @@ template < uint8_t N, uint8_t M> int testMatrices(Matrix<N,M> result, Matrix<N,M
 
 
 
-template < uint8_t N, uint8_t M>  void testForMatrix(string s, string codeWord, Matrix<N,M> *target){
+template < unsigned int N, unsigned int M>  void testForMatrix(string s, string codeWord, Matrix<N,M> *target){
     
     if (s == codeWord){
 	Matrix<N,M> newMatrix;
 	newMatrix.zero();
-	for(uint8_t m = 0; m < M; m++){
-	  for(uint8_t n = 0; n < N; n++){
+	for(unsigned int m = 0; m < M; m++){
+	  for(unsigned int n = 0; n < N; n++){
 	    file >> newMatrix(m,n);
 	  } 
 	}
@@ -67,7 +67,7 @@ template < uint8_t N, uint8_t M>  void testForMatrix(string s, string codeWord, 
 }
 
 
-template < uint8_t N, uint8_t M,uint8_t U, uint8_t V> int testFile(uuT<N,M,U,V> data[],string path){
+template < unsigned int N, unsigned int M,unsigned int U, unsigned int V> int testFile(uuT<N,M,U,V> data[],string path){
     
     int testCaseNr = 0;
     int aNrOfRows = 0;
@@ -206,10 +206,10 @@ int main( int argc,  char *argv[]) {
   
   
   if (argc == 6) {
-    uint8_t N = atoi(argv[1]);//number of colums A
-    uint8_t M = atoi(argv[2]);//number of rows A
-    uint8_t U = atoi(argv[3]);//number of colums B
-    uint8_t V = atoi(argv[4]);//number of rows B
+    unsigned int N = atoi(argv[1]);//number of colums A
+    unsigned int M = atoi(argv[2]);//number of rows A
+    unsigned int U = atoi(argv[3]);//number of colums B
+    unsigned int V = atoi(argv[4]);//number of rows B
     
     std::cout << "start testing" << std::endl;
     if(N==2 && M==2 && U ==2 && V == 2){
