@@ -3,7 +3,6 @@ using namespace eeros::logger;
 
 #include <iomanip>
 
-
 #define COLOR_RESET			"\033[0m"
 #define COLOR_BLACK			"\033[22;30m"
 #define COLOR_RED			"\033[22;31m"
@@ -23,24 +22,20 @@ using namespace eeros::logger;
 #define COLOR_WHITE			"\033[01;37m"
 
 
-StreamLogWriter::StreamLogWriter(std::ostream& out) :
-		out(out), visible_level(3), enabled(false), colored(true), lock(mutex)
-{
-
+StreamLogWriter::StreamLogWriter(std::ostream& out) : out(out), visible_level(3), enabled(false), colored(true), lock(mutex) {
+	// nothing to do
 }
 
 void StreamLogWriter::show(unsigned level) { visible_level = level; }
 
-void StreamLogWriter::begin(unsigned level, unsigned category)
-{
+void StreamLogWriter::begin(unsigned level, unsigned category) {
 	enabled = (level <= visible_level);
-	if (!enabled) return;
-
+	if(!enabled) return;
+	
 	lock.lock();
-
-
+	
 	using namespace std;
-
+	
 	time_t t(time(nullptr));
 	tm* local(localtime(&t));
 
@@ -50,12 +45,10 @@ void StreamLogWriter::begin(unsigned level, unsigned category)
 	out << setw(2) << local->tm_hour << ':' << setw(2) << local->tm_min << ':' << setw(2) << local->tm_sec;
 	out << "  ";
 
-	if (category == 0)
-	{
+	if (category == 0) {
 		out << ' ';
 	}
-	else
-	{
+	else {
 		if (category >= 'A' && category <= 'Z')
 			out << (char)category;
 		else
@@ -63,10 +56,8 @@ void StreamLogWriter::begin(unsigned level, unsigned category)
 	}
 	out << ' ';
 
-	if (colored)
-	{
-		switch(level)
-		{
+	if(colored) {
+		switch(level) {
 			case 0: out << COLOR_MAGENTA; break; // fatal
 			case 1: out << COLOR_RED; break; // error
 			case 2: out << COLOR_YELLOW; break; // warning
@@ -76,8 +67,7 @@ void StreamLogWriter::begin(unsigned level, unsigned category)
 		}
 	}
 
-	switch(level)
-	{
+	switch(level) {
 		case 0: out << "F"; break; // fatal
 		case 1: out << "E"; break; // error
 		case 2: out << "W"; break; // warning
@@ -88,50 +78,65 @@ void StreamLogWriter::begin(unsigned level, unsigned category)
 	out << ":  ";
 }
 
-void StreamLogWriter::end()
-{
-	if (!enabled) return;
-	if (colored) out << COLOR_RESET;
+void StreamLogWriter::end() {
+	if(!enabled) return;
+	if(colored) out << COLOR_RESET;
 	out << std::endl;
 	lock.unlock();
 }
 
-void StreamLogWriter::endl()
-{
-	if (!enabled) return;
+void StreamLogWriter::endl() {
+	if(!enabled) return;
 	out << std::endl << "\t\t\t   ";
 }
 
-LogWriter& StreamLogWriter::operator <<(int value)
-{
-	if (enabled)
+LogWriter& StreamLogWriter::operator <<(int value) {
+	if(enabled)
 		out << value;
-
+	
 	return *this;
 }
 
-LogWriter& StreamLogWriter::operator <<(double value)
-{
-	if (enabled)
+LogWriter& StreamLogWriter::operator <<(unsigned int value) {
+	if(enabled)
 		out << value;
-
+	
 	return *this;
 }
 
-LogWriter& StreamLogWriter::operator <<(const std::string& value)
-{
-	if (enabled)
+LogWriter& StreamLogWriter::operator <<(double value) {
+	if(enabled)
 		out << value;
-
+	
 	return *this;
 }
 
-LogWriter& StreamLogWriter::operator <<(void (*f)(LogWriter&))
-{
-	if (enabled)
-		if (f != nullptr)
+LogWriter& StreamLogWriter::operator <<(const std::string& value) {
+	if(enabled)
+		out << value;
+	
+	return *this;
+}
+
+LogWriter& StreamLogWriter::operator <<(std::ostream& os) {
+	if(enabled)
+		out << os;
+	
+	return *this;
+}
+
+// LogWriter& StreamLogWriter::operator <<(const void* value) {
+// 	if(enabled)
+// 		out << value;
+// 	
+// 	return *this;
+// }
+
+LogWriter& StreamLogWriter::operator <<(void (*f)(LogWriter&)) {
+	if(enabled)
+		if(f != nullptr)
 			f(*this);
-
+	
 	return *this;
 }
 

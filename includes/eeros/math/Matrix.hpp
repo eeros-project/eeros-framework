@@ -11,9 +11,11 @@
 
 namespace eeros {
 	namespace math {
-		template < uint8_t M, uint8_t N = 1, typename T = double >
+		template < unsigned int M, unsigned int N = 1, typename T = double >
 		class Matrix {
 		public:
+			
+			static_assert((M > 1 && N >= 1) || (M >=1 && N > 1), "Matrix dimension must be greater or equal than 1x1!");
 			
 			template < unsigned int IM, unsigned int IN, typename IT >
 			class MatrixInitializer {
@@ -28,7 +30,9 @@ namespace eeros {
 				Matrix<IM, IN, IT>& mat;
 				unsigned int index;
 			}; // END class MatrixInitializer
-		
+			
+			/********** Constructors **********/
+			
 			Matrix() { }
 			
 			Matrix(const T v) {
@@ -38,17 +42,21 @@ namespace eeros {
 			/********** Initializing the matrix **********/
 			
 			void zero() {
-				for(uint8_t i = 0; i < M * N; i++) {
+				for(unsigned int i = 0; i < M * N; i++) {
 					value[i] = 0;
 				}
 			}
 			
 			void eye() {
 				zero();
-				uint8_t j = (M < N) ? M : N;
-				for(uint8_t i = 0; i < j; i++) {
+				unsigned int j = (M < N) ? M : N;
+				for(unsigned int i = 0; i < j; i++) {
 					(*this)(i, i) = 1;
 				}
+			}
+			
+			void fill(T v) {
+				(*this) = v;
 			}
 			
 			void rotx(double angle) {
@@ -118,43 +126,60 @@ namespace eeros {
 			
 			/********** Element access **********/
 			
-			const T get(uint8_t m, uint8_t n) const {
+			const T get(unsigned int m, unsigned int n) const {
 				return (*this)(m, n);
 			}
 			
-			Matrix<M, 1, T> getCol(uint8_t n) const {
+			Matrix<M, 1, T> getCol(unsigned int n) const {
 				Matrix<M, 1, T> col;
-				for(uint8_t m = 0; m < M; m++) {
+				for(unsigned int m = 0; m < M; m++) {
 					col(m, 0) = (*this)(m, n);
 				}
 				return col;
 			}
 			
-			Matrix<1, N, T> getRow(uint8_t m) const {
+			Matrix<1, N, T> getRow(unsigned int m) const {
 				Matrix<1, N, T> row;
-				for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int n = 0; n < N; n++) {
 					row(0, n) = (*this)(m, n);
 				}
 				return row;
 			}
 			
-			void set(uint8_t m, uint8_t n, T value) {
+			template<unsigned int U, unsigned int V>
+			Matrix<U, V, T> getSubMatrix(unsigned int m, unsigned int n) const {
+				static_assert(U <= M && V <= N, "Dimension of the sub matrix must be lower or equal than of the origin!");
+				if(m + U <= M && n + V <= N) {
+					Matrix<U, V, T> sub;
+					for(unsigned int u = 0; u < U; u++) {
+						for(unsigned int v = 0; v < V; v++) {
+							sub(u, v) = (*this)(m + u, n + v);
+						}
+					}
+					return sub;
+				}
+				else {
+					throw MatrixIndexOutOfBoundException(m + U - 1, M, n + V - 1, N);
+				}
+			}
+			
+			void set(unsigned int m, unsigned int n, T value) {
 				(*this)(m, n) = value;
 			}
 			
-			void setCol(uint8_t n, const Matrix<M, 1, T>& col) {
-				for(uint8_t m = 0; m < M; m++) {
+			void setCol(unsigned int n, const Matrix<M, 1, T>& col) {
+				for(unsigned int m = 0; m < M; m++) {
 					(*this)(m, n) = col(m, 0);
 				}
 			}
 			
-			void setRow(uint8_t m, const Matrix<1, N, T>& row) {
-				for(uint8_t n = 0; n < N; n++) {
+			void setRow(unsigned int m, const Matrix<1, N, T>& row) {
+				for(unsigned int n = 0; n < N; n++) {
 					(*this)(m, n) = row(0, n);
 				}
 			}
 			
-			T& operator()(uint8_t m, uint8_t n) {
+			T& operator()(unsigned int m, unsigned int n) {
 				if(m >= 0 && m < M && n >= 0 && n < N) {
 					return value[M * n + m];
 				}
@@ -163,7 +188,7 @@ namespace eeros {
 				}
 			}
 			
-			const T operator()(uint8_t m, uint8_t n) const {
+			const T operator()(unsigned int m, unsigned int n) const {
 				if(m >= 0 && m < M && n >= 0 && n < N) {
 					return value[M * n + m];
 				}
@@ -210,7 +235,7 @@ namespace eeros {
 			
 			/********** Matrix characteristics **********/
 			
-			bool isSquare() const {
+			constexpr bool isSquare() const {
 				return M == N;
 			}
 			
@@ -227,8 +252,8 @@ namespace eeros {
 			}
 			
 			bool isDiagonal() const {
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						if(m != n){
 							if((*this)(m, n) != 0){
 								return false;
@@ -240,8 +265,8 @@ namespace eeros {
 			}
 			
 			bool isLowerTriangular() const {
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						if(m < n){
 							if((*this)(m, n) != 0){
 								return false;
@@ -253,8 +278,8 @@ namespace eeros {
 			}
 			
 			bool isUpperTriangular() const {
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						if(m > n){
 							if((*this)(m, n) != 0){
 								return false;
@@ -270,20 +295,24 @@ namespace eeros {
 				return (M == N) && (this->det() != 0);
 			}
 			
-			uint8_t getNofRows() const {
+			constexpr unsigned int getNofRows() const {
 				return M;
 			}
 			
-			uint8_t getNofColums() const {
+			constexpr unsigned int getNofColums() const {
 				return N;
+			}
+			
+			constexpr unsigned int size() const {
+				return M * N;
 			}
 			
 			unsigned int rank() const {
 				unsigned int numberOfNonZeroRows = 0;
 				Matrix<M, N, T> temp = (*this);
 				temp.gaussRowElimination();
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						if(temp(m, n) != 0){
 							numberOfNonZeroRows++;
 							break;
@@ -313,11 +342,11 @@ namespace eeros {
 						   // For big matrices this method needs a lot of time, this 
 						   // could be improved with another algorithm.
 						T det = 0;
-						uint8_t  ignoredRow = 0;
-						for(uint8_t m = 0; m < M; m++) {
+						unsigned int  ignoredRow = 0;
+						for(unsigned int m = 0; m < M; m++) {
 							Matrix<M - 1, N - 1, T> subMatrix;
-							uint8_t x = 0, y = 0;
-							uint8_t a = 0, b = 1;
+							unsigned int x = 0, y = 0;
+							unsigned int a = 0, b = 1;
 							while(a < M) {
 								while(b < N) {
 									if(a != ignoredRow) {
@@ -353,8 +382,8 @@ namespace eeros {
 			
 			T trace() const {
 				T result = 0;
-				uint8_t j = (M < N) ? M : N;
-				for(uint8_t i = 0; i < j; i++) {
+				unsigned int j = (M < N) ? M : N;
+				for(unsigned int i = 0; i < j; i++) {
 					result += (*this)(i, i);
 				}
 				return result;
@@ -362,8 +391,8 @@ namespace eeros {
 			
 			Matrix<N, M, T> transpose() const {
 				Matrix<N, M, T> result;
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						result(n, m) = (*this)(m, n);
 					}
 				}
@@ -373,8 +402,8 @@ namespace eeros {
 			/********** Base operations **********/
 			
 			bool operator==(const Matrix<M, N, T>& right) const {
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						if((*this)(m, n) != right(m, n))
 							return false;
 					}
@@ -383,8 +412,8 @@ namespace eeros {
 			}
 
 			bool operator!=(const Matrix<M, N, T>& right) const {
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						if((*this)(m, n) != right(m, n)) {
 							return true;
 						}
@@ -394,8 +423,8 @@ namespace eeros {
 			}
 			
 			bool operator<(const Matrix<M, N, T>& right) const {
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						if((*this)(m, n) >= right(m, n)) {
 							return false;
 						}
@@ -405,8 +434,8 @@ namespace eeros {
 			}
 			
 			bool operator<=(const Matrix<M, N, T>& right) const {
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						if((*this)(m, n) > right(m, n)) {
 							return false;
 						}
@@ -416,8 +445,8 @@ namespace eeros {
 			}
 			
 			bool operator>(const Matrix<M, N, T>& right) const {
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						if((*this)(m, n) <= right(m, n)) {
 							return false;
 						}
@@ -427,8 +456,8 @@ namespace eeros {
 			}
 			
 			bool operator>=(const Matrix<M, N, T>& right) const {
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						if((*this)(m, n) < right(m, n)) {
 							return false;
 						}
@@ -438,21 +467,21 @@ namespace eeros {
 			}
 			
 			Matrix<M, N, T>& operator=(T right) {
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						(*this)(m, n) = right;
 					}
 				}
 				return *this;
 			}
 			
-			template < uint8_t K >
+			template < unsigned int K >
 			Matrix<M, K, T> operator*(const Matrix<N, K, T> right) const {
 				Matrix<M, K, T> result;
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t k = 0; k < K; k++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int k = 0; k < K; k++) {
 						result(m, k) = 0;
-						for(uint8_t n = 0; n < N; n++) {
+						for(unsigned int n = 0; n < N; n++) {
 							result(m, k) += (*this)(m, n) * right(n, k);
 						}
 					}
@@ -462,8 +491,8 @@ namespace eeros {
 			
 			Matrix<M, N, T> operator*(T right) const {
 				Matrix<M, N, T> result;
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						result(m,n) = (*this)(m,n) * right;
 					}
 				}
@@ -472,8 +501,8 @@ namespace eeros {
 			
 			Matrix<M, N, T> multiplyElementWise(const Matrix<M, N, T> right) const {
 			    Matrix<M, N, T> result;
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						result(m, n) = (*this)(m, n) * right(m, n);
 					}
 			    }
@@ -482,8 +511,8 @@ namespace eeros {
 			
 			Matrix<M, N, T> operator+(const Matrix<M, N, T> right) const {
 				Matrix<M, N, T> result;
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						result(m, n) = (*this)(m, n) + right(m, n);
 					}
 				}
@@ -492,8 +521,8 @@ namespace eeros {
 			
 			Matrix<M, N, T> operator+(const T right) const {
 				Matrix<M, N, T> result;
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						result(m, n) = (*this)(m, n) + right;
 					}
 				}
@@ -507,8 +536,8 @@ namespace eeros {
 			
 			Matrix<M, N, T> operator-(const Matrix<M, N, T> right) const {
 				Matrix<M, N, T> result;
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						result(m, n) = (*this)(m, n) - right(m, n);
 					}
 				}
@@ -517,8 +546,8 @@ namespace eeros {
 			
 			Matrix<M, N, T> operator-(const T right) const {
 				Matrix<M, N, T> result;
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						result(m, n) = (*this)(m, n) - right;
 					}
 				}
@@ -537,8 +566,8 @@ namespace eeros {
 			
 			Matrix<M, N, T> operator/(T right) const {
 				Matrix<M, N, T> result;
-				for(uint8_t m = 0; m < M; m++) {
-					for(uint8_t n = 0; n < N; n++) {
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
 						result(m, n) = (*this)(m, n) / right;
 					}
 				}
@@ -581,13 +610,13 @@ namespace eeros {
 					// This algorithm needs a lot of time maybe there is a better one?
 					Matrix<M, N, T> result;
 					Matrix<M - 1, N - 1, T> smallerPart;
-					uint8_t ignoredRow = 0, ignoredColum = 0;
-					for(uint8_t m = 0; m < M; m++) {
-						for(uint8_t n = 0; n < N; n++) {
-							uint8_t a = 0, b = 0;
+					unsigned int ignoredRow = 0, ignoredColum = 0;
+					for(unsigned int m = 0; m < M; m++) {
+						for(unsigned int n = 0; n < N; n++) {
+							unsigned int a = 0, b = 0;
 							// 1. Create "matrix of minors"
-							for(uint8_t u = 0; u < M; u++) {
-								for(uint8_t w = 0; w < N; w++) {
+							for(unsigned int u = 0; u < M; u++) {
+								for(unsigned int w = 0; w < N; w++) {
 									if(u != m && w != n){
 										smallerPart(a, b) = (*this)(u, w);
 										b++;
@@ -623,15 +652,6 @@ namespace eeros {
 					// 4. transpose
 					return result.transpose();
 				}
-			}
-			
-			/********** Cast/conversation operations **********/
-			
-			operator T() const {
-				if(M == 1 && N == 1)
-					return value[0];
-				else 
-					throw EEROSException("Cast failed, dimension is not 1x1");
 			}
 			
 			/********** Static functions **********/
@@ -700,8 +720,8 @@ namespace eeros {
 			/********** Helper functions **********/
 			
 			void gaussRowElimination() {
-				uint8_t completedColum = 0, completedRow = 0;
-				uint8_t checkingRow = 0, rootRow = 0;
+				unsigned int completedColum = 0, completedRow = 0;
+				unsigned int checkingRow = 0, rootRow = 0;
 				T rowFactor = 0;
 				
 				sortForGaussAlgorithm();
@@ -711,7 +731,7 @@ namespace eeros {
 					while(checkingRow < M && (*this)(rootRow, completedColum) != 0) {
 						if((*this)(checkingRow, completedColum) != 0) {
 							rowFactor = (*this)(checkingRow, completedColum) / (*this)(rootRow, completedColum); 
-							for(uint8_t n = completedColum; n < N; n++) {
+							for(unsigned int n = completedColum; n < N; n++) {
 								(*this)(checkingRow, n) = (*this)(checkingRow, n) - rowFactor * (*this)(rootRow, n);
 							}
 						}
@@ -723,8 +743,8 @@ namespace eeros {
 			}
 			
 			void sortForGaussAlgorithm() {
-				uint8_t completedColum = 0, completedRow = 0;
-				uint8_t swapRow = completedRow + 1;
+				unsigned int completedColum = 0, completedRow = 0;
+				unsigned int swapRow = completedRow + 1;
 				
 				while(completedColum < N) {
 					while(completedRow < M) {
@@ -741,8 +761,8 @@ namespace eeros {
 				}
 			}
 			
-			void swapRows(uint8_t rowA, uint8_t rowB) {
-				for(uint8_t n = 0; n < N; n++) {
+			void swapRows(unsigned int rowA, unsigned int rowB) {
+				for(unsigned int n = 0; n < N; n++) {
 					T t = (*this)(rowA, n);
 					(*this)(rowA, n) = (*this)(rowB, n);
 					(*this)(rowB, n) =  t;
@@ -757,48 +777,65 @@ namespace eeros {
 		
 		/********** Operators **********/
 		
-		template < uint8_t M, uint8_t N = 1, typename T = double >
+		template < unsigned int M, unsigned int N = 1, typename T = double >
 		Matrix<M, N, T> operator+(T left, Matrix<M, N, T> right) {
 			Matrix<M, N, T> result;
-			for(uint8_t m = 0; m < M; m++) {
-				for(uint8_t n = 0; n < N; n++) {
+			for(unsigned int m = 0; m < M; m++) {
+				for(unsigned int n = 0; n < N; n++) {
 					result(m, n) = left + right(m, n);
 				}
 			}
 			return result;
 		}
 		
-		template < uint8_t M, uint8_t N = 1, typename T = double >
+		template < unsigned int M, unsigned int N = 1, typename T = double >
 		Matrix<M, N, T> operator-(T left, Matrix<M, N, T> right) {
 			Matrix<M, N, T> result;
-			for(uint8_t m = 0; m < M; m++) {
-				for(uint8_t n = 0; n < N; n++) {
+			for(unsigned int m = 0; m < M; m++) {
+				for(unsigned int n = 0; n < N; n++) {
 					result(m, n) = left - right(m, n);
 				}
 			}
 			return result;
 		}
 		
-		template < uint8_t M, uint8_t N = 1, typename T = double >
+		template < unsigned int M, unsigned int N = 1, typename T = double >
 		Matrix<M, N, T> operator*(T left, Matrix<M, N, T> right) {
 			Matrix<M, N, T> result;
-			for(uint8_t m = 0; m < M; m++) {
-				for(uint8_t n = 0; n < N; n++) {
+			for(unsigned int m = 0; m < M; m++) {
+				for(unsigned int n = 0; n < N; n++) {
 					result(m, n) = left * right(m, n);
 				}
 			}
 			return result;
 		}
 		
-		template < uint8_t M, uint8_t N = 1, typename T = double >
+		template < unsigned int M, unsigned int N = 1, typename T = double >
 		Matrix<M, N, T> operator/(T left, Matrix<M, N, T> right) {
 			Matrix<M, N, T> result;
-			for(uint8_t m = 0; m < M; m++) {
-				for(uint8_t n = 0; n < N; n++) {
+			for(unsigned int m = 0; m < M; m++) {
+				for(unsigned int n = 0; n < N; n++) {
 					result(m, n) = left / right(m, n);
 				}
 			}
 			return result;
+		}
+		
+		/********** Print functions **********/
+		
+		template < unsigned int M, unsigned int N = 1, typename T = double >
+		std::ostream& operator<<(std::ostream& os, const Matrix<M, N, T>& right) {
+			if(N > 1) os << "[ ";
+			for(unsigned int n = 0; n < N; n++) {
+				os << '[';
+				for(unsigned int m = 0; m < M; m++) {
+					os << right(m, n);
+					if(m < M - 1) os << ' ';
+				}
+				os << "]' ";
+			}
+			if(N > 1) os << "]";
+			return os;
 		}
 		
 		/********** Type definitions **********/
@@ -806,6 +843,76 @@ namespace eeros {
 		typedef Matrix<2,1> Vector2;
 		typedef Matrix<3,1> Vector3;
 		typedef Matrix<4,1> Vector4;
+		
+		/********** Specialization for a 1x1 matrix **********/
+		
+		template < typename T >
+		class Matrix<1, 1, T> {
+			
+		public:
+			Matrix() { }
+			
+			Matrix(const T v) { value = v; }
+			
+			void zero() { value = 0; }
+			
+			void eye() { value = 1; }
+			
+			void fill(T v) { value = v; }
+			
+			const T get(uint8_t m, uint8_t n) const { return (*this)(m, n); }
+			
+			Matrix<1, 1, T> getCol(uint8_t n) const { return (*this); }
+			
+			Matrix<1, 1, T> getRow(uint8_t m) const { return (*this); }
+			
+			void set(uint8_t m, uint8_t n, T value) { (*this)(m, n) = value; }
+			
+			T& operator()(uint8_t m, uint8_t n) { if(m == 0 && n == 0) return value; else throw MatrixIndexOutOfBoundException(m, 1, n, 1); }
+			
+			const T operator()(uint8_t m, uint8_t n) const { if(m == 0 && n == 0) return value; else throw MatrixIndexOutOfBoundException(m, 1, n, 1); }
+			
+			T& operator()(unsigned int i) { if(i == 0) return value; else throw MatrixIndexOutOfBoundException(i, 1); }
+			
+			const T operator()(unsigned int i) const { if(i == 0) return value; else throw MatrixIndexOutOfBoundException(i, 1); }
+			
+			T& operator[](unsigned int i) { if(i == 0) return value; else throw MatrixIndexOutOfBoundException(i, 1); }
+			
+			const T operator[](unsigned int i) const { if(i == 0) return value; else throw MatrixIndexOutOfBoundException(i, 1); }
+			
+			constexpr bool isSquare() const { return true; }
+			
+			bool isOrthogonal() const { return value == 1; }
+			
+			bool isSymmetric() const { return true; }
+			
+			bool isDiagonal() const { return true; }
+			
+			bool isLowerTriangular() const { return true; }
+			
+			bool isUpperTriangular() const { return true; }
+			
+			bool isInvertible() const { return value != 0; }
+			
+			constexpr unsigned int getNofRows() const { return 1; }
+			
+			constexpr unsigned int getNofColums() const { return 1; }
+			
+			constexpr unsigned int size() const { return 1; }
+			
+			unsigned int rank() const { return (value == 0) ? 1 : 0; }
+			
+			T det() const { return value; }
+			
+			T trace() const { return value; }
+			
+			Matrix<1, 1, T> operator!() const { Matrix<1, 1, T> inv(1/value); return inv; }
+			
+			operator T() const { return value; }
+			
+		protected:
+			T value;
+		};
 		
 	} // END namespace math
 } // END namespache eeros
