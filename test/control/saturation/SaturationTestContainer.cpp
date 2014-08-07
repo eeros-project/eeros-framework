@@ -6,6 +6,7 @@
 #include <ctime>
 #include <functional>
 #include <type_traits>
+#include <array>
 
 #include "../../Utils.hpp"
 
