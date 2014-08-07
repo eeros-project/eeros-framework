@@ -64,13 +64,6 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 				CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
 			endif()
 
-			if(LIBCOMEDI)
-				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
-			endif()
-			if(LIBFLINK)
-				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
-			endif()
-			
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") # FreeBSD
 			set(FREEBSD TRUE)
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") # Mac OS X
@@ -97,6 +90,13 @@ elseif(COMPILER_SUPPORTS_CXX0X)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
 	message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler!")
+endif()
+
+if(LIBCOMEDI)
+	SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
+endif()
+if(LIBFLINK)
+	SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
 endif()
 
 ## Config include file
