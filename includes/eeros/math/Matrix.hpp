@@ -55,6 +55,10 @@ namespace eeros {
 				}
 			}
 			
+			void fill(T v) {
+				(*this) = v;
+			}
+			
 			void rotx(double angle) {
 				Matrix<M, N, T>& m = *this;
 				if(M == 3 && N == 3) {
@@ -297,6 +301,10 @@ namespace eeros {
 			
 			constexpr unsigned int getNofColums() const {
 				return N;
+			}
+			
+			constexpr unsigned int size() const {
+				return M * N;
 			}
 			
 			unsigned int rank() const {
@@ -850,6 +858,8 @@ namespace eeros {
 			
 			void eye() { value = 1; }
 			
+			void fill(T v) { value = v; }
+			
 			const T get(uint8_t m, uint8_t n) const { return (*this)(m, n); }
 			
 			Matrix<1, 1, T> getCol(uint8_t n) const { return (*this); }
@@ -870,7 +880,7 @@ namespace eeros {
 			
 			const T operator[](unsigned int i) const { if(i == 0) return value; else throw MatrixIndexOutOfBoundException(i, 1); }
 			
-			bool isSquare() const { return true; }
+			constexpr bool isSquare() const { return true; }
 			
 			bool isOrthogonal() const { return value == 1; }
 			
@@ -884,9 +894,11 @@ namespace eeros {
 			
 			bool isInvertible() const { return value != 0; }
 			
-			unsigned int getNofRows() const { return 1; }
+			constexpr unsigned int getNofRows() const { return 1; }
 			
-			unsigned int getNofColums() const { return 1; }
+			constexpr unsigned int getNofColums() const { return 1; }
+			
+			constexpr unsigned int size() const { return 1; }
 			
 			unsigned int rank() const { return (value == 0) ? 1 : 0; }
 			
