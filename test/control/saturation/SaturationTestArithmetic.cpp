@@ -19,7 +19,7 @@ class SaturationBlockTest {
 			auto rand = std::bind(distribution, generator);
 			for(unsigned int i = 0; i < randomBufferLength; i++) {
 				random[i] = rand();
-				if(!std::is_integral<T>::value) random[i] /= 1000;
+				if(std::is_floating_point<T>::value) random[i] /= 1000.0;
 			}
 			
 			uut.getIn().connect(data);
@@ -74,29 +74,27 @@ class SaturationBlockTest {
 
 int main(int argc, char* argv[]) {
 	
-	using namespace eeros::math;
 	SaturationBlockTest<int> intTester;
-	SaturationBlockTest<double> doubleTester;
-// 	SaturationBlockTest<Vector3> vectorTester;
-// 	SaturationBlockTest<Matrix<4, 4>> matrixTester;
-	
+	SaturationBlockTest<long> longTester;
+	SaturationBlockTest<float> floatTester;
+	SaturationBlockTest<double> doubleTester;	
 	if(argc == 2) {
 		char t = *(argv[1]);
 		switch(t) {
 			case 'i':
 				return intTester.run();
 				break;
+			case 'l':
+				return longTester.run();
+				break;
+			case 'f':
+				return floatTester.run();
+				break;
 			case 'd':
 				return doubleTester.run();
 				break;
-// 			case 'v':
-// 				return vectorTester.run();
-// 				break;
-// 			case 'm':
-// 				return matrixTester.run();
-// 				break;
 			default:
-				std::cout << "illegal type (" << t << "), only 'd' for double, 'v' for vector or 'm' for matrix are available." << std::endl;
+				std::cout << "illegal type (" << t << "), only 'i' for integer, 'l' for long, 'f' for float or 'd' for double are available." << std::endl;
 				break;
 		}
 	}
