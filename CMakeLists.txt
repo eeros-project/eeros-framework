@@ -56,14 +56,12 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 			# TODO
 			set(PREEMPT_RT FALSE)
 			
-			# Check for additional libraries
-			CHECK_INCLUDE_FILES("comedilib.h" LIBCOMEDI)
-			CHECK_INCLUDE_FILES("flinklib.h" LIBFLINK)
-			if(LIBCOMEDI)
-				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
+			# Check for libraries
+			if(NOT LIBFLINK)
+				CHECK_INCLUDE_FILES ("flinklib.h" LIBFLINK)
 			endif()
-			if(LIBFLINK)
-				SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
+			if(NOT LIBCOMEDI)
+				CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
 			endif()
 			
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") # FreeBSD
@@ -92,6 +90,13 @@ elseif(COMPILER_SUPPORTS_CXX0X)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
 	message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler!")
+endif()
+
+if(LIBCOMEDI)
+	SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
+endif()
+if(LIBFLINK)
+	SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
 endif()
 
 ## Config include file
