@@ -4,10 +4,10 @@
 #include <eeros/core/EEROSException.hpp>
 #include "MatrixIndexOutOfBoundException.hpp"
 
+#include <utility>
 #include <sstream>
 #include <cstdlib>
 #include <cmath>
-#include <stdint.h>
 
 namespace eeros {
 	namespace math {
@@ -37,6 +37,11 @@ namespace eeros {
 			
 			Matrix(const T v) {
 				(*this) = v;
+			}
+			
+			template<typename... S>
+			Matrix(const S&&... v) : value{std::forward<const T>(v)...} {
+				static_assert(sizeof...(S) == M * N, "Invalid number of constructor arguments!");
 			}
 			
 			/********** Initializing the matrix **********/
@@ -770,7 +775,6 @@ namespace eeros {
 			}
 			
 		protected:
-			
 			T value[M * N];
 			
 		}; // END class Matrix

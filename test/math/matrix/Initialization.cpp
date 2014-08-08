@@ -39,13 +39,82 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 	
-	// ********** Part A: zero() **********
+	// ********** Part A: Constructors with initialization values **********
 	
-	std::cout << "[A] Testing zero() with a 4x2 integer matrix and with a 4x2 double matrix" << std::endl;
+	std::cout << "[A] Testing constructors with initialization values" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Copy constructor" << std::endl;
+	error = 0;
+	for(unsigned int m = 0; m < 4; m++) {
+		for(unsigned int n = 0; n < 2; n++) {
+			iM4x2(m, n) = m + n;
+		}
+	}
+	Matrix<4, 2, int> iM4x2copy(iM4x2);
+	for(unsigned int m = 0; m < 4; m++) {
+		for(unsigned int n = 0; n < 2; n++) {
+			if(iM4x2copy(m, n) != iM4x2(m, n)) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << iM4x2copy(m, n) << ", but should be " << iM4x2(m, n) << "!" << std::endl;
+				error++;
+			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	std::cout << "    #" << testNo++ << ": Single value constructor" << std::endl;
+	error = 0;
+	Matrix<8, 5, int> iM8x5(27);
+	for(unsigned int m = 0; m < 8; m++) {
+		for(unsigned int n = 0; n < 5; n++) {
+			if(iM8x5(m, n) != 27) {
+				std::cout << "    -> Failure: M(" << m << ',' << n << ") = " << iM8x5(m, n) << ", but should be 27!" << std::endl;
+				error++;
+			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	std::cout << "    #" << testNo++ << ": Multiple value constructor (3x1)" << std::endl;
+	error = 0;
+	Matrix<3, 1, int> iM3x1(1, 2, 3);
+	for(unsigned int m = 0; m < 3; m++) {
+		if(iM3x1(m, 0) != m + 1) {
+			std::cout << "    -> Failure: M(" << m << ", 0) = " << iM3x1(m, 0) << ", but should be " << m + 1 << "!" << std::endl;
+			error++;
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+		std::cout << "    #" << testNo++ << ": Multiple value constructor (6x3)" << std::endl;
+	error = 0;
+	Matrix<6, 3, int> iM6x3(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
+	i = 1;
+	for(unsigned int n = 0; n < 3; n++) {
+		for(unsigned int m = 0; m < 6; m++) {
+			if(iM6x3(m, n) != i++) {
+				std::cout << "    -> Failure: M(" << m << ", " << n << ") = " << iM6x3(m, n) << ", but should be " << i << "!" << std::endl;
+				error++;
+			}
+		}
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	// ********** Part B: zero() and eye() **********
+	
+	std::cout << "[B] Testing zero() and eye() with integer and double matrices" << std::endl;
+	iM5x5.eye();
+	dM5x5.eye();
 	iM4x2.zero();
 	dM4x2.zero();
 	
-	std::cout << "    #" << testNo++ << ": Checking integer matrix" << std::endl;
+	std::cout << "    #" << testNo++ << ": Checking zero() with a 4x2 integer matrix" << std::endl;
 	error = 0;
 	for(unsigned int m = 0; m < 4; m++) {
 		for(unsigned int n = 0; n < 2; n++) {
@@ -58,7 +127,7 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	std::cout << "    #" << testNo++ << ": Checking double matrix" << std::endl;
+	std::cout << "    #" << testNo++ << ": Checking zero with a 4x2 double matrix" << std::endl;
 	error = 0;
 	for(unsigned int m = 0; m < 4; m++) {
 		for(unsigned int n = 0; n < 2; n++) {
@@ -71,13 +140,7 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	// ********** Part B: eye() **********
-	
-	std::cout << "[B] Testing eye() with a 5x5 integer matrix and with a 5x5 double matrix" << std::endl;
-	iM5x5.eye();
-	dM5x5.eye();
-	
-	std::cout << "    #" << testNo++ << ": Checking integer matrix" << std::endl;
+	std::cout << "    #" << testNo++ << ": Checking eye() with a 5x5 integer matrix" << std::endl;
 	error = 0;
 	for(unsigned int m = 0; m < 5; m++) {
 		for(unsigned int n = 0; n < 5; n++) {
@@ -98,7 +161,7 @@ int main(int argc, char *argv[]) {
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
-	std::cout << "    #" << testNo++ << ": Checking double matrix" << std::endl;
+	std::cout << "    #" << testNo++ << ": Checking eye() with a 5x5 double matrix" << std::endl;
 	error = 0;
 	for(unsigned int m = 0; m < 5; m++) {
 		for(unsigned int n = 0; n < 5; n++) {
@@ -364,9 +427,9 @@ int main(int argc, char *argv[]) {
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
 	if (errorSum == 0)
-		std::cout << "Matrix element access test succeeded" << std::endl;
+		std::cout << "Matrix initialization test succeeded" << std::endl;
 	else
-		std::cout << "Matrix element access test failed with " << errorSum << " error(s)" << std::endl;
+		std::cout << "Matrix initialization test failed with " << errorSum << " error(s)" << std::endl;
 
 	return errorSum;
 }
