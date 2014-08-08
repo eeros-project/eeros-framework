@@ -40,7 +40,7 @@ namespace eeros {
 			}
 			
 			template<typename... S>
-			Matrix(const S&&... v) : value{std::forward<const T>(v)...} {
+			Matrix(const S... v) : value{std::forward<const T>(v)...} {
 				static_assert(sizeof...(S) == M * N, "Invalid number of constructor arguments!");
 			}
 			

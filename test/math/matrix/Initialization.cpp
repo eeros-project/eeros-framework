@@ -106,6 +106,28 @@ int main(int argc, char *argv[]) {
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
 	
 	
+	std::cout << "    #" << testNo++ << ": Multiple value constructor (6x3)" << std::endl;
+	error = 0;
+	constexpr double c0 = -0.1;
+	constexpr double c1 = 3.1415;
+	constexpr double c2 = 10;
+	Matrix<3, 1, double> dM3x1(c0, c1, c2);
+	if(dM3x1(0, 0) != c0) {
+		std::cout << "    -> Failure: M(0, 0) = " << dM3x1(0, 0) << ", but should be " << c0 << "!" << std::endl;
+		error++;
+	}
+	if(dM3x1(1, 0) != c1) {
+		std::cout << "    -> Failure: M(1, 0) = " << dM3x1(1, 0) << ", but should be " << c1 << "!" << std::endl;
+		error++;
+	}
+	if(dM3x1(2, 0) != c2) {
+		std::cout << "    -> Failure: M(2, 0) = " << dM3x1(2, 0) << ", but should be " << c2 << "!" << std::endl;
+		error++;
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	
 	// ********** Part B: zero() and eye() **********
 	
 	std::cout << "[B] Testing zero() and eye() with integer and double matrices" << std::endl;
