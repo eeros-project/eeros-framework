@@ -1,4 +1,5 @@
 #include <eeros/ui/CursesUI.hpp>
+#include <eeros/core/EEROSException.hpp>
 #include <curses.h>
 #include <sstream>
 #include <thread>
@@ -87,33 +88,33 @@ void CursesUI::printTitle(std::string text, unsigned int line) {
 }
 
 void CursesUI::printSequenceList(unsigned int first) {
-	const std::vector<Sequence*>& list = sequencer.getListOfRegisteredSequences();
-	unsigned int i = 0;
-	printTitle("Registered sequences", sequenceListStart);
-	for(auto entry : list) {
-		mvprintw(sequenceListStart + 1 + i, 1, "%i. %s (%p)", i, entry->getName().c_str(), entry);
-		i++;
-	}
+// 	const std::vector<Sequence<>*>& list = sequencer.getListOfRegisteredSequences();
+// 	unsigned int i = 0;
+// 	printTitle("Registered sequences", sequenceListStart);
+// 	for(auto entry : list) {
+// 		mvprintw(sequenceListStart + 1 + i, 1, "%i. %s (%p)", i, entry->getName().c_str(), entry);
+// 		i++;
+// 	}
 }
 
 void CursesUI::printStatus() {
 	printTitle("Status", statusStart);
 	mvprintw(statusStart + 1, 1, "State:");
-	Sequencer::State s = sequencer.getState();
+	state::type s = sequencer.getState();
 	switch(s) {
-		case Sequencer::executing:
+		case state::executing:
 			mvprintw(statusStart + 1, 9, "executing  ");
 			break;
-		case Sequencer::waiting:
+		case state::waiting:
 			mvprintw(statusStart + 1, 9, "waiting    ");
 			break;
-		case Sequencer::terminating:
+		case state::terminating:
 			mvprintw(statusStart + 1, 9, "terminating");
 			break;
-		case Sequencer::terminated:
+		case state::terminated:
 			mvprintw(statusStart + 1, 9, "terminated ");
 			break;
-		case Sequencer::idle:
+		case state::idle:
 			mvprintw(statusStart + 1, 9, "idle       ");
 			break;
 		default:
@@ -122,12 +123,12 @@ void CursesUI::printStatus() {
 	}
 	
 	mvprintw(statusStart + 1, COLS / 2 + 1, "Mode:");
-	Sequencer::Mode m = sequencer.getMode();
+	mode::type m = sequencer.getMode();
 	switch(m) {
-		case Sequencer::automatic:
+		case mode::automatic:
 			mvprintw(statusStart + 1, COLS / 2 + 7, "automatic   ");
 			break;
-		case Sequencer::stepping:
+		case mode::stepping:
 			mvprintw(statusStart + 1, COLS / 2 + 7, "stepping    ");
 			break;
 		default:
@@ -135,10 +136,10 @@ void CursesUI::printStatus() {
 			break;
 	}
 	
-	mvprintw(statusStart + 2, 1, "Current Sequence:");
-	const Sequence* cs = sequencer.getCurrentSequence();
-	move(statusStart + 2, 19); clrtoeol();
-	if(cs != nullptr) addstr(cs->getName().c_str());
+// 	mvprintw(statusStart + 2, 1, "Current Sequence:");
+// 	const Sequence<>* cs = sequencer.getCurrentSequence();
+// 	move(statusStart + 2, 19); clrtoeol();
+// 	if(cs != nullptr) addstr(cs->getName().c_str());
 //	printw("%p", cs);
 	
 }
@@ -233,7 +234,7 @@ void CursesUI::run() {
 				echo();
 				mvgetstr(LINES - 1, 24, input);
 				mvprintw(LINES - 1, COLS / 2, "You entered: %i", atoi(input));
-				sequencer.start(atoi(input));
+//				sequencer.start(atoi(input));
 				cbreak();
 				noecho();
 				timeout(INPUT_TIMEOUT);
@@ -242,7 +243,7 @@ void CursesUI::run() {
 			case KEY_F(10):
 				sequencer.stepMode();
 				sequencer.abort();
-				while(sequencer.getState() != Sequencer::idle);
+				while(sequencer.getState() != state::idle);
 				sequencer.shutdown();
 				exit();
 				break;
@@ -261,17 +262,17 @@ void CursesUI::run() {
 }
 
 bool CursesUI::checkCmdToggleIsActive() {
-	return sequencer.getState() == Sequencer::executing || sequencer.getState() == Sequencer::waiting;
+	return sequencer.getState() == state::executing || sequencer.getState() == state::waiting;
 }
 
 bool CursesUI::checkCmdAbortIsActive() {
-	return sequencer.getState() == Sequencer::executing || sequencer.getState() == Sequencer::waiting;
+	return sequencer.getState() == state::executing || sequencer.getState() == state::waiting;
 }
 
 bool CursesUI::checkCmdProceedIsActive() {
-	return sequencer.getState() == Sequencer::waiting && sequencer.getMode() == Sequencer::stepping;
+	return sequencer.getState() == state::waiting && sequencer.getMode() == mode::stepping;
 }
 
 bool CursesUI::checkCmdChooseSeqIsActive() {
-	return sequencer.getState() == Sequencer::idle && sequencer.getMode() == Sequencer::stepping;
+	return sequencer.getState() == state::idle && sequencer.getMode() == mode::stepping;
 }

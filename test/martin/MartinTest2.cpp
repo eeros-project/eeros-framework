@@ -10,28 +10,41 @@ using namespace eeros::sequencer;
 using namespace eeros::logger;
 using namespace eeros::ui;
 
-class ExampleSequence : public Sequence {
+class DetectSequence : public Sequence<bool, int> {
 public:
-	ExampleSequence(std::string name, Sequence* nextSequence = nullptr) : Sequence(name), counter(0), next(nextSequence) {
+	DetectSequence(std::string name, Sequencer* sequencer) : Sequence<bool, int>(name, sequencer) { }
+		
+	virtual bool checkPreCondition() {
+		return false;
+	}
+		
+	bool run(int x) {
+		log.trace() << "Sequence '" << getName() << "': x = " << x;
+		sleep(1);
+		return x % 2;
+	}
+};
+
+class MainSequence : public Sequence<> {
+public:
+	MainSequence(std::string name, Sequencer* sequencer) : Sequence<>(name, sequencer), counter(0), detect("detect", sequencer) {
 		log.trace() << "Creating new sequence '" << name << "'...";
+	}
 		
-		addStep([&]() {
-			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
-			sleep(1);
-		});
+	void run() {
+		log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
+		sleep(1);
+		yield();
 		
-		addStep([&]() {
-			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
-			sleep(1);
-// 			std::cout << "next pointer: " << this->next << std::endl;
-			if(this->next != nullptr) call(this->next);
-		});
+		log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
+		sleep(1);
+		auto res = detect(counter + 1);
+		log.trace() << "Sequence '" << getName() << "': calling subsequence: " << res.value << "/" << res.result;
+		yield();
 		
-		addStep([&]() {
-			log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
-			sleep(1);
-		});
-		
+		log.trace() << "Sequence '" << getName() << "': " << "Step " << counter++;
+		sleep(1);
+		yield();
 	}
 	
 	void init() {
@@ -48,8 +61,10 @@ public:
 
 private:
 	int counter;
-	Sequence* next;
+	Sequence<>* next;
+	DetectSequence detect;
 };
+
 
 int main() {
 	// Create and initialize logger
@@ -60,25 +75,16 @@ int main() {
 	
 	log.info() << "Martin Test 2 started...";
 	
-	ExampleSequence subSeqB("Sub Sequence B");
-	ExampleSequence subSeqA("Sub Sequence A", &subSeqB);
-	ExampleSequence mainSeq("Main Sequence", &subSeqA);
 	Sequencer sequencer;
 	CursesUI ui(sequencer);
-	sequencer.registerSequence(&mainSeq);
-	sequencer.registerSequence(&subSeqA);
-	sequencer.registerSequence(&subSeqB);
-	
-// 	log.trace() << "main sequence:  " << reinterpret_cast<long>(&mainSeq);
-// 	log.trace() << "sub sequence A: " << reinterpret_cast<long>(&subSeqA);
-// 	log.trace() << "sub sequence B: " << reinterpret_cast<long>(&subSeqB);
-	
 	ui.dispay();
+	
+	MainSequence mainSeq("Main Sequence", &sequencer);
+	
 	sequencer.stepMode();
 	sequencer.start(&mainSeq);
 	
 	sequencer.join();
-	ui.exit();
-	
+
 	log.info() << "Martin Test 2 finished...";
 }

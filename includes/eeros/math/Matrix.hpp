@@ -848,6 +848,9 @@ namespace eeros {
 		typedef Matrix<3,1> Vector3;
 		typedef Matrix<4,1> Vector4;
 		
+		template < unsigned int M, typename T = double >
+		using Vector = Matrix<M, 1, T>;
+		
 		/********** Specialization for a 1x1 matrix **********/
 		
 		template < typename T >

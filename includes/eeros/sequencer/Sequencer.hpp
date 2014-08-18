@@ -5,35 +5,39 @@
 #include <atomic>
 #include <vector>
 #include <eeros/core/Thread.hpp>
-#include <eeros/sequencer/Sequence.hpp>
+#include <mutex>
+#include <condition_variable>
+//#include <eeros/sequencer/Sequence.hpp>
 
 namespace eeros {
 	namespace sequencer {
-
+		
+		namespace state {
+			enum type { executing, waiting, terminating, terminated, idle };
+		}
+		
+		namespace mode {
+			enum type { automatic, stepping };
+		}
+		
+		template < typename Treturn, typename ... Targs >
+		class Sequence;
+		
 		class Sequencer : public Thread {
 		public:
 			
-			enum State { executing, waiting, terminating, terminated, idle };
-			enum Mode { automatic, stepping };
-			
-			Sequencer(Sequence* startSequence = nullptr);
-			Sequencer(Sequence& startSequence);
-			
-			virtual bool registerSequence(Sequence* sequence);
-			virtual bool isRegistered(const Sequence* sequence) const;
-			virtual const std::vector<Sequence*>& getListOfRegisteredSequences();
-			virtual const Sequence* getCurrentSequence() const;
+			Sequencer();
 			
 			virtual void start();
-			virtual void start(Sequence* sequence);
-			virtual void start(unsigned int index);
-			virtual void stepMode(bool on = true);
-			virtual void toggleMode();
+			virtual void start(Sequence<void>* sequence);
 			virtual void shutdown();
 			
+			virtual void stepMode(bool on = true);
+			virtual void toggleMode();
+			
 			virtual std::string getName() const;
-			virtual State getState() const;
-			virtual Mode getMode() const;
+			virtual state::type getState() const;
+			virtual mode::type getMode() const;
 		
 			virtual void yield();
 			virtual void proceed();
@@ -43,18 +47,18 @@ namespace eeros {
 			virtual void run();
 			
 		private:
+			std::atomic<Sequence<void>*> currentSequence;
 			unsigned int id;
-			std::vector<Sequence*> sequences;
-			std::atomic<Sequence*> currentSequence;
-			std::atomic<State> state;
-			std::atomic<Mode> mode;
+			std::atomic<state::type> state;
+			std::atomic<mode::type> mode;
+			std::atomic<bool> abortSequence;
 			std::mutex mtx;
 			std::condition_variable cv;
 			bool go;
 			
 			static int instanceCounter;
 			
-		}; // class Sequence
+		}; // class Sequencer
 	}; // namespace sequencer
 }; // namespace eeros
 

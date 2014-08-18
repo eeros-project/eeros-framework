@@ -30,8 +30,8 @@ namespace eeros {
 		private:
 			eeros::logger::UILogWriter log;
 			eeros::sequencer::Sequencer& sequencer;
-			eeros::sequencer::Sequencer::State cachedState;
-			eeros::sequencer::Sequencer::Mode cachedMode;
+			eeros::sequencer::state::type cachedState;
+			eeros::sequencer::mode::type cachedMode;
 			std::atomic<State> state;
 			unsigned int headerStart;
 			unsigned int sequenceListStart;
