@@ -6,6 +6,7 @@
 
 #include <thread>
 #include <functional>
+#include <string>
 
 namespace eeros {
 	
@@ -16,7 +17,7 @@ namespace eeros {
 		Thread(std::function<void ()> t);
 		virtual ~Thread();
 		
-		virtual std::thread::id getId() const;
+		virtual std::string getId() const;
 		virtual void join();
 		
 	protected:

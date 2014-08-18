@@ -13,14 +13,14 @@ namespace eeros
 		{
 		public:
 			StreamLogWriter(std::ostream& out);
-
+			
 			virtual void show(unsigned level = ~0);
-
+			
 			virtual void begin(unsigned level, unsigned category);
 			virtual void end();
-
+			
 			virtual void endl();
-
+			
 			virtual LogWriter& operator<<(int value);
 			virtual LogWriter& operator<<(unsigned int value);
 			virtual LogWriter& operator<<(long value);
@@ -28,7 +28,7 @@ namespace eeros
 			virtual LogWriter& operator<<(const std::string& value);
 			virtual LogWriter& operator<<(std::ostream& os);
 			virtual LogWriter& operator<<(void (*f)(LogWriter&));
-
+			
 		private:
 			Mutex mutex;
 			Lock lock;

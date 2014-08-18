@@ -11,14 +11,14 @@ namespace eeros {
 		class Frame {
 		public:
 			Frame(const CoordinateSystem& a, const CoordinateSystem& b);
-			Frame(const CoordinateSystem& a, const CoordinateSystem& b, eeros::math::Matrix<4, 4, double> T);
-			Frame(const CoordinateSystem& a, const CoordinateSystem& b, eeros::math::Matrix<3, 3, double> R, eeros::math::Matrix<3, 1, double> r);
+			Frame(const CoordinateSystem& a, const CoordinateSystem& b, const eeros::math::Matrix<4, 4, double>& T);
+			Frame(const CoordinateSystem& a, const CoordinateSystem& b, const eeros::math::Matrix<3, 3, double>& R, const eeros::math::Matrix<3, 1, double>& r);
 			virtual ~Frame();
 			
 			Frame operator*(const Frame& right) const;
 			
-			void set(eeros::math::Matrix<4, 4, double> T);
-			void set(eeros::math::Matrix<3, 3, double> R, eeros::math::Matrix<3, 1, double> r);
+			void set(const eeros::math::Matrix<4, 4, double>& T);
+			void set(const eeros::math::Matrix<3, 3, double>& R, const eeros::math::Matrix<3, 1, double>& r);
 			eeros::math::Matrix<4, 4, double> get() const;
 			const CoordinateSystem& getFromCoordinateSystem() const;
 			const CoordinateSystem& getToCoordinateSystem() const;

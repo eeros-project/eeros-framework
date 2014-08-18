@@ -20,7 +20,7 @@ namespace eeros {
 			}
 
 			virtual void run() {
-				T sum = 0;
+				T sum; sum = 0; // TODO works only with primitive types or eeros::math::Matrix -> make specialization and use fill() for compatibility with std::array;
 				for(uint8_t i = 0; i < N; i++) {
 					if(negated[i]) sum -= in[i].getSignal().getValue();
 					else sum += in[i].getSignal().getValue();

@@ -7,14 +7,12 @@ namespace eeros {
 
 	class System {
 	public:
-		System();
-		virtual ~System();
-
+		static double getClockResolution();
 		static double getTime();
 		static uint64_t getTimeNs();
 		
 	private:
-		static uint64_t timeoffset;
+		System();
 	};
 
 };

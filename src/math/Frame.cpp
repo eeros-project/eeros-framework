@@ -16,7 +16,7 @@ Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b) : a(a), b(b) 
 	list.push_back(this);
 }
 
-Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b, eeros::math::Matrix<4, 4, double> T) : a(a), b(b), T(T) {
+Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b, const eeros::math::Matrix<4, 4, double>& T) : a(a), b(b), T(T) {
 	if(getFrame(a, b) != nullptr) {
 		std::stringstream msg;
 		msg << "Frame with a = '" << a << "' and b = '" << b << "' exists already!";
@@ -25,7 +25,7 @@ Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b, eeros::math::
 	list.push_back(this);
 }
 
-Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b, eeros::math::Matrix<3, 3, double> R, eeros::math::Matrix<3, 1, double> r) : a(a), b(b) {
+Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b, const eeros::math::Matrix<3, 3, double>& R, const eeros::math::Matrix<3, 1, double>& r) : a(a), b(b) {
 	set(R, r);
 	if(getFrame(a, b) != nullptr) {
 		std::stringstream msg;
@@ -39,11 +39,11 @@ Frame::~Frame() {
 	list.remove(this);
 }
 
-void Frame::set(eeros::math::Matrix<4, 4, double> T) {
+void Frame::set(const eeros::math::Matrix<4, 4, double>& T) {
 	this->T = T;
 }
 
-void Frame::set(eeros::math::Matrix<3, 3, double> R, eeros::math::Matrix<3, 1, double> r) {
+void Frame::set(const eeros::math::Matrix<3, 3, double>& R, const eeros::math::Matrix<3, 1, double>& r) {
 	for(int n = 0; n < 3; n++) {
 		for(int m = 0; m < 3; m++) {
 			T(m, n) = R(m,n);

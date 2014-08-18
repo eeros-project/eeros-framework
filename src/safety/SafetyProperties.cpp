@@ -1,6 +1,8 @@
 #include <eeros/safety/SafetyProperties.hpp>
 #include <eeros/core/EEROSException.hpp>
 
+#include <sstream>
+
 namespace eeros {
 	namespace safety {
 
@@ -16,7 +18,9 @@ namespace eeros {
 			for(auto& l : levels) {
 				if(l.getId() == levelId) return l;
 			}
-			throw EEROSException("level not defined"); // TODO define error number and send error message to logger 
+			std::stringstream msg;
+			msg << "safety level with id '" << levelId << "' not defined!";
+			throw EEROSException(msg.str());
 		}
 		
 		SafetyLevel* SafetyProperties::entryLevelPtr() {

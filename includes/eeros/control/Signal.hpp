@@ -43,7 +43,7 @@ namespace eeros {
 				return name; // TODO
 			}
 			
-			virtual T getValue() const { // TODO better return a reference?
+			virtual T getValue() const {
 				return value;
 			}
 			
@@ -65,7 +65,7 @@ namespace eeros {
 			}
 			
 			virtual void clear() {
-				value = 0;
+				_clear<T>();
 			}
 			
 			Signal<T>& operator= (Signal<T> right) {
@@ -105,6 +105,14 @@ namespace eeros {
 			std::string name;
 		
 		private:
+			template <typename S> typename std::enable_if<std::is_arithmetic<S>::value>::type _clear() {
+				value = 0;
+			}
+			
+			template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value>::type _clear() {
+				value.fill(0);
+			}
+			
 			static std::list<SignalInterface*> signalList;
 			static uint16_t signalCounter;
 			static Signal<T> illegalSignal;

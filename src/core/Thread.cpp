@@ -1,4 +1,5 @@
 #include <eeros/core/Thread.hpp>
+#include <sstream>
 
 using namespace eeros;
 
@@ -14,8 +15,10 @@ Thread::~Thread() {
 	join();
 }
 
-std::thread::id Thread::getId() const {
-	return t.get_id();
+std::string Thread::getId() const {
+	std::ostringstream s;
+	s << t.get_id();
+	return s.str();
 }
 
 void Thread::join() {
