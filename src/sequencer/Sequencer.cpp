@@ -59,6 +59,16 @@ void Sequencer::start(Sequence<>* sequence) {
 	}
 }
 
+void Sequencer::start(unsigned int cmdSequenceIndex) {
+	if(cmdSequenceIndex < cmdSequences.size()) {
+		currentSequence = cmdSequences[cmdSequenceIndex];
+		start();
+	}
+	else {
+		log.error() << "Sequencer " << getName() << " failed to start: illegal index!";
+	}
+}
+
 void Sequencer::shutdown() {
 	state = state::terminating;
 }
@@ -124,4 +134,12 @@ mode::type Sequencer::getMode() const {
 
 std::string Sequencer::getName() const {
 	return std::to_string(id);
+}
+
+void Sequencer::addCmdSequence(Sequence<void>* sequence) {
+	cmdSequences.push_back(sequence);
+}
+
+const std::vector<Sequence<void>*>& Sequencer::getListOfCmdSequences() {
+	return cmdSequences;
 }

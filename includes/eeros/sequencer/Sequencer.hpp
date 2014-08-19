@@ -4,10 +4,9 @@
 #include <string>
 #include <atomic>
 #include <vector>
-#include <eeros/core/Thread.hpp>
 #include <mutex>
 #include <condition_variable>
-//#include <eeros/sequencer/Sequence.hpp>
+#include <eeros/core/Thread.hpp>
 
 namespace eeros {
 	namespace sequencer {
@@ -20,6 +19,7 @@ namespace eeros {
 			enum type { automatic, stepping };
 		}
 		
+		// Forward declarations
 		template < typename Treturn, typename ... Targs >
 		class Sequence;
 		
@@ -30,6 +30,7 @@ namespace eeros {
 			
 			virtual void start();
 			virtual void start(Sequence<void>* sequence);
+			virtual void start(unsigned int cmdSequenceIndex);
 			virtual void shutdown();
 			
 			virtual void stepMode(bool on = true);
@@ -43,10 +44,14 @@ namespace eeros {
 			virtual void proceed();
 			virtual void abort();
 			
+			virtual void addCmdSequence(Sequence<void>* seq);
+			virtual const std::vector<Sequence<void>*>& getListOfCmdSequences();
+			
 		protected:
 			virtual void run();
 			
 		private:
+			std::vector<Sequence<void>*> cmdSequences;
 			std::atomic<Sequence<void>*> currentSequence;
 			unsigned int id;
 			std::atomic<state::type> state;

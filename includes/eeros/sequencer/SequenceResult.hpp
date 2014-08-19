@@ -13,7 +13,7 @@ namespace eeros {
 			result::type result;
 		};
 		
-		template < typename Treturn >
+		template<typename Treturn>
 		class SequenceResult : public SequenceBaseResult {
 		public:
 			SequenceResult(result::type result) : SequenceBaseResult(result) { }
@@ -23,7 +23,7 @@ namespace eeros {
 			Treturn value;
 		};
 		
-		template < >
+		template<>
 		class SequenceResult<void> : public SequenceBaseResult {
 		public:
 			SequenceResult(result::type result) : SequenceBaseResult(result) { }

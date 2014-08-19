@@ -1,5 +1,6 @@
 #include <eeros/ui/CursesUI.hpp>
 #include <eeros/core/EEROSException.hpp>
+#include <eeros/sequencer/Sequence.hpp>
 #include <curses.h>
 #include <sstream>
 #include <thread>
@@ -88,13 +89,13 @@ void CursesUI::printTitle(std::string text, unsigned int line) {
 }
 
 void CursesUI::printSequenceList(unsigned int first) {
-// 	const std::vector<Sequence<>*>& list = sequencer.getListOfRegisteredSequences();
-// 	unsigned int i = 0;
-// 	printTitle("Registered sequences", sequenceListStart);
-// 	for(auto entry : list) {
-// 		mvprintw(sequenceListStart + 1 + i, 1, "%i. %s (%p)", i, entry->getName().c_str(), entry);
-// 		i++;
-// 	}
+	const std::vector<Sequence<void>*>& list = sequencer.getListOfCmdSequences();
+	unsigned int i = 0;
+	printTitle("Registered sequences", sequenceListStart);
+	for(auto entry : list) {
+		mvprintw(sequenceListStart + 1 + i, 1, "%i. %s (%p)", i, entry->getName().c_str(), entry);
+		i++;
+	}
 }
 
 void CursesUI::printStatus() {
@@ -234,7 +235,7 @@ void CursesUI::run() {
 				echo();
 				mvgetstr(LINES - 1, 24, input);
 				mvprintw(LINES - 1, COLS / 2, "You entered: %i", atoi(input));
-//				sequencer.start(atoi(input));
+				sequencer.start(atoi(input));
 				cbreak();
 				noecho();
 				timeout(INPUT_TIMEOUT);
