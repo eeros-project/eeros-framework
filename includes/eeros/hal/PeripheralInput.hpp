@@ -8,7 +8,7 @@ namespace eeros {
 		class PeripheralInputInterface {
 		public:
 			virtual ~PeripheralInputInterface() { }
-			virtual std::string getId() = 0;
+			virtual std::string getId() const = 0;
 		};
 
 		template <typename T>
@@ -16,8 +16,8 @@ namespace eeros {
 		public:
 			explicit PeripheralInput(std::string id) : id(id) { }
 			virtual ~PeripheralInput() { }
-			virtual inline std::string getId() { return id; }
-			virtual T get() = 0;
+			virtual inline std::string getId() const { return id; }
+			virtual T get() const = 0;
 		private:
 			std::string id;
 		};

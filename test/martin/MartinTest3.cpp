@@ -3,9 +3,28 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/math/CoordinateSystem.hpp>
 #include <eeros/math/Frame.hpp>
+#include <eeros/safety/SafetyProperties.hpp>
 
 using namespace eeros::logger;
 using namespace eeros::math;
+
+class SafetyProp : public eeros::safety::SafetyProperties {
+	public:
+		
+		enum { off = 0, temp = 10 };
+		enum { doSomething };
+		
+		SafetyProp() {
+			levels = {
+				{ off,  "OFF"  } ,
+				{ temp, "TEMP" }
+			};
+			
+			level(off).addEvent(doSomething, temp, eeros::safety::kPublicEvent);
+			
+		}
+	
+};
 
 int main() {
 	// Create and initialize logger
@@ -47,7 +66,7 @@ int main() {
 	
 	if(Frame::getFrame(a, b) == nullptr) log.error() << "Error: Frame(a, b) not found!";
 	
-	
+	SafetyProp sp;
 	
 	log.info() << "Martin Test 3 finished...";
 }

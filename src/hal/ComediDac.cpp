@@ -16,7 +16,7 @@ ComediDac::ComediDac(std::string id,
 	this->maxValue = 65535; // default 16bit
 }
 
-double ComediDac::get() {
+double ComediDac::get() const {
 	lsampl_t data = 0;
 	comedi_data_read(deviceHandle, subDeviceNumber, channel, 0, AREF_GROUND, &data);
 	return (static_cast<int>(data) - offset) / scale;

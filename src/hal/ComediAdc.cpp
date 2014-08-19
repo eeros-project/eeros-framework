@@ -13,7 +13,7 @@ ComediAdc::ComediAdc(std::string id,
 	this->channel = channel;
 }
 
-double ComediAdc::get() {
+double ComediAdc::get() const {
 	lsampl_t data = 0;
 	comedi_data_read(deviceHandle, subDeviceNumber, channel, 0, AREF_GROUND, &data);
 	return static_cast<int>(data) * scale + offset;

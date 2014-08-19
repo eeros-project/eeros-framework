@@ -4,7 +4,7 @@ using namespace eeros::hal;
 
 DummyRealOutput::DummyRealOutput(std::string id, double scale, double offset) : ScalablePeripheralOutput<double>(id, scale, offset) { }
 
-double DummyRealOutput::get() {
+double DummyRealOutput::get() const {
 	return 0;
 }
 

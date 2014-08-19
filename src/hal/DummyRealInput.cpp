@@ -4,6 +4,6 @@ using namespace eeros::hal;
 
 DummyRealInput::DummyRealInput(std::string id, double scale, double offset) : ScalablePeripheralInput<double>(id, scale, offset) { }
 
-double DummyRealInput::get() {
+double DummyRealInput::get() const {
 	return 0;
 }

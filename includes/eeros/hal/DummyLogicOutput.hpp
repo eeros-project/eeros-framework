@@ -10,7 +10,7 @@ namespace eeros {
 		class DummyLogicOutput : public PeripheralOutput<bool> {
 		public:
 			DummyLogicOutput(std::string id);
-			virtual bool get();
+			virtual bool get() const;
 			virtual void set(bool value);
 		};
 

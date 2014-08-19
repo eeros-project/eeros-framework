@@ -40,7 +40,7 @@ ComediFqd::ComediFqd(std::string id,
 	comedi_arm(deviceHandle, subDeviceNumber, NI_GPCT_ARM_IMMEDIATE);
 }
 
-double ComediFqd::get() {
+double ComediFqd::get() const {
 	lsampl_t data = 0;
 	comedi_data_read(deviceHandle, subDeviceNumber, 0, 0, 0, &data);
 	return static_cast<int>(data) * scale + offset;
