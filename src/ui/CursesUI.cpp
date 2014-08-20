@@ -6,11 +6,7 @@
 #include <thread>
 #include <chrono>
 
-#define INPUT_TIMEOUT 100
-#define MAX_NOF_COMMANDS 6
-#define HEADER_LINES 3
-#define FOOTER_LINES 2
-#define STATUS_LINES 4
+
 
 using namespace eeros;
 using namespace eeros::sequencer;
@@ -22,7 +18,7 @@ void closeUI() {
 	endwin();
 }
 
-CursesUI::CursesUI(Sequencer& sequencer) : sequencer(sequencer), state(idle), log(this) {
+CursesUI::CursesUI(Sequencer& sequencer) : sequencer(sequencer), state(idle) {
 	if(++instanceCounter > 1) {
 		throw EEROSException("Only a single user interface can exist at the same time!");
 	}
@@ -44,10 +40,6 @@ void CursesUI::exit() {
 	clear();
 	refresh();
 	closeUI();
-}
-
-void CursesUI::addMessage(unsigned level, std::string message) {
-	// TODO
 }
 
 void CursesUI::printHeader() {
@@ -91,10 +83,23 @@ void CursesUI::printTitle(std::string text, unsigned int line) {
 void CursesUI::printSequenceList(unsigned int first) {
 	const std::vector<Sequence<void>*>& list = sequencer.getListOfCmdSequences();
 	unsigned int i = 0;
-	printTitle("Registered sequences", sequenceListStart);
+	printTitle("Command sequences", sequenceListStart);
 	for(auto entry : list) {
-		mvprintw(sequenceListStart + 1 + i, 1, "%i. %s (%p)", i, entry->getName().c_str(), entry);
+		mvprintw(sequenceListStart + 1 + i, 1, "%i) %s", i, entry->getName().c_str());
 		i++;
+	}
+}
+
+void CursesUI::printMessage(std::string msg, unsigned int index) {
+	int line = messageListStart + 1 + index;
+	mvprintw(line, 1, msg.c_str());
+}
+
+void CursesUI::printMessageList() {
+	printTitle("Messages", messageListStart);
+	int i = 0;
+	for(auto msg : messageList) {
+		printMessage(msg, i++);
 	}
 }
 
@@ -167,13 +172,12 @@ void CursesUI::printCommand(std::string cmd, std::string description, bool activ
 }
 
 void CursesUI::updateScreen() {
-//	static unsigned int x = 0;
 	printHeader();
 	printSequenceList(0);
+	printMessageList();
 	printStatus();
 	printCommandList();
 	printFooter("");
-//	mvprintw(LINES - 1, 1, "x = %u", x++);
 	refresh();
 }
 
@@ -200,6 +204,7 @@ void CursesUI::initScreen() {
 	sequenceListStart = HEADER_LINES + 1;
 	commandListStart = footerStart - MAX_NOF_COMMANDS / 2 - 1;
 	statusStart = commandListStart - STATUS_LINES;
+	messageListStart = statusStart - MESSAGE_LINES;
 }
 
 void CursesUI::run() {
@@ -229,16 +234,9 @@ void CursesUI::run() {
 				updateScreen();
 				break;
 			case KEY_F(5):
-				printFooter("Enter sequence number:");
-				nocbreak();
-				timeout(-1);
-				echo();
-				mvgetstr(LINES - 1, 24, input);
-				mvprintw(LINES - 1, COLS / 2, "You entered: %i", atoi(input));
-				sequencer.start(atoi(input));
-				cbreak();
-				noecho();
-				timeout(INPUT_TIMEOUT);
+				if(checkCmdChooseSeqIsActive()){
+					while(!sequencer.start(promptForInt("Enter sequence number:")));
+				}
 				break;
 			case 27: // Esc
 			case KEY_F(10):
@@ -249,10 +247,11 @@ void CursesUI::run() {
 				exit();
 				break;
 			default:
-				if(sequencer.getState() != cachedState || sequencer.getMode() != cachedMode) {
+				if(sequencer.getState() != cachedState || sequencer.getMode() != cachedMode || messageListUpdated) {
 					updateScreen();
 					cachedState = sequencer.getState();
 					cachedMode = sequencer.getMode();
+					messageListUpdated = false;
 				}
 				break;
 		}
@@ -277,3 +276,33 @@ bool CursesUI::checkCmdProceedIsActive() {
 bool CursesUI::checkCmdChooseSeqIsActive() {
 	return sequencer.getState() == state::idle && sequencer.getMode() == mode::stepping;
 }
+
+void CursesUI::addMessage(std::string message) {
+	messageList.push_back(message);
+	if(messageList.size() > MESSAGE_LINES - 1) {
+		messageList.pop_front();
+	}
+	messageListUpdated = true;
+}
+
+int CursesUI::promptForInt(std::string message) {
+	char input[10];
+	printFooter(message);
+	nocbreak();
+	timeout(-1);
+	echo();
+	mvgetstr(LINES - 1, message.size() + 2, input);
+	cbreak();
+	noecho();
+	timeout(INPUT_TIMEOUT);
+	printFooter("");
+	return atoi(input);
+}
+
+// double CursesUI::promptForDouble(std::string message) {
+// 	
+// }
+// 
+// bool CursesUI::promptConfirm(std::string message) {
+// 	
+// }

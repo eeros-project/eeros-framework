@@ -28,9 +28,9 @@ namespace eeros {
 			
 			Sequencer();
 			
-			virtual void start();
-			virtual void start(Sequence<void>* sequence);
-			virtual void start(unsigned int cmdSequenceIndex);
+			virtual bool start();
+			virtual bool start(Sequence<void>* sequence);
+			virtual bool start(unsigned int cmdSequenceIndex);
 			virtual void shutdown();
 			
 			virtual void stepMode(bool on = true);

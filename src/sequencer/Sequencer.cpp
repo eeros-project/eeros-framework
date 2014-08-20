@@ -40,33 +40,31 @@ void Sequencer::run() {
 	log.trace() << "Sequencer " << getName() << " has stopped";
 }
 
-void Sequencer::start() {
+bool Sequencer::start() {
 	if(currentSequence != nullptr) {
 		state = state::executing;
+		return true;
 	}
-	else {
-		log.error() << "Sequencer " << getName() << " failed to start: no sequence specified!";
-	}
+	log.error() << "Sequencer " << getName() << " failed to start: no sequence specified!";
+	return false;
 }
 
-void Sequencer::start(Sequence<>* sequence) {
+bool Sequencer::start(Sequence<>* sequence) {
 	if(sequence != nullptr) {
 		currentSequence = sequence;
-		start();
+		return start();
 	}
-	else {
-		log.error() << "Sequencer " << getName() << " failed to start: sequence is null!";
-	}
+	log.error() << "Sequencer " << getName() << " failed to start: sequence is null!";
+	return false;
 }
 
-void Sequencer::start(unsigned int cmdSequenceIndex) {
+bool Sequencer::start(unsigned int cmdSequenceIndex) {
 	if(cmdSequenceIndex < cmdSequences.size()) {
 		currentSequence = cmdSequences[cmdSequenceIndex];
-		start();
+		return start();
 	}
-	else {
-		log.error() << "Sequencer " << getName() << " failed to start: illegal index!";
-	}
+	log.error() << "Sequencer " << getName() << " failed to start: illegal index!";
+	return false;
 }
 
 void Sequencer::shutdown() {
