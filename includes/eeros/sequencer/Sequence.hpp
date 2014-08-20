@@ -36,8 +36,6 @@ namespace eeros {
 			virtual void exit();
 			
 			eeros::logger::Logger<eeros::logger::LogWriter> log;
-			
-		private:
 			std::string name;
 			Sequencer* sequencer;
 		};
@@ -51,9 +49,13 @@ namespace eeros {
 			
 			SequenceResult<Treturn> operator()(Targs ... args) {
 				init();
-				if(!checkPreCondition()) return SequenceResult<Treturn>(result::fail);
+				yield();
+				if(!checkPreCondition()) return SequenceResult<Treturn>(result::preConditionFailure);
+				yield();
 				Treturn res = run(args...);
-				if(!checkPreCondition()) return SequenceResult<Treturn>(result::fail, res);
+				yield();
+				if(!checkPreCondition()) return SequenceResult<Treturn>(result::postConditionFailure, res);
+				yield();
 				exit();
 				return SequenceResult<Treturn>(result::success, res);
 			}
@@ -72,11 +74,11 @@ namespace eeros {
 			SequenceResult<void> operator()(Targs ... args) {
 				init();
 				yield();
-				if(!checkPreCondition()) return SequenceResult<void>(result::fail);
+				if(!checkPreCondition()) return SequenceResult<void>(result::preConditionFailure);
 				yield();
 				run(args...);
 				yield();
-				if(!checkPreCondition()) return SequenceResult<void>(result::fail);
+				if(!checkPreCondition()) return SequenceResult<void>(result::postConditionFailure);
 				yield();
 				exit();
 				return SequenceResult<void>(result::success);
@@ -97,11 +99,11 @@ namespace eeros {
 			SequenceResult<void> operator()() {
 				init();
 				yield();
-				if(!checkPreCondition()) return SequenceResult<void>(result::fail);
+				if(!checkPreCondition()) return SequenceResult<void>(result::preConditionFailure);
 				yield();
 				run();
 				yield();
-				if(!checkPreCondition()) return SequenceResult<void>(result::fail);
+				if(!checkPreCondition()) return SequenceResult<void>(result::postConditionFailure);
 				yield();
 				exit();
 				return SequenceResult<void>(result::success);

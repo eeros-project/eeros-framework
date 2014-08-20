@@ -4,7 +4,7 @@
 namespace eeros {
 	namespace sequencer {
 		namespace result {
-			enum type { fail, success };
+			enum type { preConditionFailure, postConditionFailure, success };
 		}
 		
 		class SequenceBaseResult {
@@ -27,7 +27,6 @@ namespace eeros {
 		class SequenceResult<void> : public SequenceBaseResult {
 		public:
 			SequenceResult(result::type result) : SequenceBaseResult(result) { }
-	
 		};
 		
 	}
