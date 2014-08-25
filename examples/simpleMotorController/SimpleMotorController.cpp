@@ -57,9 +57,9 @@ int main() {
 	SafetySystem safetySys(properties, 0.01);
 	
 	SequenceA mainSequence("Main Sequence", safetySys, controlSys, 3.14/5);
-	Sequencer sequencer("Example sequencer", mainSequence);
+	Sequencer sequencer(&mainSequence);
 	
-	while(!sequencer.done());
+	sequencer.join();
 	
 	sleep(100);
 	

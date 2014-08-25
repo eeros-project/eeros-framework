@@ -5,65 +5,113 @@
 #include <map>
 #include <functional>
 #include <vector>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
 
-#include <eeros/core/Runnable.hpp>
-#include <eeros/sequencer/SequenceException.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/LogWriter.hpp>
+#include <eeros/sequencer/Sequencer.hpp>
+#include <eeros/sequencer/SequenceResult.hpp>
 
 namespace eeros {
 	namespace sequencer {
-
-		enum SequenceState { kSequenceRunning, kSequenceFinished, kSequenceNotStarted, kSequenceException };
-		
-
-		class Sequence : public Runnable {
-		
+	
+		// Base class
+		class SequenceBase {
+			
+			friend class eeros::sequencer::Sequencer;
+			
 		public:
-			Sequence(std::string name);
-			virtual ~Sequence();
+			SequenceBase(std::string name, Sequencer* sequencer);
 			
-			virtual std::string getName();
-			
-			virtual int getState();
-			
-			virtual void run();
-			
-			virtual void init();
-			
+			virtual std::string getName() const;
 			virtual bool checkPreCondition();
-			
 			virtual bool checkPostCondition();
 			
+		protected:
+			virtual void yield();
+			
+			virtual void init();
 			virtual void exit();
 			
-			virtual void reset();
+			eeros::logger::Logger<eeros::logger::LogWriter> log;
+			std::string name;
+			Sequencer* sequencer;
+		};
+		
+		// Class template Sequence
+		template<typename Treturn = void, typename ... Targs>
+		class Sequence : public SequenceBase {
 			
-			void call(Sequence* sequence);
+		public:
+			Sequence(std::string name, Sequencer* sequencer) : SequenceBase(name, sequencer) { }
 			
-			template < typename T, typename ... Targs >
-			void call(T& sequence, Targs ... args) {
-				sequence.run(args...);
+			SequenceResult<Treturn> operator()(Targs ... args) {
+				init();
+				yield();
+				if(!checkPreCondition()) return SequenceResult<Treturn>(result::preConditionFailure);
+				yield();
+				Treturn res = run(args...);
+				yield();
+				if(!checkPreCondition()) return SequenceResult<Treturn>(result::postConditionFailure, res);
+				yield();
+				exit();
+				return SequenceResult<Treturn>(result::success, res);
 			}
 			
-			void start(Sequence* sequence);
+		protected:
+			virtual Treturn run(Targs... args) { }
+		};
+		
+		// Specializations for class template Sequence
+		template<typename ... Targs>
+		class Sequence<void, Targs...> : public SequenceBase {
 			
-			static Sequence* getSequence(std::string name);
+		public:
+			Sequence(std::string name, Sequencer* sequencer) : SequenceBase(name, sequencer) { }
+			
+			SequenceResult<void> operator()(Targs ... args) {
+				init();
+				yield();
+				if(!checkPreCondition()) return SequenceResult<void>(result::preConditionFailure);
+				yield();
+				run(args...);
+				yield();
+				if(!checkPreCondition()) return SequenceResult<void>(result::postConditionFailure);
+				yield();
+				exit();
+				return SequenceResult<void>(result::success);
+			}
 			
 		protected:
-			virtual void addStep(std::function<void(void)> action);
-			SequenceState state;
-			uint32_t currentStep;
-			std::string name;
-			std::vector<std::function<void(void)>> actionList;
-			uint32_t exceptionRetryCounter;
-			eeros::logger::Logger<eeros::logger::LogWriter> log;
+			virtual void run(Targs... args) { }
+		};
+		
+		template<>
+		class Sequence<void> : public SequenceBase {
 			
-		private:
-			static std::map<std::string, Sequence*> allSequences;
-
-		}; // class Sequence
-
+		public:
+			Sequence(std::string name, Sequencer* sequencer) : SequenceBase(name, sequencer) {
+				sequencer->addCmdSequence(this);
+			}
+			
+			SequenceResult<void> operator()() {
+				init();
+				yield();
+				if(!checkPreCondition()) return SequenceResult<void>(result::preConditionFailure);
+				yield();
+				run();
+				yield();
+				if(!checkPreCondition()) return SequenceResult<void>(result::postConditionFailure);
+				yield();
+				exit();
+				return SequenceResult<void>(result::success);
+			}
+			
+		protected:
+			virtual void run() { }
+		};
 	}; // namespace sequencer
 }; // namespace eeros
 

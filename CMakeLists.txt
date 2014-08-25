@@ -56,13 +56,10 @@ if("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
 			# TODO
 			set(PREEMPT_RT FALSE)
 			
-			# Check for libraries
-			if(NOT LIBFLINK)
-				CHECK_INCLUDE_FILES ("flinklib.h" LIBFLINK)
-			endif()
-			if(NOT LIBCOMEDI)
-				CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
-			endif()
+			# Check for additional libraries
+			CHECK_INCLUDE_FILES ("comedilib.h" LIBCOMEDI)
+			CHECK_INCLUDE_FILES ("flinklib.h" LIBFLINK)
+			CHECK_INCLUDE_FILES ("curses.h" LIBCURSES)
 			
 		elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD") # FreeBSD
 			set(FREEBSD TRUE)
@@ -97,6 +94,9 @@ if(LIBCOMEDI)
 endif()
 if(LIBFLINK)
 	SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
+endif()
+if(LIBCURSES)
+	SET(EXTERNAL_LIBS ${EXTERNAL_LIBS} ncurses)
 endif()
 
 ## Config include file

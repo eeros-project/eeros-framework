@@ -1,143 +1,26 @@
 #include <eeros/sequencer/Sequence.hpp>
-#include <eeros/sequencer/Sequencer.hpp>
-#include <eeros/core/EEROSException.hpp>
 
 using namespace eeros::sequencer;
-using namespace eeros::logger;
 
-std::map<std::string, Sequence*> Sequence::allSequences;
+SequenceBase::SequenceBase(std::string name, Sequencer* sequencer) : name(name), sequencer(sequencer) { }
 
-Sequence::Sequence(std::string name) : name(name) {
-	// reset sequence
-	reset();
-	
-	// add the sequence to the list with all sequences
-	if(!Sequence::allSequences.insert( {name, this} ).second) {
-		log.error() << "Sequence '" << name << "' already exists, please choose a unique name!";
-	}
-}
-
-Sequence::~Sequence() {
-	// remove the sequence from the list with all sequeces
-	Sequence::allSequences.erase(name);
-}
-
-std::string Sequence::getName(){
+std::string SequenceBase::getName() const {
 	return name;
 }
 
-int Sequence::getState() {
-    return state;
+bool SequenceBase::checkPreCondition() {
+	return true;
+}
+bool SequenceBase::checkPostCondition() {
+	return true;
 }
 
-void Sequence::run() {
-	try{
-		switch(state) {
-			case kSequenceFinished:
-				reset();
-				init();
-				break;
-			case kSequenceNotStarted:
-				init();
-				break;
-			case kSequenceException:
-				exceptionRetryCounter++;
-				break;
-			default:
-				log.error() << "Illegal sequence state '" << (int)state << "', resetting sequence!";
-				reset();
-				init();
-				break;
-		}
-		
-		while(!checkPreCondition()); // TODO add abort condition
-		
-		// execute action lambdas
-		while(currentStep < actionList.size()) {
-			actionList[currentStep]();
-			currentStep++;
-		}
-		
-		// check postcondition
-		if(!checkPostCondition()) throw -715; // TODO
-		
-		// cleanup and exit
-		exit();
-        
-	}
-	catch(SequenceException const &e) {
-		log.info() << e.what();
-		e.handle();
-		ExceptionReturnBehavior returnBehavior = e.getReturnBehavior();
-		
-		switch(returnBehavior) {
-			case kRepeatSequence:
-				reset();
-				break;
-			case kRepeatStep:
-				this->run();
-				break;
-			case kContinue:
-				currentStep++;
-				this->run();
-				break;
-			case kNewSequence:
-				state = kSequenceFinished;
-				call(e.getEnsuingSequence());
-				break;
-			default:
-				log.error() << "Illegal return behavior '" << (int)returnBehavior << "' in exception '" << e.what() << "'!";
-				break;
-		}
-	}
-	// TODO catch(EEROSException)
-	// TODO catch(std::exception)
-}
-
-void Sequence::init() {
-    
-}
-
-bool Sequence::checkPreCondition() {
-    return true;
-}
-
-bool Sequence::checkPostCondition() {
-    return true;
-}
-
-void Sequence::exit() {
-    
-}
-
-void Sequence::reset() {
-	state = kSequenceNotStarted;
-	currentStep = 0;
-	exceptionRetryCounter = 0;
-}
-
-void Sequence::call(Sequence* sequence) {
-	if(sequence != nullptr) {
-		sequence->run();
-	}
-	else {
-		log.warn() << "Call to NULL sequence ignored!" << endl;
+void SequenceBase::yield() {
+	if(sequencer != nullptr) {
+		sequencer->yield();
 	}
 }
 
-void Sequence::start(Sequence* sequence) {
-	if(sequence != nullptr) {
-		new Sequencer("parallelSequencer", *sequence); // TODO improve this!
-	}
-	else {
-		log.warn() << "Parallel start of NULL sequence ignored!" << endl;
-	}
-}
+void SequenceBase::init() { }
 
-void Sequence::addStep(std::function<void(void)> action) {
-	actionList.push_back(action);
-}
-
-Sequence* Sequence::getSequence(std::string name){
-	return Sequence::allSequences[name];
-}
+void SequenceBase::exit() { }

@@ -23,6 +23,7 @@ add_subdirectory(hal)
 add_subdirectory(sequencer)
 add_subdirectory(safety)
 add_subdirectory(logger)
+add_subdirectory(ui)
 
 link_directories(${EEROS_BINARY_DIR}/src/core)
 link_directories(${EEROS_BINARY_DIR}/src/control)

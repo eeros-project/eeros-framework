@@ -1,18 +1,16 @@
-#ifndef ORG_EEROS_LOGGER_STREAMLOGWRITER_HPP_
-#define ORG_EEROS_LOGGER_STREAMLOGWRITER_HPP_
+#ifndef ORG_EEROS_LOGGER_SYSLOGWRITER_HPP_
+#define ORG_EEROS_LOGGER_SYSLOGWRITER_HPP_
 
 #include <eeros/logger/LogWriter.hpp>
-#include <ostream>
+#include <sstream>
 #include <mutex>
 
-namespace eeros
-{
-	namespace logger
-	{
-		class StreamLogWriter : public LogWriter
-		{
+namespace eeros {
+	namespace logger {
+		class SysLogWriter : public LogWriter {
 		public:
-			StreamLogWriter(std::ostream& out);
+			SysLogWriter(const std::string name);
+			virtual ~SysLogWriter();
 			
 			virtual void show(unsigned level = ~0);
 			
@@ -30,14 +28,15 @@ namespace eeros
 			virtual LogWriter& operator<<(void (*f)(LogWriter&));
 			
 		private:
+			std::string name;
+			std::ostringstream out;
+			unsigned level;
 			std::mutex mtx;
 			std::unique_lock<std::mutex> lck;
-			std::ostream& out;
-			unsigned visible_level;
+			unsigned visibleLevel;
 			bool enabled;
-			bool colored;
 		};
 	}
 }
 
-#endif /* ORG_EEROS_LOGGER_STREAMLOGWRITER_HPP_ */
+#endif /* ORG_EEROS_LOGGER_SYSLOGWRITER_HPP_ */

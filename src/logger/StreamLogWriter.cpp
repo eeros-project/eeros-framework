@@ -104,6 +104,13 @@ LogWriter& StreamLogWriter::operator <<(unsigned int value) {
 	return *this;
 }
 
+LogWriter& StreamLogWriter::operator<<(long value) {
+	if(enabled)
+		out << value;
+	
+	return *this;
+}
+
 LogWriter& StreamLogWriter::operator <<(double value) {
 	if(enabled)
 		out << value;
