@@ -1,9 +1,9 @@
 #ifndef ORG_EEROS_LOGGER_STREAMLOGWRITER_HPP_
 #define ORG_EEROS_LOGGER_STREAMLOGWRITER_HPP_
 
-#include <eeros/core/Lock.hpp>
 #include <eeros/logger/LogWriter.hpp>
 #include <ostream>
+#include <mutex>
 
 namespace eeros
 {
@@ -29,8 +29,8 @@ namespace eeros
 			virtual LogWriter& operator <<(void (*f)(LogWriter&));
 
 		private:
-			Mutex mutex;
-			Lock lock;
+			std::mutex mtx;
+			std::unique_lock<std::mutex> lck;
 			std::ostream& out;
 			unsigned visible_level;
 			bool enabled;

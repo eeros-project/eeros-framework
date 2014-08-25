@@ -22,7 +22,7 @@ using namespace eeros::logger;
 #define COLOR_WHITE			"\033[01;37m"
 
 
-StreamLogWriter::StreamLogWriter(std::ostream& out) : out(out), visible_level(3), enabled(false), colored(true), lock(mutex) {
+StreamLogWriter::StreamLogWriter(std::ostream& out) : out(out), visible_level(3), enabled(false), colored(true), lck(mtx, std::defer_lock) {
 	// nothing to do
 }
 
@@ -32,7 +32,7 @@ void StreamLogWriter::begin(unsigned level, unsigned category) {
 	enabled = (level <= visible_level);
 	if(!enabled) return;
 	
-	lock.lock();
+	lck.lock();
 	
 	using namespace std;
 	
@@ -82,7 +82,7 @@ void StreamLogWriter::end() {
 	if(!enabled) return;
 	if(colored) out << COLOR_RESET;
 	out << std::endl;
-	lock.unlock();
+	lck.unlock();
 }
 
 void StreamLogWriter::endl() {
@@ -124,13 +124,6 @@ LogWriter& StreamLogWriter::operator <<(std::ostream& os) {
 	
 	return *this;
 }
-
-// LogWriter& StreamLogWriter::operator <<(const void* value) {
-// 	if(enabled)
-// 		out << value;
-// 	
-// 	return *this;
-// }
 
 LogWriter& StreamLogWriter::operator <<(void (*f)(LogWriter&)) {
 	if(enabled)
