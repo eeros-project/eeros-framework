@@ -1,11 +1,7 @@
 
-add_executable(ringbuffer RingBufferTest.cpp)
-target_link_libraries(ringbuffer eeros)
-add_test(core/ringbuffer ringbuffer)
-
-add_executable(ringbufferProcess RingBufferProcessTest.cpp)
-target_link_libraries(ringbufferProcess eeros)
-add_test(core/ringbuffer/process ringbufferProcess)
+add_executable(ringbufferTest RingBufferTest.cpp)
+target_link_libraries(ringbufferTest eeros)
+add_test(core/ringbuffer ringbufferTest)
 
 add_executable(threadTest ThreadTest.cpp)
 target_link_libraries(threadTest eeros)

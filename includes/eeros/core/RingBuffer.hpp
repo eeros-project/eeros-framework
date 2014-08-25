@@ -2,29 +2,42 @@
 #define ORG_EEROS_CORE_SIGNALBUFFER_HPP_
 
 #include <stdint.h>
+#include <array>
+#include <mutex>
 
 namespace eeros {
 
+	template<typename T, int N = 32>
 	class RingBuffer {
 	public:
-		RingBuffer(void* memory, uint32_t size);
+		RingBuffer() : tail(0), len(0) { }
 		
-		uint32_t read(void* pDest, uint32_t size);
-		uint32_t write(void* pSrc, uint32_t size);
-		uint32_t availableToRead() const;
-		uint32_t size() const;
-		void resetReader();
+		bool push(T v) {
+			std::lock_guard<std::mutex> lock(mtx);
+			if(len == N) return false;
+			items[(tail + len++) % N] = v;
+			return true;
+		}
 		
-
+		bool pop(T& v) {
+			std::lock_guard<std::mutex> lock(mtx);
+			if(len == 0) return false;
+			v = items[tail];
+			tail = (tail + 1) % N;
+			len--;
+			return true;
+		}
+		
+		unsigned int length() const { return len; }
+		
+		constexpr int size() const { return N; }
+		
 	private:
-		uint32_t ringSize;
-		uint32_t* pWriteIndex;
-			
-		char* ring;
-		char* pRead;
-		char* pWrite;
+		std::mutex mtx;
+		unsigned int tail; // points to the next readable item
+		unsigned int len;
+		T items[N];
 	};
-
 };
 
 #endif // ORG_EEROS_CORE_SIGNALBUFFER_HPP_

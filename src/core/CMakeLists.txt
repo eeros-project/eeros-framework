@@ -16,4 +16,5 @@ elseif(WINDOWS)
 endif()
 
 # Platform independent source files 
-add_eeros_sources(Thread.cpp PeriodicThread_Linux.cpp ContinualThread.cpp Executor.cpp RingBuffer.cpp EEROSException.cpp)
+add_eeros_sources(Thread.cpp PeriodicThread_Linux.cpp ContinualThread.cpp Executor.cpp EEROSException.cpp)
+#add_eeros_sources(Thread.cpp PeriodicThread_Linux.cpp ContinualThread.cpp Executor.cpp RingBuffer.cpp EEROSException.cpp)
