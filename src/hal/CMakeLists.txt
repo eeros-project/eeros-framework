@@ -9,5 +9,5 @@ if(LIBFLINK)
 endif()
 
 if(LINUX)
-	add_eeros_sources(LinuxDigOut.cpp)
+	add_eeros_sources(SysFsDigIn.cpp SysFsDigOut.cpp)
 endif()

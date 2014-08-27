@@ -2,7 +2,7 @@
 
 using namespace eeros::hal;
 
-FlinkAnalogIn::FlinkAnalogIn(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel) : PeripheralOutput<double>(id) {
+FlinkAnalogIn::FlinkAnalogIn(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel) : PeripheralInput<double>(id) {
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channel = channel;

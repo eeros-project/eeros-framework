@@ -3,13 +3,13 @@
 
 #include <string>
 #include <flinklib.h>
-#include <eeros/hal/PeripheralOutput.hpp>
+#include <eeros/hal/PeripheralInput.hpp>
 #include <eeros/hal/FlinkDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class FlinkAnalogIn : public PeripheralOutput<double> {
+		class FlinkAnalogIn : public PeripheralInput<double> {
 		public:
 			FlinkAnalogIn(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel);
 			virtual double get();

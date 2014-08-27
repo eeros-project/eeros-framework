@@ -2,7 +2,7 @@
 
 using namespace eeros::hal;
 
-FlinkDigIn::FlinkDigIn(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted) : PeripheralOutput<bool>(id) {
+FlinkDigIn::FlinkDigIn(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted) : PeripheralInput<bool>(id) {
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channel = channel;

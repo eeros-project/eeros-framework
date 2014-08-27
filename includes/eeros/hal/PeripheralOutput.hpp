@@ -2,6 +2,7 @@
 #define ORG_EEROS_HAL_PERIPHERALOUTPUT_HPP_
 
 #include <eeros/core/System.hpp>
+#include <string>
 
 namespace eeros {
 	namespace hal {
