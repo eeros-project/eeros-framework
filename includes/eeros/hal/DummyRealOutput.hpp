@@ -10,7 +10,7 @@ namespace eeros {
 		class DummyRealOutput : public ScalablePeripheralOutput<double> {
 		public:
 			DummyRealOutput(std::string id, double scale = 1, double offset = 0);
-			virtual double get() const;
+			virtual double get();
 			virtual void set(double value);
 		};
 

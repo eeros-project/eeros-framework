@@ -17,7 +17,7 @@ namespace eeros {
 			explicit PeripheralInput(std::string id) : id(id) { }
 			virtual ~PeripheralInput() { }
 			virtual inline std::string getId() const { return id; }
-			virtual T get() const = 0;
+			virtual T get() = 0;
 		private:
 			std::string id;
 		};

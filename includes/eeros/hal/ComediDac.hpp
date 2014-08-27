@@ -12,7 +12,7 @@ namespace eeros {
 		class ComediDac : public ScalablePeripheralOutput<double> {
 		public:
 			ComediDac(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0);
-			virtual double get() const;
+			virtual double get();
 			virtual void set(double value);
 			
 			void setVoltageRange(double minVoltage, double maxVoltage);

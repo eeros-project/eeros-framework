@@ -11,7 +11,7 @@ ComediDigOut::ComediDigOut(std::string id, ComediDevice* device, uint32_t subDev
 	comedi_dio_config(deviceHandle, subDeviceNumber, channel, COMEDI_OUTPUT);
 }
 
-bool ComediDigOut::get() const {
+bool ComediDigOut::get() {
 	lsampl_t data = 0;
 	bool value;
 	comedi_dio_read(deviceHandle, subDeviceNumber, channel, &data);

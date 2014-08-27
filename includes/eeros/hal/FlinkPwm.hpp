@@ -12,12 +12,17 @@ namespace eeros {
 		class FlinkPwm : public ScalablePeripheralOutput<double> {
 		public:
 			FlinkPwm(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0);
-			virtual void set(double frequency, double dutyCycle);
+			virtual double get();
+			virtual void set(double dutyCycle);
+			virtual void setFrequency(double f);
+			virtual void setDutyCycle(double d);
 			
 		private:
 			flink_t* deviceHandle;
 			uint32_t subDeviceNumber;
 			uint32_t channel;
+			double pwmFrequency;
+			uint32_t baseFrequency;
 		};
 
 	};

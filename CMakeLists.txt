@@ -70,7 +70,7 @@ if(COMPILER_SUPPORTS_CXX11)
 elseif(COMPILER_SUPPORTS_CXX0X)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
-	message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler!")
+	message(SEND_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler!")
 endif()
 
 ## Check for additional libraries
@@ -100,7 +100,7 @@ INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/e
 ## Special settings for different IDEs
 set(CMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT ON)
 
-## Enable ctest
+## Enable CTest
 enable_testing()
 
 ## Source directories
