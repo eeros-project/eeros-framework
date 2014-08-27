@@ -26,11 +26,13 @@ add_subdirectory(logger)
 add_subdirectory(ui)
 
 link_directories(${EEROS_BINARY_DIR}/src/core)
+link_directories(${EEROS_BINARY_DIR}/src/math)
 link_directories(${EEROS_BINARY_DIR}/src/control)
 link_directories(${EEROS_BINARY_DIR}/src/hal)
 link_directories(${EEROS_BINARY_DIR}/src/sequencer)
 link_directories(${EEROS_BINARY_DIR}/src/safety)
 link_directories(${EEROS_BINARY_DIR}/src/logger)
+link_directories(${EEROS_BINARY_DIR}/src/ui)
 
 add_library(eeros SHARED ${EEROS_SRCS})
 
