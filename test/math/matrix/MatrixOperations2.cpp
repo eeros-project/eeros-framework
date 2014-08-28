@@ -206,36 +206,100 @@ int main(int argc, char *argv[]) {
 	
 	// ********** Part D **********
 	
-	std::cout << "[D] divition (/)" << std::endl;
+	std::cout << "[D] division (/)" << std::endl;
 	// TODO
+	std::cout << "    -> Test not yet implemented..." << std::endl;
 	
 	
 	// ********** Part E **********
 	
-	Matrix<3, 3, int> matE1_test;
-	Matrix<3, 3, int> matE1_res;
-	Matrix<3, 3, int> matE1_ref;
-	Matrix<2, 3, int> matE2_test;
-	Matrix<3, 2, int> matE2_res;
-	Matrix<3, 2, int> matE2_ref;
-	Matrix<3, 1, int> matE3_test;
-	Matrix<1, 3, int> matE3_res;
-	Matrix<1, 3, int> matE3_ref;
+	Matrix<3, 1, int>    matE_3x1;
+	Matrix<3, 3, long>   matE_3x3;
+	Matrix<1, 2, double> matE_1x2;
+	Matrix<3, 1, int>    matE_res1;
+	Matrix<3, 1, int>    matE_ref1;
+	Matrix<3, 3, long>   matE_res2;
+	Matrix<3, 3, long>   matE_ref2;
+	Matrix<1, 2, double> matE_res3;
+	Matrix<1, 2, double> matE_ref3;
 	
-	std::cout << "[E] transpose()" << std::endl;
+	std::cout << "[E] negate (-)" << std::endl;
+	
+	std::cout << "    #" << testNo++ << ": Negating a 3x1 int vector" << std::endl;
+	error = 0;
+	
+	matE_3x1  <<  1,  2,  3;
+	matE_ref1 << -1, -2, -3;
+	matE_res1 = -matE_3x1;
+	
+	if(matE_res1 != matE_ref1) {
+		std::cout << "    -> Failure: Negation failed!" << std::endl;
+		error++;
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	std::cout << "    #" << testNo++ << ": Negating a 3x3 long matrix" << std::endl;
+	error = 0;
+	
+	matE_3x3 << 1, 2, 3,
+	            4, 5, 6,
+	            7, 8, 9;
+	matE_ref2 << -1, -2, -3,
+	             -4, -5, -6,
+	             -7, -8, -9;
+	matE_res2 = -matE_3x3;
+	
+	if(matE_res2 != matE_ref2) {
+		std::cout << "    -> Failure: Negating failed!" << std::endl;
+		error++;
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	std::cout << "    #" << testNo++ << ": Negating a 1x2 double row vector" << std::endl;
+	error = 0;
+	
+	matE_1x2 << -1.5, 5.0;
+	matE_ref3 << 1.5, -5.0;
+	matE_res3 = -matE_1x2;
+	
+	if(matE_res3 != matE_ref3) {
+		std::cout << "    -> Failure: Negation failed!" << std::endl;
+		error++;
+	}
+	errorSum += error;
+	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	
+	// ********** Part F **********
+	
+	Matrix<3, 3, int> matF1_test;
+	Matrix<3, 3, int> matF1_res;
+	Matrix<3, 3, int> matF1_ref;
+	Matrix<2, 3, int> matF2_test;
+	Matrix<3, 2, int> matF2_res;
+	Matrix<3, 2, int> matF2_ref;
+	Matrix<3, 1, int> matF3_test;
+	Matrix<1, 3, int> matF3_res;
+	Matrix<1, 3, int> matF3_ref;
+	
+	std::cout << "[F] transpose()" << std::endl;
 	
 	std::cout << "    #" << testNo++ << ": 3x3 matrix" << std::endl;
 	error = 0;
 	
-	matE1_test << 1, 2, 3,
+	matF1_test << 1, 2, 3,
 	              4, 5, 6,
 	              7, 8, 9;
-	matE1_ref  << 1, 4, 7,
+	matF1_ref  << 1, 4, 7,
 	              2, 5, 8,
 	              3, 6, 9;
-	matE1_res = matE1_test.transpose();
+	matF1_res = matF1_test.transpose();
 	
-	if(matE1_res != matE1_ref) {
+	if(matF1_res != matF1_ref) {
 		std::cout << "    -> Failure: Transpose of 3x3 matrix failed!" << std::endl;
 		error++;
 	}
@@ -245,14 +309,14 @@ int main(int argc, char *argv[]) {
 	std::cout << "    #" << testNo++ << ": 2x3 matrix" << std::endl;
 	error = 0;
 	
-	matE2_test << 1, 2, 3,
+	matF2_test << 1, 2, 3,
 	              4, 5, 6;
-	matE2_ref  << 1, 4,
+	matF2_ref  << 1, 4,
 	              2, 5,
 	              3, 6;
-	matE2_res = matE2_test.transpose();
+	matF2_res = matF2_test.transpose();
 	
-	if(matE2_res != matE2_ref) {
+	if(matF2_res != matF2_ref) {
 		std::cout << "    -> Failure: Transpose of 2x3 matrix failed!" << std::endl;
 		error++;
 	}
@@ -262,13 +326,13 @@ int main(int argc, char *argv[]) {
 	std::cout << "    #" << testNo++ << ": 3x1 matrix" << std::endl;
 	error = 0;
 	
-	matE3_test << 1,
+	matF3_test << 1,
 	              2,
 	              3;
-	matE3_ref  << 1, 2, 3;
-	matE3_res = matE3_test.transpose();
+	matF3_ref  << 1, 2, 3;
+	matF3_res = matF3_test.transpose();
 	
-	if(matE3_res != matE3_ref) {
+	if(matF3_res != matF3_ref) {
 		std::cout << "    -> Failure: Transpose of 3x1 matrix failed!" << std::endl;
 		error++;
 	}
