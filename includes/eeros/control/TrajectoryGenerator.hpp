@@ -10,7 +10,7 @@ namespace eeros {
 		class TrajectoryGenerator {
 			
 		public:
-			virtual bool finished() = 0;
+			virtual bool finished() const = 0;
 			
 			virtual std::array<T, N> get(double dt) = 0;
 			
@@ -33,6 +33,8 @@ namespace eeros {
 				s[0] = start; e[0] = end;
 				return push(s, e);
 			}
+			
+			virtual void reset() = 0;
 			
 		protected:
 			std::array<T, N> last;
