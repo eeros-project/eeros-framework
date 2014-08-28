@@ -17,6 +17,8 @@ namespace eeros {
 			
 			static_assert((M > 1 && N >= 1) || (M >=1 && N > 1), "Matrix dimension must be greater or equal than 1x1!");
 			
+			using value_type = T;
+			
 			template < unsigned int IM, unsigned int IN, typename IT >
 			class MatrixInitializer {
 			public:
@@ -857,6 +859,9 @@ namespace eeros {
 		class Matrix<1, 1, T> {
 			
 		public:
+			
+			using value_type = T;
+			
 			Matrix() { }
 			
 			Matrix(const T v) { value = v; }
