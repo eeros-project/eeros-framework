@@ -7,3 +7,5 @@ add_subdirectory(safety)
 if(LIBCOMEDI)
 #	add_subdirectory(simpleMotorController)
 endif()
+
+add_subdirectory(flink)

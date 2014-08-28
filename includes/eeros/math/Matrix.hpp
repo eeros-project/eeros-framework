@@ -567,7 +567,11 @@ namespace eeros {
 			}
 			
 			Matrix<M, N, T>& operator-() {
-				(*this) = 0 - (*this);
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
+						(*this)(m, n) = -(*this)(m, n);
+					}
+				}
 				return (*this);
 			}
 			
@@ -896,13 +900,13 @@ namespace eeros {
 			
 			bool isOrthogonal() const { return value == 1; }
 			
-			bool isSymmetric() const { return true; }
+			constexpr bool isSymmetric() const { return true; }
 			
-			bool isDiagonal() const { return true; }
+			constexpr bool isDiagonal() const { return true; }
 			
-			bool isLowerTriangular() const { return true; }
+			constexpr bool isLowerTriangular() const { return true; }
 			
-			bool isUpperTriangular() const { return true; }
+			constexpr bool isUpperTriangular() const { return true; }
 			
 			bool isInvertible() const { return value != 0; }
 			

@@ -11,10 +11,25 @@ FlinkPwm::FlinkPwm(std::string id,
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channel = channel;
+	flink_pwm_get_baseclock(deviceHandle, subDeviceNumber, &this->baseFrequency);
 }
 
-void FlinkPwm::set(double frequency, double dutyCycle) {
+double FlinkPwm::get() {
 	// TODO
-	//lsampl_t data = static_cast<lsampl_t>(value * maxValue / (maxVoltage - minVoltage) + maxValue / 2.0);
-	//comedi_data_write(deviceHandle, subDeviceNumber, channel, 0, AREF_GROUND, data);
+	return 0;
+}
+
+void FlinkPwm::set(double dutyCycle) {
+	this->setDutyCycle(dutyCycle);
+}
+
+void FlinkPwm::setFrequency(double f) {
+	pwmFrequency = f;
+	flink_pwm_set_period(deviceHandle, subDeviceNumber, channel, (uint32_t)(baseFrequency / pwmFrequency));
+}
+
+void FlinkPwm::setDutyCycle(double d) {
+	if(d >= 0 && d <= 1) {
+		flink_pwm_set_hightime(deviceHandle, subDeviceNumber, channel, (uint32_t)(baseFrequency / pwmFrequency * d));
+	}
 }

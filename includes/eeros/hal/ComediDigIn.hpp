@@ -12,7 +12,7 @@ namespace eeros {
 		class ComediDigIn : public PeripheralInput<bool> {
 		public:
 			ComediDigIn(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted = false);
-			virtual bool get() const;
+			virtual bool get();
 			
 		private:
 			comedi_t* deviceHandle;

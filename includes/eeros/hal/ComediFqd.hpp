@@ -12,7 +12,7 @@ namespace eeros {
 		class ComediFqd : public ScalablePeripheralInput<double> {
 		public:
 			ComediFqd(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channelA, uint32_t channelB, uint32_t channelZ, double scale = 1, double offset = 0, double initValue = 0);
-			virtual double get() const;
+			virtual double get();
 			
 		private:
 			comedi_t* deviceHandle;
