@@ -1,8 +1,9 @@
 #ifndef ORG_EEROS_CONTROL_CONSTANTACCTRAJECTORYGENERATOR_HPP_
 #define ORG_EEROS_CONTROL_CONSTANTACCTRAJECTORYGENERATOR_HPP_
 
+#include <eeros/core/EEROSException.hpp>
 #include <cmath>
-#include <type_traits>
+#include <mutex>
 #include "TrajectoryGenerator.hpp"
 
 namespace eeros {
@@ -15,40 +16,44 @@ namespace eeros {
 			
 			using E = typename T::value_type;
 			
-			ConstantAccTrajectoryGenerator(T velMax, T accMax, T decMax, double dt) : finish(false), velMax(velMax), accMax(accMax), decMax(decMax), dt(dt) { }
+			ConstantAccTrajectoryGenerator(T velMax, T accMax, T decMax, double dt) : finish(true), velMax(velMax), accMax(accMax), decMax(decMax), dt(dt) { }
 			
-			virtual bool finished() const {
+			virtual bool finished() {
+				std::lock_guard<std::mutex> lck(mtx);
 				return finish;
 			}
 			
 			virtual std::array<T, 3> get(double dt) {
-				std::array<T, 3> y;
+				std::lock_guard<std::mutex> lck(mtx);
+				std::array<T, 3> y = this->last;
 				t += dt;
 				
 				for(unsigned int i = 0; i < a1p.size(); i++) {
-					if(t >= 0 && t < dT1) {
-						y[0][i] = a1p[i] * pow(t, 2) + c1p[i];
-						y[1][i] = b1v[i] * t;
-						y[2][i] = c1a[i];
-					}
-					else if(t >= dT1 && t < dT1 + dT2) {
-						y[0][i] = b2p[i] * t + c2p[i];
-						y[1][i] = c2v[i];
-						y[2][i] = 0;
-					}
-					else if(t >= dT1 + dT2 && t < dT1 + dT2 + dT3) {
-						y[0][i] = a3p[i] * pow(t, 2) + b3p[i] * t + c3p[i];
-						y[1][i] = b3v[i] * t + c3v[i];
-						y[2][i] = c3a[i];
-					}
-					else if(t >= dT1 + dT2 + dT3) {
-						finish = true;
-						y[0][i] = this->last[0][i];
-						y[1][i] = 0.0;
-						y[2][i] = 0.0;
-					}
-					else { // t < 0
-						throw 1234654; // TODO
+					if(!finish) {
+						if(t >= 0 && t < dT1) {
+							y[0][i] = a1p[i] * pow(t, 2) + c1p[i];
+							y[1][i] = b1v[i] * t;
+							y[2][i] = c1a[i];
+						}
+						else if(t >= dT1 && t < dT1 + dT2) {
+							y[0][i] = b2p[i] * t + c2p[i];
+							y[1][i] = c2v[i];
+							y[2][i] = 0;
+						}
+						else if(t >= dT1 + dT2 && t < dT1 + dT2 + dT3) {
+							y[0][i] = a3p[i] * pow(t, 2) + b3p[i] * t + c3p[i];
+							y[1][i] = b3v[i] * t + c3v[i];
+							y[2][i] = c3a[i];
+						}
+						else if(t >= dT1 + dT2 + dT3) {
+							finish = true;
+							y[0][i] = this->last[0][i];
+							y[1][i] = 0.0;
+							y[2][i] = 0.0;
+						}
+						else { // t < 0
+							throw EEROSException("get() failed, t < 0 (dt = " + std::to_string(dt) + ")");
+						}
 					}
 					// set last value
 					this->last[0][i] = y[0][i];
@@ -60,10 +65,10 @@ namespace eeros {
 			}
 			
 			virtual bool push(std::array<T, 3> start, std::array<T, 3> end) {
+				if(!finish) return false;
 				T calcVelNorm, calcAccNorm, calcDecNorm;
 				E velNorm, accNorm, decNorm, squareNormVel;
 				T distance = end[0] - start[0];
-				reset();
 				
 				// Define speeds and accelerations
 				for(unsigned int i = 0; i < calcVelNorm.size(); i++) {
@@ -112,15 +117,23 @@ namespace eeros {
 				c3p = start[0] + (1 - velNorm * 0.5 * dt / dT3 * pow(dT1 + dT2 + dT3, 2)) * distance;
 				b3v = (-1) *velNorm * dt * distance / dT3 * dt;  
 				c3v = velNorm * (dT1 + dT2 + dT3) * distance * dt / dT3 * dt; 
-				c3a = (-1) * velNorm * dt / dT3 * distance * dt * dt;  
+				c3a = (-1) * velNorm * dt / dT3 * distance * dt * dt;
+				
+				std::lock_guard<std::mutex> lck(mtx);
+				finish = false;
+				t = 0;
+				
+				return true;
 			}
 			
-			virtual void reset() {
-				t = 0;
-				finish = false;
+			virtual void reset(std::array<T, 3> last) {
+				std::lock_guard<std::mutex> lck(mtx);
+				this->last = last;
+				this->finish = true;
 			}
 			
 		protected:
+			std::mutex mtx;
 			double dt;
 			T velMax, accMax, decMax;
 			
