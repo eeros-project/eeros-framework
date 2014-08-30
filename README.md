@@ -8,8 +8,7 @@ Project Website: www.eeros.org
 Documentation
 -------------
 
+- [Getting started](doc/gettingStarted.md)
 - [How to build the Framework](doc/build.md)
 - [Setup a develop environment](doc/setupDevelopmentEnvironment.md)
-- [Getting started](doc/gettingStarted.md)
-- [Road map](doc/roadmap.md)
-- [Changelog](doc/changelog.md)
+
