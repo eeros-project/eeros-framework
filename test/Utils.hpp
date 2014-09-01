@@ -3,18 +3,14 @@
 
 class Utils {
 	public:
-		/** compare
-		 * @param tolerance relative to ref
-		 */
+		
 		static bool compareApprox(double ref, double val, double tolerance) {
-			if (ref == val) {
+			if(ref == val) {
 				return true;
 			}
 			else {
-				double diff = (ref - val);
-				if (diff < 0) diff = -diff;
-				if (ref < 0) ref = -ref;
-				return (diff < tolerance*ref);
+				double diff = abs(ref - val);
+				return (diff < abs(tolerance));
 			}
 		}
 		
