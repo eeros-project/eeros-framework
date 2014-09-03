@@ -50,13 +50,20 @@ namespace eeros {
 			SequenceResult<Treturn> operator()(Targs ... args) {
 				init();
 				yield();
-				if(!checkPreCondition()) return SequenceResult<Treturn>(result::preConditionFailure);
+				
+				if(!checkPreCondition())
+					return SequenceResult<Treturn>(result::preConditionFailure);
+				
 				yield();
 				Treturn res = run(args...);
 				yield();
-				if(!checkPreCondition()) return SequenceResult<Treturn>(result::postConditionFailure, res);
+				
+				if(!checkPostCondition())
+					return SequenceResult<Treturn>(result::postConditionFailure, res);
+				
 				yield();
 				exit();
+				
 				return SequenceResult<Treturn>(result::success, res);
 			}
 			
@@ -74,13 +81,20 @@ namespace eeros {
 			SequenceResult<void> operator()(Targs ... args) {
 				init();
 				yield();
-				if(!checkPreCondition()) return SequenceResult<void>(result::preConditionFailure);
+				
+				if(!checkPreCondition())
+					return SequenceResult<void>(result::preConditionFailure);
+				
 				yield();
 				run(args...);
 				yield();
-				if(!checkPreCondition()) return SequenceResult<void>(result::postConditionFailure);
+				
+				if(!checkPostCondition())
+					return SequenceResult<void>(result::postConditionFailure);
+				
 				yield();
 				exit();
+				
 				return SequenceResult<void>(result::success);
 			}
 			
@@ -99,13 +113,20 @@ namespace eeros {
 			SequenceResult<void> operator()() {
 				init();
 				yield();
-				if(!checkPreCondition()) return SequenceResult<void>(result::preConditionFailure);
+				
+				if(!checkPreCondition())
+					return SequenceResult<void>(result::preConditionFailure);
+				
 				yield();
 				run();
 				yield();
-				if(!checkPreCondition()) return SequenceResult<void>(result::postConditionFailure);
+				
+				if(!checkPostCondition())
+					return SequenceResult<void>(result::postConditionFailure);
+				
 				yield();
 				exit();
+				
 				return SequenceResult<void>(result::success);
 			}
 			
