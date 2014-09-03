@@ -6,6 +6,7 @@
 #include <mutex>
 #include "TrajectoryGenerator.hpp"
 
+
 namespace eeros {
 	namespace control {
 		
@@ -69,6 +70,11 @@ namespace eeros {
 				T calcVelNorm, calcAccNorm, calcDecNorm;
 				E velNorm, accNorm, decNorm, squareNormVel;
 				T distance = end[0] - start[0];
+				
+				T zero;
+				zero = 0;
+				if (distance == zero)
+					return false;
 				
 				// Define speeds and accelerations
 				for(unsigned int i = 0; i < calcVelNorm.size(); i++) {
