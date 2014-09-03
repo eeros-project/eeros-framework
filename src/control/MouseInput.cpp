@@ -99,6 +99,10 @@ void MouseInput::setInitPos(double x, double y, double z, double r) {
 	out.getSignal().setValue(eeros::math::Matrix<4>{ x, y, z, r });
 }
 
+void MouseInput::setInitPos(eeros::math::Matrix<4> pos) {
+	setInitPos(pos[0], pos[1], pos[2], pos[3]);
+}
+
 void MouseInput::reset(double x, double y, double z, double r) {
         this->x = (x - axisScale_x * j.current.axis.y);
         this->y = (y - axisScale_y * j.current.axis.x);

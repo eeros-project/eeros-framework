@@ -27,6 +27,7 @@ namespace eeros {
                 virtual void run();
 
                 virtual void setInitPos(double x, double y, double z, double r);
+                virtual void setInitPos(eeros::math::Matrix<4> pos);
                 virtual void reset(double x, double y, double z, double r);
 
       protected:
