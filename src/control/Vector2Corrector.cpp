@@ -6,124 +6,80 @@ using namespace eeros::math;
 
 
 bool Vector2Corrector::load(const char *filename) {
-	bool result = false;
-	double x, y;
-	int nx, ny;
 	FILE *file = fopen(filename, "r");
 	if (file == nullptr) return false;
 
-	std::vector<double> x_ref;
-	std::vector<double> y_ref;
-	std::vector<Vector2> mapped;
-	
-	int r = fscanf(file, "x: %lf", &x);
-	if (r == 1) {
-		x_ref.push_back(x);
-		while (true) {
-			r = fscanf(file, " , %lf", &x);
-			if (r == 1) {
-				x_ref.push_back(x);
-			}
-			else {
+	bool result = true;
+	std::vector<map> maps;
+	while (result) {
+		Vector2 pr[3], pm[3];
+		
+		for (int i = 0; i < 3; i++) {
+			double xr, yr, xm, ym;
+			int r = fscanf(file, " ( %lf , %lf ) => ( %lf , %lf ) ; ", &xr, &yr, &xm, &ym);
+			if (r != 4) {
+				result = false;
 				break;
 			}
+			pr[i][0] = xr;
+			pr[i][1] = yr;
+			pm[i][0] = xm;
+			pm[i][1] = ym;
 		}
-		nx = x_ref.size();
-	
-		r = fscanf(file, "y: %lf", &y);
-		if (r == 1) {
-			y_ref.push_back(y);
-			while (true) {
-				r = fscanf(file, " , %lf", &y);
-				if (r == 1) {
-					y_ref.push_back(y);
-				}
-				else {
-					break;
-				}
-			}
-			ny = y_ref.size();
+		
+		if (result) {
+			Matrix<2,2> Tr;
+			Tr(0, 0) = pr[1][0] - pr[0][0];
+			Tr(1, 0) = pr[1][1] - pr[0][1];
+			Tr(0, 1) = pr[2][0] - pr[0][0];
+			Tr(1, 1) = pr[2][1] - pr[0][1];
 			
-			result = true;
-			for (int j = 0; j < ny; j++) {
-				for (int i = 0; i < nx; i++) {
-					const char *format = ((i + 1) == nx) ? " ( %lf , %lf ) ; " : " ( %lf , %lf ) , ";
-					r = fscanf(file, format, &x, &y);
-					if (r != 2) {
-						result = false;
-						break;
-					}
-					mapped.push_back(Vector2(x, y));
-				}
-				if (r != 2) break;
-			}
-			if (result) {
-				this->x_ref = x_ref;
-				this->y_ref = y_ref;
-				this->mapped = mapped;
+			if (Tr.isInvertible()) {
+				Matrix<2,2> Tm;
+				Tm(0, 0) = pm[1][0] - pm[0][0];
+				Tm(1, 0) = pm[1][1] - pm[0][1];
+				Tm(0, 1) = pm[2][0] - pm[0][0];
+				Tm(1, 1) = pm[2][1] - pm[0][1];
+				
+				Vector2Corrector::map map;
+				map.Aref = pr[0];
+				map.Tiref = !Tr;
+				map.Amapped = pm[0];
+				map.Tmapped = Tm;
+				maps.push_back(map);
 			}
 		}
+	}
+	
+	result = false;
+	if (maps.size() > 0) {
+		this->maps = maps;
+		this->mapped.reserve(this->maps.size());
+		result = true;
 	}
 	fclose(file);
 	return result;
 }
 
+int Vector2Corrector::count() {
+	return maps.size();
+}
+
 Vector2 Vector2Corrector::get(const Vector2 &in) {
-	int ix = find_interval(in[0], x_ref);
-	if (ix < 0) return in;
-	
-	int iy = find_interval(in[1], y_ref);
-	if (iy < 0) return in;
-	
-	double a = (in[0] - x_ref[ix]) / (x_ref[ix + 1] - x_ref[ix]);
-	double b = (in[1] - y_ref[iy]) / (y_ref[iy + 1] - y_ref[iy]);
-	
-	Vector2 A = get_mapped(ix    , iy    );
-	Vector2 B = get_mapped(ix + 1, iy    );
-	Vector2 C = get_mapped(ix    , iy + 1);
-	Vector2 D = get_mapped(ix + 1, iy + 1);
-	
-	Vector2 a1 = A + (B-A) * a;
-	Vector2 a2 = C + (D-C) * a;
-	Vector2 b1 = A + (C-A) * b;
-	Vector2 b2 = B + (D-B) * b;
-	
-	Vector2 va = a2 - a1;
-	Vector2 vb = b2 - b1;
-	
-	double len_va = sqrt(va[0]*va[0] + va[1]*va[1]);
-	double len_vb = sqrt(vb[0]*vb[0] + vb[1]*vb[1]);
-	
-	va = va / len_va;
-	vb = vb / len_vb;
-	
-	eeros::math::Matrix<2,2> G;
-	G(0,0) = va[0];
-	G(1,0) = va[1];
-	G(0,1) = vb[0];
-	G(1,1) = vb[1];
-	
-	if (!G.isInvertible()) return in;
-	
-	Vector2 h;
-	h[0] = b1[0] - a1[0];
-	h[1] = b1[1] - a1[1];
-	
-	Vector2 phi = !G * h;
-	return a1 + phi[0] * va;
-}
-
-int Vector2Corrector::find_interval(double value, std::vector<double>& list) {
-	int index = -1;
-	int n = list.size();
-	for (int i = 0; i < n; i++) {
-		if (list[i] > value) break;
-		index = i;
+	int n = 0;
+	for (map &m : this->maps) {
+		Vector2 l = m.Tiref * (in - m.Aref);
+		if (l[0] < 0 || l[0] > 1) continue;
+		if (l[1] < 0 || l[1] > 1) continue;
+		if ((l[0] + l[1]) > 1) continue;
+		mapped[n++] = m.Tmapped * l + m.Amapped;
 	}
-	if ((index + 1) == n) return -1;
-	return index;
-}
-
-Vector2 Vector2Corrector::get_mapped(int ix, int iy) {
-	return mapped[ ix + iy * x_ref.size() ];
+	if (n == 0) return in;
+	Vector2 out;
+	out = 0;
+	for (int i = 0; i < n; i++) {
+		out = out + mapped[i];
+	}
+	out = out / static_cast<double>(n);
+	return out;
 }

@@ -11,15 +11,18 @@ namespace eeros {
 		public:
 			virtual bool load(const char *filename);
 			
+			virtual int count();
 			virtual eeros::math::Vector2 get(const eeros::math::Vector2 &in);
 			
 		protected:
-			virtual int find_interval(double value, std::vector<double>& list);
-			virtual eeros::math::Vector2 get_mapped(int ix, int iy);
-			
-			std::vector<double> x_ref;
-			std::vector<double> y_ref;
-			std::vector<eeros::math::Vector2> mapped;
+			struct map {
+				eeros::math::Vector2 Aref;			// triangle origin (of reference system)
+				eeros::math::Matrix<2,2> Tiref;		// transformation: cartesian to triangle coordinates (of reference system)
+				eeros::math::Vector2 Amapped;		// triangle origin (of mapped system)
+				eeros::math::Matrix<2,2> Tmapped;	// transformation: triangle to cartesian coordinates (of mapped system)
+			};
+			std::vector<map> maps;
+			std::vector<eeros::math::Vector2> mapped; // preallocated buffer
 		};
 
 	};
