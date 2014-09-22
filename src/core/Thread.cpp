@@ -3,13 +3,14 @@
 
 using namespace eeros;
 
-Thread::Thread() : t([&]() { this->run(); }) {
-	// nothing to do
-}
+Thread::Thread() : t([&]() {
+	std::string id = getId();
+	log.trace() << "Thread '" << id << "' started.";
+	this->run();
+	log.trace() << "Thread '" << id << "' finished.";
+}) { }
 
-Thread::Thread(std::function<void ()> t) : t(t) {
-	// nothing to do
-}
+Thread::Thread(std::function<void ()> t) : t(t) { }
 
 Thread::~Thread() {
 	join();

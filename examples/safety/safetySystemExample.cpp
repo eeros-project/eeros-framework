@@ -4,7 +4,6 @@
 #include <initializer_list>
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/hal/HAL.hpp>
-#include <eeros/core/Executor.hpp>
 #include <eeros/core/EEROSException.hpp>
 #include <eeros/hal/DummyRealInput.hpp>
 #include <eeros/hal/DummyLogicInput.hpp>

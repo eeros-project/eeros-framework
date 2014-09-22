@@ -8,4 +8,6 @@ if(LIBCOMEDI)
 #	add_subdirectory(simpleMotorController)
 endif()
 
-add_subdirectory(flink)
+if(LIBFLINK)
+#	add_subdirectory(flink)
+endif()

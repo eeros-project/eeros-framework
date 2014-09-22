@@ -14,13 +14,14 @@ namespace eeros {
 	
 	public:
 		Thread();
-		Thread(std::function<void ()> t);
 		virtual ~Thread();
 		
 		virtual std::string getId() const;
 		virtual void join();
 		
 	protected:
+		Thread(std::function<void ()> t);
+		
 		virtual void run() = 0;
 		
 		std::thread t;

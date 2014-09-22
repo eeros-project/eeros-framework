@@ -23,20 +23,22 @@ PeriodicThread::PeriodicThread(double period, double delay, bool realtime, statu
 		uint64_t period_ns = to_ns(this->period);
 		std::string id = getId();
 		
+		log.trace() << "Periodic thread '" << id << "' started.";
+		
 		clock_gettime(CLOCK_MONOTONIC, &time);
 		time.tv_nsec += to_ns(this->delay);
 		
 		if(this->rt) {
-			log.trace() << "Thread '" << id << "': configuring for realtime scheduling.";
+			log.trace() << "Periodic thread '" << id << "' configured for realtime scheduling.";
 			struct sched_param schedulingParam;
 			schedulingParam.sched_priority = RT_PRIORITY;
 			if(sched_setscheduler(0, SCHED_FIFO, &schedulingParam) == -1) {
-				log.error() << "Thread '" << id << "': failed to set real time scheduler!";
+				log.error() << "Periodic thread '" << id << "': failed to set real time scheduler!";
 			}
 			
 			/* Lock memory */
 			if(mlockall(MCL_CURRENT | MCL_FUTURE) == -1) {
-				log.error() << "Thread '" << id << "': failed to lock memory allocation!";
+				log.error() << "Periodic thread '" << id << "': failed to lock memory allocation!";
 			}
 			
 			/* Pre-fault our stack */
@@ -56,7 +58,7 @@ PeriodicThread::PeriodicThread(double period, double delay, bool realtime, statu
 				time.tv_sec++;
 			}
 		}
-		log.trace() << "Thread '" << id << "': stopped.";
+		log.trace() << "Periodic thread '" << id << "' stopped.";
 		s = stopped;
 	}) {
 }
