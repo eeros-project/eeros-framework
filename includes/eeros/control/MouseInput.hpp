@@ -30,7 +30,9 @@ namespace eeros {
                 virtual void setInitPos(eeros::math::Matrix<4> pos);
                 virtual void reset(double x, double y, double z, double r);
 
-      protected:
+                eeros::hal::Mouse j;
+
+       protected:
                 static constexpr double axisScale_x = 0.0001;
                 static constexpr double axisScale_y = 0.0001;
                 static constexpr double axisScale_z = 0.001;
@@ -53,8 +55,6 @@ namespace eeros {
 
                 double x, y, z, r;
                 bool first;
-
-                eeros::hal::Mouse j;
                 std::thread* t;
         };
 	};
