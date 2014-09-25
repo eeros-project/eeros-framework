@@ -1,5 +1,4 @@
 #include <eeros/core/Thread.hpp>
-#include <eeros/core/ContinualThread.hpp>
 #include <eeros/core/PeriodicThread.hpp>
 
 #include <string>
@@ -45,28 +44,10 @@ private:
 	uint32_t counter;
 };
 
-class ContinualTest : public ContinualThread {
-public:
-	ContinualTest(std::string n) : name(n), counter(0) {
-		std::cout << "Continual thread '" << name << "' created with id " << getId() << std::endl;
-	}
-	
-protected:
-	virtual void run() {
-		counter++;
-		if(counter > 100) stop();
-	}
-	
-private:
-	std::string name;
-	uint32_t counter;
-};
 
 int main(int argc, char* argv[]) {
 	ThreadTest a("a");
 	PeriodicTest b("b", 0.01, 0.5);
-	ContinualTest c("c");
 	a.join();
 	b.join();
-	c.join();
 } 

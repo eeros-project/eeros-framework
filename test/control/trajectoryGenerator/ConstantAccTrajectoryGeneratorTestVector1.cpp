@@ -83,7 +83,6 @@ class ConstantAccTrajectoryGeneratorTest {
 
 			file.close();
 			return error;
-			
 	}
 };
 
