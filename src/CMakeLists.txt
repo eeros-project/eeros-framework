@@ -1,6 +1,6 @@
 
 macro(add_eeros_sources)
-    file(RELATIVE_PATH _relPath "${CMAKE_SOURCE_DIR}/src" "${CMAKE_CURRENT_SOURCE_DIR}")
+    file(RELATIVE_PATH _relPath "${PROJECT_SOURCE_DIR}/src" "${CMAKE_CURRENT_SOURCE_DIR}")
     foreach(_src ${ARGN})
         if(_relPath)
             list(APPEND EEROS_SRCS "${_relPath}/${_src}")
