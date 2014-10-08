@@ -117,6 +117,17 @@ INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/e
 ## Special settings for different IDEs
 set(CMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT ON)
 
+
+## Doxygen documentation target (make doc)
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+	configure_file(doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+	add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMENT "Generating API documentation with Doxygen" VERBATIM )
+endif(DOXYGEN_FOUND)
+
+
 ## Enable CTest
 enable_testing()
 
