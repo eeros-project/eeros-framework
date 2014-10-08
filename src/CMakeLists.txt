@@ -36,6 +36,6 @@ link_directories(${EEROS_BINARY_DIR}/src/ui)
 
 add_library(eeros SHARED ${EEROS_SRCS})
 
-target_link_libraries(eeros ${EXTERNAL_LIBS} -lrt)
+target_link_libraries(eeros ${EXTERNAL_LIBS})
 
 INSTALL(TARGETS eeros LIBRARY DESTINATION lib)

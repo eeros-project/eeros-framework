@@ -5,6 +5,8 @@
 #include <sstream>
 #include <thread>
 #include <chrono>
+#include <stdlib.h>
+#include <unistd.h>
 
 
 
@@ -212,7 +214,7 @@ void CursesUI::run() {
 	// idle state
 	std::chrono::milliseconds sleepDuration(100);
 	while(state == idle) {
-		std::this_thread::sleep_for(sleepDuration);
+		usleep(sleepDuration.count() * 1000);
 	}
 	
 	// active state

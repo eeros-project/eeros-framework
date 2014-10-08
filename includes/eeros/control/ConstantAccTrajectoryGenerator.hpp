@@ -53,7 +53,7 @@ namespace eeros {
 							y[2][i] = 0.0;
 						}
 						else { // t < 0
-							throw EEROSException("get() failed, t < 0 (dt = " + std::to_string(dt) + ")");
+							throw EEROSException("get() failed, t < 0");
 						}
 					}
 					// set last value

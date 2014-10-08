@@ -60,6 +60,12 @@ elseif(UNIX)
 	elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 		set(MACOSX TRUE) # Mac OS X
 	
+	elseif(${CMAKE_SYSTEM_NAME} MATCHES "QNX")
+		set(QNX TRUE) # QNX Neutrino
+
+		set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -ansi -D_POSIX_C_SOURCE=199506")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ansi -D_POSIX_C_SOURCE=199506")
+
 	else()
 		# Unkown UNIX
 		 message(WARNING "Unknown UNIX operating system!")
@@ -98,6 +104,10 @@ find_file(LIBCURSES "curses.h")
 if(LIBCURSES)
 	message(STATUS "-> libcurses available")
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ncurses)
+endif()
+
+if(LINUX)
+	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} -lrt)
 endif()
 
 ## Config include file

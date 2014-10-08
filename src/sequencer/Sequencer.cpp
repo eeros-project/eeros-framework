@@ -1,6 +1,7 @@
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/core/EEROSException.hpp>
+#include <cstdio>
 
 using namespace eeros;
 using namespace eeros::sequencer;
@@ -131,7 +132,9 @@ mode::type Sequencer::getMode() const {
 }
 
 std::string Sequencer::getName() const {
-	return std::to_string(id);
+	char buffer[64];
+	sprintf(buffer, "%d", id);
+	return std::string(buffer);
 }
 
 void Sequencer::addCmdSequence(Sequence<void>* sequence) {

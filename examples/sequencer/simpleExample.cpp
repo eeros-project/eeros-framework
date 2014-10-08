@@ -4,6 +4,7 @@
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/ui/CursesUI.hpp>
 #include <unistd.h>
+#include <stdlib.h>
 
 using namespace eeros;
 using namespace eeros::sequencer;

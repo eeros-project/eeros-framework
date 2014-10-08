@@ -1,4 +1,3 @@
-#include <unistd.h>
 #include <iostream>
 #include <vector>
 #include <initializer_list>
@@ -10,6 +9,7 @@
 #include <eeros/hal/DummyLogicOutput.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/logger/Logger.hpp>
+#include <unistd.h>
 
 #include "ExampleSafetyProperties.hpp"
 
