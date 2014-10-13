@@ -31,7 +31,6 @@ namespace eeros
 			
 		private:
 			std::mutex mtx;
-			std::unique_lock<std::mutex> lck;
 			std::ostream& out;
 			unsigned visible_level;
 			bool enabled;
