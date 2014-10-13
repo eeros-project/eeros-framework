@@ -16,7 +16,7 @@ Requirements
 Local build
 -----------
 
-  1. Clone git repository: `$ git clone https://github.com/mzueger/eeros-framework.git`
+  1. Clone git repository: `$ git clone https://github.com/eeros-project/eeros-framework.git`
   2. Create a build directory: `$ mkdir build-local`
   3. Enter the build directory and setup your build environment with CMake: `$ cmake ..`
      - Optional: you can specify an installation prefix path: `-DCMAKE_INSTALL_PREFIX:PATH=/usr/local/`
@@ -26,7 +26,7 @@ Local build
 Cross build
 -----------
 
-  1. Clone git repository: `$ git clone https://github.com/mzueger/eeros-framework.git`
+  1. Clone git repository: `$ git clone https://github.com/eeros-project/eeros-framework.git`
   2. Create a build directory, e.g: `$ mkdir build-powerpc`
   3. Create a CMake toolchain file (or pick one from the cmake directory of the EEROS framework). For more informations, please have a look at the [CMake Wiki](http://www.cmake.org/Wiki/CMake_Cross_Compiling).
   4. Enter the build directory and setup your build environment with CMake: `$ cmake -DCMAKE_TOOLCHAIN_FILE:PATH=/path/to/your/toolchain/file.cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr/powerpc-linux-gnu/ ..`
