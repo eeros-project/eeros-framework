@@ -4,7 +4,7 @@
 #include <list>
 #include <string>
 #include <eeros/core/PeriodicThread.hpp>
-#include <eeros/control/Block.hpp>
+#include <eeros/core/Runnable.hpp>
 
 namespace eeros {
 	namespace control {
@@ -12,7 +12,7 @@ namespace eeros {
 		class TimeDomain : public PeriodicThread {
 		public:
 			TimeDomain(std::string name, double period, bool realtime);
-			virtual void addBlock(Block* block);
+			virtual void addBlock(Runnable* block);
 //			virtual void sortBlocks();
 			
 		protected:
@@ -20,7 +20,7 @@ namespace eeros {
 			
 		private:
 			std::string name;
-			std::list<Block*> blocks;
+			std::list<Runnable*> blocks;
 		};
 
 	};

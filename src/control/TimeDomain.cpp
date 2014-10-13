@@ -12,7 +12,7 @@ void TimeDomain::run() {
 	}
 }
 
-void TimeDomain::addBlock(Block* block) {
+void TimeDomain::addBlock(eeros::Runnable* block) {
 	blocks.push_back(block);
 }
 
