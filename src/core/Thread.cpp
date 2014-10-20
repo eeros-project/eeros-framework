@@ -25,3 +25,5 @@ std::string Thread::getId() const {
 void Thread::join() {
 	if(t.joinable()) t.join();
 }
+
+void Thread::run() { }

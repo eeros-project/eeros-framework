@@ -22,7 +22,7 @@ namespace eeros {
 	protected:
 		Thread(std::function<void ()> t);
 		
-		virtual void run() = 0;
+		virtual void run();
 		
 		std::thread t;
 		eeros::logger::Logger<eeros::logger::LogWriter> log;
