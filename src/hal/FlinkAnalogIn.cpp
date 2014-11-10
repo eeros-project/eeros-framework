@@ -2,27 +2,20 @@
 
 using namespace eeros::hal;
 
-FlinkAnalogIn::FlinkAnalogIn(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel) : PeripheralInput<double>(id) {
-	this->deviceHandle = device->getDeviceHandle();
-	this->subDeviceNumber = subDeviceNumber;
-	this->channel = channel;
-	this->bit_mask = 0;
-	//cache resolution	
-	flink_analog_in_get_resolution(deviceHandle,subDeviceNumber,&resolution);
-
-	for(uint32_t i = 0; i < resolution; i++){
-		bit_mask = bit_mask | (0x1 << i);
-	}
-
+FlinkAnalogIn::FlinkAnalogIn(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, double umax, double umin) : ScalablePeripheralInput<double>(id, 1, 0), channel(channel), bitMask(0) {
+	this->subdeviceHandle = flink_get_subdevice_by_id(device->getDeviceHandle(), subDeviceNumber);
+	
+	uint32_t resolution;
+	flink_analog_in_get_resolution(subdeviceHandle, &resolution);
+	bitMask = (1 << resolution) - 1;
+	
+	scale = umax - umin / ((1 << resolution) - 1);
+	offset = -(umax - umin) / 2;
 }
 
 double FlinkAnalogIn::get() {
-	uint32_t data = 0;
-	flink_analog_in_get_value(deviceHandle,subDeviceNumber,channel,&data);
-	data = data & bit_mask;
-	return data;
-}
-
-void FlinkAnalogIn::set(double value) {
-	//do nothing
+	uint32_t data;
+	flink_analog_in_get_value(subdeviceHandle, channel, &data);
+	data &= bitMask;
+	return data * scale + offset;
 }

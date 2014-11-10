@@ -16,10 +16,8 @@ namespace eeros {
 			virtual void set(bool value);
 			
 		private:
-			flink_t* deviceHandle;
-			uint32_t subDeviceNumber;
+			flink_subdev* subdeviceHandle;
 			uint32_t channel;
-			
 			bool inverted;
 		};
 

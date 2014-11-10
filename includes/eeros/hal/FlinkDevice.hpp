@@ -12,10 +12,10 @@ namespace eeros {
 			FlinkDevice(std::string deviceNode);
 			virtual ~FlinkDevice();
 			
-			flink_t* getDeviceHandle();
+			flink_dev* getDeviceHandle();
 
 		private:
-			flink_t *it;
+			flink_dev *it;
 		};
 	};
 };

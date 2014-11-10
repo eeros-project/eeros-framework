@@ -31,8 +31,8 @@ PeriodicThread::PeriodicThread(double period, double delay, bool realtime, statu
 		if(this->rt) {
 			log.trace() << "Periodic thread '" << id << "' configured for realtime scheduling.";
 			struct sched_param schedulingParam;
-			schedulingParam.sched_priority = RT_PRIORITY;
-			if(sched_setscheduler(0, SCHED_FIFO, &schedulingParam) == -1) {
+			schedulingParam.sched_priority = RT_PRIORITY; // TODO use sched_get_priority_max
+			if(sched_setscheduler(0, SCHED_FIFO, &schedulingParam) == -1) { // TODO add support for SCHED_DEADLINE
 				log.error() << "Periodic thread '" << id << "': failed to set real time scheduler!";
 			}
 			

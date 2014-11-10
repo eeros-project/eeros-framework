@@ -7,11 +7,9 @@ FlinkPwm::FlinkPwm(std::string id,
 				   uint32_t subDeviceNumber,
 				   uint32_t channel,
 				   double scale,
-				   double offset) : ScalablePeripheralOutput<double>(id, scale, offset) {
-	this->deviceHandle = device->getDeviceHandle();
-	this->subDeviceNumber = subDeviceNumber;
-	this->channel = channel;
-	flink_pwm_get_baseclock(deviceHandle, subDeviceNumber, &this->baseFrequency);
+				   double offset) : ScalablePeripheralOutput<double>(id, scale, offset), channel(channel) {
+	subdeviceHandle = flink_get_subdevice_by_id(device->getDeviceHandle(), subDeviceNumber);
+	flink_pwm_get_baseclock(subdeviceHandle, &baseFrequency);
 }
 
 double FlinkPwm::get() {
@@ -20,16 +18,16 @@ double FlinkPwm::get() {
 }
 
 void FlinkPwm::set(double dutyCycle) {
-	this->setDutyCycle(dutyCycle);
+	setDutyCycle(dutyCycle);
 }
 
 void FlinkPwm::setFrequency(double f) {
 	pwmFrequency = f;
-	flink_pwm_set_period(deviceHandle, subDeviceNumber, channel, (uint32_t)(baseFrequency / pwmFrequency));
+	flink_pwm_set_period(subdeviceHandle, channel, (uint32_t)(baseFrequency / pwmFrequency));
 }
 
 void FlinkPwm::setDutyCycle(double d) {
 	if(d >= 0 && d <= 1) {
-		flink_pwm_set_hightime(deviceHandle, subDeviceNumber, channel, (uint32_t)(baseFrequency / pwmFrequency * d));
+		flink_pwm_set_hightime(subdeviceHandle, channel, (uint32_t)(baseFrequency / pwmFrequency * d));
 	}
 }

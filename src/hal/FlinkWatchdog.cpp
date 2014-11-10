@@ -1,32 +1,27 @@
 #include <eeros/hal/FlinkWatchdog.hpp>
 using namespace eeros::hal;
 
-FlinkWatchdog::FlinkWatchdog(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel) : PeripheralOutput<double>(id) {
-	this->deviceHandle = device->getDeviceHandle();
-	this->subDeviceNumber = subDeviceNumber;
-	this->channel = channel;
-	//cache base clock
-	flink_wd_get_baseclock(deviceHandle,subDeviceNumber, &baseClock);	
-
+FlinkWatchdog::FlinkWatchdog(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, double timeout) : PeripheralOutput<bool>(id), channel(channel) {
+	subdeviceHandle = flink_get_subdevice_by_id(device->getDeviceHandle(), subDeviceNumber);
+	flink_wd_get_baseclock(subdeviceHandle, &baseClock);
+	setTimeout(timeout);
 }
 
-double FlinkWatchdog::get() {
-	//nothing to return	
-	return 0;
+void FlinkWatchdog::set(bool b) {
+	flink_wd_set_counter(subdeviceHandle, counter);
 }
 
-void FlinkWatchdog::set(double frequency) {
-	uint32_t value = uint32_t(baseClock/frequency);
-	flink_wd_set_counter_reg(deviceHandle, subDeviceNumber, channel, value);
+void FlinkWatchdog::setTimeout(double t) {
+	counter = static_cast<uint32_t>(baseClock * t);
 }
 
-void FlinkWatchdog::reset(){
-	flink_wd_reset_chanel(deviceHandle,subDeviceNumber,channel);
+bool FlinkWatchdog::get() {
+	uint8_t status;
+	flink_wd_get_status(subdeviceHandle, &status);
+	return static_cast<bool>(status);
 }
-void FlinkWatchdog::setClkPol(bool pol){
-	if(pol){
-		flink_wd_set_clk_pol(deviceHandle,subDeviceNumber,channel,1);
-	}else{
-		flink_wd_set_clk_pol(deviceHandle,subDeviceNumber,channel,1);
-	}
+
+void FlinkWatchdog::reset() {
+	flink_wd_set_counter(subdeviceHandle, counter);
+	flink_wd_arm(subdeviceHandle);
 }

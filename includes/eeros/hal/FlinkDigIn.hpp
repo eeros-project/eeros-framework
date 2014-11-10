@@ -11,15 +11,12 @@ namespace eeros {
 
 		class FlinkDigIn : public PeripheralInput<bool> {
 		public:
-			FlinkDigIn(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted = false);
+			FlinkDigIn(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, bool inverted = false);
 			virtual bool get();
-			virtual void set(bool value);
 			
 		private:
-			flink_t* deviceHandle;
-			uint32_t subDeviceNumber;
+			flink_subdev* subdeviceHandle;
 			uint32_t channel;
-			
 			bool inverted;
 		};
 

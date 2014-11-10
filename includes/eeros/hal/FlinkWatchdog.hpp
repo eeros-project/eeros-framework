@@ -9,23 +9,21 @@
 namespace eeros {
 	namespace hal {
 
-		class FlinkWatchdog : public PeripheralOutput<double> {
+		class FlinkWatchdog : public PeripheralOutput<bool> {
 		public:
-			FlinkWatchdog(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel);
-			virtual double get();
-			virtual void set(double frequency);
+			FlinkWatchdog(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, double timeout = 0.05);
+			
+			virtual bool get();
+			virtual void set(bool b);
+			virtual void setTimeout(double t);
 			virtual void reset();
-			virtual void setClkPol(bool pol); //false == rising edge, true == falling edge			
-		
-
+			
 		private:
-			flink_t* deviceHandle;
-			uint32_t subDeviceNumber;
+			flink_subdev* subdeviceHandle;
 			uint32_t channel;
 			uint32_t baseClock;
-
+			uint32_t counter;
 		};
-
 	};
 };
 

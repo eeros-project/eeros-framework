@@ -3,24 +3,21 @@
 
 #include <string>
 #include <flinklib.h>
-#include <eeros/hal/PeripheralInput.hpp>
+#include <eeros/hal/ScalablePeripheralInput.hpp>
 #include <eeros/hal/FlinkDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class FlinkAnalogIn : public PeripheralInput<double> {
+		class FlinkAnalogIn : public ScalablePeripheralInput<double> {
 		public:
-			FlinkAnalogIn(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel);
+			FlinkAnalogIn(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, double umax = 10, double umin = -10);
 			virtual double get();
-			virtual void set(double value);
 			
 		private:
-			flink_t* deviceHandle;
-			uint32_t subDeviceNumber;
+			flink_subdev* subdeviceHandle;
 			uint32_t channel;
-			uint32_t resolution;
-			uint32_t bit_mask;
+			uint32_t bitMask;
 		};
 
 	};

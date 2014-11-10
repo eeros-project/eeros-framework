@@ -14,6 +14,6 @@ FlinkDevice::~FlinkDevice() {
 	flink_close(it);
 }
 
-flink_t* FlinkDevice::getDeviceHandle() {
+flink_dev* FlinkDevice::getDeviceHandle() {
 	return it;
 }

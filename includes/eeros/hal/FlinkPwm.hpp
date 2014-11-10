@@ -18,8 +18,7 @@ namespace eeros {
 			virtual void setDutyCycle(double d);
 			
 		private:
-			flink_t* deviceHandle;
-			uint32_t subDeviceNumber;
+			flink_subdev* subdeviceHandle;
 			uint32_t channel;
 			double pwmFrequency;
 			uint32_t baseFrequency;
