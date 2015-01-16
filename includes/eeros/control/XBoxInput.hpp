@@ -26,15 +26,15 @@ namespace eeros {
 			double xScale = 0.0001;
 			double yScale = 0.0001;
 			double zScale = 0.0001;
-			double rScale = 0.001;
+			double rScale = 0.002;
 			double min_x = -0.03;
 			double max_x = 0.045;
 			double min_y = -0.03;
 			double max_y = 0.03;
 			double min_z = -0.053;
 			double max_z = -0.015;
-			double min_r = -1.6;
-			double max_r = 3.1;
+			double min_r = -2.8;
+			double max_r = 2.8;
 
 		protected:
 			eeros::math::Matrix<4,4,double> axisScale;

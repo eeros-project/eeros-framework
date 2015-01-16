@@ -33,15 +33,15 @@ namespace eeros {
                 double axisScale_x = 0.0001;
                 double axisScale_y = 0.0001;
                 double axisScale_z = 0.001;
-                double axisScale_r = 0.1;
+                double axisScale_r = 0.2;
                 double min_x = -0.03;
                 double max_x = 0.045;
                 double min_y = -0.03;
                 double max_y = 0.03;
                 double min_z = -0.053;
                 double max_z = -0.015;
-                double min_r = -1.6;
-                double max_r = 3.1;
+                double min_r = -2.8;
+                double max_r = 2.8;
 
                 eeros::hal::Mouse j;
 
