@@ -23,13 +23,21 @@ namespace eeros {
 			
 			double speedScaleFactor = 1.0;
 
+			double xScale = 0.0001;
+			double yScale = 0.0001;
+			double zScale = 0.0001;
+			double rScale = 0.001;
+			double min_x = -0.03;
+			double max_x = 0.045;
+			double min_y = -0.03;
+			double max_y = 0.03;
+			double min_z = -0.053;
+			double max_z = -0.015;
+			double min_r = -1.6;
+			double max_r = 3.1;
+
 		protected:
 			eeros::math::Matrix<4,4,double> axisScale;
-			
-			static constexpr double xScale = 0.0001;
-			static constexpr double yScale = 0.0001;
-			static constexpr double zScale = 0.0001;
-			static constexpr double rScale = 0.001;
 			
 			eeros::hal::Joystick j;
 			std::thread* t;

@@ -60,7 +60,29 @@ void XBoxInput::run() {
 		if(v(i) > -0.2 && v(i) < 0.2) v(i) = 0;
 	}
 	
-	out.getSignal().setValue(out.getSignal().getValue() + axisScale * speedScaleFactor * v);
+	v = out.getSignal().getValue() + axisScale * speedScaleFactor * v;
+
+	if (v[0] < min_x)
+		v[0] = min_x;
+	else if (v[0] > max_x)
+		v[0] = max_x;
+	
+	if (v[1] < min_y)
+		v[1] = min_y;
+	else if (v[1] > max_y)
+		v[1] = max_y;
+	
+	if (v[2] < min_z)
+		v[2] = min_z;
+	else if (v[2] > max_z)
+		v[2] = max_z;
+	
+	if (v[3] < min_r)
+		v[3] = min_r;
+	else if (v[3] > max_r)
+		v[3] = max_r;
+	
+	out.getSignal().setValue(v);
 	
 	uint64_t ts = eeros::System::getTimeNs();
 	out.getSignal().setTimestamp(ts);
