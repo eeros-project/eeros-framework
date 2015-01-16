@@ -30,22 +30,22 @@ namespace eeros {
                 virtual void setInitPos(eeros::math::Matrix<4> pos);
                 virtual void reset(double x, double y, double z, double r);
 
+                double axisScale_x = 0.0001;
+                double axisScale_y = 0.0001;
+                double axisScale_z = 0.001;
+                double axisScale_r = 0.1;
+                double min_x = -0.03;
+                double max_x = 0.045;
+                double min_y = -0.03;
+                double max_y = 0.03;
+                double min_z = -0.053;
+                double max_z = -0.015;
+                double min_r = -1.6;
+                double max_r = 3.1;
+
                 eeros::hal::Mouse j;
 
        protected:
-                static constexpr double axisScale_x = 0.0001;
-                static constexpr double axisScale_y = 0.0001;
-                static constexpr double axisScale_z = 0.001;
-                static constexpr double axisScale_r = 0.1;
-                static constexpr double min_x = -0.03;
-                static constexpr double max_x = 0.045;
-                static constexpr double min_y = -0.03;
-                static constexpr double max_y = 0.03;
-                static constexpr double min_z = -0.053;
-                static constexpr double max_z = -0.015;
-                static constexpr double min_r = -1.6;
-                static constexpr double max_r = 3.1;
-
                 eeros::control::Output<double> outX;
                 eeros::control::Output<double> outY;
                 eeros::control::Output<double> outZ;
