@@ -2,8 +2,6 @@
 #define ORG_EEROS_CORE_PERIODICTHREAD_HPP_
 
 #include <eeros/core/Thread.hpp>
-#include <eeros/config.hpp>
-
 #include <atomic>
 
 namespace eeros {
