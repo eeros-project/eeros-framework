@@ -5,7 +5,7 @@ if(LIBCOMEDI)
 endif()
 
 if(LIBFLINK)
-	add_eeros_sources(FlinkDevice.cpp FlinkAnalogIn.cpp FlinkDigIn.cpp FlinkDigOut.cpp FlinkFqd.cpp FlinkPwm.cpp FlinkWatchdog.cpp)
+	add_eeros_sources(FlinkDevice.cpp FlinkAnalogIn.cpp FlinkAnalogOut.cpp FlinkDigIn.cpp FlinkDigOut.cpp FlinkFqd.cpp FlinkPwm.cpp FlinkWatchdog.cpp)
 endif()
 
 if(LINUX)

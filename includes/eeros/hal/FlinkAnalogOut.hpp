@@ -13,6 +13,7 @@ namespace eeros {
 		public:
 			FlinkAnalogOut(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0);
 			virtual void set(double voltage);
+			virtual double get();
 			void setValue(uint32_t value);
 			
 		private:
