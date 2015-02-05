@@ -11,13 +11,15 @@ namespace eeros {
 
 		class FlinkAnalogIn : public ScalablePeripheralInput<double> {
 		public:
-			FlinkAnalogIn(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, double umax = 10, double umin = -10);
+			FlinkAnalogIn(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0, bool twosComplement = false);
 			virtual double get();
 			
 		private:
 			flink_subdev* subdeviceHandle;
+			uint32_t resolution;
 			uint32_t channel;
 			uint32_t bitMask;
+			bool twosComplement;
 		};
 
 	};

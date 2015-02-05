@@ -2,7 +2,7 @@
 
 using namespace eeros::hal;
 
-FlinkAnalogOut::FlinkAnalogOut(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, double scale, double offset) : ScalablePeripheralOutput<double>(id, 1, 0), channel(channel), bitMask(0) {
+FlinkAnalogOut::FlinkAnalogOut(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, double scale, double offset) : ScalablePeripheralOutput<double>(id, scale, offset), channel(channel), bitMask(0) {
 	this->subdeviceHandle = flink_get_subdevice_by_id(device->getDeviceHandle(), subDeviceNumber);
 
 	flink_analog_out_get_resolution(subdeviceHandle, &resolution);
@@ -10,6 +10,11 @@ FlinkAnalogOut::FlinkAnalogOut(std::string id, FlinkDevice* device, uint8_t subD
 	
 	this->scale = scale;
 	this->offset = offset;
+}
+
+double FlinkAnalogOut::get() {
+	// TODO
+	return 0;
 }
 
 void FlinkAnalogOut::setValue(uint32_t value) {
