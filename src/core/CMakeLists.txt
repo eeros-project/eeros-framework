@@ -6,4 +6,4 @@ elseif(WINDOWS)
 endif()
 
 # Platform independent source files 
-add_eeros_sources(Version.cpp Thread.cpp EEROSException.cpp)
+add_eeros_sources(Version.cpp Thread.cpp EEROSException.cpp Config.cpp SimpleConfig.cpp)
