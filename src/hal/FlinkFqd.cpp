@@ -7,8 +7,10 @@ FlinkFqd::FlinkFqd(std::string id,
 					 uint32_t subDeviceNumber,
 					 uint32_t channel,
 					 double scale,
-					 double offset) : 
-					 ScalablePeripheralInput<double>(id, scale, offset), channel(channel), prevPos(0) {
+					 double offset,
+					 bool getDelta) : 
+	ScalablePeripheralInput<double>(id, scale, offset), channel(channel), prevPos(0), getDelta(getDelta)
+{
 	this->subdeviceHandle = flink_get_subdevice_by_id(device->getDeviceHandle(), subDeviceNumber);
 	reset();
 }
@@ -17,10 +19,15 @@ double FlinkFqd::get() {
 	uint32_t data = 0;
 	flink_counter_get_count(subdeviceHandle, channel, &data);
 	int16_t newPos = static_cast<uint16_t>(data);
-	int16_t delta = newPos - prevPos;
+	int16_t deltaPos = newPos - prevPos;
 	prevPos = newPos;
-	pos += delta * scale + offset;
-	return pos;
+	double delta = deltaPos * scale + offset;
+	pos += delta;
+	
+	if (getDelta)
+		return delta;
+	else
+		return pos;
 }
 
 void FlinkFqd::reset() {

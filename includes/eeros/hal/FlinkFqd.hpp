@@ -11,7 +11,7 @@ namespace eeros {
 		
 		class FlinkFqd : public ScalablePeripheralInput<double> {
 		public:
-			FlinkFqd(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0);
+			FlinkFqd(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0, bool getDelta = false);
 			virtual double get();
 			void reset();
 			
@@ -20,6 +20,7 @@ namespace eeros {
 			uint32_t channel;
 			uint16_t prevPos;
 			double pos;
+			bool getDelta;
 		};
 	};
 };
