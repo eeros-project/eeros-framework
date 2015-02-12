@@ -270,8 +270,26 @@ int main(int argc, char *argv[]) {
 		std::cout << "    -> Failure: Negation failed!" << std::endl;
 		error++;
 	}
+	
 	errorSum += error;
 	std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	
+	{
+		std::cout << "    #" << testNo++ << ": Negating a 6x1 double vector" << std::endl;
+		error = 0;
+		
+		Matrix<6,1> mat{ 1, 2, 3, 4, 5, 6 };
+		Matrix<6,1> ref{ -1, -2, -3, -4, -5, -6 };
+		auto res = -mat;
+	
+		if(res != ref) {
+			std::cout << "    -> Failure: Negation failed!" << std::endl;
+			error++;
+		}
+
+		errorSum += error;
+		std::cout << "    -> Test finished with " << error << " error(s)" << std::endl;
+	}
 	
 	
 	// ********** Part F **********

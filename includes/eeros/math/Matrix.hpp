@@ -810,6 +810,17 @@ namespace eeros {
 		}
 		
 		template < unsigned int M, unsigned int N = 1, typename T = double >
+		Matrix<M, N, T> operator-(const Matrix<M, N, T> &right) {
+			Matrix<M, N, T> result;
+			for(unsigned int m = 0; m < M; m++) {
+				for(unsigned int n = 0; n < N; n++) {
+					result(m, n) = -right(m, n);
+				}
+			}
+			return result;
+		}
+		
+		template < unsigned int M, unsigned int N = 1, typename T = double >
 		Matrix<M, N, T> operator*(T left, Matrix<M, N, T> right) {
 			Matrix<M, N, T> result;
 			for(unsigned int m = 0; m < M; m++) {
