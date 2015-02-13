@@ -29,6 +29,18 @@ void Sequencer::run() {
 				stepMode();
 				state = state::idle;
 			}
+			catch(std::exception &e) {
+				log.warn() << "Uncaught exception, switching to step mode." << logger::endl << e.what();
+				currentSequence = nullptr;
+				stepMode();
+				state = state::idle;
+			}
+			catch(int &e) {
+				log.warn() << "Uncaught exception, switching to step mode. (" << e << ")";
+				currentSequence = nullptr;
+				stepMode();
+				state = state::idle;
+			}
 			catch(...) {
 				log.warn() << "Uncaught exception, switching to step mode.";
 				currentSequence = nullptr;
