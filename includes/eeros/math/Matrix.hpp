@@ -566,13 +566,14 @@ namespace eeros {
 				return (*this);
 			}
 			
-			Matrix<M, N, T>& operator-() {
+			Matrix<M, N, T> operator-() {
+				Matrix<M, N, T> result;
 				for(unsigned int m = 0; m < M; m++) {
 					for(unsigned int n = 0; n < N; n++) {
-						(*this)(m, n) = -(*this)(m, n);
+						result(m, n) = -(*this)(m, n);
 					}
 				}
-				return (*this);
+				return result;
 			}
 			
 			Matrix<M, N, T> operator/(T right) const {
