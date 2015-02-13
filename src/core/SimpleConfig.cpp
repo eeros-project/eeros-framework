@@ -20,11 +20,12 @@ SimpleConfig::SimpleConfig(const char *path) : Config(path) { }
 
 SimpleConfig::~SimpleConfig() { }
 
-void SimpleConfig::save(const char *path) {
+bool SimpleConfig::save(const char *path) {
 	if (path == nullptr) path = this->path;
 	if (path == nullptr) throw EEROSException("path is null");
 	char buffer[buffer_size + 1];
 	std::ofstream file(path);
+	if (file.fail()) return false;
 	for (auto p: properties ) {
 		int n = strlen(p.first);
 		strncpy(buffer, p.first, n);
@@ -37,13 +38,15 @@ void SimpleConfig::save(const char *path) {
 		buffer[n] = 0;
 		file << buffer;
 	}
+	return true;
 }
 
-void SimpleConfig::load(const char *path) {
+bool SimpleConfig::load(const char *path) {
 	if (path == nullptr) path = this->path;
 	if (path == nullptr) throw EEROSException("path is null");
 	char buffer[buffer_size + 1];
 	std::ifstream file(path);
+	if (file.fail()) return false;
 	while (file.good()) {
 		file.getline(buffer, buffer_size);
 		int n = strlen(buffer);
@@ -72,8 +75,7 @@ void SimpleConfig::load(const char *path) {
 		
 		if (buffer[i++] != '=')
 			continue; // illegal format -> skip line
-		
-		
+
 		buffer[name_end] = 0;
 		
 		auto p = properties.find(&buffer[name_start]);
@@ -81,4 +83,5 @@ void SimpleConfig::load(const char *path) {
 		
 		p->second.get(p->first, &buffer[i], (n - i));
 	}
+	return true;
 }

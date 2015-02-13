@@ -28,8 +28,8 @@ namespace eeros {
 		virtual ~Config();
 		
 		virtual void loadDefaults();
-		virtual void save(const char *path = nullptr) = 0;
-		virtual void load(const char *path = nullptr) = 0;
+		virtual bool save(const char *path = nullptr) = 0;
+		virtual bool load(const char *path = nullptr) = 0;
 		
 	protected:
 		virtual void add(const char *name, int &value);

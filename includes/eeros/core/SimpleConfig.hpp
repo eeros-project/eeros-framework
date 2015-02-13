@@ -10,8 +10,8 @@ namespace eeros {
 		SimpleConfig(const char *path = nullptr);
 		virtual ~SimpleConfig();
 		
-		virtual void save(const char *path = nullptr);
-		virtual void load(const char *path = nullptr);
+		virtual bool save(const char *path = nullptr);
+		virtual bool load(const char *path = nullptr);
 		
 		static constexpr int buffer_size = 256;
 	};
