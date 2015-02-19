@@ -17,6 +17,7 @@ namespace eeros {
 			virtual void run() {
 				for(int i = 0; i < N; i++) {
 					out[i].getSignal().setValue(in.getSignal().getValue()(i));
+					out[i].getSignal().setTimestamp(in.getSignal().getTimestamp());
 				}
 			}
 			
