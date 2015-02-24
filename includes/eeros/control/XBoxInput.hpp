@@ -21,6 +21,11 @@ namespace eeros {
 			virtual void setInitPos(eeros::math::Vector4 initPos);
 			virtual void setSpeedScaleFactor(double speedScale);
 			
+			inline void on_button(std::function<void(int, bool)> &&action)
+			{
+				j.on_button(std::move(action));
+			}
+			
 			double speedScaleFactor = 1.0;
 
 			double xScale = 0.0001;
