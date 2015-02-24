@@ -1,6 +1,6 @@
 
-add_executable(martinTest1 MartinTest1.cpp)
-target_link_libraries(martinTest1 eeros)
+#add_executable(martinTest1 MartinTest1.cpp)
+#target_link_libraries(martinTest1 eeros)
 
 if(LIBCURSES)
 	add_executable(martinTest2 MartinTest2.cpp)
