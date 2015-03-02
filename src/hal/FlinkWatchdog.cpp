@@ -8,7 +8,10 @@ FlinkWatchdog::FlinkWatchdog(std::string id, FlinkDevice* device, uint32_t subDe
 }
 
 void FlinkWatchdog::set(bool b) {
-	flink_wd_set_counter(subdeviceHandle, counter);
+	if (b)
+		flink_wd_set_counter(subdeviceHandle, counter);
+	else
+		flink_wd_set_counter(subdeviceHandle, 0);
 }
 
 void FlinkWatchdog::setTimeout(double t) {
