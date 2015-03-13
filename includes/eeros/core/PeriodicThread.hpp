@@ -2,6 +2,7 @@
 #define ORG_EEROS_CORE_PERIODICTHREAD_HPP_
 
 #include <eeros/core/Thread.hpp>
+#include <eeros/core/PeriodicCounter.hpp>
 #include <atomic>
 
 namespace eeros {
@@ -27,6 +28,8 @@ namespace eeros {
 				return false;
 			#endif
 		}
+		
+		PeriodicCounter counter;
 		
 	private:
 		double period, delay;

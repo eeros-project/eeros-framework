@@ -13,7 +13,8 @@ void stack_prefault() {
 	unsigned char dummy[MAX_SAFE_STACK] = {};
 }
 
-PeriodicThread::PeriodicThread(double period, double delay, bool realtime, status start) : 
+PeriodicThread::PeriodicThread(double period, double delay, bool realtime, status start) :
+	counter(period),
 	rt(realtime),
 	period(period),
 	delay(delay),
@@ -51,7 +52,9 @@ PeriodicThread::PeriodicThread(double period, double delay, bool realtime, statu
 		}
 		while(s != stopping) {
 			clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time, NULL);
+			counter.tick();
 			if(s != paused) this->run();
+			counter.tock();
 			time.tv_nsec += period_ns;
 			while(time.tv_nsec >= to_ns(1)) {
 				time.tv_nsec -= to_ns(1);
