@@ -13,13 +13,13 @@ void stack_prefault() {
 	unsigned char dummy[MAX_SAFE_STACK] = {};
 }
 
-PeriodicThread::PeriodicThread(double period, double delay, bool realtime, status start) :
+PeriodicThread::PeriodicThread(double period, double delay, bool realtime, status start, int priority) :
 	counter(period),
 	rt(realtime),
 	period(period),
 	delay(delay),
 	s(start),
-	Thread([this]() {
+	Thread([this, priority]() {
 		struct timespec time;
 		uint64_t period_ns = to_ns(this->period);
 		std::string id = getId();
@@ -32,7 +32,7 @@ PeriodicThread::PeriodicThread(double period, double delay, bool realtime, statu
 		if(this->rt) {
 			log.trace() << "Periodic thread '" << id << "' configured for realtime scheduling.";
 			struct sched_param schedulingParam;
-			schedulingParam.sched_priority = RT_PRIORITY; // TODO use sched_get_priority_max
+			schedulingParam.sched_priority = RT_PRIORITY + priority; // TODO use sched_get_priority_max
 			if(sched_setscheduler(0, SCHED_FIFO, &schedulingParam) == -1) { // TODO add support for SCHED_DEADLINE
 				log.error() << "Periodic thread '" << id << "': failed to set real time scheduler!";
 			}
