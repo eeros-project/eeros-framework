@@ -10,7 +10,7 @@ namespace eeros {
 		log('S'),
 		currentLevel(nullptr),
 		privateContext(this),
-		PeriodicThread(period, 0, PeriodicThread::isRealtimeSupported(), PeriodicThread::paused) {
+		PeriodicThread(period, 0, PeriodicThread::isRealtimeSupported(), PeriodicThread::paused, 10) {
 			if(++instCount > 1) { // only one instance is allowed
 				throw EEROSException("only one instance of the safety system is allowed");
 			}
