@@ -4,4 +4,4 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 add_executable(safetySystemExample ExampleSafetyProperties.cpp safetySystemExample.cpp)
-target_link_libraries(safetySystemExample eeros)
+target_link_libraries(safetySystemExample eeros pthread)
