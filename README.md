@@ -1,21 +1,17 @@
-EEROS Robotics Framework
-========================
+# EEROS Robotics Framework
 
 EEROS is a fully open-source software framework for the developement of robots used in research and as well for commercial used robot systems. It is supposed to be a flexible and universal usable platform which is safe and easy to use. It contains three sub systems: The Control System, the Safety System and the Sequencer.
 
 
-Documentation
--------------
+## Documentation
 
-- Project Website: www.eeros.org
-- Project Wiki: wiki.eeros.org
-- EEROS API: api.eeros.org
+- Project Website: (www.eeros.org)
+- Project Wiki: (wiki.eeros.org) 
+- EEROS API: (api.eeros.org) 
 
-Build the EEROS Robotics Framework
-==================================
+## Build the EEROS Robotics Framework
 
-Requirements
-------------
+### Requirements
 
   - Linux based operating system (support for other platforms will be added in a further release)
   - GCC 4.7 or newer (clang/llvm should work too, but is not tested)
@@ -26,8 +22,7 @@ Requirements
     - libcomedi (www.comedi.org)
     - libflink (www.github.com/flink-project)
 
-Local build
------------
+### Local build
 
   1. Clone git repository: `$ git clone https://github.com/eeros-project/eeros-framework.git`
   2. Create a build directory: `$ mkdir build-local`
@@ -36,8 +31,7 @@ Local build
   4. Build the source code: `$ make`
   5. Install the library and header files on your system: `$ make install`
 
-Cross build
------------
+### Cross build
 
   1. Clone git repository: `$ git clone https://github.com/eeros-project/eeros-framework.git`
   2. Create a build directory, e.g: `$ mkdir build-powerpc`
