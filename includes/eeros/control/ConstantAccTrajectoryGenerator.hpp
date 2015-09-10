@@ -1,10 +1,10 @@
 #ifndef ORG_EEROS_CONTROL_CONSTANTACCTRAJECTORYGENERATOR_HPP_
 #define ORG_EEROS_CONTROL_CONSTANTACCTRAJECTORYGENERATOR_HPP_
 
-#include <eeros/core/EEROSException.hpp>
 #include <cmath>
 #include <mutex>
-#include "TrajectoryGenerator.hpp"
+#include <eeros/core/EEROSException.hpp>
+#include <eeros/control/TrajectoryGenerator.hpp>
 
 
 namespace eeros {
