@@ -938,6 +938,16 @@ namespace eeros {
 			
 			operator T() const { return value; }
 			
+			Matrix<1, 1, T>& operator+=(const Matrix<1, 1, T> right) {
+				(*this) = (*this) + right;
+				return (*this);
+			}
+			
+			Matrix<1, 1, T>& operator-=(const Matrix<1, 1, T> right) {
+				(*this) = (*this) - right;
+				return (*this);
+			}
+			
 		protected:
 			T value;
 		};
