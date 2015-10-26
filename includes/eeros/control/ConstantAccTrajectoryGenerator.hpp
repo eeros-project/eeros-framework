@@ -138,6 +138,17 @@ namespace eeros {
 				this->finish = true;
 			}
 			
+			virtual void setMaxSpeed(T speed) {
+				velMax = speed;
+			}
+			
+			virtual void setMaxAcc(T acc) {
+				accMax = acc;
+			}
+			virtual void setMaxDec(T dec) {
+				decMax = dec;
+			}
+			
 		protected:
 			std::mutex mtx;
 			double dt;
