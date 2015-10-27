@@ -51,7 +51,14 @@ PeriodicThread::PeriodicThread(double period, double delay, bool realtime, statu
 			time.tv_sec++;
 		}
 		while(s != stopping) {
-			clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time, NULL);
+			int r;
+			do {
+				r = clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time, NULL);
+			} while (r == EINTR);
+			if (r != 0) {
+				log.error() << "failed to sleep " << r;
+				break;
+			}
 			counter.tick();
 			if(s != paused) this->run();
 			counter.tock();
