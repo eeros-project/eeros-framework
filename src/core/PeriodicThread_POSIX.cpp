@@ -26,7 +26,11 @@ PeriodicThread::PeriodicThread(double period, double delay, bool realtime, statu
 		
 		log.trace() << "Periodic thread '" << id << "' started.";
 		
-		clock_gettime(CLOCK_MONOTONIC, &time);
+		int r = clock_gettime(CLOCK_MONOTONIC, &time);
+		if (r != 0) {
+			log.error() << "failed to get time " << errno;
+			return;
+		}
 		time.tv_nsec += to_ns(this->delay);
 		
 		if(this->rt) {
@@ -51,7 +55,6 @@ PeriodicThread::PeriodicThread(double period, double delay, bool realtime, statu
 			time.tv_sec++;
 		}
 		while(s != stopping) {
-			int r;
 			do {
 				r = clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time, NULL);
 			} while (r == EINTR);
