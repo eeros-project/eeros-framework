@@ -43,7 +43,7 @@ PeriodicThread::PeriodicThread(double period, double delay, bool realtime, statu
 			
 			/* Lock memory */
 			if(mlockall(MCL_CURRENT | MCL_FUTURE) == -1) {
-				log.error() << "Periodic thread '" << id << "': failed to lock memory allocation!";
+				log.error() << "Periodic thread '" << id << "': failed to lock memory in RAM!";
 			}
 			
 			/* Pre-fault our stack */
