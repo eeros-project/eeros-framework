@@ -21,8 +21,8 @@ PeriodicThread::PeriodicThread(double period, double delay, bool realtime, statu
 	s(start),
 	Thread([this, priority]() {
 		struct timespec time;
-		uint64_t period_ns = to_ns(this->period);
 		std::string id = getId();
+		uint64_t period_ns = to_ns(this->period);
 		
 		log.trace() << "Periodic thread '" << id << "' started.";
 		
