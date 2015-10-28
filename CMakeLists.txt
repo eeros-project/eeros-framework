@@ -88,19 +88,19 @@ endif()
 
 ## Check for additional libraries
 message(STATUS "looking for additional libraries")
-find_file(LIBCOMEDI "comedilib.h")
+find_file(LIBCOMEDI "comedilib.h" ${ADDITIONAL_INCLUDE_DIRS})
 if(LIBCOMEDI)
 	message(STATUS "-> libcomedi available")
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
 endif()
 
-find_file(LIBFLINK "flinklib.h")
+find_file(LIBFLINK "flinklib.h" ${ADDITIONAL_INCLUDE_DIRS})
 if(LIBFLINK)
 	message(STATUS "-> libflink available")
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
 endif()
 
-find_file(LIBCURSES "curses.h")
+find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 if(LIBCURSES)
 	message(STATUS "-> libcurses available")
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ncurses)
