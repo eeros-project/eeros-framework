@@ -23,6 +23,31 @@ link_directories(${ADDITIONAL_LINK_DIRS})
 ## Install directive for the header files
 INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
 
+## Install CMake configuration file
+set(INCLUDE_INSTALL_DIR include/)
+set(LIB_INSTALL_DIR lib/)
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+	cmake/EEROSConfig.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake
+	INSTALL_DESTINATION ${LIB_INSTALL_DIR}/EEROS/cmake
+	PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR)
+
+write_basic_package_version_file(
+	${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
+	VERSION ${EEROS_VERSION}
+	COMPATIBILITY SameMajorVersion)
+
+install(
+	FILES
+		${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake
+		${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
+	DESTINATION
+		${LIB_INSTALL_DIR}/EEROS/cmake)
+
+
 ## Load CMake modules
 include(CheckCXXCompilerFlag)
 
