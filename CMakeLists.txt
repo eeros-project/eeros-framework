@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 2.8)
 ## EEROS Robotic Framework
 project(EEROS)
 
+set(EEROS_VERSION_SO 0.0)
 set(EEROS_VERSION_MAJOR 0)
 set(EEROS_VERSION_MINOR 0)
 set(EEROS_VERSION_PATCH 0)

@@ -38,4 +38,9 @@ add_library(eeros SHARED ${EEROS_SRCS})
 
 target_link_libraries(eeros ${EXTERNAL_LIBS})
 
+set_target_properties(eeros PROPERTIES
+			VERSION ${EEROS_VERSION}
+			SOVERSION ${EEROS_VERSION_SO})
+
+
 INSTALL(TARGETS eeros LIBRARY DESTINATION lib)
