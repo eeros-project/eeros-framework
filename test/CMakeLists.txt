@@ -10,7 +10,7 @@ set(TEST_DATA_DIR ${CMAKE_SOURCE_DIR}/test/data)
 add_subdirectory(core)
 add_subdirectory(math)
 add_subdirectory(control)
-#add_subdirectory(safety)
+add_subdirectory(safety)
 #add_subdirectory(sequencer)
 #add_subdirectory(logger)
 
