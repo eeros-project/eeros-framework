@@ -6,4 +6,15 @@ elseif(WINDOWS)
 endif()
 
 # Platform independent source files 
-add_eeros_sources(Version.cpp Thread.cpp EEROSException.cpp Config.cpp SimpleConfig.cpp PeriodicCounter.cpp Statistics.cpp)
+add_eeros_sources(
+	Version.cpp
+	Runnable.cpp
+	Thread.cpp
+	EEROSException.cpp
+	Config.cpp
+	SimpleConfig.cpp
+	PeriodicCounter.cpp
+	Statistics.cpp
+	Semaphore.cpp
+	Executor.cpp
+)

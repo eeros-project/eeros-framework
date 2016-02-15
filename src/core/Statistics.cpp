@@ -4,29 +4,31 @@
 using namespace eeros;
 
 
-
-Statistics::Statistics() : max_count(1000) { }
-
-Statistics::Statistics(long max_count) : max_count(max_count) { }
-
-void Statistics::add(double value)
-{
-	if (value < min) min = value;
-	if (value > max) max = value;
-	
-	if (count < max_count) {
-		mean = (mean * count + value) / (count + 1);
-	}
-	else {
-		mean = (mean * (max_count - 1) + value) / max_count;
-	}
-	count++;
+Statistics::Statistics() {
+	reset();
 }
 
-void Statistics::reset()
-{
+void Statistics::add(double value) {
+	if (value < min) min = value;
+	if (value > max) max = value;
+
+	count++;
+	last = value;
+
+	A += value;
+	B += value * value;
+
+	mean = A / count;
+	variance = (B - 2*mean*A) / count + mean*mean;
+}
+
+void Statistics::reset() {
 		count = 0;
+		last = 0;
 		min = std::numeric_limits<double>::max();
 		max = std::numeric_limits<double>::lowest();
 		mean = 0;
+		variance = 0;
+		A = 0;
+		B = 0;
 }

@@ -6,15 +6,18 @@ namespace eeros {
 	class Statistics {
 	public:
 		Statistics();
-		Statistics(long max_count);
 		void add(double value);
 		void reset();
-		
-		long max_count;
+
 		long count;
+		double last;
 		double min;
 		double max;
 		double mean;
+		double variance;
+
+	private:
+		double A, B;
 	};
 };
 

@@ -8,22 +8,22 @@
 namespace eeros {
 	namespace control {
 
-		template < typename T = double >
+		template < typename Tin = double, typename Tout = Tin >
 		class Block1i1o : public Block {
 		public:
 			Block1i1o() { }
 			
-			virtual Input<T>& getIn() {
+			virtual Input<Tin>& getIn() {
 				return in;
 			}
 			
-			virtual Output<T>& getOut() {
+			virtual Output<Tout>& getOut() {
 				return out;
 			}
 			
 		protected:
-			Input<T> in;
-			Output<T> out;
+			Input<Tin> in;
+			Output<Tout> out;
 		};
 		
 	};

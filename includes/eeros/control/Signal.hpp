@@ -10,6 +10,8 @@
 namespace eeros {
 	namespace control {
 		
+		extern uint16_t signalCounter;
+			
 		template < typename T = double >
 		class Signal : public SignalInterface {
 		public:
@@ -114,15 +116,11 @@ namespace eeros {
 			}
 			
 			static std::list<SignalInterface*> signalList;
-			static uint16_t signalCounter;
 			static Signal<T> illegalSignal;
 		};
 		
 		template < typename T>
 		std::list<SignalInterface*> Signal<T>::signalList;
-		
-		template < typename T>
-		uint16_t Signal<T>::signalCounter = startSignalId;
 		
 		template < typename T>
 		Signal<T> Signal<T>::illegalSignal;

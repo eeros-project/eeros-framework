@@ -1,4 +1,5 @@
 #include "MyControlSystem.hpp"
+#include <eeros/core/Executor.hpp>
 
 using namespace eeros::control;
 
@@ -61,6 +62,8 @@ MyControlSystem::MyControlSystem(double ts) :
 	timedomain.addBlock(&inertia);
 	timedomain.addBlock(&invMotConst);
 	timedomain.addBlock(&dac);
+
+	eeros::Executor::instance().add(timedomain);
 }
 
 void MyControlSystem::start() {

@@ -2,8 +2,21 @@
 
 using namespace eeros::control;
 
-TimeDomain::TimeDomain(std::string name, double period, bool realtime) : name(name), PeriodicThread(period, 0, realtime, paused) {
+TimeDomain::TimeDomain(std::string name, double period, bool realtime) :
+	name(name), period(period), realtime(realtime) {
 	// nothing to do
+}
+
+std::string TimeDomain::getName() {
+	return name;
+}
+
+double TimeDomain::getPeriod() {
+	return period;
+}
+
+bool TimeDomain::getRealtime() {
+	return realtime;
 }
 
 void TimeDomain::run() {

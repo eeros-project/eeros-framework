@@ -9,17 +9,21 @@
 namespace eeros {
 	namespace control {
 
-		class TimeDomain : public PeriodicThread {
+		class TimeDomain : public virtual Runnable {
 		public:
 			TimeDomain(std::string name, double period, bool realtime);
 			virtual void addBlock(Runnable* block);
-//			virtual void sortBlocks();
 			
-		protected:
+			std::string getName();
+			double getPeriod();
+			bool getRealtime();
+
 			virtual void run();
 			
 		private:
 			std::string name;
+			double period;
+			bool realtime;
 			std::list<Runnable*> blocks;
 		};
 

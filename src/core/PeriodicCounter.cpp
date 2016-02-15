@@ -1,15 +1,26 @@
 #include <eeros/core/PeriodicCounter.hpp>
+#include <eeros/logger/Pretty.hpp>
 using namespace eeros;
 
 PeriodicCounter::PeriodicCounter(double period, unsigned logger_category) :
-	counter_period(period), max_period(1.2*period), min_period(0.8*period),
-	max_jitter(0.2*period), min_jitter(-max_jitter),
-	max_run(0.8*period), min_run(0),
-	warn_counter(0), rate_limiter(0),
-	log(logger_category)
+	log(logger_category), reset_after(20)
 {
-	reset();
+	setPeriod(period);
 	start = clk::now();
+	first = true;
+}
+
+void PeriodicCounter::setPeriod(double period) {
+	counter_period = period;
+	reset();
+}
+
+void PeriodicCounter::setResetTime(double sec) {
+	reset_after = sec;
+}
+
+void PeriodicCounter::addDefaultMonitor(double tolerance) {
+	PeriodicCounter::addDefaultMonitor(monitors, counter_period, tolerance);
 }
 
 void PeriodicCounter::tick() {
@@ -18,6 +29,11 @@ void PeriodicCounter::tick() {
 }
 
 void PeriodicCounter::tock() {
+	if (first) {
+		first = false;
+		return;
+	}
+
 	time_point stop = clk::now();
 	double new_period = std::chrono::duration<double>(start - last).count();
 	double new_run = std::chrono::duration<double>(stop - start).count();
@@ -27,34 +43,15 @@ void PeriodicCounter::tock() {
 	run.add(new_run);
 	jitter.add(new_jitter);
 	
-	bool warn = false;
-	bool first = (rate_limiter == 0);
-	if (new_period < min_period || new_period > max_period) {
-		if (first) log.warn() << "period: " << new_period;
-		warn = true;
+	for (auto &func: monitors)
+		func(*this, log);
+
+	if (reset_counter <= 0) {
+		*this >> log.trace();
+		reset();
 	}
-	if (new_jitter < min_jitter || new_jitter > max_jitter) {
-		if (first) log.warn() << "jitter: " << new_jitter;
-		warn = true;
-	}
-	if (new_run < min_run || new_run > max_run) {
-		if (first) log.warn() << "run:    " << new_run;
-		warn = true;
-	}
-	if (warn) {
-		warn_counter++;
-		
-		if (rate_limiter == 0)
-			rate_limiter = (int)(1 / counter_period);
-	}
-	if (rate_limiter == 1)
-	{
-		log.warn() << warn_counter << " warnings not shown";
-		warn_counter = 0;
-		rate_limiter = 0;
-	}
-	else if (rate_limiter > 0) {
-		rate_limiter--;
+	else {
+		reset_counter--;
 	}
 }
 
@@ -62,4 +59,46 @@ void PeriodicCounter::reset() {
 	period.reset();
 	jitter.reset();
 	run.reset();
+	reset_counter = (int)(reset_after / counter_period);
+}
+
+void PeriodicCounter:: operator >> (eeros::logger::LogEntry<logger::LogWriter> &event) {
+	using namespace eeros::logger;
+
+	auto l = [](LogEntry<LogWriter> &e, Statistics &x) -> decltype(e) {
+		return e << pretty(x.mean) << "\t" << pretty(x.variance) << "\t" << pretty(x.min) << "\t" << pretty(x.max);
+	};
+
+	event << "stats:\t     mean\t variance\t      min\t      max" << endl;
+
+	event << "period\t";
+	l(event, period) << endl;
+
+	event << "jitter\t";
+	l(event, jitter) << endl;
+
+	event << "run   \t";
+	l(event, run) << endl;
+
+	event << "count = " << period.count;
+}
+
+void PeriodicCounter:: operator >> (eeros::logger::LogEntry<logger::LogWriter> &&event) {
+	*this >> event;
+}
+
+
+void PeriodicCounter::addDefaultMonitor(std::vector<MonitorFunc> &monitors, double period, double tolerance){
+	double Tmin = period * (1 - tolerance);
+	double Tmax = period * (1 + tolerance);
+
+	monitors.push_back([Tmin, Tmax](PeriodicCounter& counter, Logger& log){
+		double T = counter.period.last;
+		if (T < Tmin || T > Tmax) {
+			auto e = log.warn();
+			e << "last period was " << T << eeros::logger::endl;
+			counter >> e;
+		}
+	});
+
 }

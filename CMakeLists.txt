@@ -120,7 +120,7 @@ if(LIBCOMEDI)
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
 endif()
 
-find_package(flink)
+find_package(flink QUIET)
 if (FLINK_LIB_DIR)
 	message(STATUS "-> libflink package available")
 	include_directories("${FLINK_INCLUDE_DIR}")
