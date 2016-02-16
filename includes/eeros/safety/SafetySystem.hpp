@@ -2,7 +2,7 @@
 #define ORG_EEROS_SAFETY_SAFETYSYSTEM_HPP_
 
 #include <vector>
-#include <eeros/core/PeriodicThread.hpp>
+#include <eeros/core/Runnable.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetyProperties.hpp>
 #include <eeros/safety/SafetyContext.hpp>
@@ -16,7 +16,7 @@ namespace eeros {
 		class SystemInputInterface;
 		class SystemOutputInterface;
 		
-		class SafetySystem : private PeriodicThread {
+		class SafetySystem : public Runnable {
 		public:
 			SafetySystem(SafetyProperties properties, double period);
 			virtual ~SafetySystem();
@@ -25,12 +25,11 @@ namespace eeros {
 			SafetyLevel& operator[](unsigned levelId);
 			
 			void triggerEvent(uint32_t event, SafetyContext* context = nullptr);
-			void shutdown();
 			const SafetyProperties* getProperties() const;
+			double getPeriod() const;
 			
 			logger::Logger<logger::LogWriter> log;
 			
-		protected:
 			void run();
 		private:
 			bool setProperties(SafetyProperties safetyProperties);
@@ -39,6 +38,7 @@ namespace eeros {
 			SafetyLevel* currentLevel;
 			SafetyContext privateContext;
 			static uint8_t instCount;
+			double period;
 		};
 
 	};

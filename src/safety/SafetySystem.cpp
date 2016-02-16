@@ -10,29 +10,19 @@ namespace eeros {
 		log('S'),
 		currentLevel(nullptr),
 		privateContext(this),
-		PeriodicThread(period, 0, PeriodicThread::isRealtimeSupported(), PeriodicThread::paused, 10) {
+		period(period) {
 			if(++instCount > 1) { // only one instance is allowed
 				throw EEROSException("only one instance of the safety system is allowed");
 			}
 			if(!setProperties(safetyProperties)) {
 				throw EEROSException("verification of safety properties failed!");
 			}
-			start();
 		}
 		
 		SafetySystem::~SafetySystem() {
-			if(getStatus() != stopped) {
-				stop();
-				join();
-			}
 			instCount--;
 		}
-		
-		void SafetySystem::shutdown() {
-			stop();
-			join();
-		}
-		
+
 		SafetyLevel& SafetySystem::getCurrentLevel(void) {
 			if(currentLevel) {
 				return *currentLevel;
@@ -93,6 +83,10 @@ namespace eeros {
 		
 		const SafetyProperties* SafetySystem::getProperties() const {
 			return &properties;
+		}
+
+		double SafetySystem::getPeriod() const {
+			return period;
 		}
 
 		void SafetySystem::run() {

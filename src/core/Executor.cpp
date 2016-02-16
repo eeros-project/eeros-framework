@@ -14,6 +14,7 @@
 #include <eeros/task/Lambda.hpp>
 #include <eeros/task/HarmonicTaskList.hpp>
 #include <eeros/control/TimeDomain.hpp>
+#include <eeros/safety/SafetySystem.hpp>
 
 
 volatile bool running = true;
@@ -132,6 +133,11 @@ void Executor::setMainTask(task::Periodic &mainTask) {
 	if (mainTask.getPeriod() != period)
 		throw std::runtime_error("the main task must have the same period as the executor");
 	this->mainTask = &mainTask;
+}
+
+void Executor::setMainTask(safety::SafetySystem &mainTask) {
+	task::Periodic *task = new task::Periodic("main", mainTask.getPeriod(), mainTask, true);
+	setMainTask(*task);
 }
 
 void Executor::add(task::Periodic task) {

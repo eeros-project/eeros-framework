@@ -6,7 +6,7 @@
 #include <eeros/hal/PeripheralInput.hpp>
 
 class ExampleSafetyProperties : public eeros::safety::SafetyProperties {
-
+public:
 	// Define all possible events
 	enum {
 		doSwInit,
@@ -48,8 +48,7 @@ class ExampleSafetyProperties : public eeros::safety::SafetyProperties {
 		motionStarting = 42,
 		moving = 50
 	};
-	
-public:
+
     ExampleSafetyProperties();
     virtual ~ExampleSafetyProperties();
 	

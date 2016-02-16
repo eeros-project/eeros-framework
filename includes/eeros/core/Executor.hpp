@@ -15,6 +15,10 @@ namespace eeros {
 		class TimeDomain;
 	}
 
+	namespace safety {
+		class SafetySystem;
+	};
+
 	class Executor : public Runnable {
 		Executor();
 	public:
@@ -24,6 +28,7 @@ namespace eeros {
 		static Executor& instance();
 		void setPeriod(double period);
 		void setMainTask(task::Periodic &mainTask);
+		void setMainTask(safety::SafetySystem &mainTask);
 		void add(task::Periodic task);
 		void add(control::TimeDomain &timedomain);
 		virtual void run();
