@@ -6,6 +6,7 @@
 
 #include <eeros/control/Signal.hpp>
 #include <eeros/control/Input.hpp>
+#include <eeros/control/Output.hpp>
 #include <eeros/hal/PeripheralInput.hpp>
 
 
@@ -15,21 +16,32 @@ namespace eeros {
 		template <typename T>
 		class ControlInput : public hal::PeripheralInput<T> {
 		public:
-			explicit ControlInput(std::string id, control::Input<T> &input);
+			ControlInput(std::string id, control::Input<T> &input);
+			ControlInput(std::string id, control::Output<T> &output);
+			ControlInput(std::string id, control::Signal<T> &signal);
 			virtual ~ControlInput();
 			virtual T get();
 		private:
-			control::Signal<T> &input;
+			control::Signal<T> &signal;
 		};
 		
 		template <typename T>
-		ControlInput<T>::ControlInput(std::string id, control::Input<T> &input) : hal::PeripheralInput<T>(id), input(input.getSignal()) { }
+		ControlInput<T>::ControlInput(std::string id, control::Input<T> &input) :
+			hal::PeripheralInput<T>(id), signal(input.getSignal()) { }
+
+		template <typename T>
+		ControlInput<T>::ControlInput(std::string id, control::Output<T> &output) :
+			hal::PeripheralInput<T>(id), signal(output.getSignal()) { }
+
+		template <typename T>
+		ControlInput<T>::ControlInput(std::string id, control::Signal<T> &signal) :
+			hal::PeripheralInput<T>(id), signal(signal) { }
 		
 		template <typename T>
 		ControlInput<T>::~ControlInput() { }
 		
 		template <typename T>
-		T ControlInput<T>::get() { return input.getValue(); }
+		T ControlInput<T>::get() { return signal.getValue(); }
 		
 	}
 }

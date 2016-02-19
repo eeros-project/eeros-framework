@@ -17,7 +17,7 @@ int test_double() {
 	eeros::control::Input<double> in1;
 	in1.connect(out1);
 	
-	eeros::safety::ControlInput<double> cin1("in1", in1);
+	eeros::safety::ControlInput<double> cin1("in1", in1.getSignal());
 	
 	double x;
 	double y;
@@ -56,7 +56,7 @@ int test_vector() {
 	eeros::control::Input<T> in1;
 	in1.connect(out1);
 	
-	eeros::safety::ControlInput<T> cin1("in1", in1);
+	eeros::safety::ControlInput<T> cin1("in1", in1.getSignal());
 	
 	T x;
 	T y;
