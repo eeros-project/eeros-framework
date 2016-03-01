@@ -46,13 +46,13 @@ void PeriodicCounter::tock() {
 	for (auto &func: monitors)
 		func(*this, log);
 
-	if (reset_counter <= 0) {
+/*	if (reset_counter <= 0) {
 		*this >> log.trace();
 		reset();
 	}
 	else {
 		reset_counter--;
-	}
+	}*/
 }
 
 void PeriodicCounter::reset() {
