@@ -12,7 +12,7 @@
 namespace eeros {
 
 	class PeriodicCounter {
-		using clk = std::chrono::high_resolution_clock;
+		using clk = std::chrono::steady_clock;
 		using time_point = clk::time_point;
 
 	public:

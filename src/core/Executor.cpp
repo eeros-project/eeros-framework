@@ -234,7 +234,7 @@ void Executor::run() {
 
 	log.trace() << "starting periodic execution";
 
-	auto next_cylce = std::chrono::high_resolution_clock::now() + seconds(period);
+	auto next_cylce = std::chrono::steady_clock::now() + seconds(period);
 	while (running) {
 		std::this_thread::sleep_until(next_cylce);
 
