@@ -3,7 +3,7 @@
 #include <time.h>
 
 #define NS_PER_SEC 1000000000
-#define CLOCK CLOCK_REALTIME
+#define CLOCK CLOCK_MONOTONIC_RAW
 
 using namespace eeros;
 
