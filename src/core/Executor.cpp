@@ -86,7 +86,7 @@ namespace {
 		if (task.getRealtime())
 			log.trace() << "creating harmonic realtime task '" << task.getName()
 						<< "' with period " << param.actualPeriod << " sec (k = "
-						<< param.k << ") and priority " << (49 - task.getNice())
+						<< param.k << ") and priority " << (Executor::basePriority - task.getNice())
 						<< " based on '" << baseTask.getName() << "'";
 		else
 			log.trace() << "creating harmonic task '" << task.getName() << "' with period "
@@ -159,7 +159,7 @@ bool Executor::lock_memory() {
 
 bool Executor::set_priority(int nice) {
 	struct sched_param schedulingParam;
-	schedulingParam.sched_priority = (49 - nice);
+	schedulingParam.sched_priority = (Executor::basePriority - nice);
 	return (sched_setscheduler(0, SCHED_FIFO, &schedulingParam) != -1);
 }
 
