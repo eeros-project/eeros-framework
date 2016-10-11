@@ -42,18 +42,6 @@ namespace {
 		task::Async async;
 	};
 
-	struct Harmonic {
-		Harmonic(task::Periodic &base, task::Periodic &task) {
-			k = static_cast<int>(task.getPeriod() / base.getPeriod());
-			actualPeriod = k * base.getPeriod();
-			deviation = std::abs(task.getPeriod() - actualPeriod) / task.getPeriod();
-		}
-
-		int k;
-		double actualPeriod;
-		double deviation;
-	};
-
 	template < typename F >
 	void traverse(std::vector<task::Periodic> &tasks, F func) {
 		for (auto &t: tasks) {
@@ -63,37 +51,39 @@ namespace {
 		}
 	}
 
-	task::Harmonic createThread(Logger &log, std::vector<std::shared_ptr<TaskThread>> &threads, task::Periodic &baseTask, task::Periodic &task, std::vector<task::Harmonic> &output);
+ 	void createThread(Logger &log, task::Periodic &task, task::Periodic &baseTask, std::vector<std::shared_ptr<TaskThread>> &threads, std::vector<task::Harmonic> &output);
 
-	void createThreads(Logger &log, std::vector<task::Periodic> &tasks, std::vector<std::shared_ptr<TaskThread>> &threads, task::Periodic &baseTask, task::HarmonicTaskList &output) {
+	void createThreads(Logger &log, std::vector<task::Periodic> &tasks, task::Periodic &baseTask, std::vector<std::shared_ptr<TaskThread>> &threads, task::HarmonicTaskList &output) {
 		for (task::Periodic &t: tasks) {
-			createThread(log, threads, baseTask, t, output.tasks);
+			createThread(log, t, baseTask, threads, output.tasks);
 		}
 	}
 
-	task::Harmonic createThread(Logger &log, std::vector<std::shared_ptr<TaskThread>> &threads, task::Periodic &baseTask, task::Periodic &task, std::vector<task::Harmonic> &output) {
-		Harmonic param(baseTask, task);
+	void createThread(Logger &log, task::Periodic &task, task::Periodic &baseTask, std::vector<std::shared_ptr<TaskThread>> &threads, std::vector<task::Harmonic> &output) {
+		int k = static_cast<int>(task.getPeriod() / baseTask.getPeriod());
+		double actualPeriod = k * baseTask.getPeriod();
+		double deviation = std::abs(task.getPeriod() - actualPeriod) / task.getPeriod();
 		task::HarmonicTaskList taskList;
 
 		if (task.before.size() > 0) {
-			createThreads(log, task.before, threads, task, taskList);
+			createThreads(log, task.before, task, threads, taskList);
 		}
 		taskList.add(task.getTask());
 		if (task.after.size() > 0) {
-			createThreads(log, task.after, threads, task, taskList);
+			createThreads(log, task.after, task, threads, taskList);
 		}
 
 		if (task.getRealtime())
 			log.trace() << "creating harmonic realtime task '" << task.getName()
-						<< "' with period " << param.actualPeriod << " sec (k = "
-						<< param.k << ") and priority " << (Executor::basePriority - task.getNice())
+						<< "' with period " << actualPeriod << " sec (k = "
+						<< k << ") and priority " << (Executor::basePriority - task.getNice())
 						<< " based on '" << baseTask.getName() << "'";
 		else
 			log.trace() << "creating harmonic task '" << task.getName() << "' with period "
-						<< param.actualPeriod << " sec (k = " << param.k << ")"
+						<< actualPeriod << " sec (k = " << k << ")"
 						<< " based on '" << baseTask.getName() << "'";
 
-		if (param.deviation > 0.01) throw std::runtime_error("period deviation too high");
+		if (deviation > 0.01) throw std::runtime_error("period deviation too high");
 
 		if (task.getRealtime() && task.getNice() <= 0)
 			throw std::runtime_error("priority not set");
@@ -101,10 +91,9 @@ namespace {
 		if (taskList.tasks.size() == 0)
 			throw std::runtime_error("no task to execute");
 
-		threads.push_back(std::make_shared<TaskThread>(param.actualPeriod, task, taskList));
-		output.emplace_back(threads.back()->async, param.k);
+		threads.push_back(std::make_shared<TaskThread>(actualPeriod, task, taskList));
+		output.emplace_back(threads.back()->async, k);
 	}
-
 }
 
 
@@ -135,8 +124,8 @@ void Executor::setMainTask(task::Periodic &mainTask) {
 	this->mainTask = &mainTask;
 }
 
-void Executor::setMainTask(safety::SafetySystem &mainTask) {
-	task::Periodic *task = new task::Periodic("main", mainTask.getPeriod(), mainTask, true);
+void Executor::setMainTask(safety::SafetySystem &ss) {
+	task::Periodic *task = new task::Periodic("safety system", ss.getPeriod(), ss, true);
 	setMainTask(*task);
 }
 
@@ -207,10 +196,10 @@ void Executor::run() {
 	}
 
 	std::vector<std::shared_ptr<TaskThread>> threads; // smart pointer used because async objects must not be copied
-	task::HarmonicTaskList list;
+	task::HarmonicTaskList taskList;
 	task::Periodic executorTask("executor", period, this, true);
 
-	createThreads(log, tasks, threads, executorTask, list);
+	createThreads(log, tasks, executorTask, threads, taskList);
 
 	signal(SIGHUP, signalHandler);
 	signal(SIGINT, signalHandler);
@@ -239,7 +228,7 @@ void Executor::run() {
 		std::this_thread::sleep_until(next_cylce);
 
 		counter.tick();
-		list.run();
+		taskList.run();
 
 		if (mainTask != nullptr)
 			mainTask->run();
