@@ -199,6 +199,8 @@ void Executor::run() {
 	task::HarmonicTaskList taskList;
 	task::Periodic executorTask("executor", period, this, true);
 
+	counter.monitors = this->mainTask->monitors;
+
 	createThreads(log, tasks, executorTask, threads, taskList);
 
 	signal(SIGHUP, signalHandler);
@@ -223,18 +225,16 @@ void Executor::run() {
 
 	log.trace() << "starting periodic execution";
 
-	auto next_cylce = std::chrono::steady_clock::now() + seconds(period);
+	auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
 	while (running) {
-		std::this_thread::sleep_until(next_cylce);
+		std::this_thread::sleep_until(next_cycle);
 
 		counter.tick();
 		taskList.run();
-
 		if (mainTask != nullptr)
 			mainTask->run();
-
 		counter.tock();
-		next_cylce += seconds(period);
+		next_cycle += seconds(period);
 	}
 
 	log.trace() << "stopping all threads";
