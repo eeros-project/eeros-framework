@@ -1,9 +1,8 @@
-#include "Filter.hpp"
+#include <eeros/control/Filter.hpp>
 
 using namespace eeros;
 using namespace eeros::control;
 using namespace eeros::math;
-using namespace parallelscara;
 
 Filter::Filter(double k) : k(k){ }
 

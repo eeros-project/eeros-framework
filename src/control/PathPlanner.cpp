@@ -1,9 +1,8 @@
-#include "PathPlanner.hpp"
+#include <eeros/control/PathPlanner.hpp>
 #include <eeros/core/System.hpp>
 #include <iostream>
 #include <fstream>
 
-using namespace pathos::peepingpanel;
 using namespace eeros;
 using namespace eeros::control;
 
@@ -60,11 +59,12 @@ bool PathPlanner::move(AxisVector p, bool limitOn) {
 		t = 0;
 		dTold = 0;
 		k = 0;
-	}	
+	}
 	return true;
 }
 
-bool PathPlanner::move(std::array<AxisVector, 100> array, bool limitOn) {
+// bool PathPlanner::move(std::array<AxisVector, 100> array, bool limitOn) {
+bool PathPlanner::move(std::vector<AxisVector> array, bool limitOn) {
 	if(!finish)
 		return false;
 	coefficients.zero();
@@ -75,6 +75,7 @@ bool PathPlanner::move(std::array<AxisVector, 100> array, bool limitOn) {
 	// find end of array
 	AxisVector zero; zero.zero();
 	int nr_in_points = 0;
+
 	for(int i = 0; i < array.size(); i++){
 		if(array[i] < zero)
 			i = array.size();
@@ -83,9 +84,10 @@ bool PathPlanner::move(std::array<AxisVector, 100> array, bool limitOn) {
 	}
 	
 	// Safety check, if -1 at end of array missing, don't calculate trajectory
-	if(nr_in_points == array.size())
-		return false;
-	
+// 	if(nr_in_points == array.size()){
+// 		std::cout << "return false" << std::endl;
+// 		return false;
+// 	}
 	this->points_nr = nr_in_points;
 		
 	if(calculateCoefficients_fromPosition()){
@@ -114,16 +116,19 @@ bool PathPlanner::move(std::string filename, double time_tot, AxisVector end_pos
 	
 	std::fstream file;
 	file.open(filename, std::fstream::in);
-	if(!file.is_open()) throw EEROSException("File for loading trajectory!");
+	if(!file.is_open()) throw EEROSException("File for loading ref. systems is not open!");
 
-	std::array<double, 100> input_time; 
-	std::array<double, 100> input_jerk; 
+// 	std::array<double, 100> input_time; 
+// 	std::array<double, 100> input_jerk; 
+	std::vector<double> input_time = std::vector<double>(100);
+	std::vector<double> input_jerk = std::vector<double>(100);
 	
 	// set array dimension, time and jerk values
 	int nr_in_points = 0;
 	for(int j = 0; j < input_time.size(); j++){
 		file >> input_time[j]; 
 		file >> input_jerk[j];
+			
 		if(input_time[j] < 0.0)
 			j = input_time.size();
 		else
@@ -134,61 +139,72 @@ bool PathPlanner::move(std::string filename, double time_tot, AxisVector end_pos
 	
 	// Norm and scale curve
 	for(int j = 0; j < points_nr; j++){
-		input_time[j] = input_time[j] * time_tot;
-		input_jerk[j] = input_jerk[j] * end_position / (time_tot*time_tot*time_tot);
+		input_time[j] = input_time[j] * time_tot; 
+		input_jerk[j] = input_jerk[j] * end_position[0] / (time_tot*time_tot*time_tot); // TODO end position universal for axisVectors
 	}
 	
-	double rounded_points_nr = 0;
-	std::array<double, 100> rounded_input_time; 
-	std::array<double, 100> rounded_input_jerk; 
-	std::array<double, 100> dT;
-	std::array<double, 100> rest;
-	std::array<int   , 100> rest2;
-	
-	double timePrev = 0.0;
-	for(int j = 0; j < points_nr; j++){
-		// check if time intervals are multiple of sample time
-		if(j == 0) {dT[j] = input_time[j];          }
-		else       {dT[j] = dT[j-1] + input_time[j];}
+	// TEST
+	bool test = true;
+	if(test == true){
+		double rounded_points_nr = 0;
+// 		std::array<double, 100> rounded_input_time; 
+// 		std::array<double, 100> rounded_input_jerk; 
+// 		std::array<double, 100> dT;
+// 		std::array<double, 100> rest;
+// 		std::array<int   , 100> rest2;
+		std::vector<double> rounded_input_time = std::vector<double>(100);
+		std::vector<double> rounded_input_jerk = std::vector<double>(100);
+		std::vector<double> dT = std::vector<double>(100);
+		std::vector<double> rest = std::vector<double>(100);
+		std::vector<int> rest2 = std::vector<int>(100);
+		
+		double timePrev = 0.0;
+		for(int j = 0; j < points_nr; j++){
+			// check if time intervals are multiple of sample time
+			if(j == 0) {dT[j] = input_time[j];          }
+			else       {dT[j] = dT[j-1] + input_time[j];}
+				
+			rest[j]  = dT[j] / dt;                              
+			rest2[j] = static_cast<int>(std::floor(rest[j]));
 			
-		rest[j]  = dT[j] / dt;                              
-		rest2[j] = static_cast<int>(std::floor(rest[j]));
-		
-		double roundDown;
-		if(rest[j] != rest2[j]) {
-			// calculate variation in "next init values" to be saved
-			roundDown = rest2[j]*dt - timePrev;
-			rounded_input_time[rounded_points_nr] = roundDown;
-			rounded_input_jerk[rounded_points_nr] = input_jerk[j];
-		
-			double t1 = dT[j]-timePrev-roundDown; 
-			double t2 = (dt-t1);
-			if(j < points_nr -1) {
-				rounded_input_time[rounded_points_nr+1] = dt;
-				rounded_input_jerk[rounded_points_nr+1] = (input_jerk[j] * t1 + input_jerk[j+1] * t2)/ dt;
+			
+			double roundDown;
+			if(rest[j] != rest2[j]) {
+				// calculate variation in "next init values" to be saved
+				roundDown = rest2[j]*dt - timePrev;
+				rounded_input_time[rounded_points_nr] = roundDown;
+				rounded_input_jerk[rounded_points_nr] = input_jerk[j];
+			
+				double t1 = dT[j]-timePrev-roundDown; 
+				double t2 = (dt-t1);
+				if(j < points_nr -1) {
+					rounded_input_time[rounded_points_nr+1] = dt;
+					rounded_input_jerk[rounded_points_nr+1] = (input_jerk[j] * t1 + input_jerk[j+1] * t2)/ dt;
+				}
+				
+				// update indexes
+				timePrev = dT[j] + t2; 
+				if(j < points_nr -1) rounded_points_nr = rounded_points_nr + 2;
+				else rounded_points_nr = rounded_points_nr + 1;
 			}
+			else{
+				rounded_input_time[rounded_points_nr] = dT[j] - timePrev;   //input_time[j];
+				rounded_input_jerk[rounded_points_nr] = input_jerk[j];
 			
-			// update indexes
-			timePrev = dT[j] + t2; 
-			if(j < points_nr -1) rounded_points_nr = rounded_points_nr + 2;
-			else rounded_points_nr = rounded_points_nr + 1;
+				// update indexes
+				timePrev = timePrev + rounded_input_time[rounded_points_nr];
+				rounded_points_nr = rounded_points_nr + 1;
+			}
 		}
-		else{
-			rounded_input_time[rounded_points_nr] = dT[j] - timePrev;   //input_time[j];
-			rounded_input_jerk[rounded_points_nr] = input_jerk[j];
+		points_nr = rounded_points_nr;
 		
-			// update indexes
-			timePrev = timePrev + rounded_input_time[rounded_points_nr];
-			rounded_points_nr = rounded_points_nr + 1;
+		// final settings
+		for(int j = 0; j < points_nr; j++){
+			input_time[j] = rounded_input_time[j];
+			input_jerk[j] = rounded_input_jerk[j];
 		}
 	}
-	points_nr = rounded_points_nr;
-	
-	// final settings
-	for(int j = 0; j < points_nr; j++){
-		input_time[j] = rounded_input_time[j];
-		input_jerk[j] = rounded_input_jerk[j];
-	}
+	// END TEST
 	
 	// save time and jerk into coefficients
 	int j = 0;
@@ -211,22 +227,25 @@ bool PathPlanner::move(std::string filename, double time_tot, AxisVector end_pos
 }
 
 bool PathPlanner::calculateCoefficients_fromPosition() {
+	AxisVector zero; zero = 0;
 	for (int k = 0; k < points_nr; k++) {
-		std::array<AxisVector, 4> start;
+// 		std::array<AxisVector, 4> start;
+		std::vector<AxisVector> start = std::vector<AxisVector>(4);
 		if(k == 0) {
 			start = last; 
 		}
 		else{
-			start = {positions[k-1](0), 0, 0, 0};
+			start = {positions[k-1], zero, zero, zero};
+// 			start = {positions[k-1](0), 0, 0, 0};
 		}
-		std::array<AxisVector, 4> end = {positions[k](0), 0, 0, 0};
-
+		
+// 		std::array<AxisVector, 4> end = {positions[k], zero, zero, zero};
+		std::vector<AxisVector> end = std::vector<AxisVector>{positions[k], zero, zero, zero};
+	
 		AxisVector calcVelNorm, calcAccNorm, calcDecNorm;
-		AxisVector velNorm, accNorm, decNorm, squareNormVel;
+		double velNorm, accNorm, decNorm, squareNormVel;
 		AxisVector distance = end[0] - start[0];
-				
-		AxisVector zero;
-		zero = 0;
+		
 		if (distance == zero){
 			return false;
 		}
@@ -276,9 +295,9 @@ bool PathPlanner::calculateCoefficients_fromPosition() {
 		cv3 = ca1 * dT1 + ca2 * dT2;  
 		
 		if(k == 0)
-			cp1 = last[0][0];
+			cp1 = last[0]; //[0];
 		else
-			cp1 = positions[k-1](0);
+			cp1 = positions[k-1]; //(0);
 		cp2 = cp1 + cv1 * dT1 + ca1 * dT1 * dT1 / 2.0; 
 		cp3 = cp2 + cv2 * dT2 + ca2 * dT2 * dT2 / 2.0;
 
@@ -290,8 +309,10 @@ bool PathPlanner::calculateCoefficients_fromPosition() {
 		
 		coefficients(2+k*3,0) = dT3; coefficients(2+k*3,1) = cj3; coefficients(2+k*3,2) = ca3;
 		coefficients(2+k*3,3) = cv3; coefficients(2+k*3,4) = cp3;
+		
 	}
 	segments_nr = points_nr * 3.0;
+	
 
 	return true;
 }
@@ -300,9 +321,9 @@ bool PathPlanner::calculateCoefficients_fromJerk() {
 	for (int k = 0; k < points_nr; k++) {
 		if(k == 0){
 			cj1 = coefficients(k,1);
-			ca1 = last[2][0];
-			cv1 = last[1][0];
-			cp1 = last[0][0];
+			ca1 = last[2]; //[0];
+			cv1 = last[1]; //[0];
+			cp1 = last[0]; //[0];
 		}
 		else{
 			AxisVector t_old = coefficients(k-1,0);
@@ -312,16 +333,18 @@ bool PathPlanner::calculateCoefficients_fromJerk() {
 			AxisVector p_old = coefficients(k-1,4);
 			
 			cj1 = coefficients(k,1);
-			ca1 = a_old + j_old * t_old;
-			cv1 = v_old + a_old * t_old + j_old / 2.0 * t_old * t_old;
-			cp1 = p_old + v_old * t_old + a_old / 2.0 * t_old * t_old + j_old / 6.0 * t_old * t_old * t_old;
+			
+			for(int i=0; i<ca1.size(); i++){
+				ca1(i) = a_old(i) + j_old(i) * t_old(i);
+				cv1(i) = v_old(i) + a_old(i) * t_old(i) + j_old(i) / 2.0 * t_old(i) * t_old(i);
+				cp1(i) = p_old(i) + v_old(i) * t_old(i) + a_old(i) / 2.0 * t_old(i) * t_old(i) + j_old(i) / 6.0 * t_old(i) * t_old(i) * t_old(i);
+			}
 		}
 		coefficients(k,2) = ca1;
 		coefficients(k,3) = cv1; 
 		coefficients(k,4) = cp1; 
 	}
 	segments_nr = points_nr; 
-	
 	return true;
 }
 
@@ -331,7 +354,8 @@ bool PathPlanner::posReached() {
 
 void PathPlanner::setInitPos(AxisVector initPos) {
 	AxisVector z; z.zero();
-	std::array<AxisVector, 4> r;
+// 	std::array<AxisVector, 4> r;
+	std::vector<AxisVector> r = std::vector<AxisVector>(4);
 	r[0] = initPos;
 	r[1] = z;
 	r[2] = z;
@@ -343,71 +367,73 @@ void PathPlanner::setInitPos(AxisVector initPos) {
 
 void PathPlanner::run() {
 	// get()
-	std::array<AxisVector, 4> y = this->last;
+// 	std::array<AxisVector, 4> y = this->last;
+	std::vector<AxisVector> y = std::vector<AxisVector>(4);
+	y = this->last;
 	timestamp_t time = System::getTimeNs();	
 	t += dt;
 	
-	for(unsigned int i = 0; i < velMax.size() ; i++) {
-		if(!finish) {
-			if (k < segments_nr) {
-				// define coefficients
-				if(segment_set == false) {
-					dT     = coefficients(k,0);
-					j_prev = coefficients(k,1);
-					a_prev = coefficients(k,2);
-					v_prev = coefficients(k,3);
-					p_prev = coefficients(k,4);
-					j0 =   6.0 * coefficients(k,2) / coefficients(k,0);
-					s0 = -12.0 * coefficients(k,2) / (coefficients(k,0)*coefficients(k,0));
-					segment_set = true;
+	if(!finish) {
+		if (k < segments_nr) {
+			// define coefficients
+			if(segment_set == false) {
+				dT     = coefficients(k,0)(0);
+				j_prev = coefficients(k,1);
+				a_prev = coefficients(k,2);
+				v_prev = coefficients(k,3);
+				p_prev = coefficients(k,4);
+				for(int i=0; i<j_prev.size() ;i++){
+					j0 =   6.0 * coefficients(k,2)(i) / coefficients(k,0)(i);
+					s0 = -12.0 * coefficients(k,2)(i) / (coefficients(k,0)(i)*coefficients(k,0)(i));
 				}
-				
-				// define trajectory
-				if(t >= dTold && t < dT + dTold) { }
-				else {
-					finish_segment = true;
-					segment_set = false;
-					dTold = dTold + dT;
-					k++;
-				}
-				
-				y[0][i] = p_prev + v_prev * dt + (a_prev/2.0) * pow(dt,2) + (j_prev/6.0) * pow(dt,3);
-				y[1][i] = v_prev + a_prev * dt + (j_prev/2.0) * pow(dt,2);
-// 				y[2][i] = a_prev + j_prev * dt;
-				
-				if(jerk_limit_on) {
-					y[2][i] = (s0 / 2.0) * (t-dTold) * (t-dTold) + j0 * (t-dTold);
-				}
-				else {
-					y[2][i] = a_prev + j_prev * dt;
-				}
-				
-				y[3][i] = j_prev;
-
-				p_prev = y[0][i];
-				v_prev = y[1][i];
-				a_prev = y[2][i];
-				j_prev = y[3][i];
+				segment_set = true;
 			}
-			if(finish_segment == true && k == segments_nr){
-				finish = true;
+			
+			// define trajectory
+			if(t >= dTold && t < dT + dTold) { }
+			else {
+				finish_segment = true;
+				segment_set = false;
+				dTold = dTold + dT;
+				k++;
 			}
+			
+			y[0] = p_prev + v_prev * dt + (a_prev/2.0) * pow(dt,2) + (j_prev/6.0) * pow(dt,3);
+			y[1] = v_prev + a_prev * dt + (j_prev/2.0) * pow(dt,2);
+			y[2] = a_prev + j_prev * dt;
+			
+			if(jerk_limit_on) {
+				y[2] = (s0 / 2.0) * (t-dTold) * (t-dTold) + j0 * (t-dTold);
+			}
+			else {
+				y[2] = a_prev + j_prev * dt;
+			}
+			
+			y[3] = j_prev;
+			
+			p_prev = y[0];
+			v_prev = y[1];
+			a_prev = y[2];
+			j_prev = y[3];
 		}
-		// set last value
-		this->last[0][i] = y[0][i];
-		this->last[1][i] = y[1][i];
-		this->last[2][i] = y[2][i];
-		this->last[3][i] = y[3][i];
-	}	
+		if(finish_segment == true && k == segments_nr){
+			finish = true;
+		}
+	}
+	// set last value
+	this->last[0] = y[0];
+	this->last[1] = y[1];
+	this->last[2] = y[2];
+	this->last[3] = y[3];
 
 	posOut.getSignal().setValue( y[0]);
 	velOut.getSignal().setValue( y[1]);
 	accOut.getSignal().setValue( y[2]);
 	jerkOut.getSignal().setValue(y[3]);
 
-	posOut.getSignal().setTimestamp(time);
-	velOut.getSignal().setTimestamp(time);
-	accOut.getSignal().setTimestamp(time);
+	posOut.getSignal().setTimestamp( time);
+	velOut.getSignal().setTimestamp( time);
+	accOut.getSignal().setTimestamp( time);
 	jerkOut.getSignal().setTimestamp(time);
 }
 

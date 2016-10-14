@@ -1,5 +1,5 @@
-#ifndef CH_NTB_PARALLELSCARA_FILTER_HPP_
-#define CH_NTB_PARALLELSCARA_FILTER_HPP_
+#ifndef ORG_EEROS_CONTROL_FILTER_HPP_
+#define ORG_EEROS_CONTROL_FILTER_HPP_
 
 #include <eeros/control/Block1i1o.hpp>
 #include "../types.hpp"
@@ -8,7 +8,9 @@
 #include <stdlib.h>
 #include <cmath>
 
-namespace parallelscara {
+namespace eeros {
+	namespace control {
+		
 		class Filter: public eeros::control::Block1i1o<eeros::math::Vector2> {
 			
 		public:
@@ -21,4 +23,6 @@ namespace parallelscara {
 			AxisVector prev;
 		};
 	};
-#endif /* CH_NTB_PARALLELSCARA_FILTER_HPP_ */
+};
+
+#endif /* ORG_EEROS_CONTROL_FILTER_HPP_ */
