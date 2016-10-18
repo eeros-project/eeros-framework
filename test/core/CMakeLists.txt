@@ -7,10 +7,6 @@ add_executable(config config.cpp)
 target_link_libraries(config eeros)
 add_test(core/config config pthread)
 
-add_executable(threadTest ThreadTest.cpp)
-target_link_libraries(threadTest eeros)
-add_test(core/thread/base threadTest)
-
 add_executable(systemTimeTest SystemTimeTest.cpp)
 target_link_libraries(systemTimeTest eeros pthread)
 add_test(core/system/getTime systemTimeTest)
