@@ -1,3 +1,5 @@
 add_executable(harmonicExample harmonicExample.cpp)
 target_link_libraries(harmonicExample eeros pthread)
 
+add_executable(periodicExample PeriodicExample.cpp)
+target_link_libraries(periodicExample eeros pthread)
