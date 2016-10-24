@@ -1,10 +1,5 @@
 #include <iostream>
-#include <functional>
-#include <unistd.h>
-#include <chrono>
 #include <thread>
-#include <ctime>
-#include <iomanip>
 
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/LogWriter.hpp>
@@ -13,7 +8,6 @@
 #include <eeros/core/Executor.hpp>
 #include <eeros/core/System.hpp>
 #include <eeros/task/Periodic.hpp>
-#include <eeros/core/PeriodicCounter.hpp>
 #include <eeros/task/Lambda.hpp>
 
 /*
@@ -47,7 +41,6 @@ int main() {
 	});
 	eeros::task::Periodic ss("ss", dt, ls);
 	executor.setMainTask(ss);
-	ss.addDefaultMonitor();
 	ss.monitors.push_back([](eeros::PeriodicCounter &c, Logger &log){
 		static int ticks = 0;
 		if (++ticks < 10) return;
@@ -65,7 +58,6 @@ int main() {
 	});
 	eeros::task::Periodic t1("t1", dt, l1);
 	
-	t1.addDefaultMonitor();
 	t1.monitors.push_back([](eeros::PeriodicCounter &c, Logger &log){
 		static int ticks = 0;
 		if (++ticks < 10) return;
@@ -82,7 +74,6 @@ int main() {
 		}
 	});
 	eeros::task::Periodic t2("t2", 2 * dt, l2);
-	t2.addDefaultMonitor();
 	t2.monitors.push_back([](eeros::PeriodicCounter &c, Logger &log){
 		static int ticks = 0;
 		if (++ticks < 10) return;
@@ -101,7 +92,6 @@ int main() {
 	eeros::task::Periodic t4("t2", 4 * dt, l4);
 	t2.after.push_back(t4);
 	t1.after.push_back(t2);
-	t4.addDefaultMonitor();
 	t4.monitors.push_back([](eeros::PeriodicCounter &c, Logger &log){
 		static int ticks = 0;
 		if (++ticks < 10) return;
@@ -119,7 +109,6 @@ int main() {
 	});
 	eeros::task::Periodic t3("t3", 5 * dt, l3);
 	t1.after.push_back(t3);
-	t3.addDefaultMonitor();
 	t3.monitors.push_back([](eeros::PeriodicCounter &c, Logger &log){
 		static int ticks = 0;
 		if (++ticks < 10) return;
@@ -136,10 +125,9 @@ int main() {
 		}
 	});
 	eeros::task::Periodic t5("t5", 3 * dt, l5);
-	t5.addDefaultMonitor();
 	t5.monitors.push_back([](eeros::PeriodicCounter &c, Logger &log){
 		static int ticks = 0;
-		if (++ticks < 1) return;
+		if (++ticks < 10) return;
 		ticks = 0;
 		log.info() << "t5: period max: " << c.period.max*1000 << "   run max: " << c.run.max*1000 << "   run mean: " << c.run.mean*1000;
 		c.reset();
