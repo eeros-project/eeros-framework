@@ -6,25 +6,20 @@
 namespace eeros {
 	namespace safety {
 
-		SafetyProperties::SafetyProperties() : entryLevel(-1) {
+		SafetyProperties::SafetyProperties() : entryLevel(nullptr) {
 			// nothing to do
 		}
 		
 		SafetyProperties::~SafetyProperties() {
 			// nothing to do
 		}
-
-		SafetyLevel& SafetyProperties::level(uint32_t levelId) {
-			for(auto& l : levels) {
-				if(l.getId() == levelId) return l;
-			}
-			std::stringstream msg;
-			msg << "safety level with id '" << levelId << "' not defined!";
-			throw EEROSException(msg.str());
+		
+		SafetyLevel* SafetyProperties::getEntryLevel() {
+			return entryLevel;
 		}
 		
-		SafetyLevel* SafetyProperties::entryLevelPtr() {
-			return &level(entryLevel);
+		void SafetyProperties::setEntryLevel(SafetyLevel& entryLevel) {
+			this->entryLevel = &entryLevel;
 		}
 		
 		bool SafetyProperties::verify() {
@@ -40,30 +35,30 @@ namespace eeros {
 			}
 			
 			// Check entry level
-			check = entryLevelPtr() != nullptr;
+			check = getEntryLevel() != nullptr;
 			
 			return check;
 		}
 		
-		void SafetyProperties::addEventToLevel(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type) {
-			level(levelId).addEvent(event, nextLevelId, type);
+		void SafetyProperties::addEventToLevel(SafetyLevel& level, SafetyEvent event, SafetyLevel& nextLevel, EventType type) {
+			level.addEvent(event, nextLevel, type);
 		}
 
-		void SafetyProperties::addEventToLevelAndAbove(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type) {
-			for(auto& level : levels) {
-				if(level.getId() >= levelId) level.addEvent(event, nextLevelId, type);
+		void SafetyProperties::addEventToLevelAndAbove(SafetyLevel& level, SafetyEvent event, SafetyLevel& nextLevel, EventType type) {
+			for(auto& lev : levels) {
+				if(lev->id >= level.id) lev->addEvent(event, nextLevel, type);
 			}
 		}
 
-		void SafetyProperties::addEventToLevelAndBelow(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type) {
-			for(auto& level : levels) {
-				if(level.getId() <= levelId) level.addEvent(event, nextLevelId, type);
+		void SafetyProperties::addEventToLevelAndBelow(SafetyLevel& level, SafetyEvent event, SafetyLevel& nextLevel, EventType type) {
+			for(auto& lev : levels) {
+				if(lev->id <= level.id) lev->addEvent(event, nextLevel, type);
 			}
 		}
 
-		void SafetyProperties::addEventToAllLevelsBetween(int32_t lowerLevelId, int32_t upperLevelId, uint32_t event, int32_t nextLevelId, EventType type) {
-			for(auto& level : levels) {
-				if(level.getId() >= lowerLevelId && level.getId() <= upperLevelId) level.addEvent(event, nextLevelId, type);
+		void SafetyProperties::addEventToAllLevelsBetween(SafetyLevel& lowerLevel, SafetyLevel& upperLevel, SafetyEvent event, SafetyLevel& nextLevel, EventType type) {
+			for(auto& lev : levels) {
+				if(lev->id >= lowerLevel.id && lev->id <= upperLevel.id) lev->addEvent(event, nextLevel, type);
 			}
 		}
 		

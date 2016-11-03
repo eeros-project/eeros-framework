@@ -5,8 +5,9 @@ namespace eeros {
 	namespace safety {
 		
 		uint8_t SafetySystem::instCount = 0;
+		SafetySystem* SafetySystem::instance = nullptr;
 		
-		SafetySystem::SafetySystem(SafetyProperties safetyProperties, double period) :
+		SafetySystem::SafetySystem(SafetyProperties& safetyProperties, double period) :
 		log('S'),
 		currentLevel(nullptr),
 		privateContext(this),
@@ -17,6 +18,7 @@ namespace eeros {
 			if(!setProperties(safetyProperties)) {
 				throw EEROSException("verification of safety properties failed!");
 			}
+			instance = this;
 		}
 		
 		SafetySystem::~SafetySystem() {
@@ -32,48 +34,27 @@ namespace eeros {
 			}
 		}
 		
-		bool SafetySystem::setProperties(SafetyProperties safetyProperties) {
-				if(safetyProperties.verify()) {
-						properties = safetyProperties;
-						currentLevel = properties.entryLevelPtr();
-						return true;
-				}
-				return false;
+		bool SafetySystem::setProperties(SafetyProperties& safetyProperties) {
+			if(safetyProperties.verify()) {
+				properties = safetyProperties;
+				currentLevel = properties.getEntryLevel();
+				return true;
+			}
+			return false;
 		}
 		
-		SafetyLevel& SafetySystem::getLevelById(int32_t levelId) {
-			for(auto& level : properties.levels) {
-				if(level.getId() == levelId) return level;
-			}
-			throw EEROSException("level is not defined"); // TODO define error number and send error message to logger 
-		}
-
-		SafetyLevel& SafetySystem::operator[](unsigned levelId) {
-			return getLevelById(levelId);
-		}
-
-		void SafetySystem::triggerEvent(uint32_t event, SafetyContext* context) {
+		void SafetySystem::triggerEvent(SafetyEvent event, SafetyContext* context) {
 			if(currentLevel) {
-				log.info() << "triggering event: (" << (int)event << ")";
-				int32_t nextLevelId = currentLevel->getLevelIdForEvent(event, context == &privateContext);
-				if(nextLevelId != kInvalidLevel) {
-					SafetyLevel* nextLevel = &(getLevelById(nextLevelId));
-					if(nextLevel != nullptr) {
-						bool transition = (nextLevel != currentLevel);
-						currentLevel = nextLevel; // TODO make atomic
-
-						if (transition)
-							log.info() << "new safety level: [" << nextLevelId << "] " << nextLevel->getDescription();
-					}
-					else {
-						throw EEROSException("unknown safety level"); // TODO define error number and send error message to logger
-					}
-					
-				}
-				else {
-					log.error()	<< "no transition for event (" << (int)event
-								<< ") in level [" << currentLevel->getId() << "] "
-								<< currentLevel->getDescription();
+				log.info() << "triggering event: \'" << event.getDescription() << "\'";
+				SafetyLevel* nextLevel = currentLevel->getDestLevelForEvent(event, context == &privateContext);
+				if(nextLevel != nullptr) {
+					bool transition = (nextLevel != currentLevel);
+					currentLevel = nextLevel; // TODO make atomic
+					if (transition) log.info() << "new safety level: [" << nextLevel->id << "] \'" << nextLevel->getDescription() << "\'";	
+				} else {
+					log.error()	<< "no transition for event \'" << event.getDescription()
+								<< "\' in level [" << currentLevel->id << "] \'"
+								<< currentLevel->getDescription() << "\'";
 				}
 			}
 			else {
@@ -91,7 +72,7 @@ namespace eeros {
 
 		void SafetySystem::run() {
 			if(currentLevel != nullptr) {
-				// 1) Make local copy of currentLevel
+				// 1) Get currentLevel
 				SafetyLevel* level = currentLevel;
 				
 				// 2) Read inputs
@@ -104,8 +85,8 @@ namespace eeros {
 							eeros::hal::PeripheralInputInterface* input = (eeros::hal::PeripheralInputInterface*)(ia->inputInterface);
 							if (oldLevel != newLevel) {
 								log.info()	<< "level changed due to input action: " << input->getId() << endl
-											<< "  previous level: [" << oldLevel->getId() << "] " << oldLevel->getDescription() << endl
-											<< "  new level:      [" << newLevel->getId() << "] " << newLevel->getDescription();
+											<< "  previous level: [" << oldLevel->id << "] " << oldLevel->getDescription() << endl
+											<< "  new level:      [" << newLevel->id << "] " << newLevel->getDescription();
 							}
 						}
 					}
@@ -126,6 +107,11 @@ namespace eeros {
 			else {
 				log.error() << "current level is null!";
 			}
+		}
+		
+		void SafetySystem::exitHandler() {
+			SafetySystem* ss = SafetySystem::instance;
+			if(ss) ss->properties.exitFunction(&ss->privateContext);
 		}
 	};
 };

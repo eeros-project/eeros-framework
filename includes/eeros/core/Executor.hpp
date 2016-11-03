@@ -36,6 +36,7 @@ namespace eeros {
 		static void prefault_stack();
 		static bool lock_memory();
 		static bool set_priority(int nice);
+		static void stop();
 
 		PeriodicCounter counter;
 

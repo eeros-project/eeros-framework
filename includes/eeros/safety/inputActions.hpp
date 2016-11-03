@@ -21,7 +21,7 @@ namespace eeros {
 		template <typename T>
 		class CheckInputAction : public InputAction {
 		public:
-			CheckInputAction(eeros::hal::PeripheralInput<T>& input, T value, uint32_t event) : InputAction(input), input(input), value(value), event(event) { }
+			CheckInputAction(eeros::hal::PeripheralInput<T>& input, T value, SafetyEvent event) : InputAction(input), input(input), value(value), event(event) { }
 			virtual ~CheckInputAction() { }
 			virtual bool check(SafetyContext* context) {
 				if(input.get() != value) {
@@ -34,13 +34,13 @@ namespace eeros {
 		private:
 			eeros::hal::PeripheralInput<T>& input;
 			T value;
-			uint32_t event;
+			SafetyEvent event;
 		};
 
 		template <typename T>
 		class CheckRangeInputAction : public InputAction {
 		public:
-			CheckRangeInputAction(eeros::hal::PeripheralInput<T>& input, T min, T max, uint32_t event) : InputAction(input), input(input), min(min), max(max), event(event) { }
+			CheckRangeInputAction(eeros::hal::PeripheralInput<T>& input, T min, T max, SafetyEvent event) : InputAction(input), input(input), min(min), max(max), event(event) { }
 			virtual ~CheckRangeInputAction() { }
 			virtual bool check(SafetyContext* context) {
 				T value = input.get();
@@ -55,7 +55,7 @@ namespace eeros {
 			eeros::hal::PeripheralInput<T>& input;
 			T min;
 			T max;
-			uint32_t event;
+			SafetyEvent event;
 		};
 
 		template <typename T>
@@ -69,22 +69,22 @@ namespace eeros {
 		}
 
 		template <typename T>
-		CheckInputAction<T>* check(eeros::hal::PeripheralInput<T>& input, T value, uint32_t event) {
+		CheckInputAction<T>* check(eeros::hal::PeripheralInput<T>& input, T value, SafetyEvent event) {
 			return new CheckInputAction<T>(input, value, event);
 		}
 		
 		template <typename T>
-		CheckInputAction<T>* check(eeros::hal::PeripheralInput<T>* input, T value, uint32_t event) {
+		CheckInputAction<T>* check(eeros::hal::PeripheralInput<T>* input, T value, SafetyEvent event) {
 			return new CheckInputAction<T>(*input, value, event);
 		}
 
 		template <typename T>
-		CheckRangeInputAction<T>* range(eeros::hal::PeripheralInput<T>& input, T min, T max, uint32_t event) {
+		CheckRangeInputAction<T>* range(eeros::hal::PeripheralInput<T>& input, T min, T max, SafetyEvent event) {
 			return new CheckRangeInputAction<T>(input, min, max, event);
 		}
 		
 		template <typename T>
-		CheckRangeInputAction<T>* range(eeros::hal::PeripheralInput<T>* input, T min, T max, uint32_t event) {
+		CheckRangeInputAction<T>* range(eeros::hal::PeripheralInput<T>* input, T min, T max, SafetyEvent event) {
 			return new CheckRangeInputAction<T>(*input, min, max, event);
 		}
 

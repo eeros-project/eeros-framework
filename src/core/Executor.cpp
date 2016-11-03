@@ -19,13 +19,7 @@
 
 volatile bool running = true;
 
-void signalHandler(int signum) {
-	running = false;
-}
-
-
 using namespace eeros;
-
 
 namespace {
 
@@ -152,9 +146,11 @@ bool Executor::set_priority(int nice) {
 	return (sched_setscheduler(0, SCHED_FIFO, &schedulingParam) != -1);
 }
 
+void Executor::stop() {
+	running = false;
+}
 
-void Executor::assignPriorities()
-{
+void Executor::assignPriorities() {
 	std::vector<task::Periodic*> priorityAssignments;
 
 	// add task to list of priority assignments
@@ -202,13 +198,6 @@ void Executor::run() {
 	counter.monitors = this->mainTask->monitors;
 
 	createThreads(log, tasks, executorTask, threads, taskList);
-
-	signal(SIGHUP, signalHandler);
-	signal(SIGINT, signalHandler);
-	signal(SIGQUIT, signalHandler);
-	signal(SIGKILL, signalHandler);
-	signal(SIGTERM, signalHandler);
-	signal(SIGPWR, signalHandler);
 
 	using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
 

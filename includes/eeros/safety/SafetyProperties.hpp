@@ -20,20 +20,22 @@ namespace eeros {
 			SafetyProperties();
 			virtual ~SafetyProperties();
 			
-			void addEventToLevel(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type);
-			void addEventToLevelAndAbove(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type);
-			void addEventToLevelAndBelow(int32_t levelId, uint32_t event, int32_t nextLevelId, EventType type);
-			void addEventToAllLevelsBetween(int32_t lowerLevelId, int32_t upperLevelId, uint32_t event, int32_t nextLevelId, EventType type);
-			SafetyLevel* entryLevelPtr();
+			void addEventToLevel(SafetyLevel& level, SafetyEvent event, SafetyLevel& nextLevel, EventType type);
+			void addEventToLevelAndAbove(SafetyLevel& level, SafetyEvent event, SafetyLevel& nextLevel, EventType type);
+			void addEventToLevelAndBelow(SafetyLevel& level, SafetyEvent event, SafetyLevel& nextLevel, EventType type);
+			void addEventToAllLevelsBetween(SafetyLevel& lowerLevel, SafetyLevel& upperLevel, SafetyEvent event, SafetyLevel& nextLevel, EventType type);
+			SafetyLevel* getEntryLevel();
 			bool verify();
-			
+			void addLevel(SafetyLevel& level) {levels.push_back(&level);}
 		protected:
-			virtual SafetyLevel& level(uint32_t levelId);
+			void setEntryLevel(SafetyLevel& entryLevel);
 			
-			std::vector<SafetyLevel> levels;
+			std::function<void (SafetyContext*)> exitFunction;			
+			std::vector<SafetyLevel*> levels;
 			std::vector<eeros::hal::PeripheralOutputInterface*> criticalOutputs;
 			std::vector<eeros::hal::PeripheralInputInterface*> criticalInputs;
-			uint32_t entryLevel;
+		private:
+			SafetyLevel* entryLevel;
 		};
 		
 	};

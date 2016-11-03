@@ -7,12 +7,13 @@ namespace eeros {
 	namespace safety {
 
 		class SafetySystem;
+		class SafetyEvent;
 
 		class SafetyContext {
 			friend class SafetySystem;
 			
 		public:
-			void triggerEvent(int32_t event);
+			void triggerEvent(SafetyEvent event);
 			
 		private:
 			SafetyContext(SafetySystem* parent);

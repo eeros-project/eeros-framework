@@ -15,39 +15,40 @@ namespace eeros {
 		class SafetyContext;
 		class SafetySystem;
 
-		enum { kInvalidLevel = -1 };
 		enum EventType { kPrivateEvent, kPublicEvent };
-
-		class SafetyLevel {
-
-			friend class SafetySystem;
-
+		
+		class SafetyEvent {
+			friend class SafetyLevel;
 		public:
-			SafetyLevel(int32_t id, std::string description);
-			virtual ~SafetyLevel();
-			
-			int32_t getId();
+			SafetyEvent(std::string description);
+			virtual ~SafetyEvent();
 			std::string getDescription();
-			int32_t getLevelIdForEvent(uint32_t event, bool privateEventOk = false);
-			
-			void addEvent(uint32_t event, int32_t nextLevelId, EventType type = kPrivateEvent);
-			
+		private:
+			std::string description;
+			uint32_t id;
+		};
+
+		
+		class SafetyLevel {
+			friend class SafetySystem;
+			friend class SafetyProperties;
+		public:
+			SafetyLevel(std::string description);
+			virtual ~SafetyLevel();
+			std::string getDescription();
+			SafetyLevel* getDestLevelForEvent(SafetyEvent event, bool privateEventOk = false);
+			void addEvent(SafetyEvent event, SafetyLevel& nextLevel, EventType type = kPrivateEvent);
 			void setInputAction(InputAction* action); // TODO rename to add...
 			void setInputActions(std::vector<InputAction*> actionList);
 			void setOutputAction(OutputAction* action); // TODO rename to add...
 			void setOutputActions(std::vector<OutputAction*> actionList);
-			
 			void setLevelAction(std::function<void (SafetyContext* context)> action);
-			
-			SafetyLevel& operator<(const SafetyLevel&);
-			
+//			SafetyLevel& operator<(const SafetyLevel&);
 		private:
 			std::function<void (SafetyContext*)> action;
-			
 			int32_t id;
 			std::string description;
-			std::map<uint32_t, std::pair<int32_t, EventType>> transitions;
-			
+			std::map<uint32_t, std::pair<SafetyLevel*, EventType>> transitions;
 			std::vector<InputAction*> inputAction;
 			std::vector<OutputAction*> outputAction;
 		};
