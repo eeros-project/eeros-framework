@@ -52,7 +52,6 @@ int main() {
 
 	// Create and run executor
 	auto executor = eeros::Executor::instance();
-	executor.setPeriod(period);
 	executor.setMainTask(safetySys);
 	
 	eeros::task::Lambda l1 ([&] () {

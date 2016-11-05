@@ -29,7 +29,6 @@ int main() {
 	log.trace() << "eeros " << eeros::Version::string;
 
 	eeros::Executor &executor = eeros::Executor::instance();
-	executor.setPeriod(dt);
 
 	eeros::task::Lambda ls ([&] () { });
 	eeros::task::Periodic ss("ss", dt, ls);

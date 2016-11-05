@@ -90,7 +90,6 @@ namespace {
 	}
 }
 
-
 Executor::Executor() :
 	log('E'), period(0), mainTask(nullptr) { }
 
@@ -103,18 +102,11 @@ Executor& Executor::instance() {
 	return executor;
 }
 
-void Executor::setPeriod(double period) {
-	if (this->period != 0.0)
-		throw std::runtime_error("The period of the executor can only be set once.");
-	this->period = period;
-	counter.setPeriod(period);
-}
-
 void Executor::setMainTask(task::Periodic &mainTask) {
 	if (this->mainTask != nullptr)
 		throw std::runtime_error("you can only define one main task per executor");
-	if (mainTask.getPeriod() != period)
-		throw std::runtime_error("the main task must have the same period as the executor");
+	period = mainTask.getPeriod();
+	counter.setPeriod(period);
 	this->mainTask = &mainTask;
 }
 
