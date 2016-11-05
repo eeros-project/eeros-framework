@@ -22,11 +22,11 @@ public:
 		seStartInitializing("start initializing"),
 		seInitializingDone("initialization done"),
 		seStartRunning("start running"),
-		seShutDown("start shuting down"),
+		seShutDown("start shutting down"),
 		seStopRunning("stop running"),
 		seSwitchingOff("switching off"),
 		slOff("off"),
-		slShutingDown("shuting down"),
+		slShuttingDown("shutting down"),
 		slIinitializing("initializing"),
 		slInitialized("initialized"),
 		slRunning("running")
@@ -44,36 +44,36 @@ public:
 		
 		// ############ Add levels ############
 		addLevel(slOff);
-		addLevel(slShutingDown);
+		addLevel(slShuttingDown);
 		addLevel(slIinitializing);
 		addLevel(slInitialized);
 		addLevel(slRunning);
 		
 		// ############ Add events to the levels ############
 		slOff.addEvent(seStartInitializing, slIinitializing, kPublicEvent);
-		slShutingDown.addEvent(seSwitchingOff, slOff, kPrivateEvent);
+		slShuttingDown.addEvent(seSwitchingOff, slOff, kPrivateEvent);
 		slIinitializing.addEvent(seInitializingDone, slInitialized, kPublicEvent);
 		slInitialized.addEvent(seStartRunning, slRunning, kPublicEvent);
 		slRunning.addEvent(seStopRunning, slInitialized, kPrivateEvent);
-		addEventToLevelAndAbove(slIinitializing, seShutDown, slShutingDown, kPublicEvent);
+		addEventToLevelAndAbove(slIinitializing, seShutDown, slShuttingDown, kPublicEvent);
 
 		// ############ Define input states and events for all levels ############
 		slOff.setInputActions({ ignore(in1) });
-		slShutingDown.setInputActions({ ignore(in1) });
+		slShuttingDown.setInputActions({ ignore(in1) });
 		slIinitializing.setInputActions({ ignore(in1) });
 		slInitialized.setInputActions({ check(in1, true, seStartRunning) });
 		slRunning.setInputActions({ check(in1, false, seStopRunning) });
 
 		// ############ Define output states and events for all levels ############
 		slOff.setOutputActions({ set(out1, false) });
-		slShutingDown.setOutputActions({ set(out1, false) });
+		slShuttingDown.setOutputActions({ set(out1, false) });
 		slIinitializing.setOutputActions({ set(out1, false) });
 		slInitialized.setOutputActions({ set(out1, false) });
 		slRunning.setOutputActions({ set(out1, true) });
 
 		// Define and add level functions
 		slOff.setLevelAction([&](SafetyContext* privateContext) {Executor::stop();});
-		slShutingDown.setLevelAction([&](SafetyContext* privateContext) {privateContext->triggerEvent(seSwitchingOff);});
+		slShuttingDown.setLevelAction([&](SafetyContext* privateContext) {privateContext->triggerEvent(seSwitchingOff);});
 
 		// Define entry level
 		setEntryLevel(slOff);
@@ -97,7 +97,7 @@ public:
 	SafetyEvent seSwitchingOff;
 	
 	SafetyLevel slOff;
-	SafetyLevel slShutingDown;
+	SafetyLevel slShuttingDown;
 	SafetyLevel slIinitializing;
 	SafetyLevel slInitialized;
 	SafetyLevel slRunning;
