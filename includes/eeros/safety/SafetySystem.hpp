@@ -21,8 +21,6 @@ namespace eeros {
 			SafetySystem(SafetyProperties& properties, double period);
 			virtual ~SafetySystem();
 			SafetyLevel& getCurrentLevel(void);
-//			SafetyLevel& getLevelById(int32_t levelId);
-//			SafetyLevel& operator[](unsigned levelId);
 			void triggerEvent(SafetyEvent event, SafetyContext* context = nullptr);
 			const SafetyProperties* getProperties() const;
 			double getPeriod() const;
@@ -35,6 +33,7 @@ namespace eeros {
 			
 			SafetyProperties properties;
 			SafetyLevel* currentLevel;
+			SafetyLevel* nextLevel;
 			SafetyContext privateContext;
 			static uint8_t instCount;
 			static SafetySystem* instance;

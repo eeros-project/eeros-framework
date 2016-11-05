@@ -14,8 +14,6 @@ using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;
 
-extern volatile bool running;
-
 class SafetyPropertiesTest1 : public SafetyProperties {
 public:
 	SafetyPropertiesTest1()  : 

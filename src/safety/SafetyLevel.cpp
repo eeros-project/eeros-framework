@@ -23,6 +23,18 @@ SafetyLevel::~SafetyLevel() {
 	// nothing to do...
 }
 
+bool SafetyLevel::operator<(const SafetyLevel& level) {
+	return this->id < level.id;
+}
+
+bool SafetyLevel::operator>(const SafetyLevel& level) {
+	return this->id > level.id;
+}
+
+bool SafetyLevel::operator==(const SafetyLevel& level) {
+	return this->id == level.id;
+}
+
 std::string SafetyLevel::getDescription() {
 	return description;
 }

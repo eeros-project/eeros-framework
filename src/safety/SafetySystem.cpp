@@ -38,26 +38,25 @@ namespace eeros {
 			if(safetyProperties.verify()) {
 				properties = safetyProperties;
 				currentLevel = properties.getEntryLevel();
+				nextLevel = currentLevel;
 				return true;
 			}
 			return false;
 		}
 		
 		void SafetySystem::triggerEvent(SafetyEvent event, SafetyContext* context) {
-			if(currentLevel) {
+			if (currentLevel) {
 				log.info() << "triggering event: \'" << event.getDescription() << "\'";
-				SafetyLevel* nextLevel = currentLevel->getDestLevelForEvent(event, context == &privateContext);
-				if(nextLevel != nullptr) {
-					bool transition = (nextLevel != currentLevel);
-					currentLevel = nextLevel; // TODO make atomic
+				nextLevel = currentLevel->getDestLevelForEvent(event, context == &privateContext);
+				if (nextLevel != nullptr) {
+					bool transition = (nextLevel != currentLevel);	// stage level change
 					if (transition) log.info() << "new safety level: [" << nextLevel->id << "] \'" << nextLevel->getDescription() << "\'";	
 				} else {
 					log.error()	<< "no transition for event \'" << event.getDescription()
 								<< "\' in level [" << currentLevel->id << "] \'"
 								<< currentLevel->getDescription() << "\'";
 				}
-			}
-			else {
+			} else {
 				throw EEROSException("current level not defined"); // TODO define error number and send error message to logger
 			}
 		}
@@ -71,7 +70,10 @@ namespace eeros {
 		}
 
 		void SafetySystem::run() {
+			// level must only change before safety system runs or after run method has finished
+			currentLevel = nextLevel; // TODO make atomic
 			if(currentLevel != nullptr) {
+
 				// 1) Get currentLevel
 				SafetyLevel* level = currentLevel;
 				
@@ -103,6 +105,7 @@ namespace eeros {
 						oa->set();
 					}
 				}
+				currentLevel = nextLevel; // TODO make atomic
 			}
 			else {
 				log.error() << "current level is null!";

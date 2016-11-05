@@ -43,7 +43,9 @@ namespace eeros {
 			void setOutputAction(OutputAction* action); // TODO rename to add...
 			void setOutputActions(std::vector<OutputAction*> actionList);
 			void setLevelAction(std::function<void (SafetyContext* context)> action);
-//			SafetyLevel& operator<(const SafetyLevel&);
+			bool operator<(const SafetyLevel& level);
+			bool operator>(const SafetyLevel& level);
+			bool operator==(const SafetyLevel& level);
 		private:
 			std::function<void (SafetyContext*)> action;
 			int32_t id;
