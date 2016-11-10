@@ -1,4 +1,4 @@
-add_eeros_sources(HAL.cpp DummyLogicInput.cpp DummyLogicOutput.cpp DummyRealInput.cpp DummyRealOutput.cpp)
+add_eeros_sources(HAL.cpp DummyLogicInput.cpp DummyLogicOutput.cpp DummyRealInput.cpp DummyRealOutput.cpp JsonParser.cpp)
 
 if(LIBCOMEDI)
 	add_eeros_sources(ComediDevice.cpp ComediDigIn.cpp ComediDigOut.cpp ComediAdc.cpp ComediDac.cpp ComediFqd.cpp)

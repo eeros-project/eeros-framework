@@ -11,6 +11,4 @@ add_subdirectory(core)
 add_subdirectory(math)
 add_subdirectory(control)
 add_subdirectory(safety)
-
-
-
+add_subdirectory(hal)

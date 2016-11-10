@@ -146,6 +146,12 @@ if(LINUX)
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} -lrt)
 endif()
 
+find_file(LIBUCL "ucl++.h" ${ADDITIONAL_INCLUDE_DIRS})
+if(LIBUCL)
+	message(STATUS "-> libucl available")
+	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ucl)
+endif()
+
 ## Config include file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
