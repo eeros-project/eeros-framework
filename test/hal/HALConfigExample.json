@@ -1,58 +1,11 @@
 {
 	"device0": {
-		"driver": "flink",
+		"library": "libflinkeeros.so",
 		"devHandle": "/dev/flink0",
-		"subdevice2": {
-			"type": "DAC",
-			"channel0": {
-				"signalId": "dacOut1",
-				"scale":[
-						{"scale1": {"kM": 2.5}},
-						{"scale2": {"g2": 3.2}},
-						{"scale3": {"g3": 2.4}},
-						{"scale4": {"g4": 0.000317097}}
-					],
-				"range":[
-						{"min": -10, "max": 10},
-						{"min": -5, "max": 5},
-						{"min": -10, "max": 10},
-						{"min": 0, "max": 65536}
-					],
-				"unit": "Nm"
-			}
-		},
-		"subdevice5": {
+		"subdevice4": {
 			"type": "DigOut",
 			"channel0": {
-				"signalId": "enableDrv"
-			},
-			"channel10": {
-				"signalId": "readySig1"
-			}
-		}
-	},
-	"device1": {
-		"driver": "comedi",
-		"devHandle": "/dev/comedi0",
-		"subdevice2": {
-			"type": "DAC",
-			"testFail": "abc",
-			"channel0": {
-				"signalId": "dacOut0",
-				"scale":[
-					  { "minOut": -9.772, "maxOut": 9.879},
-					  { "minIn": 2000, "maxIn": 64000}
-					],
-				"unit": "Nm"
-			}
-		},
-		"subdevice5": {
-			"type": "DigIn",
-			"channel0": {
-				"signalId": "readyMot"
-			},
-			"channel1": {
-				"signalId": "testIn"
+				"signalId": "io1"
 			}
 		}
 	}

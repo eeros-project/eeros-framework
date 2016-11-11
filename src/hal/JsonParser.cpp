@@ -1,6 +1,7 @@
 #include <eeros/hal/JsonParser.hpp>
 #include <eeros/core/EEROSException.hpp>
 #include <regex>
+#include <dlfcn.h>
 
 using namespace eeros;
 using namespace eeros::hal;
@@ -18,19 +19,35 @@ void JsonParser::createHalObjects(){
 	if (halRootObj) {
 		std::cout << "halRootObj found" << std::endl;
 		//std::cout << obj.dump(UCL_EMIT_CONFIG) << std::endl;
-
+		  
 		for (const auto &o : halRootObj) {
 			auto devObj = o;
 			for(const auto &subO : devObj){
+				void *libFlinkHandle = nullptr;
+				void *createDevHandle = nullptr;
 				std::regex sdRegex("subdevice[0-9]+", std::regex_constants::extended);
-				if(subO.key() == "driver"){
-					std::cout << "\tload driver for " << subO.string_value() << std::endl;
+				if(subO.key() == "library"){
+					std::cout << "\tload library for " << subO.string_value() << std::endl;
+					
+					if(subO.string_value() == "libflinkeeros.so"){
+						std::cout << "will load flinkeeros" << std::endl;
+						libFlinkHandle = dlopen("libflinkeeros.so", RTLD_NOW);//dlopen(subO.string_value().c_str(), RTLD_NOW);
+						if(libFlinkHandle == nullptr){
+							std::cout << "could not load library: " << dlerror() << std::endl;
+							throw new eeros::EEROSException("could not load library: " + subO.string_value());
+						}
+						else{
+							std::cout << "lib successfully loaded" << std::endl;
+						}
+					}
 					//---------------------------------------------
 					//TODO load driver/hw library for driver field
 					//---------------------------------------------
 				}
 				else if(subO.key() == "devHandle"){
 					std::cout << "\tdev Handle is " << subO.string_value() << std::endl;
+					//TODO if flink, now just create the device
+					
 				}
 				else if(std::regex_match(subO.key(), sdRegex)){
 					std::cout << "\t" << subO.key() << std::endl;
