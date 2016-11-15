@@ -2,32 +2,53 @@
 
 using namespace eeros::safety;
 
-SafetyLevel::SafetyLevel(int32_t id, std::string description) : id(id), description(description) {
-	// nothing to do...
+SafetyEvent::SafetyEvent(std::string description) : description(description) {
+	static int count = 0;
+	id = count++;
+}
+
+SafetyEvent::~SafetyEvent() {
+}
+
+std::string SafetyEvent::getDescription() {
+	return description;
+}
+
+SafetyLevel::SafetyLevel(std::string description) : description(description) {
+	static int count = 0;
+	id = count++;
 }
 
 SafetyLevel::~SafetyLevel() {
 	// nothing to do...
 }
 
-int32_t SafetyLevel::getId() {
-	return id;
+bool SafetyLevel::operator<(const SafetyLevel& level) {
+	return this->id < level.id;
+}
+
+bool SafetyLevel::operator>(const SafetyLevel& level) {
+	return this->id > level.id;
+}
+
+bool SafetyLevel::operator==(const SafetyLevel& level) {
+	return this->id == level.id;
 }
 
 std::string SafetyLevel::getDescription() {
 	return description;
 }
 
-int32_t SafetyLevel::getLevelIdForEvent(uint32_t event, bool privateEventOk) {
-	auto it = transitions.find(event);
+SafetyLevel* SafetyLevel::getDestLevelForEvent(SafetyEvent event, bool privateEventOk) {
+	auto it = transitions.find(event.id);
 	if(it != transitions.end()) {
 		if((it->second.second != kPrivateEvent) || privateEventOk) return it->second.first;
 	}
-	return kInvalidLevel;
+	return nullptr;
 }
 
-void SafetyLevel::addEvent(uint32_t event, int32_t nextLevelId, EventType type) {
-	transitions.insert(std::make_pair(event, std::make_pair(nextLevelId, type)));
+void SafetyLevel::addEvent(SafetyEvent event, SafetyLevel& nextLevel, EventType type) {
+	transitions.insert(std::make_pair(event.id, std::make_pair(&nextLevel, type)));
 }
 
 void SafetyLevel::setLevelAction(std::function<void (SafetyContext*)> action) {

@@ -26,16 +26,16 @@ namespace eeros {
 
 		virtual ~Executor();
 		static Executor& instance();
-		void setPeriod(double period);
 		void setMainTask(task::Periodic &mainTask);
 		void setMainTask(safety::SafetySystem &mainTask);
-		void add(task::Periodic task);
+		void add(task::Periodic &task);
 		void add(control::TimeDomain &timedomain);
 		virtual void run();
 
 		static void prefault_stack();
 		static bool lock_memory();
 		static bool set_priority(int nice);
+		static void stop();
 
 		PeriodicCounter counter;
 

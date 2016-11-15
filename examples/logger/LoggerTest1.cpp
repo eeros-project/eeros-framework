@@ -1,18 +1,21 @@
 #include <eeros/logger/SysLogWriter.hpp>
 #include <eeros/logger/Logger.hpp>
+#include <eeros/logger/StreamLogWriter.hpp>
 #include <string>
+#include <iostream>
 
 using namespace eeros;
 using namespace eeros::logger;
 
 int main() {
 	// Create and initialize logger
-	SysLogWriter w("martinTest4");
+	StreamLogWriter w(std::cout);
+//	SysLogWriter w("LoggerTest1");
 	Logger<LogWriter>::setDefaultWriter(&w);
 	Logger<LogWriter> log;
 	w.show(~0);
 	
-	log.info() << "Martin Test 4 started...";
+	log.info() << "Logger Test 1 started...";
 	
 	log.trace() << "This is a debug message...";
 	log.info() << "This is a info message...";
@@ -33,5 +36,5 @@ int main() {
 	log.info() << "Double: " << d;
 	log.info() << "String: " << s;
 	
-	log.info() << "Martin Test 4 finished...";
+	log.info() << "Logger Test 1 finished...";
 }

@@ -19,13 +19,7 @@
 
 volatile bool running = true;
 
-void signalHandler(int signum) {
-	running = false;
-}
-
-
 using namespace eeros;
-
 
 namespace {
 
@@ -96,7 +90,6 @@ namespace {
 	}
 }
 
-
 Executor::Executor() :
 	log('E'), period(0), mainTask(nullptr) { }
 
@@ -109,18 +102,11 @@ Executor& Executor::instance() {
 	return executor;
 }
 
-void Executor::setPeriod(double period) {
-	if (this->period != 0.0)
-		throw std::runtime_error("The period of the executor can only be set once.");
-	this->period = period;
-	counter.setPeriod(period);
-}
-
 void Executor::setMainTask(task::Periodic &mainTask) {
 	if (this->mainTask != nullptr)
 		throw std::runtime_error("you can only define one main task per executor");
-	if (mainTask.getPeriod() != period)
-		throw std::runtime_error("the main task must have the same period as the executor");
+	period = mainTask.getPeriod();
+	counter.setPeriod(period);
 	this->mainTask = &mainTask;
 }
 
@@ -129,7 +115,7 @@ void Executor::setMainTask(safety::SafetySystem &ss) {
 	setMainTask(*task);
 }
 
-void Executor::add(task::Periodic task) {
+void Executor::add(task::Periodic &task) {
 	tasks.push_back(task);
 }
 
@@ -152,9 +138,11 @@ bool Executor::set_priority(int nice) {
 	return (sched_setscheduler(0, SCHED_FIFO, &schedulingParam) != -1);
 }
 
+void Executor::stop() {
+	running = false;
+}
 
-void Executor::assignPriorities()
-{
+void Executor::assignPriorities() {
 	std::vector<task::Periodic*> priorityAssignments;
 
 	// add task to list of priority assignments
@@ -202,13 +190,6 @@ void Executor::run() {
 	counter.monitors = this->mainTask->monitors;
 
 	createThreads(log, tasks, executorTask, threads, taskList);
-
-	signal(SIGHUP, signalHandler);
-	signal(SIGINT, signalHandler);
-	signal(SIGQUIT, signalHandler);
-	signal(SIGKILL, signalHandler);
-	signal(SIGTERM, signalHandler);
-	signal(SIGPWR, signalHandler);
 
 	using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
 

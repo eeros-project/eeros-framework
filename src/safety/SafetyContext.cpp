@@ -8,7 +8,7 @@ using namespace eeros::safety;
 SafetyContext::SafetyContext(SafetySystem* parent) : parent(parent) { }
 
 
-void SafetyContext::triggerEvent(int32_t event) {	
+void SafetyContext::triggerEvent(SafetyEvent event) {	
 	// Trigger event in private context
 	parent->triggerEvent(event, this);
 }

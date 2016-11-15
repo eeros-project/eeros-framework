@@ -3,7 +3,6 @@
 
 #include <list>
 #include <string>
-#include <eeros/core/PeriodicThread.hpp>
 #include <eeros/core/Runnable.hpp>
 
 namespace eeros {

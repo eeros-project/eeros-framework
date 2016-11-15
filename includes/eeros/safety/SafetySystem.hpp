@@ -18,26 +18,25 @@ namespace eeros {
 		
 		class SafetySystem : public Runnable {
 		public:
-			SafetySystem(SafetyProperties properties, double period);
+			SafetySystem(SafetyProperties& properties, double period);
 			virtual ~SafetySystem();
 			SafetyLevel& getCurrentLevel(void);
-			SafetyLevel& getLevelById(int32_t levelId);
-			SafetyLevel& operator[](unsigned levelId);
-			
-			void triggerEvent(uint32_t event, SafetyContext* context = nullptr);
+			void triggerEvent(SafetyEvent event, SafetyContext* context = nullptr);
 			const SafetyProperties* getProperties() const;
 			double getPeriod() const;
-			
+			void run();
+			static void exitHandler();
 			logger::Logger<logger::LogWriter> log;
 			
-			void run();
 		private:
-			bool setProperties(SafetyProperties safetyProperties);
+			bool setProperties(SafetyProperties& safetyProperties);
 			
 			SafetyProperties properties;
 			SafetyLevel* currentLevel;
+			SafetyLevel* nextLevel;
 			SafetyContext privateContext;
 			static uint8_t instCount;
+			static SafetySystem* instance;
 			double period;
 		};
 
