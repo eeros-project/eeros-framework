@@ -14,6 +14,9 @@ HAL& HAL::instance() {
 }
 
 bool HAL::readConfigFromFile(std::string file) {
+	
+	parser = JsonParser(file);
+	parser.createHalObjects(hwLibraries);
 	// TODO parse file, load necessary modules and delegate creation of the system in- and output objects
 	return false;
 }

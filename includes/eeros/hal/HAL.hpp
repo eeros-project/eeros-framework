@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <eeros/hal/PeripheralInput.hpp>
 #include <eeros/hal/PeripheralOutput.hpp>
+#include <eeros/hal/JsonParser.hpp>
 
 namespace eeros {
 	namespace hal {
@@ -38,6 +39,10 @@ namespace eeros {
 			
 			std::map<std::string, PeripheralInputInterface*> inputs;
 			std::map<std::string, PeripheralOutputInterface*> outputs;
+			
+			std::map<std::string, void*> hwLibraries;
+			JsonParser parser;
+			
 		};
 
 	};

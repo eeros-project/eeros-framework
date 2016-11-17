@@ -1,6 +1,7 @@
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/hal/JsonParser.hpp>
+#include <eeros/hal/HAL.hpp>
 
 using namespace eeros::logger;
 using namespace eeros::hal;
@@ -13,6 +14,7 @@ int main(){
 	
 	log.info() << "ParserTest started...";
   
-	JsonParser parser = JsonParser("../../../../eeros-framework/test/hal/HALConfigExample.json");
-	parser.createHalObjects();
+	HAL& hal = HAL::instance();
+	hal.readConfigFromFile("../../../../eeros-framework/test/hal/HALConfigExample.json");
+	
 }

@@ -8,8 +8,9 @@ namespace eeros {
 		class JsonParser
 		{
 		public:
-			JsonParser(const char *filePath);
-			virtual void createHalObjects();
+			JsonParser();
+			JsonParser(std::string filePath);
+			virtual void createHalObjects(std::map<std::string, void*> lib);
 		private:
 			ucl::Ucl halRootObj;
 		};
