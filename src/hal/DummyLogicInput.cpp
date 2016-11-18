@@ -5,5 +5,9 @@ using namespace eeros::hal;
 DummyLogicInput::DummyLogicInput(std::string id) : PeripheralInput<bool>(id) { }
 
 bool DummyLogicInput::get() {
-	return false;
+	return value;
+}
+
+void DummyLogicInput::set(bool val) {
+	value = val;
 }

@@ -30,7 +30,7 @@ namespace eeros {
 				return *currentLevel;
 			}
 			else {
-				throw EEROSException("currentLevel not defiend"); // TODO define error number and send error message to logger
+				throw EEROSException("currentLevel not defined"); // TODO define error number and send error message to logger
 			}
 		}
 		
@@ -46,15 +46,14 @@ namespace eeros {
 		
 		void SafetySystem::triggerEvent(SafetyEvent event, SafetyContext* context) {
 			if (currentLevel) {
-				log.info() << "triggering event: \'" << event.getDescription() << "\'";
+				log.info() << "triggering event: \'" << event.getDescription() << "\' in level '" << nextLevel->getDescription() << "\'";
 				nextLevel = currentLevel->getDestLevelForEvent(event, context == &privateContext);
 				if (nextLevel != nullptr) {
 					bool transition = (nextLevel != currentLevel);	// stage level change
-					if (transition) log.info() << "new safety level: [" << nextLevel->id << "] \'" << nextLevel->getDescription() << "\'";	
+					if (transition) log.info() << "new safety level: '" << nextLevel->getDescription() << "\'";	
 				} else {
 					log.error()	<< "no transition for event \'" << event.getDescription()
-								<< "\' in level [" << currentLevel->id << "] \'"
-								<< currentLevel->getDescription() << "\'";
+								<< "\' in level \'" << currentLevel->getDescription() << "\'";
 				}
 			} else {
 				throw EEROSException("current level not defined"); // TODO define error number and send error message to logger
@@ -71,7 +70,7 @@ namespace eeros {
 
 		void SafetySystem::run() {
 			// level must only change before safety system runs or after run method has finished
-			currentLevel = nextLevel; // TODO make atomic
+			if (nextLevel != nullptr) currentLevel = nextLevel; // TODO make atomic
 			if(currentLevel != nullptr) {
 
 				// 1) Get currentLevel
@@ -82,13 +81,13 @@ namespace eeros {
 					if(ia != nullptr) {
 						SafetyLevel* oldLevel = currentLevel;
 						if (ia->check(&privateContext)) {
-							SafetyLevel* newLevel = currentLevel;
-							using namespace eeros::logger;
-							eeros::hal::PeripheralInputInterface* input = (eeros::hal::PeripheralInputInterface*)(ia->inputInterface);
+							SafetyLevel* newLevel = nextLevel;
+							using namespace logger;
+							hal::PeripheralInputInterface* input = (hal::PeripheralInputInterface*)(ia->getInput());
 							if (oldLevel != newLevel) {
 								log.info()	<< "level changed due to input action: " << input->getId() << endl
-											<< "  previous level: [" << oldLevel->id << "] " << oldLevel->getDescription() << endl
-											<< "  new level:      [" << newLevel->id << "] " << newLevel->getDescription();
+											<< "  previous level: '" << oldLevel->getDescription() << "'" << endl
+											<< "  new level:      '" << newLevel->getDescription() << "'";
 							}
 						}
 					}
@@ -105,7 +104,7 @@ namespace eeros {
 						oa->set();
 					}
 				}
-				currentLevel = nextLevel; // TODO make atomic
+				if (nextLevel != nullptr) currentLevel = nextLevel; // TODO make atomic
 			}
 			else {
 				log.error() << "current level is null!";

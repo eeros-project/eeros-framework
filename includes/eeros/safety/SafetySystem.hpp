@@ -12,10 +12,6 @@
 namespace eeros {
 	namespace safety {
 		
-		// Forward declarations
-		class SystemInputInterface;
-		class SystemOutputInterface;
-		
 		class SafetySystem : public Runnable {
 		public:
 			SafetySystem(SafetyProperties& properties, double period);
