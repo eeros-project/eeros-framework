@@ -119,12 +119,12 @@ LogWriter& SysLogWriter::operator <<(const std::string& value) {
 	return *this;
 }
 
-LogWriter& SysLogWriter::operator <<(std::ostream& os) {
+/*LogWriter& SysLogWriter::operator <<(std::ostream& os) {
 	if(enabled)
 		out << os;
 	
 	return *this;
-}
+}*/
 
 LogWriter& SysLogWriter::operator <<(void (*f)(LogWriter&)) {
 	if(enabled)

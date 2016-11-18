@@ -130,12 +130,12 @@ LogWriter& StreamLogWriter::operator <<(const std::string& value) {
 	return *this;
 }
 
-LogWriter& StreamLogWriter::operator <<(std::ostream& os) {
+/*LogWriter& StreamLogWriter::operator <<(std::ostream& os) {
 	if(enabled)
 		out << os;
 	
 	return *this;
-}
+}*/
 
 LogWriter& StreamLogWriter::operator <<(void (*f)(LogWriter&)) {
 	if(enabled)

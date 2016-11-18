@@ -3,6 +3,7 @@
 #include <regex>
 #include <dlfcn.h>
 #include <eeros/hal/PeripheralOutput.hpp>
+#include <eeros/hal/HAL.hpp>
 
 using namespace eeros;
 using namespace eeros::hal;
@@ -22,7 +23,8 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	std::string library;
 	std::string devHandle;
 	std::string type;
-	
+
+	HAL& hal = HAL::instance();
   
 	if (halRootObj) {
 		std::cout << "halRootObj found" << std::endl;
@@ -94,34 +96,14 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 											std::cout << "channelNum: " << channelNumber << std::endl;
 											//TODO: upper lines only temporary
 											std::string createStr = "create" + type;
-											std::cout << "method string: " << createStr << std::endl;
-											typedef PeripheralOutput<bool> * createSignature_t(std::string, std::string, uint32_t, uint32_t, bool);
 											void *createHandle = dlsym(libIt->second, createStr.c_str());
 											if(createHandle == nullptr){
 												std::cout << "could not find createMethod: " << dlerror() << std::endl;
 												throw new eeros::EEROSException("could not find method in dynamic library");
 											}
+											//TODO make generic for In and Outputs and for different number of parameters
 											PeripheralOutput<bool> *halObj = reinterpret_cast<PeripheralOutput<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(chanProp.string_value(), devHandle, subDevNumber, channelNumber);
-// 											PeripheralOutput<bool> *halObj = reinterpret_cast<PeripheralOutput<bool> *(*)()>(createHandle)(chanProp.string_value(), devHandle, subDevNumber, channelNumber);
-// 											createSignature_t* halFun = reinterpret_cast<createSignature_t*>(createHandle);
-											
-// 											PeripheralOutput<bool> *halObj = halFun(chanProp.string_value(), devHandle, subDevNumber, channelNumber, false);
-
-
-
-											/*
-											typedef PeripheralOutput<bool> * createSignature_t(std::string, std::string, uint32_t, uint32_t, bool);
-											void *createHandle = dlsym(libIt->second, createStr.c_str());
-											if(createHandle == nullptr){
-												std::cout << "could not find createMethod: " << dlerror() << std::endl;
-												throw new eeros::EEROSException("could not find method in dynamic library");
-											}
-// 											PeripheralOutput<bool> *halObj = reinterpret_cast<PeripheralOutput<bool> *(*)()>(createHandle)(chanProp.string_value(), devHandle, subDevNumber, channelNumber);
-											createSignature_t* halFun = reinterpret_cast<createSignature_t*>(createHandle);
-											
-											PeripheralOutput<bool> *halObj = halFun(chanProp.string_value(), devHandle, subDevNumber, channelNumber, false);*/
-											
-// 											halObj->set(true);
+											hal.addPeripheralOutput(halObj);
 										}
 									}
 								}
