@@ -4,6 +4,8 @@
 #include <dlfcn.h>
 #include <eeros/hal/PeripheralOutput.hpp>
 #include <eeros/hal/HAL.hpp>
+#include <eeros/hal/HALFeatures.hpp>
+#include <stdexcept>
 
 using namespace eeros;
 using namespace eeros::hal;
@@ -23,8 +25,6 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	std::string library;
 	std::string devHandle;
 	std::string type;
-
-	HAL& hal = HAL::instance();
   
 	if (halRootObj) {
 		std::cout << "halRootObj found" << std::endl;
@@ -64,11 +64,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 						std::regex chanRegex("channel[0-9]+", std::regex_constants::extended);
 						std::string subDevParam = chanO.key();
 						
-						if(subDevParam == "type"){
-							std::cout << "\t\ttype: " << chanO.string_value() << std::endl;
-							type = chanO.string_value();
-						}
-						else if(std::regex_match(subDevParam, chanRegex)){
+						if(std::regex_match(subDevParam, chanRegex)){
 							std::cout << "\t\t" << subDevParam << std::endl;
 							
 							auto chanObj = chanO;
@@ -83,27 +79,18 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 								if(libIt != libHandles.end()){
 									if(!devHandle.empty()){
 										for(const auto &chanProp : chanObj){
+											if(chanProp.key() == "type"){
+												std::cout << "\t\t\ttype: " << chanProp.string_value() << std::endl;
+												type = chanProp.string_value();
+											}
 											if(chanProp.key() == "signalId"){
 												std::cout << "\t\t\tsignalId: " << chanProp.string_value() << std::endl;
 												//TODO create function which can create string createDigOut from type
 												//TODO: change when using HAL Object: only for test purposes
-												std::string subDevStr = subDevO.key();
-												int subDevNumber = std::stoi(subDevStr.substr(9, subDevStr.length()));
-												std::cout << "subDevNum: " << subDevNumber << std::endl;
+												int subDevNumber = std::stoi(subDevO.key().substr(9, subDevO.key().length()));
+												int channelNumber = std::stoi(chanObj.key().substr(7, chanObj.key().length()));
 												
-												std::string chanStr = chanObj.key();
-												int channelNumber = std::stoi(chanStr.substr(7, chanStr.length()));
-												std::cout << "channelNum: " << channelNumber << std::endl;
-												//TODO: upper lines only temporary
-												std::string createStr = "create" + type;
-												void *createHandle = dlsym(libIt->second, createStr.c_str());
-												if(createHandle == nullptr){
-													std::cout << "could not find createMethod: " << dlerror() << std::endl;
-													throw new eeros::EEROSException("could not find method in dynamic library");
-												}
-												//TODO make generic for In and Outputs and for different number of parameters
-												PeripheralOutput<bool> *halObj = reinterpret_cast<PeripheralOutput<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(chanProp.string_value(), devHandle, subDevNumber, channelNumber);
-												hal.addPeripheralOutput(halObj);
+												createObject(libIt->second, type, chanProp.string_value(), devHandle, subDevNumber, channelNumber);
 											}
 										}
 									}
@@ -147,3 +134,46 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 		throw new eeros::EEROSException("No parsed HAL root object");
 	}
 }
+
+void JsonParser::createObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber){
+	HAL& hal = HAL::instance();
+	
+	if(libHandle == nullptr || type.empty() || id.empty() || devHandle.empty()){
+		throw std::invalid_argument("could not create object");
+	}
+	
+	std::string createStr = "create" + type;
+	void *createHandle = dlsym(libHandle, createStr.c_str());
+	if(createHandle == nullptr){
+		std::cout << "could not find createMethod: " << dlerror() << std::endl;
+		throw new eeros::EEROSException("could not find method in dynamic library");
+	}
+	auto dirIt = directionOfChannel.find(type);
+	auto typeIt = typeOfChannel.find(type);
+	if(dirIt != directionOfChannel.end()){
+		if(typeIt != typeOfChannel.end()){
+			//TODO add generic for type
+			
+			if(dirIt->second == Input){
+				std::cout << "createIn" << std::endl;
+				PeripheralInput<bool> *halObj = reinterpret_cast<PeripheralInput<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
+				hal.addPeripheralInput(halObj);
+			}
+			else if(dirIt->second == Output){
+				std::cout << "createOut" << std::endl;
+				PeripheralOutput<bool> *halObj = reinterpret_cast<PeripheralOutput<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
+				hal.addPeripheralOutput(halObj);
+			}
+			else{
+				throw eeros::EEROSException("undefined direction for channel " + id);
+			}
+		}
+		else{
+			throw eeros::EEROSException("undefined type for channel " + id);
+		}
+	}
+	else{
+		throw eeros::EEROSException("undefined direction for channel " + id);
+	}
+}
+

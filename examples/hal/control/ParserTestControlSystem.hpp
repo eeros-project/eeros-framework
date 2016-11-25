@@ -16,6 +16,8 @@ public:
 	eeros::control::Constant<bool> setPos;
 // 	eeros::control::PeripheralOutput<double> dac1;
 	eeros::control::PeripheralOutput<bool> io1;
+	eeros::control::PeripheralOutput<bool> ioOut;
+	eeros::control::PeripheralInput<bool> ioIn;
 	eeros::control::TimeDomain timedomain;
   
 private:
