@@ -3,6 +3,9 @@
 #include <regex>
 #include <dlfcn.h>
 #include <eeros/hal/PeripheralOutput.hpp>
+#include <eeros/hal/PeripheralInput.hpp>
+#include <eeros/hal/ScalablePeripheralInput.hpp>
+#include <eeros/hal/ScalablePeripheralOutput.hpp>
 #include <eeros/hal/HAL.hpp>
 #include <eeros/hal/HALFeatures.hpp>
 #include <stdexcept>
@@ -60,15 +63,21 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 				else if(std::regex_match(subO.key(), sdRegex)){
 					std::cout << "\t" << subO.key() << std::endl;
 					auto subDevO = subO;
+					int subDevNumber = std::stoi(subDevO.key().substr(9, subDevO.key().length()));
 					for(const auto &chanO : subDevO){
 						std::regex chanRegex("channel[0-9]+", std::regex_constants::extended);
 						std::string subDevParam = chanO.key();
-						
-						if(std::regex_match(subDevParam, chanRegex)){
+												
+						if(chanO.key() == "type"){
+							std::cout << "\t\t\ttype: " << chanO.string_value() << std::endl;
+							type = chanO.string_value();
+						}
+						else if(std::regex_match(subDevParam, chanRegex)){
 							std::cout << "\t\t" << subDevParam << std::endl;
 							
 							auto chanObj = chanO;
-							
+							int channelNumber = std::stoi(chanObj.key().substr(7, chanObj.key().length()));
+						
 							//----------------------------------
 							//TODO create HAL Object for channel
 							//----------------------------------
@@ -79,18 +88,34 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 								if(libIt != libHandles.end()){
 									if(!devHandle.empty()){
 										for(const auto &chanProp : chanObj){
-											if(chanProp.key() == "type"){
-												std::cout << "\t\t\ttype: " << chanProp.string_value() << std::endl;
-												type = chanProp.string_value();
+											
+											if(chanProp.key() == "scale"){
+												//TODO
+											}
+											if(chanProp.key() == "offset"){
+												//TODO
 											}
 											if(chanProp.key() == "signalId"){
 												std::cout << "\t\t\tsignalId: " << chanProp.string_value() << std::endl;
 												//TODO create function which can create string createDigOut from type
 												//TODO: change when using HAL Object: only for test purposes
-												int subDevNumber = std::stoi(subDevO.key().substr(9, subDevO.key().length()));
-												int channelNumber = std::stoi(chanObj.key().substr(7, chanObj.key().length()));
-												
-												createObject(libIt->second, type, chanProp.string_value(), devHandle, subDevNumber, channelNumber);
+												auto typeIt = typeOfChannel.find(type);
+												if(typeIt != typeOfChannel.end()){
+													if(typeIt->second == Real){
+													  std::cout << "create Real" << std::endl;
+// 														createRealObject(libIt->second, type, chanProp.string_value(), devHandle, subDevNumber, channelNumber, scale, offset);
+													}
+													else if(typeIt->second == Logic){
+													  std::cout << "create Logic" << std::endl;
+														createLogicObject(libIt->second, type, chanProp.string_value(), devHandle, subDevNumber, channelNumber);
+													}
+												}
+												else{
+													throw eeros::EEROSException("undefined type: " + type + "for " + chanProp.string_value());
+												}
+											}
+											if(chanProp.key() == "unit"){
+												//TODO
 											}
 										}
 									}
@@ -114,7 +139,6 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 						else{
 							std::cout << "\t\tno valid key: " << subDevParam << std::endl;
 						}
-						
 					}
 					type.clear();
 				}
@@ -135,7 +159,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	}
 }
 
-void JsonParser::createObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber){
+void JsonParser::createLogicObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber){
 	HAL& hal = HAL::instance();
 	
 	if(libHandle == nullptr || type.empty() || id.empty() || devHandle.empty()){
@@ -149,27 +173,20 @@ void JsonParser::createObject(void *libHandle, std::string type, std::string id,
 		throw new eeros::EEROSException("could not find method in dynamic library");
 	}
 	auto dirIt = directionOfChannel.find(type);
-	auto typeIt = typeOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
-		if(typeIt != typeOfChannel.end()){
-			//TODO add generic for type
-			
-			if(dirIt->second == Input){
-				std::cout << "createIn" << std::endl;
-				PeripheralInput<bool> *halObj = reinterpret_cast<PeripheralInput<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
-				hal.addPeripheralInput(halObj);
-			}
-			else if(dirIt->second == Output){
-				std::cout << "createOut" << std::endl;
-				PeripheralOutput<bool> *halObj = reinterpret_cast<PeripheralOutput<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
-				hal.addPeripheralOutput(halObj);
-			}
-			else{
-				throw eeros::EEROSException("undefined direction for channel " + id);
-			}
+	//TODO add generic for type
+		if(dirIt->second == Input){
+			std::cout << "createIn" << std::endl;
+			PeripheralInput<bool> *halObj = reinterpret_cast<PeripheralInput<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
+			hal.addPeripheralInput(halObj);
+		}
+		else if(dirIt->second == Output){
+			std::cout << "createOut" << std::endl;
+			PeripheralOutput<bool> *halObj = reinterpret_cast<PeripheralOutput<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
+			hal.addPeripheralOutput(halObj);
 		}
 		else{
-			throw eeros::EEROSException("undefined type for channel " + id);
+			throw eeros::EEROSException("undefined direction for channel " + id);
 		}
 	}
 	else{
@@ -177,3 +194,58 @@ void JsonParser::createObject(void *libHandle, std::string type, std::string id,
 	}
 }
 
+void JsonParser::createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset){
+	HAL& hal = HAL::instance();
+	
+	if(libHandle == nullptr || type.empty() || id.empty() || devHandle.empty()){
+		throw std::invalid_argument("could not create object");
+	}
+	
+	std::string createStr = "create" + type;
+	void *createHandle = dlsym(libHandle, createStr.c_str());
+	if(createHandle == nullptr){
+		std::cout << "could not find createMethod: " << dlerror() << std::endl;
+		throw new eeros::EEROSException("could not find method in dynamic library");
+	}
+	auto dirIt = directionOfChannel.find(type);
+	if(dirIt != directionOfChannel.end()){
+	//TODO add generic for type
+		if(dirIt->second == Input){
+			std::cout << "createIn" << std::endl;
+			ScalablePeripheralInput<double> *halObj = reinterpret_cast<ScalablePeripheralInput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset);
+			hal.addPeripheralInput(halObj);
+		}
+		else if(dirIt->second == Output){
+			std::cout << "createOut" << std::endl;
+			ScalablePeripheralOutput<double> *halObj = reinterpret_cast<ScalablePeripheralOutput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset);
+			hal.addPeripheralOutput(halObj);
+		}
+		else{
+			throw eeros::EEROSException("undefined direction for channel " + id);
+		}
+	}
+	else{
+		throw eeros::EEROSException("undefined direction for channel " + id);
+	}
+}
+
+template<typename T> 
+T JsonParser::getType(std::string type){
+	auto typeIt = typeOfChannel.find(type);
+	
+	if(typeIt != typeOfChannel.end()){
+		
+		if(typeIt->second == Real){	// if Real type -> double
+			return double();
+		}
+		else if(typeIt->second == Logic){	// Logic -> bool
+			return bool();
+		}
+		else{
+			throw eeros::EEROSException("undefined type: " + type);	//should not occur
+		}
+	}
+	else{
+		throw eeros::EEROSException("undefined type: " + type);
+	}
+}

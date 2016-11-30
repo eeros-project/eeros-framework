@@ -13,7 +13,10 @@ namespace eeros {
 			virtual void createHalObjects(std::map<std::string, void*> lib);
 		private:
 			ucl::Ucl halRootObj;
-			void createObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber);
+			void createLogicObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber);
+			void createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset);
+			template<typename T> 
+			T getType(std::string type);
 		};
 	};
 };
