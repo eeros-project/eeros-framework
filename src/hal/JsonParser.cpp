@@ -30,6 +30,9 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	std::string type;
 	std::string chanType;
 	std::string sigId;
+	std::string chanUnit;
+	double scale = 1;
+	double offset = 0;
   
 	if (halRootObj) {
 		std::cout << "halRootObj found" << std::endl;
@@ -95,9 +98,14 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 												chanType = chanProp.string_value();
 											}
 											if(chanProp.key() == "scale"){
+												for(const auto &scaleProp: chanProp){
+													std::cout << "sc: " << scaleProp.key() << std::endl;
+												}
 												//TODO
+												std::cout << "scale: " << chanProp.at(0).string_value() << std::endl;
+// 												std::cout << "length: " << chanProp.len() << std::endl;
 											}
-											if(chanProp.key() == "offset"){
+											if(chanProp.key() == "range"){
 												//TODO
 											}
 											if(chanProp.key() == "signalId"){
@@ -106,11 +114,9 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 												
 											}
 											if(chanProp.key() == "unit"){
-												//TODO
+												chanUnit = chanProp.string_value();
 											}
 										}
-										//TODO create function which can create string createDigOut from type
-										//TODO: change when using HAL Object: only for test purposes
 										if(chanType.empty()){
 											chanType = type;
 										}
@@ -118,7 +124,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										if(typeIt != typeOfChannel.end()){
 											if(typeIt->second == Real){
 												std::cout << "create Real" << std::endl;
-// 												createRealObject(libIt->second, chanType, chanProp.string_value(), devHandle, subDevNumber, channelNumber, scale, offset);
+												createRealObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber, scale, offset, chanUnit);
 											}
 											else if(typeIt->second == Logic){
 												std::cout << "create Logic" << std::endl;
@@ -130,6 +136,9 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										}
 										sigId.clear();
 										chanType.clear();
+										chanUnit.clear();
+										scale = 1;
+										offset = 0;
 									}
 									else{
 										std::cout << "no device handle defined for " << subDevParam << std::endl;
@@ -206,7 +215,7 @@ void JsonParser::createLogicObject(void *libHandle, std::string type, std::strin
 	}
 }
 
-void JsonParser::createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset){
+void JsonParser::createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset, std::string unit){
 	HAL& hal = HAL::instance();
 	
 	if(libHandle == nullptr || type.empty() || id.empty() || devHandle.empty()){
@@ -224,12 +233,12 @@ void JsonParser::createRealObject(void *libHandle, std::string type, std::string
 	//TODO add generic for type
 		if(dirIt->second == In){
 			std::cout << "createIn" << std::endl;
-			ScalableInput<double> *halObj = reinterpret_cast<ScalableInput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset);
+			ScalableInput<double> *halObj = reinterpret_cast<ScalableInput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double, std::string)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset, unit);
 			hal.addInput(halObj);
 		}
 		else if(dirIt->second == Out){
 			std::cout << "createOut" << std::endl;
-			ScalableOutput<double> *halObj = reinterpret_cast<ScalableOutput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset);
+			ScalableOutput<double> *halObj = reinterpret_cast<ScalableOutput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double, std::string)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset, unit);
 			hal.addOutput(halObj);
 		}
 		else{
@@ -238,26 +247,5 @@ void JsonParser::createRealObject(void *libHandle, std::string type, std::string
 	}
 	else{
 		throw eeros::EEROSException("undefined direction for channel " + id);
-	}
-}
-
-template<typename T> 
-T JsonParser::getType(std::string type){
-	auto typeIt = typeOfChannel.find(type);
-	
-	if(typeIt != typeOfChannel.end()){
-		
-		if(typeIt->second == Real){	// if Real type -> double
-			return double();
-		}
-		else if(typeIt->second == Logic){	// Logic -> bool
-			return bool();
-		}
-		else{
-			throw eeros::EEROSException("undefined type: " + type);	//should not occur
-		}
-	}
-	else{
-		throw eeros::EEROSException("undefined type: " + type);
 	}
 }

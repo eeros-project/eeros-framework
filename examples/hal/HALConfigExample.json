@@ -17,6 +17,22 @@
 			"channel4": {
 				"signalId": "ioOut4"
 			}
+		},
+		"subdevice2": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "dac1",
+				"scale": [ { "dac" : {
+							"minIn": 	2000, 	"maxIn": 	64000,
+							"minOut": 	-9.772, "maxOut": 	9.879 }}
+							
+					 ],
+				"range": [ { "dac" : {
+							"minIn": 	0, 	"maxIn": 	65535,
+							"minOut": 	-10.0, 	"maxOut": 	10.0 }}
+					 ],
+				"unit": "V"
+			}
 		}
 	}
 }

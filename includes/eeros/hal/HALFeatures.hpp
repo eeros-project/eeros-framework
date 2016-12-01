@@ -19,8 +19,8 @@ namespace eeros{
 		const std::map<std::string, Direction> directionOfChannel = {
 			{ "DigIn", 	In },
 			{ "DigOut", 	Out },
-			{ "DAC", 	Out },
-			{ "ADC", 	In },
+			{ "AnalogOut", 	Out },
+			{ "AnalogIn", 	In },
 			{ "PWM", 	Out },
 			{ "FQD", 	In }
 		};
@@ -28,8 +28,8 @@ namespace eeros{
 		const std::map<std::string, Type> typeOfChannel = {
 			{ "DigIn", 	Logic },
 			{ "DigOut", 	Logic },
-			{ "DAC", 	Real },
-			{ "ADC", 	Real },
+			{ "AnalogOut", 	Real },
+			{ "AnalogIn", 	Real },
 			{ "PWM", 	Real },
 			{ "FQD", 	Real }
 		};
