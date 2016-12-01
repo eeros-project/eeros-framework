@@ -10,9 +10,12 @@
 			"channel3": {
 				"signalId": "ioOut"
 			},
-			"type": "DigIn",
 			"channel2": {
+				"type": "DigIn",
 				"signalId": "ioIn"
+			},
+			"channel4": {
+				"signalId": "ioOut4"
 			}
 		}
 	}

@@ -28,6 +28,8 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	std::string library;
 	std::string devHandle;
 	std::string type;
+	std::string chanType;
+	std::string sigId;
   
 	if (halRootObj) {
 		std::cout << "halRootObj found" << std::endl;
@@ -67,7 +69,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 					for(const auto &chanO : subDevO){
 						std::regex chanRegex("channel[0-9]+", std::regex_constants::extended);
 						std::string subDevParam = chanO.key();
-												
+						std::cout << "." << std::endl;
 						if(chanO.key() == "type"){
 							std::cout << "\t\t\ttype: " << chanO.string_value() << std::endl;
 							type = chanO.string_value();
@@ -88,7 +90,10 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 								if(libIt != libHandles.end()){
 									if(!devHandle.empty()){
 										for(const auto &chanProp : chanObj){
-											
+											if(chanProp.key() == "type"){
+												std::cout << "\t\t\ttype: " << chanProp.string_value() << std::endl;
+												chanType = chanProp.string_value();
+											}
 											if(chanProp.key() == "scale"){
 												//TODO
 											}
@@ -97,27 +102,34 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 											}
 											if(chanProp.key() == "signalId"){
 												std::cout << "\t\t\tsignalId: " << chanProp.string_value() << std::endl;
-												//TODO create function which can create string createDigOut from type
-												//TODO: change when using HAL Object: only for test purposes
-												auto typeIt = typeOfChannel.find(type);
-												if(typeIt != typeOfChannel.end()){
-													if(typeIt->second == Real){
-													  std::cout << "create Real" << std::endl;
-// 														createRealObject(libIt->second, type, chanProp.string_value(), devHandle, subDevNumber, channelNumber, scale, offset);
-													}
-													else if(typeIt->second == Logic){
-													  std::cout << "create Logic" << std::endl;
-														createLogicObject(libIt->second, type, chanProp.string_value(), devHandle, subDevNumber, channelNumber);
-													}
-												}
-												else{
-													throw eeros::EEROSException("undefined type: " + type + "for " + chanProp.string_value());
-												}
+												sigId = chanProp.string_value();
+												
 											}
 											if(chanProp.key() == "unit"){
 												//TODO
 											}
 										}
+										//TODO create function which can create string createDigOut from type
+										//TODO: change when using HAL Object: only for test purposes
+										if(chanType.empty()){
+											chanType = type;
+										}
+										auto typeIt = typeOfChannel.find(chanType);
+										if(typeIt != typeOfChannel.end()){
+											if(typeIt->second == Real){
+												std::cout << "create Real" << std::endl;
+// 												createRealObject(libIt->second, chanType, chanProp.string_value(), devHandle, subDevNumber, channelNumber, scale, offset);
+											}
+											else if(typeIt->second == Logic){
+												std::cout << "create Logic" << std::endl;
+												createLogicObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber);
+											}
+										}
+										else{
+											throw eeros::EEROSException("undefined type: " + chanType + "for " + sigId);
+										}
+										sigId.clear();
+										chanType.clear();
 									}
 									else{
 										std::cout << "no device handle defined for " << subDevParam << std::endl;
