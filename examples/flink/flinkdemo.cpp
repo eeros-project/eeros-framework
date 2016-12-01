@@ -30,9 +30,9 @@ void initHardware() {
 	FlinkDigOut* en0 = new FlinkDigOut("enable", flink0, 3, 0);
 	
 	std::cout << "  Registering I/Os in the HAL..." << std::endl;
-	hal.addPeripheralInput(enc0);
-	hal.addPeripheralOutput(mot0);
-	hal.addPeripheralOutput(en0);
+	hal.addInput(enc0);
+	hal.addOutput(mot0);
+	hal.addOutput(en0);
 	
 	std::cout << "  Initializing I/Os" << std::endl;
 	enc0->reset();

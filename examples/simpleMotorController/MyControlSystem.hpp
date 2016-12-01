@@ -28,7 +28,7 @@ public:
 	eeros::control::Gain<> speedController;
 	eeros::control::Gain<> inertia;
 	eeros::control::Gain<> invMotConst;
-	eeros::control::PeripheralOutput<> dac;
+	eeros::control::Output<> dac;
 	
 private:
 	eeros::control::TimeDomain timedomain;

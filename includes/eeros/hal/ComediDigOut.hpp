@@ -3,13 +3,13 @@
 
 #include <string>
 #include <comedilib.h>
-#include <eeros/hal/PeripheralOutput.hpp>
+#include <eeros/hal/Output.hpp>
 #include <eeros/hal/ComediDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class ComediDigOut : public PeripheralOutput<bool> {
+		class ComediDigOut : public Output<bool> {
 		public:
 			ComediDigOut(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted = false);
 			virtual bool get();

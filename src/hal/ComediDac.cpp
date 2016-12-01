@@ -7,7 +7,7 @@ ComediDac::ComediDac(std::string id,
 					 uint32_t subDeviceNumber,
 					 uint32_t channel,
 					 double scale,
-					 double offset) : ScalablePeripheralOutput<double>(id, scale, offset) {
+					 double offset) : ScalableOutput<double>(id, scale, offset) {
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channel = channel;

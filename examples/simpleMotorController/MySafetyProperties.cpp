@@ -19,13 +19,13 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) : controlSys
 	HAL& hal = HAL::instance();
 
 	// ############ Define critical outputs ############
-	enable = hal.getLogicPeripheralOutput("enable");
+	enable = hal.getLogicOutput("enable");
 	
 	criticalOutputs = { enable };
 	
 	// ############ Define critical inputs ############
-	emergency = hal.getLogicPeripheralInput("emergency");
-	q = hal.getRealPeripheralInput("q");
+	emergency = hal.getLogicInput("emergency");
+	q = hal.getRealInput("q");
 	
 	criticalInputs = { emergency, q };
 	

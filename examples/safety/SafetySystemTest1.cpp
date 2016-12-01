@@ -40,8 +40,8 @@ int main() {
 	
 	// Get HAL instance and initialize
 	HAL& hal = HAL::instance();
-	hal.addPeripheralInput(new DummyLogicInput("in1"));
-	hal.addPeripheralOutput(new DummyLogicOutput("out1"));
+	hal.addInput(new DummyLogicInput("in1"));
+	hal.addOutput(new DummyLogicOutput("out1"));
 	
 	// Create and initialize safety system
 	double period = 1;

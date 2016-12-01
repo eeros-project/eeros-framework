@@ -11,7 +11,7 @@ ComediFqd::ComediFqd(std::string id,
 					 double scale,
 					 double offset,
 					 double initValue) : 
-					 ScalablePeripheralInput<double>(id, scale, offset) {
+					 ScalableInput<double>(id, scale, offset) {
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channelA = channelA;

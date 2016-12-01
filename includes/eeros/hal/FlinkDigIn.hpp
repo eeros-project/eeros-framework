@@ -3,13 +3,13 @@
 
 #include <string>
 #include <flinklib.h>
-#include <eeros/hal/PeripheralInput.hpp>
+#include <eeros/hal/Input.hpp>
 #include <eeros/hal/FlinkDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class FlinkDigIn : public PeripheralInput<bool> {
+		class FlinkDigIn : public Input<bool> {
 		public:
 			FlinkDigIn(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, bool inverted = false);
 			virtual bool get();

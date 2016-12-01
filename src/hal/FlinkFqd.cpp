@@ -9,7 +9,7 @@ FlinkFqd::FlinkFqd(std::string id,
 					 double scale,
 					 double offset,
 					 bool getDelta) : 
-	ScalablePeripheralInput<double>(id, scale, offset), channel(channel), prevPos(0), getDelta(getDelta)
+	ScalableInput<double>(id, scale, offset), channel(channel), prevPos(0), getDelta(getDelta)
 {
 	this->subdeviceHandle = flink_get_subdevice_by_id(device->getDeviceHandle(), subDeviceNumber);
 	reset();

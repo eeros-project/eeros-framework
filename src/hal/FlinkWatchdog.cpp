@@ -1,7 +1,7 @@
 #include <eeros/hal/FlinkWatchdog.hpp>
 using namespace eeros::hal;
 
-FlinkWatchdog::FlinkWatchdog(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, double timeout) : PeripheralOutput<bool>(id), channel(channel) {
+FlinkWatchdog::FlinkWatchdog(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, double timeout) : Output<bool>(id), channel(channel) {
 	subdeviceHandle = flink_get_subdevice_by_id(device->getDeviceHandle(), subDeviceNumber);
 	flink_wd_get_baseclock(subdeviceHandle, &baseClock);
 	setTimeout(timeout);

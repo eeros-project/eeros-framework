@@ -7,7 +7,7 @@ FlinkPwm::FlinkPwm(std::string id,
 				   uint32_t subDeviceNumber,
 				   uint32_t channel,
 				   double scale,
-				   double offset) : ScalablePeripheralOutput<double>(id, scale, offset), channel(channel) {
+				   double offset) : ScalableOutput<double>(id, scale, offset), channel(channel) {
 	subdeviceHandle = flink_get_subdevice_by_id(device->getDeviceHandle(), subDeviceNumber);
 	flink_pwm_get_baseclock(subdeviceHandle, &baseFrequency);
 }

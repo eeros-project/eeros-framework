@@ -3,13 +3,13 @@
 
 #include <string>
 #include <flinklib.h>
-#include <eeros/hal/PeripheralOutput.hpp>
+#include <eeros/hal/Output.hpp>
 #include <eeros/hal/FlinkDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class FlinkWatchdog : public PeripheralOutput<bool> {
+		class FlinkWatchdog : public Output<bool> {
 		public:
 			FlinkWatchdog(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, double timeout = 0.05);
 			

@@ -2,10 +2,10 @@
 #include <eeros/core/EEROSException.hpp>
 #include <regex>
 #include <dlfcn.h>
-#include <eeros/hal/PeripheralOutput.hpp>
-#include <eeros/hal/PeripheralInput.hpp>
-#include <eeros/hal/ScalablePeripheralInput.hpp>
-#include <eeros/hal/ScalablePeripheralOutput.hpp>
+#include <eeros/hal/Output.hpp>
+#include <eeros/hal/Input.hpp>
+#include <eeros/hal/ScalableInput.hpp>
+#include <eeros/hal/ScalableOutput.hpp>
 #include <eeros/hal/HAL.hpp>
 #include <eeros/hal/HALFeatures.hpp>
 #include <stdexcept>
@@ -187,15 +187,15 @@ void JsonParser::createLogicObject(void *libHandle, std::string type, std::strin
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
 	//TODO add generic for type
-		if(dirIt->second == Input){
+		if(dirIt->second == In){
 			std::cout << "createIn" << std::endl;
-			PeripheralInput<bool> *halObj = reinterpret_cast<PeripheralInput<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
-			hal.addPeripheralInput(halObj);
+			Input<bool> *halObj = reinterpret_cast<Input<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
+			hal.addInput(halObj);
 		}
-		else if(dirIt->second == Output){
+		else if(dirIt->second == Out){
 			std::cout << "createOut" << std::endl;
-			PeripheralOutput<bool> *halObj = reinterpret_cast<PeripheralOutput<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
-			hal.addPeripheralOutput(halObj);
+			Output<bool> *halObj = reinterpret_cast<Output<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
+			hal.addOutput(halObj);
 		}
 		else{
 			throw eeros::EEROSException("undefined direction for channel " + id);
@@ -222,15 +222,15 @@ void JsonParser::createRealObject(void *libHandle, std::string type, std::string
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
 	//TODO add generic for type
-		if(dirIt->second == Input){
+		if(dirIt->second == In){
 			std::cout << "createIn" << std::endl;
-			ScalablePeripheralInput<double> *halObj = reinterpret_cast<ScalablePeripheralInput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset);
-			hal.addPeripheralInput(halObj);
+			ScalableInput<double> *halObj = reinterpret_cast<ScalableInput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset);
+			hal.addInput(halObj);
 		}
-		else if(dirIt->second == Output){
+		else if(dirIt->second == Out){
 			std::cout << "createOut" << std::endl;
-			ScalablePeripheralOutput<double> *halObj = reinterpret_cast<ScalablePeripheralOutput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset);
-			hal.addPeripheralOutput(halObj);
+			ScalableOutput<double> *halObj = reinterpret_cast<ScalableOutput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset);
+			hal.addOutput(halObj);
 		}
 		else{
 			throw eeros::EEROSException("undefined direction for channel " + id);

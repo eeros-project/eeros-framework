@@ -38,11 +38,11 @@ public:
 	
 protected:
 	// critical outputs
-	eeros::hal::PeripheralOutput<bool>* enable;
+	eeros::hal::Output<bool>* enable;
 	
 	// critical inputs
-	eeros::hal::PeripheralInput<bool>* emergency;
-	eeros::hal::PeripheralInput<double>* q;
+	eeros::hal::Input<bool>* emergency;
+	eeros::hal::Input<double>* q;
 	
 	MyControlSystem& controlSys;
 };

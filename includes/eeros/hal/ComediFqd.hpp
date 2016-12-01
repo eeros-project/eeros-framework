@@ -3,13 +3,13 @@
 
 #include <string>
 #include <comedilib.h>
-#include <eeros/hal/ScalablePeripheralInput.hpp>
+#include <eeros/hal/ScalableInput.hpp>
 #include <eeros/hal/ComediDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class ComediFqd : public ScalablePeripheralInput<double> {
+		class ComediFqd : public ScalableInput<double> {
 		public:
 			ComediFqd(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channelA, uint32_t channelB, uint32_t channelZ, double scale = 1, double offset = 0, double initValue = 0);
 			virtual double get();

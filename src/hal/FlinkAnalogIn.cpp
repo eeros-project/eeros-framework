@@ -2,7 +2,7 @@
 
 using namespace eeros::hal;
 
-FlinkAnalogIn::FlinkAnalogIn(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, double scale, double offset, bool twosComplement) : ScalablePeripheralInput<double>(id, 1, 0), channel(channel), bitMask(0) {
+FlinkAnalogIn::FlinkAnalogIn(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, double scale, double offset, bool twosComplement) : ScalableInput<double>(id, 1, 0), channel(channel), bitMask(0) {
 	this->subdeviceHandle = flink_get_subdevice_by_id(device->getDeviceHandle(), subDeviceNumber);
 
 	flink_analog_in_get_resolution(subdeviceHandle, &resolution);

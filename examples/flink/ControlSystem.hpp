@@ -7,8 +7,8 @@
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/Switch.hpp>
 #include <eeros/control/Constant.hpp>
-#include <eeros/control/PeripheralInput.hpp>
-#include <eeros/control/PeripheralOutput.hpp>
+#include <eeros/control/Input.hpp>
+#include <eeros/control/Output.hpp>
 #include <eeros/control/Mux.hpp>
 #include <eeros/control/DeMux.hpp>
 #include <eeros/core/Executor.hpp>
@@ -25,7 +25,7 @@ public:
 	
 // 	eeros::control::Constant<> setpoint;
 // 	eeros::control::Constant<> setpointV;
-	eeros::control::PeripheralInput<> enc;
+	eeros::control::Input<> enc;
 // 	eeros::control::D<> diff1;
 // 	eeros::control::Sum<2> sum1;
 // 	eeros::control::Gain<> posController;
@@ -34,7 +34,7 @@ public:
 // 	eeros::control::Gain<> speedController;
 // 	eeros::control::Gain<> inertia;
 // 	eeros::control::Gain<> invMotConst;
-// 	eeros::control::PeripheralOutput<> dac;
+// 	eeros::control::Output<> dac;
 	
 private:
 	ControlSystem();

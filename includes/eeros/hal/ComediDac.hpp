@@ -3,13 +3,13 @@
 
 #include <string>
 #include <comedilib.h>
-#include <eeros/hal/ScalablePeripheralOutput.hpp>
+#include <eeros/hal/ScalableOutput.hpp>
 #include <eeros/hal/ComediDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class ComediDac : public ScalablePeripheralOutput<double> {
+		class ComediDac : public ScalableOutput<double> {
 		public:
 			ComediDac(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0);
 			virtual double get();

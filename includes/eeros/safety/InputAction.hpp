@@ -2,7 +2,7 @@
 #define ORG_EEROS_SAFETY_INPUTACTION_HPP_
 
 #include <stdint.h>
-#include <eeros/hal/PeripheralInput.hpp>
+#include <eeros/hal/Input.hpp>
 
 namespace eeros {
 	namespace safety {
@@ -11,11 +11,11 @@ namespace eeros {
 
 		class InputAction {
 		public:
-			InputAction(eeros::hal::PeripheralInputInterface& inputInterface) : inputInterface(&inputInterface) { }
+			InputAction(eeros::hal::InputInterface& inputInterface) : inputInterface(&inputInterface) { }
 			virtual ~InputAction() { }
 			virtual bool check(SafetyContext* context) { return false; }
 			
-			eeros::hal::PeripheralInputInterface const* inputInterface;
+			eeros::hal::InputInterface const* inputInterface;
 		};
 
 	};

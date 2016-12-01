@@ -2,12 +2,12 @@
 #define ORG_EEROS_HAL_DUMMYLOGICOUTPUT_HPP_
 
 #include <string>
-#include <eeros/hal/PeripheralOutput.hpp>
+#include <eeros/hal/Output.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class DummyLogicOutput : public PeripheralOutput<bool> {
+		class DummyLogicOutput : public Output<bool> {
 		public:
 			DummyLogicOutput(std::string id);
 			virtual bool get();

@@ -2,12 +2,12 @@
 #define ORG_EEROS_HAL_DUMMYREALOUTPUT_HPP_
 
 #include <string>
-#include <eeros/hal/ScalablePeripheralOutput.hpp>
+#include <eeros/hal/ScalableOutput.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class DummyRealOutput : public ScalablePeripheralOutput<double> {
+		class DummyRealOutput : public ScalableOutput<double> {
 		public:
 			DummyRealOutput(std::string id, double scale = 1, double offset = 0);
 			virtual double get();

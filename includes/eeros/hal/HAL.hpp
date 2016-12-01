@@ -4,8 +4,8 @@
 #include <string>
 #include <map>
 #include <unordered_set>
-#include <eeros/hal/PeripheralInput.hpp>
-#include <eeros/hal/PeripheralOutput.hpp>
+#include <eeros/hal/Input.hpp>
+#include <eeros/hal/Output.hpp>
 #include <eeros/hal/JsonParser.hpp>
 
 namespace eeros {
@@ -13,15 +13,15 @@ namespace eeros {
 		
 		class HAL {
 		public:
-			PeripheralOutputInterface* getPeripheralOutput(std::string name, bool exclusive = false);
-			PeripheralOutput<bool>* getLogicPeripheralOutput(std::string name, bool exclusive = false);
-			PeripheralOutput<double>* getRealPeripheralOutput(std::string name, bool exclusive = false);
-			PeripheralInputInterface* getPeripheralInput(std::string name, bool exclusive = false);
-			PeripheralInput<bool>* getLogicPeripheralInput(std::string name, bool exclusive = false);
-			PeripheralInput<double>* getRealPeripheralInput(std::string name, bool exclusive = false);
+			OutputInterface* getOutput(std::string name, bool exclusive = false);
+			Output<bool>* getLogicOutput(std::string name, bool exclusive = false);
+			Output<double>* getRealOutput(std::string name, bool exclusive = false);
+			InputInterface* getInput(std::string name, bool exclusive = false);
+			Input<bool>* getLogicInput(std::string name, bool exclusive = false);
+			Input<double>* getRealInput(std::string name, bool exclusive = false);
 			
-			bool addPeripheralInput(PeripheralInputInterface* systemInput);
-			bool addPeripheralOutput(PeripheralOutputInterface* systemOutput);
+			bool addInput(InputInterface* systemInput);
+			bool addOutput(OutputInterface* systemOutput);
 			
 			bool readConfigFromFile(std::string file);
 			
@@ -34,11 +34,11 @@ namespace eeros {
 			
 			bool loadModule(std::string moduleName);
 			
-			std::unordered_set<PeripheralOutputInterface*> exclusiveReservedOutputs;
-			std::unordered_set<PeripheralInputInterface*> exclusiveReservedInputs;
+			std::unordered_set<OutputInterface*> exclusiveReservedOutputs;
+			std::unordered_set<InputInterface*> exclusiveReservedInputs;
 			
-			std::map<std::string, PeripheralInputInterface*> inputs;
-			std::map<std::string, PeripheralOutputInterface*> outputs;
+			std::map<std::string, InputInterface*> inputs;
+			std::map<std::string, OutputInterface*> outputs;
 			
 			std::map<std::string, void*> hwLibraries;
 			JsonParser parser;

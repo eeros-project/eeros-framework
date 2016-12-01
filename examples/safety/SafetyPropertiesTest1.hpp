@@ -2,8 +2,8 @@
 #define SAFETYPROPERTIESTEST1_HPP
 
 #include <eeros/safety/SafetyProperties.hpp>
-#include <eeros/hal/PeripheralOutput.hpp>
-#include <eeros/hal/PeripheralInput.hpp>
+#include <eeros/hal/Output.hpp>
+#include <eeros/hal/Input.hpp>
 #include <eeros/safety/InputAction.hpp>
 #include <eeros/safety/inputActions.hpp>
 #include <eeros/safety/OutputAction.hpp>
@@ -33,11 +33,11 @@ public:
 		HAL& hal = HAL::instance();
 
 		// ############ Define critical outputs ############
-		out1 = hal.getLogicPeripheralOutput("out1");
+		out1 = hal.getLogicOutput("out1");
 		criticalOutputs = { out1 };
 
 		// ############ Define critical inputs ############
-		in1 = hal.getLogicPeripheralInput("in1");
+		in1 = hal.getLogicInput("in1");
 		criticalInputs = { in1 };
 		
 		// ############ Add levels ############
@@ -82,10 +82,10 @@ public:
 	}
 	
 	// critical outputs
-	PeripheralOutput<bool>* out1;
+	Output<bool>* out1;
 	
 	// critical inputs
-	PeripheralInput<bool>* in1;
+	Input<bool>* in1;
 	
 	SafetyEvent seStartInitializing;
 	SafetyEvent seInitializingDone;

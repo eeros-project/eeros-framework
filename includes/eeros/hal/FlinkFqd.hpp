@@ -3,13 +3,13 @@
 
 #include <string>
 #include <flinklib.h>
-#include <eeros/hal/ScalablePeripheralInput.hpp>
+#include <eeros/hal/ScalableInput.hpp>
 #include <eeros/hal/FlinkDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 		
-		class FlinkFqd : public ScalablePeripheralInput<double> {
+		class FlinkFqd : public ScalableInput<double> {
 		public:
 			FlinkFqd(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0, bool getDelta = false);
 			virtual double get();

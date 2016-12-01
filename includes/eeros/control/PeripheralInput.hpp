@@ -3,7 +3,7 @@
 
 #include <eeros/control/Block1o.hpp>
 #include <eeros/hal/HAL.hpp>
-#include <eeros/hal/PeripheralInput.hpp>
+#include <eeros/hal/Input.hpp>
 #include <eeros/core/EEROSException.hpp>
 
 namespace eeros {
@@ -14,7 +14,7 @@ namespace eeros {
 
 		public:
 			PeripheralInput(std::string id) : hal(hal::HAL::instance()) {
-				systemInput = dynamic_cast<eeros::hal::PeripheralInput<T>*>(hal.getPeripheralInput(id));
+				systemInput = dynamic_cast<eeros::hal::Input<T>*>(hal.getInput(id));
 				if(systemInput == nullptr) throw EEROSException("Peripheral input '" + id + "' not found!");
 			}
 			
@@ -25,7 +25,7 @@ namespace eeros {
 
 		private:
 			hal::HAL& hal;
-			hal::PeripheralInput<T>* systemInput;
+			hal::Input<T>* systemInput;
 		};
 
 	};

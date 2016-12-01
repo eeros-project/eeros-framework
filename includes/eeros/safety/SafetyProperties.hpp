@@ -32,8 +32,8 @@ namespace eeros {
 			
 			std::function<void (SafetyContext*)> exitFunction;			
 			std::vector<SafetyLevel*> levels;
-			std::vector<eeros::hal::PeripheralOutputInterface*> criticalOutputs;
-			std::vector<eeros::hal::PeripheralInputInterface*> criticalInputs;
+			std::vector<eeros::hal::OutputInterface*> criticalOutputs;
+			std::vector<eeros::hal::InputInterface*> criticalInputs;
 		private:
 			SafetyLevel* entryLevel;
 		};

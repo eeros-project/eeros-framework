@@ -2,7 +2,7 @@
 
 using namespace eeros::hal;
 
-ComediDigIn::ComediDigIn(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted) : PeripheralInput<bool>(id) {
+ComediDigIn::ComediDigIn(std::string id, ComediDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted) : Input<bool>(id) {
 	this->deviceHandle = device->getDeviceHandle();
 	this->subDeviceNumber = subDeviceNumber;
 	this->channel = channel;

@@ -5,7 +5,7 @@
 #include <eeros/safety/SafetySystem.hpp>
 #include "../control/ParserTestControlSystem.hpp"
 #include <eeros/hal/HAL.hpp>
-#include <eeros/hal/PeripheralOutput.hpp>
+#include <eeros/hal/Output.hpp>
 
 class ParserTestMainSequence : public eeros::sequencer::Sequence<void> {
 

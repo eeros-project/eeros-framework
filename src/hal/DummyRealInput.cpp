@@ -2,7 +2,7 @@
 
 using namespace eeros::hal;
 
-DummyRealInput::DummyRealInput(std::string id, double scale, double offset) : ScalablePeripheralInput<double>(id, scale, offset) { }
+DummyRealInput::DummyRealInput(std::string id, double scale, double offset) : ScalableInput<double>(id, scale, offset) { }
 
 double DummyRealInput::get() {
 	return 0;

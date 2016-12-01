@@ -3,13 +3,13 @@
 
 #include <string>
 #include <flinklib.h>
-#include <eeros/hal/ScalablePeripheralOutput.hpp>
+#include <eeros/hal/ScalableOutput.hpp>
 #include <eeros/hal/FlinkDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class FlinkPwm : public ScalablePeripheralOutput<double> {
+		class FlinkPwm : public ScalableOutput<double> {
 		public:
 			FlinkPwm(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0);
 			virtual double get();

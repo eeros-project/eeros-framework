@@ -2,7 +2,7 @@
 
 using namespace eeros::hal;
 
-FlinkDigOut::FlinkDigOut(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted) : PeripheralOutput<bool>(id), channel(channel), inverted(inverted) {
+FlinkDigOut::FlinkDigOut(std::string id, FlinkDevice* device, uint32_t subDeviceNumber, uint32_t channel, bool inverted) : Output<bool>(id), channel(channel), inverted(inverted) {
 	this->subdeviceHandle = flink_get_subdevice_by_id(device->getDeviceHandle(), subDeviceNumber);
 	
 	flink_dio_set_direction(subdeviceHandle, channel, FLINK_OUTPUT);

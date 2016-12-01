@@ -2,12 +2,12 @@
 #define ORG_EEROS_HAL_DUMMYLOGICINPUT_HPP_
 
 #include <string>
-#include <eeros/hal/PeripheralInput.hpp>
+#include <eeros/hal/Input.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class DummyLogicInput : public PeripheralInput<bool> {
+		class DummyLogicInput : public Input<bool> {
 		public:
 			DummyLogicInput(std::string id);
 			virtual bool get();

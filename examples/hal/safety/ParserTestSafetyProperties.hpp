@@ -3,7 +3,7 @@
 
 #include <eeros/safety/SafetyProperties.hpp>
 #include <eeros/hal/HAL.hpp>
-#include <eeros/hal/ScalablePeripheralInput.hpp>
+#include <eeros/hal/ScalableInput.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 	
 	class ParserTestControlSystem;

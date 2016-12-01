@@ -7,14 +7,14 @@
 #include <eeros/control/Signal.hpp>
 #include <eeros/control/Input.hpp>
 #include <eeros/control/Output.hpp>
-#include <eeros/hal/PeripheralInput.hpp>
+#include <eeros/hal/Input.hpp>
 
 
 namespace eeros {
 	namespace safety {
 
 		template <typename T>
-		class ControlInput : public hal::PeripheralInput<T> {
+		class ControlInput : public hal::Input<T> {
 		public:
 			ControlInput(std::string id, control::Input<T> &input);
 			ControlInput(std::string id, control::Output<T> &output);
@@ -27,15 +27,15 @@ namespace eeros {
 		
 		template <typename T>
 		ControlInput<T>::ControlInput(std::string id, control::Input<T> &input) :
-			hal::PeripheralInput<T>(id), signal(input.getSignal()) { }
+			hal::Input<T>(id), signal(input.getSignal()) { }
 
 		template <typename T>
 		ControlInput<T>::ControlInput(std::string id, control::Output<T> &output) :
-			hal::PeripheralInput<T>(id), signal(output.getSignal()) { }
+			hal::Input<T>(id), signal(output.getSignal()) { }
 
 		template <typename T>
 		ControlInput<T>::ControlInput(std::string id, control::Signal<T> &signal) :
-			hal::PeripheralInput<T>(id), signal(signal) { }
+			hal::Input<T>(id), signal(signal) { }
 		
 		template <typename T>
 		ControlInput<T>::~ControlInput() { }

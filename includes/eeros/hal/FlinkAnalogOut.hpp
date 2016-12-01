@@ -3,13 +3,13 @@
 
 #include <string>
 #include <flinklib.h>
-#include <eeros/hal/ScalablePeripheralOutput.hpp>
+#include <eeros/hal/ScalableOutput.hpp>
 #include <eeros/hal/FlinkDevice.hpp>
 
 namespace eeros {
 	namespace hal {
 
-		class FlinkAnalogOut : public ScalablePeripheralOutput<double> {
+		class FlinkAnalogOut : public ScalableOutput<double> {
 		public:
 			FlinkAnalogOut(std::string id, FlinkDevice* device, uint8_t subDeviceNumber, uint32_t channel, double scale = 1, double offset = 0);
 			virtual void set(double voltage);

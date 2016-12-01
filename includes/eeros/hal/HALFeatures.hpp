@@ -7,8 +7,8 @@
 namespace eeros{
 	namespace hal{
 		enum Direction {
-			Input,
-			Output
+			In,
+			Out
 		};
 		
 		enum Type {
@@ -17,12 +17,12 @@ namespace eeros{
 		};
 		
 		const std::map<std::string, Direction> directionOfChannel = {
-			{ "DigIn", 	Input },
-			{ "DigOut", 	Output },
-			{ "DAC", 	Output },
-			{ "ADC", 	Input },
-			{ "PWM", 	Output },
-			{ "FQD", 	Input }
+			{ "DigIn", 	In },
+			{ "DigOut", 	Out },
+			{ "DAC", 	Out },
+			{ "ADC", 	In },
+			{ "PWM", 	Out },
+			{ "FQD", 	In }
 		};
 		
 		const std::map<std::string, Type> typeOfChannel = {
