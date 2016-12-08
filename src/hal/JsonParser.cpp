@@ -170,25 +170,20 @@ void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType,
 	
 	*sigId = chanObj["signalId"].string_value();
 	std::cout << "\t\t\tsignalId: " << *sigId << std::endl;
+	
+	std::cout << "\t\t\ttype: " << chanObj["type"].string_value() << std::endl;
+	*chanType = chanObj["type"].string_value();
 
 	for(const auto &chanProp : chanObj){
-		if(chanProp.key() == "type"){
-			std::cout << "\t\t\ttype: " << chanProp.string_value() << std::endl;
-			*chanType = chanProp.string_value();
-		}
 		if(chanProp.key() == "range"){
 			//TODO
 		}
-// 		if(chanProp.key() == "signalId"){
-// 			std::cout << "\t\t\tsignalId: " << chanProp.string_value() << std::endl;
-// 			*sigId = chanProp.string_value();
-// 		}
+
 		if(chanProp.key() == "unit"){
 			*chanUnit = chanProp.string_value();
 		}
 		
 	}
-	
 	
 	calcScale(chanObj, scale, offset, rangeMin, rangeMax);
 }
@@ -242,7 +237,8 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 			i++;
 			
 		}
-		std::cout << "pos: " << pos << std::endl;
+		
+		//calculate scale, offset		
 		double rangeMax = obj["range"].at(pos)["maxOut"].number_value();
 		double rangeMin = obj["range"].at(pos)["minOut"].number_value();
 		lsb = (maxOut - minOut)/(maxIn - minIn);
@@ -250,10 +246,7 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 		std::cout << "rangeMax: " << rangeMax << std::endl;
 		xMin = minIn - (minOut + rangeMax) / lsb;
 		xMax = maxIn - (maxOut + rangeMin) / lsb;
-		std::cout << "xMin: " << xMin << "\txMax: " << xMax <<std::endl;
-		std::cout << "div:" << fabs(rangeMin) + fabs(rangeMax) << std::endl;
 		m = (xMax - xMin) / ( fabs(rangeMin) + fabs(rangeMax) );
-		std::cout << "m: " << m << std::endl;
 		*scale = (*scale) / m;
 		std::cout << "scale: " << *scale << std::endl;
 		*offset += -(rangeMax + xMin / m);
