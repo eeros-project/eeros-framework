@@ -26,12 +26,12 @@ void ParserTestMainSequence::run() {
 	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){
 	  
 		if(i%4 == 0){
-// 			controlSys->dac1.getIn().getSignal().setValue(2.5);
+			controlSys->dac1.getIn().getSignal().setValue(2.5);
 // 			controlSys->setPos.getOut().getSignal().setValue(true);
 			controlSys->io1.getIn().getSignal().setValue(true);
 		}
 		else{
-// 			controlSys->dac1.getIn().getSignal().setValue(-2.5);
+			controlSys->dac1.getIn().getSignal().setValue(-2.5);
 // 			controlSys->setPos.getOut().getSignal().setValue(false);
 			controlSys->io1.getIn().getSignal().setValue(false);
 		}

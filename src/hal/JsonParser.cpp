@@ -1,6 +1,7 @@
 #include <eeros/hal/JsonParser.hpp>
 #include <eeros/core/EEROSException.hpp>
 #include <regex>
+#include <cmath>
 #include <dlfcn.h>
 #include <eeros/hal/Output.hpp>
 #include <eeros/hal/Input.hpp>
@@ -34,6 +35,8 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	std::string chanUnit;
 	double scale = 1;
 	double offset = 0;
+	double rangeMin = 0;
+	double rangeMax = 0;
   
 	if (halRootObj) {
 		std::cout << "halRootObj found" << std::endl;
@@ -93,26 +96,9 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 							if(!library.empty()){
 								if(libIt != libHandles.end()){
 									if(!devHandle.empty()){
-										for(const auto &chanProp : chanObj){
-											if(chanProp.key() == "type"){
-												std::cout << "\t\t\ttype: " << chanProp.string_value() << std::endl;
-												chanType = chanProp.string_value();
-											}
-											if(chanProp.key() == "scale"){
-												calcScale(chanProp, &scale, &offset);
-											}
-											if(chanProp.key() == "range"){
-												//TODO
-											}
-											if(chanProp.key() == "signalId"){
-												std::cout << "\t\t\tsignalId: " << chanProp.string_value() << std::endl;
-												sigId = chanProp.string_value();
-												
-											}
-											if(chanProp.key() == "unit"){
-												chanUnit = chanProp.string_value();
-											}
-										}
+									  
+										parseChannelProperties(chanObj, &chanType, &sigId, &scale, &offset, &rangeMin, &rangeMax, &chanUnit);
+										
 										if(chanType.empty()){
 											chanType = type;
 										}
@@ -135,6 +121,8 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										chanUnit.clear();
 										scale = 1;
 										offset = 0;
+										rangeMin = 0;
+										rangeMax = 0;
 									}
 									else{
 										std::cout << "no device handle defined for " << subDevParam << std::endl;
@@ -176,17 +164,56 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	}
 }
 
-void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset){
+void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType, std::string* sigId, double* scale, double* offset, double* rangeMin, double* rangeMax, std::string *chanUnit){
+	double min = -10.0;
+	double max = 10.0;
+	
+	*sigId = chanObj["signalId"].string_value();
+	std::cout << "\t\t\tsignalId: " << *sigId << std::endl;
+
+	for(const auto &chanProp : chanObj){
+		if(chanProp.key() == "type"){
+			std::cout << "\t\t\ttype: " << chanProp.string_value() << std::endl;
+			*chanType = chanProp.string_value();
+		}
+		if(chanProp.key() == "range"){
+			//TODO
+		}
+// 		if(chanProp.key() == "signalId"){
+// 			std::cout << "\t\t\tsignalId: " << chanProp.string_value() << std::endl;
+// 			*sigId = chanProp.string_value();
+// 		}
+		if(chanProp.key() == "unit"){
+			*chanUnit = chanProp.string_value();
+		}
+		
+	}
 	
 	
-	for(const auto &scaleProp: obj){
-		double minIn = 0.0;
-		double maxIn = 0.0;
-		double minOut = 0.0;
-		double maxOut = 0.0;
+	calcScale(chanObj, scale, offset, rangeMin, rangeMax);
+}
+
+
+void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *rangeMin, double *rangeMax){
+	*scale = 1.0;
+	*offset = 0.0;
+  
+	double minIn = 0.0;
+	double maxIn = 0.0;
+	double minOut = 0.0;
+	double maxOut = 0.0;
+	double lsb = 0.0;
+	double xMin = 0.0;
+	double xMax = 0.0;
+	double m = 0.0;
+	std::string id;
+	
+	for(const auto &scaleProp: obj["scale"]){
+		
 		for(const auto &minMax: scaleProp){
 			if(minMax.key() == "id"){
 				std::cout << "id: " << minMax.string_value() << std::endl;
+				id = minMax.string_value();
 			}
 			else if(minMax.key() == "minIn"){
 				minIn = minMax.number_value();
@@ -205,9 +232,37 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset){
 				std::cout << minMax.key() << "\t" << minMax.number_value() << std::endl;
 			}
 		}
-		//TODO calculate actual scale!!
 		
+		int i = 0;
+		int pos = -1;
+		for(const auto &rangeIt: obj["range"]){
+			if(rangeIt["id"].string_value() == id){
+				pos = i;
+			}
+			i++;
+			
+		}
+		std::cout << "pos: " << pos << std::endl;
+		double rangeMax = obj["range"].at(pos)["maxOut"].number_value();
+		double rangeMin = obj["range"].at(pos)["minOut"].number_value();
+		lsb = (maxOut - minOut)/(maxIn - minIn);
+		std::cout << "lsb: " << lsb << std::endl;
+		std::cout << "rangeMax: " << rangeMax << std::endl;
+		xMin = minIn - (minOut + rangeMax) / lsb;
+		xMax = maxIn - (maxOut + rangeMin) / lsb;
+		std::cout << "xMin: " << xMin << "\txMax: " << xMax <<std::endl;
+		std::cout << "div:" << fabs(rangeMin) + fabs(rangeMax) << std::endl;
+		m = (xMax - xMin) / ( fabs(rangeMin) + fabs(rangeMax) );
+		std::cout << "m: " << m << std::endl;
+		*scale = (*scale) / m;
+		std::cout << "scale: " << *scale << std::endl;
+		*offset += -(rangeMax + xMin / m);
+		
+		std::cout << "s1: " << *scale << "\t offs: " << *offset << std::endl;
+		
+		id.clear();
 	}
+	std::cout << "scale: " << *scale << "\t offs: " << *offset << std::endl;
 }
 
 void JsonParser::createLogicObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber){

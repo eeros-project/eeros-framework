@@ -2,7 +2,7 @@
 
 using namespace eeros::hal;
 
-DummyRealOutput::DummyRealOutput(std::string id, double scale, double offset) : ScalableOutput<double>(id, scale, offset) { }
+DummyRealOutput::DummyRealOutput(std::string id, double scale, double offset, double minOut, double maxOut) : ScalableOutput<double>(id, scale, offset, minOut, maxOut) { }
 
 double DummyRealOutput::get() {
 	return 0;

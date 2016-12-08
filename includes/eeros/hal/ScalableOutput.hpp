@@ -10,7 +10,7 @@ namespace eeros {
 		template <typename T>
 		class ScalableOutput : public Output<T> {
 		public:
-			explicit ScalableOutput(std::string id, T scale, T offset, std::string unit = "") : Output<T>(id), scale(scale), offset(offset), unit(unit) { }
+			explicit ScalableOutput(std::string id, T scale, T offset, T minOut, T maxOut, std::string unit = "" ) : Output<T>(id), scale(scale), offset(offset), minOut(minOut), maxOut(maxOut), unit(unit) { }
 			virtual ~ScalableOutput() { }
 			
 			virtual T getScale() { return scale; }
@@ -24,6 +24,8 @@ namespace eeros {
 			T scale;
 			T offset;
 			std::string unit;
+			T minOut;
+			T maxOut;
 		};
 
 	};

@@ -10,20 +10,26 @@ namespace eeros {
 		template <typename T>
 		class ScalableInput : public Input<T> {
 		public:
-			ScalableInput(std::string id, T scale, T offset, std::string unit = "") : Input<T>(id), scale(scale), offset(offset), unit(unit) { }
+			ScalableInput(std::string id, T scale, T offset, T minIn, T maxIn, std::string unit = "") : Input<T>(id), scale(scale), offset(offset), minIn(minIn), maxIn(maxIn), unit(unit)  { }
 			virtual ~ScalableInput() { }
 			
 			virtual T getScale() { return scale; }
 			virtual T getOffset() { return offset; }
 			virtual std::string getUnit() { return unit; }
+			virtual T getMinIn() { return minIn; }
+			virtual T getMaxIn() { return maxIn; }
 			virtual void setScale(T s) { scale = s; }
 			virtual void setOffset(T o) { offset = o; }
 			virtual void setUnit(std::string unit) { this->unit = unit; }
+			virtual void setMinIn(T minI) { minIn = minI; }
+			virtual void setMaxIn(T maxI) { maxIn = maxI; }
 			
 		protected:
 			T scale;
 			T offset;
 			std::string unit;
+			T minIn;
+			T maxIn;
 		};
 
 	};
