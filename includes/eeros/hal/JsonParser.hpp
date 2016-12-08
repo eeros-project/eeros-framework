@@ -15,6 +15,7 @@ namespace eeros {
 			ucl::Ucl halRootObj;
 			void createLogicObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber);
 			void createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset, std::string unit);
+			void calcScale(ucl::Ucl obj, double *scale, double *offset);
 		};
 	};
 };

@@ -9,6 +9,7 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/hal/HALFeatures.hpp>
 #include <stdexcept>
+#include <ucl.h>
 
 using namespace eeros;
 using namespace eeros::hal;
@@ -98,12 +99,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 												chanType = chanProp.string_value();
 											}
 											if(chanProp.key() == "scale"){
-												for(const auto &scaleProp: chanProp){
-													std::cout << "sc: " << scaleProp.key() << std::endl;
-												}
-												//TODO
-												std::cout << "scale: " << chanProp.at(0).string_value() << std::endl;
-// 												std::cout << "length: " << chanProp.len() << std::endl;
+												calcScale(chanProp, &scale, &offset);
 											}
 											if(chanProp.key() == "range"){
 												//TODO
@@ -177,6 +173,40 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	}
 	else{
 		throw new eeros::EEROSException("No parsed HAL root object");
+	}
+}
+
+void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset){
+	
+	
+	for(const auto &scaleProp: obj){
+		double minIn = 0.0;
+		double maxIn = 0.0;
+		double minOut = 0.0;
+		double maxOut = 0.0;
+		for(const auto &minMax: scaleProp){
+			if(minMax.key() == "id"){
+				std::cout << "id: " << minMax.string_value() << std::endl;
+			}
+			else if(minMax.key() == "minIn"){
+				minIn = minMax.number_value();
+				std::cout << minMax.key() << "\t" << minMax.number_value() << std::endl;
+			}
+			else if(minMax.key() == "maxIn"){
+				maxIn = minMax.number_value();
+				std::cout << minMax.key() << "\t" << minMax.number_value() << std::endl;
+			}
+			else if(minMax.key() == "minOut"){
+				minOut = minMax.number_value();
+				std::cout << minMax.key() << "\t" << minMax.number_value() << std::endl;
+			}
+			else if(minMax.key() == "maxOut"){
+				maxOut = minMax.number_value();
+				std::cout << minMax.key() << "\t" << minMax.number_value() << std::endl;
+			}
+		}
+		//TODO calculate actual scale!!
+		
 	}
 }
 
