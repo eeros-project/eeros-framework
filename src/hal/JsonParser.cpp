@@ -172,10 +172,6 @@ void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType,
 	*chanType = chanObj["type"].string_value();
 
 	for(const auto &chanProp : chanObj){
-		if(chanProp.key() == "range"){
-			//TODO
-		}
-
 		if(chanProp.key() == "unit"){
 			*chanUnit = chanProp.string_value();
 		}
@@ -232,7 +228,9 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 				pos = i;
 			}
 			i++;
-			
+		}
+		if(pos == -1){
+			throw eeros::EEROSException("no range values found for " + id);
 		}
 		
 		//calculate scale, offset
@@ -258,6 +256,10 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 		*scale = (*scale) / m;
 		*offset = (*offset) / m -(tmpRangeMax + xMin / m);
 		std::cout << "scale: " << *scale << "\toffset: " << (*offset) << std::endl;
+		
+		if( !std::isfinite(*scale) || !std::isfinite(*offset) || !std::isfinite(*rangeMin) || !std::isfinite(*rangeMin) ){
+			throw eeros::EEROSException("config for scale or range is invalid, id: " + id);
+		}
 		
 		id.clear();
 		double minIn = 0.0;
@@ -286,7 +288,6 @@ void JsonParser::createLogicObject(void *libHandle, std::string type, std::strin
 	}
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
-	//TODO add generic for type
 		if(dirIt->second == In){
 			std::cout << "createIn" << std::endl;
 			Input<bool> *halObj = reinterpret_cast<Input<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
@@ -321,7 +322,6 @@ void JsonParser::createRealObject(void *libHandle, std::string type, std::string
 	}
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
-	//TODO add generic for type
 		if(dirIt->second == In){
 			std::cout << "createIn" << std::endl;
 			ScalableInput<double> *halObj = reinterpret_cast<ScalableInput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double, std::string)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset, unit);
