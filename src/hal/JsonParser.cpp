@@ -39,8 +39,6 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	double rangeMax = 0;
   
 	if (halRootObj) {
-		std::cout << "halRootObj found" << std::endl;
-		//std::cout << obj.dump(UCL_EMIT_CONFIG) << std::endl;
 		  
 		for (const auto &o : halRootObj) {
 			auto devObj = o;
@@ -76,7 +74,6 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 					for(const auto &chanO : subDevO){
 						std::regex chanRegex("channel[0-9]+", std::regex_constants::extended);
 						std::string subDevParam = chanO.key();
-						std::cout << "." << std::endl;
 						if(chanO.key() == "type"){
 							std::cout << "\t\t\ttype: " << chanO.string_value() << std::endl;
 							type = chanO.string_value();
@@ -190,8 +187,13 @@ void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType,
 
 
 void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *rangeMin, double *rangeMax){
+	if(scale == nullptr || offset == nullptr || rangeMin == nullptr || rangeMax == nullptr){
+		throw std::invalid_argument("parameter nullptr");
+	}
 	*scale = 1.0;
 	*offset = 0.0;
+	*rangeMax = 0.0;
+	*rangeMin = 0.0;
   
 	double minIn = 0.0;
 	double maxIn = 0.0;
@@ -207,24 +209,19 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 		
 		for(const auto &minMax: scaleProp){
 			if(minMax.key() == "id"){
-				std::cout << "id: " << minMax.string_value() << std::endl;
 				id = minMax.string_value();
 			}
 			else if(minMax.key() == "minIn"){
 				minIn = minMax.number_value();
-				std::cout << minMax.key() << "\t" << minMax.number_value() << std::endl;
 			}
 			else if(minMax.key() == "maxIn"){
 				maxIn = minMax.number_value();
-				std::cout << minMax.key() << "\t" << minMax.number_value() << std::endl;
 			}
 			else if(minMax.key() == "minOut"){
 				minOut = minMax.number_value();
-				std::cout << minMax.key() << "\t" << minMax.number_value() << std::endl;
 			}
 			else if(minMax.key() == "maxOut"){
 				maxOut = minMax.number_value();
-				std::cout << minMax.key() << "\t" << minMax.number_value() << std::endl;
 			}
 		}
 		
@@ -238,24 +235,40 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 			
 		}
 		
-		//calculate scale, offset		
-		double rangeMax = obj["range"].at(pos)["maxOut"].number_value();
-		double rangeMin = obj["range"].at(pos)["minOut"].number_value();
+		//calculate scale, offset
+		double tmpRangeMax = obj["range"].at(pos)["maxOut"].number_value();
+		double tmpRangeMin = obj["range"].at(pos)["minOut"].number_value();
 		lsb = (maxOut - minOut)/(maxIn - minIn);
-		std::cout << "lsb: " << lsb << std::endl;
-		std::cout << "rangeMax: " << rangeMax << std::endl;
-		xMin = minIn - (minOut + rangeMax) / lsb;
-		xMax = maxIn - (maxOut + rangeMin) / lsb;
-		m = (xMax - xMin) / ( fabs(rangeMin) + fabs(rangeMax) );
-		*scale = (*scale) / m;
-		std::cout << "scale: " << *scale << std::endl;
-		*offset += -(rangeMax + xMin / m);
+		xMin = minIn - (minOut + tmpRangeMax) / lsb;
+		xMax = maxIn - (maxOut + tmpRangeMin) / lsb;
+		m = (xMax - xMin) / ( fabs(tmpRangeMin) + fabs(tmpRangeMax) );
+		// calculate new range before applying new scale
+		double tmpMinIn = obj["range"].at(pos)["minIn"].number_value();
+		double tmpMaxIn = obj["range"].at(pos)["maxIn"].number_value();
+		// check if new range is reduced by new block (min value), replace if necessary
+		if( ((tmpMinIn - *offset)/(*scale)) < (*rangeMin) ){
+			*rangeMin = (tmpMinIn - *offset)/(*scale);
+		}
+		// check range max value, replace if necessary
+		if( ((tmpMaxIn - *offset)/(*scale)) > (*rangeMax) ){
+			*rangeMax = (tmpMaxIn - *offset)/(*scale);
+		}
 		
-		std::cout << "s1: " << *scale << "\t offs: " << *offset << std::endl;
+		// apply new scale
+		*scale = (*scale) / m;
+		*offset = (*offset) / m -(tmpRangeMax + xMin / m);
+		std::cout << "scale: " << *scale << "\toffset: " << (*offset) << std::endl;
 		
 		id.clear();
+		double minIn = 0.0;
+		double maxIn = 0.0;
+		double minOut = 0.0;
+		double maxOut = 0.0;
+		double lsb = 0.0;
+		double xMin = 0.0;
+		double xMax = 0.0;
+		double m = 0.0;
 	}
-	std::cout << "scale: " << *scale << "\t offs: " << *offset << std::endl;
 }
 
 void JsonParser::createLogicObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber){

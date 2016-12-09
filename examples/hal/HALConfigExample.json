@@ -26,7 +26,7 @@
 								"minIn": 	2000, 	"maxIn": 	64000,
 								"minOut": 	-9.752, "maxOut": 	9.862 },
 					   { "id" : "test",
-								"minIn": 	-10.0, 	"maxIn": 	10.0,
+								"minIn": 	-5.0, 	"maxIn": 	5.0,
 								"minOut":	-10.0, 	"maxOut": 	10.0 }
 							
 					 ],
@@ -34,7 +34,7 @@
 							"minIn": 	0, 	"maxIn": 	65535,
 							"minOut": 	-10.0, 	"maxOut": 	10.0 },
 					   { "id" : "test",
-							"minIn": 	-10.0, 	"maxIn": 	10.0,
+							"minIn": 	-5.0, 	"maxIn": 	5.0,
 							"minOut": 	-10.0, 	"maxOut": 	10.0 },
 					 ],
 				"unit": "V"
