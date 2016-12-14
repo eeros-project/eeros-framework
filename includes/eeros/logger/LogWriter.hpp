@@ -18,7 +18,6 @@ namespace eeros
 			virtual LogWriter& operator<<(long value) = 0;
 			virtual LogWriter& operator<<(double value) = 0;
 			virtual LogWriter& operator<<(const std::string& value) = 0;
-			virtual LogWriter& operator<<(std::ostream& os) = 0;
 			virtual LogWriter& operator<<(void (*f)(LogWriter&)) = 0;
 		};
 
