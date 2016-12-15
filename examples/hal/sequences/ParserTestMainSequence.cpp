@@ -24,7 +24,11 @@ void ParserTestMainSequence::run() {
 	
 	log.info() << "Starting...";
 	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){
-	  
+		
+		if(i%5 == 0){
+			std::cout << "enc: " << controlSys->encMot1.getOut().getSignal().getValue() << std::endl;
+		}
+		
 		if(i%4 == 0){
 			controlSys->dac1.getIn().getSignal().setValue(2.5);
 // 			controlSys->setPos.getOut().getSignal().setValue(true);

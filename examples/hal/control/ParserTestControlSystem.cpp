@@ -12,6 +12,7 @@ ParserTestControlSystem::ParserTestControlSystem(double ts) :
 	ioOut("ioOut"),
 	ioIn("ioIn"),
 	dac1("dac1"),
+	encMot1("encMot1"),
 	timedomain("Main time domain", ts, true)
 {
 	
@@ -22,6 +23,7 @@ ParserTestControlSystem::ParserTestControlSystem(double ts) :
 	timedomain.addBlock(&io1);
 	timedomain.addBlock(&ioIn);
 	timedomain.addBlock(&ioOut);
+	timedomain.addBlock(&encMot1);
 	
 	timedomain.addBlock(&dac1);
 	

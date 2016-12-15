@@ -21,8 +21,8 @@ namespace eeros{
 			{ "DigOut", 	Out },
 			{ "AnalogOut", 	Out },
 			{ "AnalogIn", 	In },
-			{ "PWM", 	Out },
-			{ "FQD", 	In }
+			{ "Pwm", 	Out },
+			{ "Fqd", 	In }
 		};
 		
 		const std::map<std::string, Type> typeOfChannel = {
@@ -30,8 +30,8 @@ namespace eeros{
 			{ "DigOut", 	Logic },
 			{ "AnalogOut", 	Real },
 			{ "AnalogIn", 	Real },
-			{ "PWM", 	Real },
-			{ "FQD", 	Real }
+			{ "Pwm", 	Real },
+			{ "Fqd", 	Real }
 		};
 	};
 };
