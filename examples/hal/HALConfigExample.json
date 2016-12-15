@@ -40,7 +40,7 @@
 							"minOut": 	-10.0, 	"maxOut": 	10.0 },
 					   { "id" : "direct",
 							"minIn":	-10.0,  "maxIn": 	10.0,
-							"minOut":	-10.0,	"maxOut": 	10.0 }
+							"minOut":	-2.0,	"maxOut": 	2.0 }
 					 ],
 				"unit": "V"
 			}

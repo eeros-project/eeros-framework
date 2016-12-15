@@ -203,6 +203,7 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 	bool setScaleDirect = false;
 	double tmpScale = 1.0;
 	double tmpOffset = 0.0;
+	bool firstScale = true;
 	
 	for(const auto &scaleProp: obj["scale"]){
 		
@@ -227,7 +228,7 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 				setScaleDirect = true;
 			}
 			else if(minMax.key() == "offset"){
-				tmpOffset = -minMax.number_value();
+				tmpOffset = minMax.number_value();
 			}
 			else{
 				throw eeros::EEROSException("unknown scale property in id: " + id);
@@ -248,38 +249,65 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 		
 		double tmpRangeMinIn = obj["range"].at(pos)["minIn"].number_value();
 		double tmpRangeMaxIn = obj["range"].at(pos)["maxIn"].number_value();
-		double tmpRangeOutMax = obj["range"].at(pos)["maxOut"].number_value();
-		double tmpRangeOutMin = obj["range"].at(pos)["minOut"].number_value();
+		double tmpRangeMaxOut = obj["range"].at(pos)["maxOut"].number_value();
+		double tmpRangeMinOut = obj["range"].at(pos)["minOut"].number_value();
 			
 		
 		if(!setScaleDirect){
 			//calculate scale, offset
 			lsb = (maxOut - minOut)/(maxIn - minIn);
-			xMin = minIn - (minOut + tmpRangeOutMax) / lsb;
-			xMax = maxIn - (maxOut + tmpRangeOutMin) / lsb;
-			m = (xMax - xMin) / ( fabs(tmpRangeOutMin) + fabs(tmpRangeOutMax) );
+			xMin = minIn - (minOut + tmpRangeMaxOut) / lsb;
+			xMax = maxIn - (maxOut + tmpRangeMinOut) / lsb;
+			m = (xMax - xMin) / ( fabs(tmpRangeMinOut) + fabs(tmpRangeMaxOut) );
 			tmpScale = 1 / m;
-			tmpOffset = -(tmpRangeOutMax + xMin * tmpScale);
+			tmpOffset = -(tmpRangeMaxOut + xMin * tmpScale);
 		}
 		
-		// calculate new range before applying new scale
-		// check if new range is reduced by new block (min value), replace if necessary
-		if( ((tmpRangeMinIn - *offset)/(*scale)) < (*rangeMin) ){
-			//TODO check for range Min Out
-			*rangeMin = (tmpRangeMinIn - *offset)/(*scale);
+		if(firstScale){
+			firstScale = false;
+			*rangeMin = tmpRangeMinIn;
+			*rangeMax = tmpRangeMaxIn;
 		}
+		
+		// calculate new range for next input scale before applying new scale
+		// check if new range is reduced by new block (min value), replace if necessary
+		std::cout << "rangeMinIn: " << tmpRangeMinIn << "\trangeMaxIn: " << tmpRangeMaxIn << std::endl;
+		std::cout << "rangeMinOut: " << tmpRangeMinOut << "\trangeMaxOut: " << tmpRangeMaxOut << std::endl;
+		std::cout << "oldMin: " << *rangeMin << "\toldMax: " << *rangeMax << std::endl;
+		std::cout << "checkMin: " << ((tmpRangeMinIn - *offset) / (*scale)) << std::endl;
+		
+		
+		if( ((tmpRangeMinIn - *offset) / (*scale)) > (*rangeMin) ){
+			*rangeMin = (tmpRangeMinIn - *offset) / (*scale);
+			std::cout << "new rangeMin: " << *rangeMin << std::endl;
+		}
+		
+		std::cout << "checkMax: " << ((tmpRangeMaxIn - *offset) / (*scale)) << std::endl;
 		// check range max value, replace if necessary
-		if( ((tmpRangeMaxIn - *offset)/(*scale)) > (*rangeMax) ){
-			*rangeMax = (tmpRangeMaxIn - *offset)/(*scale);
+		if( ((tmpRangeMaxIn - *offset) / (*scale)) < (*rangeMax) ){
+			*rangeMax = (tmpRangeMaxIn - *offset) / (*scale);
+			std::cout << "new rangeMax: " << *rangeMax << std::endl;
 		}
 			
 		// apply new scale
 		std::cout << "tmpScale: " << tmpScale << "\ttmpOffset: " << tmpOffset << std::endl;
 		std::cout << "oldScale: " << *scale << "\toldOffset: " << *offset << std::endl;
 		*offset = (*offset) * tmpScale + tmpOffset;
-// 		*offset = (*offset) * tmpScale + tmpOffset * (*scale);
 		*scale = (*scale) * tmpScale;
 		std::cout << "scale: " << *scale << "\toffset: " << (*offset) << std::endl;
+		
+		std::cout << "checkMinOut: " << ((tmpRangeMinOut - *offset) / (*scale)) << std::endl;
+		std::cout << "checkMaxOut: " << ((tmpRangeMaxOut - *offset) / (*scale)) << std::endl;
+		// calculate new output range with new scale
+		// check out max/min
+		if( ((tmpRangeMinOut - *offset) / (*scale)) > (*rangeMin) ){
+			*rangeMin = ((tmpRangeMinOut - *offset) / (*scale));
+			std::cout << "new rangeMin: " << *rangeMin << std::endl;
+		}
+		if( ((tmpRangeMaxOut - *offset) / (*scale)) < (*rangeMax) ){
+			*rangeMax = ((tmpRangeMaxOut - *offset) / (*scale));
+			std::cout << "new rangeMax: " << *rangeMax << std::endl;
+		}
 		
 		if( !std::isfinite(*scale) || !std::isfinite(*offset) || !std::isfinite(*rangeMin) || !std::isfinite(*rangeMin) ){
 			throw eeros::EEROSException("config for scale or range is invalid, id: " + id);
