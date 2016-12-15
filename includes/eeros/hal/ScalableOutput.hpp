@@ -16,9 +16,13 @@ namespace eeros {
 			virtual T getScale() { return scale; }
 			virtual T getOffset() { return offset; }
 			virtual std::string getUnit() { return unit; }
+			virtual T getMinOut() { return minOut; }
+			virtual T getMaxOut() { return maxOut; }
 			virtual void setScale(T s) { scale = s; }
 			virtual void setOffset(T o) { offset = o; }
 			virtual void setUnit(std::string unit) { this->unit = unit; }
+			virtual void setMinOut(T minO) { minOut = minO; }
+			virtual void setMaxOut(T maxO) { maxOut = maxO; }
 			
 		protected:
 			T scale;

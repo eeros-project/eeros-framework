@@ -103,7 +103,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										if(typeIt != typeOfChannel.end()){
 											if(typeIt->second == Real){
 												std::cout << "create Real" << std::endl;
-												createRealObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber, scale, offset, chanUnit);
+												createRealObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, chanUnit);
 											}
 											else if(typeIt->second == Logic){
 												std::cout << "create Logic" << std::endl;
@@ -362,7 +362,7 @@ void JsonParser::createLogicObject(void *libHandle, std::string type, std::strin
 	}
 }
 
-void JsonParser::createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset, std::string unit){
+void JsonParser::createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset, double rangeMin, double rangeMax, std::string unit){
 	HAL& hal = HAL::instance();
 	
 	if(libHandle == nullptr || type.empty() || id.empty() || devHandle.empty()){
@@ -379,12 +379,12 @@ void JsonParser::createRealObject(void *libHandle, std::string type, std::string
 	if(dirIt != directionOfChannel.end()){
 		if(dirIt->second == In){
 			std::cout << "createIn" << std::endl;
-			ScalableInput<double> *halObj = reinterpret_cast<ScalableInput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double, std::string)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset, unit);
+			ScalableInput<double> *halObj = reinterpret_cast<ScalableInput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double, double, double, std::string)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, unit);
 			hal.addInput(halObj);
 		}
 		else if(dirIt->second == Out){
 			std::cout << "createOut" << std::endl;
-			ScalableOutput<double> *halObj = reinterpret_cast<ScalableOutput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double, std::string)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset, unit);
+			ScalableOutput<double> *halObj = reinterpret_cast<ScalableOutput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double, double, double, std::string)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, unit);
 			hal.addOutput(halObj);
 		}
 		else{

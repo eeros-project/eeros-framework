@@ -30,7 +30,7 @@
 								"minOut":	-10.0, 	"maxOut": 	10.0 },
 					   { "id" : "direct",
 								"scale":	0.5,
-								"offset": 	1.0 }
+								"offset": 	0.5 }
 					 ],
 				"range": [ { "id" : "dac",
 							"minIn": 	0, 	"maxIn": 	65535,
@@ -40,7 +40,7 @@
 							"minOut": 	-10.0, 	"maxOut": 	10.0 },
 					   { "id" : "direct",
 							"minIn":	-10.0,  "maxIn": 	10.0,
-							"minOut":	-2.0,	"maxOut": 	2.0 }
+							"minOut":	-4.0,	"maxOut": 	4.0 }
 					 ],
 				"unit": "V"
 			}
