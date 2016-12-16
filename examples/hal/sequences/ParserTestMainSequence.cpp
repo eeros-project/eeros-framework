@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <iostream>
 
+#include <eeros/hal/Output.hpp>
+#include <dlfcn.h>
+
 using namespace eeros;
 using namespace eeros::sequencer;
 using namespace eeros::safety;
@@ -22,11 +25,32 @@ bool ParserTestMainSequence::checkPreCondition() {
 void ParserTestMainSequence::run() {
 	log.trace() << "[ Main Sequence Started ]";
 	
+	std::cout << "setFrequency: ";
+	HAL& hal = HAL::instance();
+	
+	auto outObj = hal.getOutput("pwm1");
+	
+	void *handle = dlsym(outObj->getLibHandle(), "setFrequency");
+	if(handle == nullptr){
+		throw new eeros::EEROSException("could not find method in dynamic library");
+		std::cout << "err: " << dlerror() << std::endl;
+	}
+	
+	void (*setFreqPtr)(eeros::hal::OutputInterface*, double) = reinterpret_cast<void(*)(eeros::hal::OutputInterface*, double)>(handle);
+	
+	(setFreqPtr)(outObj, 100);
+	
+// 	void *setFrequencyHandle();
+// 	hal.getOutputFeature("dac1", "setFrequency", setFrequencyHandle);
+// 	setFrequencyHandle(controlSys->pwm1, 100);
+	
+	
 	log.info() << "Starting...";
 	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){
 		
 		if(i%5 == 0){
 			std::cout << "enc: " << controlSys->encMot1.getOut().getSignal().getValue() << std::endl;
+			controlSys->pwm1.getIn().getSignal().setValue(0.4);
 		}
 		
 		if(i%4 == 0){

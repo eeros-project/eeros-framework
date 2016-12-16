@@ -19,6 +19,7 @@ public:
 	eeros::control::PeripheralOutput<bool> ioOut;
 	eeros::control::PeripheralInput<bool> ioIn;
 	eeros::control::PeripheralInput<double> encMot1;
+	eeros::control::PeripheralOutput<double> pwm1;
 	eeros::control::TimeDomain timedomain;
   
 private:

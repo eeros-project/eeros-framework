@@ -27,6 +27,8 @@ namespace eeros {
 			
 			static HAL& instance();
 			
+			void getOutputFeature(std::string name, std::string featureName, void *(handle)());
+			
 		private:
 			HAL();
 			HAL(const HAL&);

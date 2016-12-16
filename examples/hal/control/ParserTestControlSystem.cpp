@@ -13,6 +13,7 @@ ParserTestControlSystem::ParserTestControlSystem(double ts) :
 	ioIn("ioIn"),
 	dac1("dac1"),
 	encMot1("encMot1"),
+	pwm1("pwm1"),
 	timedomain("Main time domain", ts, true)
 {
 	
@@ -24,7 +25,7 @@ ParserTestControlSystem::ParserTestControlSystem(double ts) :
 	timedomain.addBlock(&ioIn);
 	timedomain.addBlock(&ioOut);
 	timedomain.addBlock(&encMot1);
-	
+	timedomain.addBlock(&pwm1);
 	timedomain.addBlock(&dac1);
 	
 	eeros::task::Periodic td("control system",ts, timedomain);

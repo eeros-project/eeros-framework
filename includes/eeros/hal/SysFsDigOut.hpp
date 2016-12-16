@@ -9,7 +9,7 @@ namespace eeros {
 	namespace hal {
 		class SysFsDigOut : public Output<bool> {
 		public:
-			SysFsDigOut(std::string id, unsigned int gpio, bool inverted = false);
+			SysFsDigOut(std::string id, void* libHandle, unsigned int gpio, bool inverted = false);
 			~SysFsDigOut();
 			virtual bool get();
 			virtual void set(bool value);

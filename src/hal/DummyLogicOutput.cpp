@@ -2,7 +2,7 @@
 
 using namespace eeros::hal;
 
-DummyLogicOutput::DummyLogicOutput(std::string id) : Output<bool>(id) { }
+DummyLogicOutput::DummyLogicOutput(std::string id, void* libHandle) : Output<bool>(id, libHandle) { }
 
 bool DummyLogicOutput::get() {
 	return false;

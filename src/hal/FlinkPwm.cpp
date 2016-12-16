@@ -28,6 +28,6 @@ void FlinkPwm::setFrequency(double f) {
 
 void FlinkPwm::setDutyCycle(double d) {
 	if(d >= 0 && d <= 1) {
-		flink_pwm_set_hightime(subdeviceHandle, channel, (uint32_t)(baseFrequency / pwmFrequency * d));
+		flink_pwm_set_hightime(subdeviceHandle, channel, (uint32_t)((baseFrequency / pwmFrequency) * d));
 	}
 }

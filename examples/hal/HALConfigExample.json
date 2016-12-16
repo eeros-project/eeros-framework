@@ -58,6 +58,12 @@
 					 ],
 				"unit": "rad"
 			}
+		},
+		"subdevice0": {
+			"type": "Pwm",
+			"channel1": {
+				"signalId": "pwm1"
+			}
 		}
 	}
 }

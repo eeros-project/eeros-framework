@@ -1,5 +1,6 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/core/EEROSException.hpp>
+#include <dlfcn.h>
 
 using namespace eeros;
 using namespace eeros::hal;
@@ -83,4 +84,14 @@ Input<double>* HAL::getRealInput(std::string name, bool exclusive) {
 		if(!exclusiveReservedInputs.insert(in).second) throw EEROSException("Real system input '" + name + "' is exclusive reserved!");
 	}
 	return in;
+}
+
+void HAL::getOutputFeature(std::string name, std::string featureName, void *(handle)() ){
+// 	auto outObj = outputs[name];
+// // 	d
+// 	handle = reinterpret_cast<void*()>(dlsym(outObj->getLibHandle(), featureName.c_str()));
+// 	if(handle == nullptr){
+// 		throw new eeros::EEROSException("could not find method in dynamic library");
+// 		std::cout << "err: " << dlerror() << std::endl;
+// 	}
 }
