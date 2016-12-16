@@ -50,8 +50,8 @@
 			"channel0": {
 				"signalId": "encMot1",
 				"scale": [ { "id" : "enc1",
-								"scale":	0.000245437,
-								"offset":	0.0 }
+							"minIn": 	0, "maxIn": 6.283185307,
+							"minOut":	0, "maxOut": 25600 }
 					 ],
 				"range": [ { "id" : "enc1",
 								"noLimit": 	true }

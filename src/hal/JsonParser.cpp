@@ -258,7 +258,10 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 		}
 		
 		if(noRangeLimit && !setScaleDirect){
-			throw eeros::EEROSException("set a valid range or set scale directly for " + id);
+			tmpRangeMaxOut = maxOut;
+			tmpRangeMaxIn = maxIn;
+			tmpRangeMinIn = minIn;
+			tmpRangeMinOut = minOut;
 		}
 		
 		if(!noRangeLimit){
@@ -266,7 +269,7 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 			tmpRangeMaxIn = obj["range"].at(pos)["maxIn"].number_value();
 			tmpRangeMaxOut = obj["range"].at(pos)["maxOut"].number_value();
 			tmpRangeMinOut = obj["range"].at(pos)["minOut"].number_value();
-			
+		}
 		
 			if(!setScaleDirect){
 				//calculate scale, offset
@@ -291,7 +294,7 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 			std::cout << "oldMin: " << *rangeMin << "\toldMax: " << *rangeMax << std::endl;
 			std::cout << "checkMin: " << ((tmpRangeMinIn - *offset) / (*scale)) << std::endl;
 			
-			
+		if(!noRangeLimit){	
 			if( ((tmpRangeMinIn - *offset) / (*scale)) > (*rangeMin) ){
 				*rangeMin = (tmpRangeMinIn - *offset) / (*scale);
 				std::cout << "new rangeMin: " << *rangeMin << std::endl;
@@ -326,9 +329,12 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 				std::cout << "new rangeMax: " << *rangeMax << std::endl;
 			}
 			
-			if( !std::isfinite(*scale) || !std::isfinite(*offset) || !std::isfinite(*rangeMin) || !std::isfinite(*rangeMin) ){
-				throw eeros::EEROSException("config for scale or range is invalid, id: " + id);
+			if( !std::isfinite(*rangeMin) || !std::isfinite(*rangeMin) ){
+				throw eeros::EEROSException("config for range is invalid, id: " + id);
 			}
+		}
+		if( !std::isfinite(*scale) || !std::isfinite(*offset) ){
+			throw eeros::EEROSException("config for scale is invalid, id: " + id);
 		}
 		
 		setScaleDirect = false;
