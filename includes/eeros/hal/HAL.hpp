@@ -7,6 +7,9 @@
 #include <eeros/hal/Input.hpp>
 #include <eeros/hal/Output.hpp>
 #include <eeros/hal/JsonParser.hpp>
+#include <eeros/core/EEROSException.hpp>
+#include <iostream>
+
 
 namespace eeros {
 	namespace hal {
@@ -27,7 +30,30 @@ namespace eeros {
 			
 			static HAL& instance();
 			
-			void getOutputFeature(std::string name, std::string featureName, void *(handle)());
+			void* getOutputFeature(std::string name, std::string featureName);
+			void* getOutputFeature(eeros::hal::OutputInterface * obj, std::string featureName);
+			template<typename ... ArgTypes>
+			void callOutputFeature(std::string name, std::string featureName, ArgTypes... args){
+								
+				void (*featureFunction)(eeros::hal::OutputInterface*, ArgTypes...) = reinterpret_cast<void(*)(eeros::hal::OutputInterface*, ArgTypes...)>(getOutputFeature(name, featureName));
+				
+				if(featureFunction == nullptr){
+					throw new eeros::EEROSException("could not find method in dynamic library: " + featureName);
+				}
+				auto outObj = getOutput(name);
+				featureFunction(outObj, args...);
+			}
+			
+			template<typename ... ArgTypesObj>
+			void callOutputFeature(eeros::hal::OutputInterface* obj, std::string featureName, ArgTypesObj... args){
+								
+				void (*featureFunction)(eeros::hal::OutputInterface*, ArgTypesObj...) = reinterpret_cast<void(*)(eeros::hal::OutputInterface*, ArgTypesObj...)>(getOutputFeature(obj, featureName));
+				if(featureFunction == nullptr){
+					throw new eeros::EEROSException("could not find method in dynamic library: " + featureName);
+				}
+				featureFunction(obj, args...);
+				
+			}
 			
 		private:
 			HAL();

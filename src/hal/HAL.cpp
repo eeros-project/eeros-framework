@@ -1,5 +1,4 @@
 #include <eeros/hal/HAL.hpp>
-#include <eeros/core/EEROSException.hpp>
 #include <dlfcn.h>
 
 using namespace eeros;
@@ -86,12 +85,11 @@ Input<double>* HAL::getRealInput(std::string name, bool exclusive) {
 	return in;
 }
 
-void HAL::getOutputFeature(std::string name, std::string featureName, void *(handle)() ){
-// 	auto outObj = outputs[name];
-// // 	d
-// 	handle = reinterpret_cast<void*()>(dlsym(outObj->getLibHandle(), featureName.c_str()));
-// 	if(handle == nullptr){
-// 		throw new eeros::EEROSException("could not find method in dynamic library");
-// 		std::cout << "err: " << dlerror() << std::endl;
-// 	}
+void * HAL::getOutputFeature(std::string name, std::string featureName){
+	auto outObj = outputs[name];
+	return getOutputFeature(outObj, featureName);
+}
+
+void* HAL::getOutputFeature(eeros::hal::OutputInterface * obj, std::string featureName){
+	return dlsym(obj->getLibHandle(), featureName.c_str());
 }

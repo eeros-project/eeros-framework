@@ -22,7 +22,8 @@ private:
 	ParserTestControlSystem* controlSys;
 	eeros::safety::SafetySystem* safetySys;
 	
-	
+	eeros::hal::HAL& hal = eeros::hal::HAL::instance();
+	eeros::hal::Output<double> &pwm1 = *hal.getRealOutput("pwm1");
 	
 };
 		

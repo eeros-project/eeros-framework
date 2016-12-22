@@ -28,21 +28,22 @@ void ParserTestMainSequence::run() {
 	std::cout << "setFrequency: ";
 	HAL& hal = HAL::instance();
 	
-	auto outObj = hal.getOutput("pwm1");
+// 	double freq = 100.0;
+// 	hal.callOutputFeature("pwm1", "setFrequency", freq);
 	
-	void *handle = dlsym(outObj->getLibHandle(), "setFrequency");
-	if(handle == nullptr){
-		throw new eeros::EEROSException("could not find method in dynamic library");
-		std::cout << "err: " << dlerror() << std::endl;
-	}
+	hal.callOutputFeature("pwm1", "setFrequency", 50.0);
 	
-	void (*setFreqPtr)(eeros::hal::OutputInterface*, double) = reinterpret_cast<void(*)(eeros::hal::OutputInterface*, double)>(handle);
+// 	auto outObj = hal.getOutput("pwm1");
+// 	void (*handle)(eeros::hal::OutputInterface*, double) = reinterpret_cast< void (*)(eeros::hal::OutputInterface*, double)>(dlsym(outObj->getLibHandle(), "setFrequency"));
+// 	if(dlerror()){
+// 		throw new eeros::EEROSException("could not find method in dynamic library");
+// 		std::cout << "err: " << dlerror() << std::endl;
+// 	}
+// 	handle(outObj,100.0);
 	
-	(setFreqPtr)(outObj, 100);
 	
-// 	void *setFrequencyHandle();
-// 	hal.getOutputFeature("dac1", "setFrequency", setFrequencyHandle);
-// 	setFrequencyHandle(controlSys->pwm1, 100);
+
+
 	
 	
 	log.info() << "Starting...";
@@ -50,7 +51,8 @@ void ParserTestMainSequence::run() {
 		
 		if(i%5 == 0){
 			std::cout << "enc: " << controlSys->encMot1.getOut().getSignal().getValue() << std::endl;
-			controlSys->pwm1.getIn().getSignal().setValue(0.4);
+// 			controlSys->pwm1.getIn().getSignal().setValue(0.4);
+			pwm1.set(0.2);
 		}
 		
 		if(i%4 == 0){
