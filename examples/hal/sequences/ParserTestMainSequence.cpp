@@ -25,26 +25,9 @@ bool ParserTestMainSequence::checkPreCondition() {
 void ParserTestMainSequence::run() {
 	log.trace() << "[ Main Sequence Started ]";
 	
-	std::cout << "setFrequency: ";
-	HAL& hal = HAL::instance();
-	
-// 	double freq = 100.0;
-// 	hal.callOutputFeature("pwm1", "setFrequency", freq);
-	
-	hal.callOutputFeature("pwm1", "setFrequency", 50.0);
-	
-// 	auto outObj = hal.getOutput("pwm1");
-// 	void (*handle)(eeros::hal::OutputInterface*, double) = reinterpret_cast< void (*)(eeros::hal::OutputInterface*, double)>(dlsym(outObj->getLibHandle(), "setFrequency"));
-// 	if(dlerror()){
-// 		throw new eeros::EEROSException("could not find method in dynamic library");
-// 		std::cout << "err: " << dlerror() << std::endl;
-// 	}
-// 	handle(outObj,100.0);
-	
-	
-
-
-	
+	// set PWM frequency here for example or in main of application
+// 	HAL& hal = HAL::instance();	
+// 	hal.callOutputFeature("pwm1", "setPwmFrequency", 100.0);
 	
 	log.info() << "Starting...";
 	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){
