@@ -27,7 +27,7 @@ void ParserTestMainSequence::run() {
 	
 	// set PWM frequency here for example or in main of application
 	HAL& hal = HAL::instance();	
-	hal.callOutputFeature(&pwm1, "setPwmFrequency", 80.0);
+	hal.callOutputFeature(&pwm1, "setPwmFrequency", 100.0);
 	
 	log.info() << "Starting...";
 	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){

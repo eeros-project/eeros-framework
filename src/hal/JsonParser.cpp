@@ -374,7 +374,7 @@ void JsonParser::createLogicObject(void *libHandle, std::string type, std::strin
 	if(dirIt != directionOfChannel.end()){
 		if(dirIt->second == In){
 			std::cout << "createIn" << std::endl;
-			Input<bool> *halObj = reinterpret_cast<Input<bool> *(*)(std::string, std::string, uint32_t, uint32_t)>(createHandle)(id, devHandle, subDevNumber, channelNumber);
+			Input<bool> *halObj = reinterpret_cast<Input<bool> *(*)(std::string, void*, std::string, uint32_t, uint32_t)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber);
 			hal.addInput(halObj);
 		}
 		else if(dirIt->second == Out){
@@ -408,7 +408,7 @@ void JsonParser::createRealObject(void *libHandle, std::string type, std::string
 	if(dirIt != directionOfChannel.end()){
 		if(dirIt->second == In){
 			std::cout << "createIn" << std::endl;
-			ScalableInput<double> *halObj = reinterpret_cast<ScalableInput<double> *(*)(std::string, std::string, uint32_t, uint32_t, double, double, double, double, std::string)>(createHandle)(id, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, unit);
+			ScalableInput<double> *halObj = reinterpret_cast<ScalableInput<double> *(*)(std::string, void*, std::string, uint32_t, uint32_t, double, double, double, double, std::string)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, unit);
 			hal.addInput(halObj);
 		}
 		else if(dirIt->second == Out){

@@ -3,7 +3,7 @@
 
 using namespace eeros::hal;
 
-SysFsDigIn::SysFsDigIn(std::string id, unsigned int gpio, bool inverted) : Input<bool>(id), basePath("/sys/class/gpio/gpio" + std::to_string(gpio) + "/") {
+SysFsDigIn::SysFsDigIn(std::string id, void* libHandle, unsigned int gpio, bool inverted) : Input<bool>(id, libHandle), basePath("/sys/class/gpio/gpio" + std::to_string(gpio) + "/") {
 	std::ofstream exportFile;
 	std::ofstream directionFile;
 	

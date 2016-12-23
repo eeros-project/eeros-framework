@@ -9,7 +9,7 @@ namespace eeros {
 	namespace hal {
 		class SysFsDigIn : public Input<bool> {
 		public:
-			SysFsDigIn(std::string id, unsigned int gpio, bool inverted = false);
+			SysFsDigIn(std::string id, void* libHandle, unsigned int gpio, bool inverted = false);
 			~SysFsDigIn();
 			virtual bool get();
 			

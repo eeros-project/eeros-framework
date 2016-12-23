@@ -10,7 +10,7 @@ namespace eeros {
 		template <typename T>
 		class ScalableInput : public Input<T> {
 		public:
-			ScalableInput(std::string id, T scale, T offset, T minIn, T maxIn, std::string unit = "") : Input<T>(id), scale(scale), offset(offset), minIn(minIn), maxIn(maxIn), unit(unit)  { }
+			ScalableInput(std::string id, void* libHandle, T scale, T offset, T minIn, T maxIn, std::string unit = "") : Input<T>(id, libHandle), scale(scale), offset(offset), minIn(minIn), maxIn(maxIn), unit(unit)  { }
 			virtual ~ScalableInput() { }
 			
 			virtual T getScale() { return scale; }

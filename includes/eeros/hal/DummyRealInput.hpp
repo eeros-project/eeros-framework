@@ -9,7 +9,7 @@ namespace eeros {
 
 		class DummyRealInput : public ScalableInput<double> {
 		public:
-			DummyRealInput(std::string id, double scale = 1, double offset = 0, double minIn = -10.0, double maxIn = -10.0);
+			DummyRealInput(std::string id, void* libHandle = nullptr, double scale = 1, double offset = 0, double minIn = -10.0, double maxIn = -10.0);
 			virtual double get();
 		};
 	};

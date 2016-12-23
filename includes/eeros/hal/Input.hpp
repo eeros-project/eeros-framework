@@ -9,17 +9,20 @@ namespace eeros {
 		public:
 			virtual ~InputInterface() { }
 			virtual std::string getId() const = 0;
+			virtual void* getLibHandle() = 0;
 		};
 
 		template <typename T>
 		class Input : public InputInterface {
 		public:
-			explicit Input(std::string id) : id(id) { }
+			explicit Input(std::string id, void* libHandle) : id(id), libHandle(libHandle) { }
 			virtual ~Input() { }
 			virtual inline std::string getId() const { return id; }
 			virtual T get() = 0;
+			virtual void *getLibHandle() { return libHandle; }
 		private:
 			std::string id;
+			void* libHandle;
 		};
 
 	};

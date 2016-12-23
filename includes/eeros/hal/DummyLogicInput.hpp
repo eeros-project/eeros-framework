@@ -9,7 +9,7 @@ namespace eeros {
 
 		class DummyLogicInput : public Input<bool> {
 		public:
-			DummyLogicInput(std::string id);
+			DummyLogicInput(std::string id, void* libHandle = nullptr);
 			virtual bool get();
 		};
 
