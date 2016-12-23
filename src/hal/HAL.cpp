@@ -151,3 +151,12 @@ void * HAL::getOutputFeature(std::string name, std::string featureName){
 void* HAL::getOutputFeature(eeros::hal::OutputInterface * obj, std::string featureName){
 	return dlsym(obj->getLibHandle(), featureName.c_str());
 }
+
+void * HAL::getInputFeature(std::string name, std::string featureName){
+	auto inObj = inputs[name];
+	return getInputFeature(inObj, featureName);
+}
+
+void* HAL::getInputFeature(eeros::hal::InputInterface * obj, std::string featureName){
+	return dlsym(obj->getLibHandle(), featureName.c_str());
+}

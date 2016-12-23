@@ -39,6 +39,11 @@ void ParserTestMainSequence::run() {
 // 			std::cout << "seq_enc: " << enc1.get() << std::endl;
 		}
 		
+		if(i%50 == 0){
+			std::cout << "reset fqd: " << std::endl;
+			hal.callInputFeature("encMot1", "resetFqd");
+		}
+		
 		if(i%4 == 0){
 			controlSys->dac1.getIn().getSignal().setValue(2.5);
 // 			controlSys->setPos.getOut().getSignal().setValue(true);
