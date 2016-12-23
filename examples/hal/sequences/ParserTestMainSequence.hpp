@@ -24,7 +24,7 @@ private:
 	
 	eeros::hal::HAL& hal = eeros::hal::HAL::instance();
 	eeros::hal::Output<double> &pwm1 = *hal.getRealOutput("pwm1");
-	
+// 	eeros::hal::Input<double> &enc1 = *hal.getRealInput("encMot1");
 };
 		
 #endif // CH_NTB_CB20TESTMAINSEQUENCE_HPP_  

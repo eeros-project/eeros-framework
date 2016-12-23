@@ -39,7 +39,7 @@ int main(){
 	HAL& hal = HAL::instance();
 	hal.readConfigFromFile("/mnt/data/config/HALConfigExample.json");
 	
-	hal.callOutputFeature("pwm1", "setPwmFrequency", 100.0);
+// 	hal.callOutputFeature("pwm1", "setPwmFrequency", 100.0);
 	
 	ParserTestControlSystem* parserTestCtrlSys; 
 	parserTestCtrlSys = new ParserTestControlSystem(dt);

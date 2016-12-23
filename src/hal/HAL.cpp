@@ -42,14 +42,34 @@ bool HAL::addOutput(OutputInterface* systemOutput) {
 }
 
 OutputInterface* HAL::getOutput(std::string name, bool exclusive) {
+	if( exclusiveReservedOutputs.find(outputs[name]) != exclusiveReservedOutputs.end() ) throw EEROSException("System output '" + name + "' is exclusive reserved!");
+	
+	if(exclusive) {
+		if( nonExclusiveOutputs.find(outputs[name]) != nonExclusiveOutputs.end() ){
+			throw EEROSException("System output '" + name + "' is already claimed as non-exclusive output!");
+		}
+		if(!exclusiveReservedOutputs.insert(outputs[name]).second) throw EEROSException("System output '" + name + "' is exclusive reserved!"); // should not fail here because already checked at the beginning
+	}
+	else{
+		nonExclusiveOutputs.insert(outputs[name]).second;
+	}
 	return outputs[name];
 }
 
 Output<bool>* HAL::getLogicOutput(std::string name, bool exclusive) {
 	Output<bool>* out = dynamic_cast<Output<bool>*>(outputs[name]);
 	if(out == nullptr) throw EEROSException("Logic system output '" + name + "' not found!");
+	
+	if( exclusiveReservedOutputs.find(outputs[name]) != exclusiveReservedOutputs.end() ) throw EEROSException("Logic system output '" + name + "' is exclusive reserved!");
+	
 	if(exclusive) {
-		if(!exclusiveReservedOutputs.insert(out).second) throw EEROSException("Logic system output '" + name + "' is exclusive reserved!");
+		if( nonExclusiveOutputs.find(outputs[name]) != nonExclusiveOutputs.end() ){
+			throw EEROSException("Logic system output '" + name + "' is already claimed as non-exclusive output!");
+		}
+		if(!exclusiveReservedOutputs.insert(outputs[name]).second) throw EEROSException("Logic system output '" + name + "' is exclusive reserved!"); // should not fail here because already checked at the beginning
+	}
+	else{
+		nonExclusiveOutputs.insert(outputs[name]).second;
 	}
 	return out;
 }
@@ -57,21 +77,50 @@ Output<bool>* HAL::getLogicOutput(std::string name, bool exclusive) {
 Output<double>* HAL::getRealOutput(std::string name, bool exclusive) {
 	Output<double>* out = dynamic_cast<Output<double>*>(outputs[name]);
 	if(out == nullptr) throw EEROSException("Real system output '" + name + "' not found!");
+	
+	if( exclusiveReservedOutputs.find(outputs[name]) != exclusiveReservedOutputs.end() ) throw EEROSException("Real system output '" + name + "' is exclusive reserved!");
+	
 	if(exclusive) {
-		if(!exclusiveReservedOutputs.insert(out).second) throw EEROSException("Real system output '" + name + "' is exclusive reserved!");
+		if( nonExclusiveOutputs.find(outputs[name]) != nonExclusiveOutputs.end() ){
+			throw EEROSException("Real system output '" + name + "' is already claimed as non-exclusive output!");
+		}
+		if(!exclusiveReservedOutputs.insert(outputs[name]).second) throw EEROSException("Real system output '" + name + "' is exclusive reserved!"); // should not fail here because already checked at the beginning
+	}
+	else{
+		nonExclusiveOutputs.insert(outputs[name]).second;
 	}
 	return out;
 }
 
 InputInterface* HAL::getInput(std::string name, bool exclusive) {
+	if( exclusiveReservedInputs.find(inputs[name]) != exclusiveReservedInputs.end() ) throw EEROSException("System input '" + name + "' is exclusive reserved!");
+	
+	if(exclusive) {
+		if( nonExclusiveInputs.find(inputs[name]) != nonExclusiveInputs.end() ){
+			throw EEROSException("System input '" + name + "' is already claimed as non-exclusive input!");
+		}
+		if(!exclusiveReservedInputs.insert(inputs[name]).second) throw EEROSException("System input '" + name + "' is exclusive reserved!");	// should not fail here because already checked at the beginning
+	}
+	else{	
+		nonExclusiveInputs.insert(inputs[name]).second;
+	}
 	return inputs[name];
 }
 
 Input<bool>* HAL::getLogicInput(std::string name, bool exclusive) {
 	Input<bool>* in = dynamic_cast<Input<bool>*>(inputs[name]);
 	if(in == nullptr) throw EEROSException("Logic system input '" + name + "' not found!");
+	
+	if( exclusiveReservedInputs.find(inputs[name]) != exclusiveReservedInputs.end() ) throw EEROSException("Logic system input '" + name + "' is exclusive reserved!");
+		
 	if(exclusive) {
-		if(!exclusiveReservedInputs.insert(in).second) throw EEROSException("Logic system input '" + name + "' is exclusive reserved!");
+		if( nonExclusiveInputs.find(inputs[name]) != nonExclusiveInputs.end() ){
+			throw EEROSException("Logic system input '" + name + "' is already claimed as non-exclusive input!");
+		}
+		if(!exclusiveReservedInputs.insert(inputs[name]).second) throw EEROSException("Logic system input '" + name + "' is exclusive reserved!");	// should not fail here because already checked at the beginning
+	}
+	else{	
+		nonExclusiveInputs.insert(inputs[name]).second;
 	}
 	return in;
 }
@@ -79,8 +128,17 @@ Input<bool>* HAL::getLogicInput(std::string name, bool exclusive) {
 Input<double>* HAL::getRealInput(std::string name, bool exclusive) {
 	Input<double>* in = dynamic_cast<Input<double>*>(inputs[name]);
 	if(in == nullptr) throw EEROSException("Real system input '" + name + "' not found!");
+	
+	if( exclusiveReservedInputs.find(inputs[name]) != exclusiveReservedInputs.end() ) throw EEROSException("Real system input '" + name + "' is exclusive reserved!");
+	
 	if(exclusive) {
-		if(!exclusiveReservedInputs.insert(in).second) throw EEROSException("Real system input '" + name + "' is exclusive reserved!");
+		if( nonExclusiveInputs.find(inputs[name]) != nonExclusiveInputs.end() ){
+			throw EEROSException("Real system input '" + name + "' is already claimed as non-exclusive input!");
+		}
+		if(!exclusiveReservedInputs.insert(inputs[name]).second) throw EEROSException("Real system input '" + name + "' is exclusive reserved!");	// should not fail here because already checked at the beginning
+	}
+	else{	
+		nonExclusiveInputs.insert(inputs[name]).second;
 	}
 	return in;
 }

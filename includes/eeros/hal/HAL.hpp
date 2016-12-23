@@ -16,12 +16,12 @@ namespace eeros {
 		
 		class HAL {
 		public:
-			OutputInterface* getOutput(std::string name, bool exclusive = false);
-			Output<bool>* getLogicOutput(std::string name, bool exclusive = false);
-			Output<double>* getRealOutput(std::string name, bool exclusive = false);
-			InputInterface* getInput(std::string name, bool exclusive = false);
-			Input<bool>* getLogicInput(std::string name, bool exclusive = false);
-			Input<double>* getRealInput(std::string name, bool exclusive = false);
+			OutputInterface* getOutput(std::string name, bool exclusive = true);
+			Output<bool>* getLogicOutput(std::string name, bool exclusive = true);
+			Output<double>* getRealOutput(std::string name, bool exclusive = true);
+			InputInterface* getInput(std::string name, bool exclusive = true);
+			Input<bool>* getLogicInput(std::string name, bool exclusive = true);
+			Input<double>* getRealInput(std::string name, bool exclusive = true);
 			
 			bool addInput(InputInterface* systemInput);
 			bool addOutput(OutputInterface* systemOutput);
@@ -45,7 +45,7 @@ namespace eeros {
 			}
 			
 			template<typename ... ArgTypesObj>
-			void callOutputFeature(eeros::hal::OutputInterface* obj, std::string featureName, ArgTypesObj... args){
+			void callOutputFeature(eeros::hal::OutputInterface *obj, std::string featureName, ArgTypesObj... args){
 								
 				void (*featureFunction)(eeros::hal::OutputInterface*, ArgTypesObj...) = reinterpret_cast<void(*)(eeros::hal::OutputInterface*, ArgTypesObj...)>(getOutputFeature(obj, featureName));
 				if(featureFunction == nullptr){
@@ -63,7 +63,9 @@ namespace eeros {
 			bool loadModule(std::string moduleName);
 			
 			std::unordered_set<OutputInterface*> exclusiveReservedOutputs;
+			std::unordered_set<OutputInterface*> nonExclusiveOutputs;
 			std::unordered_set<InputInterface*> exclusiveReservedInputs;
+			std::unordered_set<InputInterface*> nonExclusiveInputs;
 			
 			std::map<std::string, InputInterface*> inputs;
 			std::map<std::string, OutputInterface*> outputs;

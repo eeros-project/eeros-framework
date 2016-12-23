@@ -26,8 +26,8 @@ void ParserTestMainSequence::run() {
 	log.trace() << "[ Main Sequence Started ]";
 	
 	// set PWM frequency here for example or in main of application
-// 	HAL& hal = HAL::instance();	
-// 	hal.callOutputFeature("pwm1", "setPwmFrequency", 100.0);
+	HAL& hal = HAL::instance();	
+	hal.callOutputFeature(&pwm1, "setPwmFrequency", 80.0);
 	
 	log.info() << "Starting...";
 	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){
@@ -36,6 +36,7 @@ void ParserTestMainSequence::run() {
 			std::cout << "enc: " << controlSys->encMot1.getOut().getSignal().getValue() << std::endl;
 // 			controlSys->pwm1.getIn().getSignal().setValue(0.4);
 			pwm1.set(0.2);
+// 			std::cout << "seq_enc: " << enc1.get() << std::endl;
 		}
 		
 		if(i%4 == 0){
