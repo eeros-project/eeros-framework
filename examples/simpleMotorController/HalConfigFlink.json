@@ -1,0 +1,45 @@
+{
+	"device0": {
+		"library": "libflinkeeros.so",
+		"devHandle": "/dev/flink0",
+		"subdevice4": {
+			"type": "DigIn",
+			"channel0": {
+				"signalId": "emergency",
+				"inverted": true
+			}
+		},
+		"subdevice5": {
+			"type": "DigOut",
+			"channel0": {
+				"signalId": "enable",
+			}
+		},
+		"subdevice2": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "dac",
+				"scale": [ { "id" : "noScale",
+								"scale":	1,
+								"offset": 	0 }
+					 ],
+				"unit": "V"
+			}
+		},
+		"subdevice1": {
+			"type": "Fqd",
+			"channel0": {
+				"signalId": "q",
+				"scale": [ { "id" : "enc1",
+							"minIn": 	0, "maxIn": 6.28318530718,
+							"minOut":	0, "maxOut": 2000 }
+					 ],
+				"range": [ { "id" : "enc1",
+								"noLimit": 	true }
+					 ],
+				"unit": "rad"
+			}
+		}
+	}
+}
+

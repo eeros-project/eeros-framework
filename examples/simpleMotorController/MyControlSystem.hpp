@@ -14,8 +14,8 @@ class MyControlSystem {
 public:
 	MyControlSystem(double ts);
 	
-	void start();
-	void stop();
+// 	void start();
+// 	void stop();
 	
 	eeros::control::Constant<> setpoint;
 	eeros::control::Constant<> setpointV;
@@ -28,7 +28,7 @@ public:
 	eeros::control::Gain<> speedController;
 	eeros::control::Gain<> inertia;
 	eeros::control::Gain<> invMotConst;
-	eeros::control::Output<> dac;
+	eeros::control::PeripheralOutput<> dac;
 	
 private:
 	eeros::control::TimeDomain timedomain;

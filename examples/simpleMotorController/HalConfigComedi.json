@@ -1,0 +1,45 @@
+{
+	"device0": {
+		"library": "libcomedieeros.so",
+		"devHandle": "/dev/comedi0",
+		"subdevice2": {
+			"type": "DigIn",
+			"channel1": {
+				"signalId": "emergency",
+				"inverted": true
+			}
+		},
+		"subdevice2": {
+			"type": "DigOut",
+			"channel0": {
+				"signalId": "enable",
+			}
+		},
+		"subdevice1": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "dac",
+				"scale": [ { "id" : "noScale",
+								"scale":	1,
+								"offset": 	0 }
+					 ],
+				"unit": "V"
+			}
+		},
+		"subdevice11": {
+			"type": "Fqd",
+			"channel8": {
+				"signalId": "q",
+				"scale": [ { "id" : "enc1",
+							"minIn": 	0, "maxIn": 6.28318530718,
+							"minOut":	0, "maxOut": 2000 }
+					 ],
+				"range": [ { "id" : "enc1",
+								"noLimit": 	true }
+					 ],
+				"unit": "rad"
+			}
+		}
+	}
+}
+

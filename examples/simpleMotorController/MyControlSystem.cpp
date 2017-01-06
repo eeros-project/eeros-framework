@@ -66,10 +66,10 @@ MyControlSystem::MyControlSystem(double ts) :
 	eeros::Executor::instance().add(timedomain);
 }
 
-void MyControlSystem::start() {
-	timedomain.start();
-}
-
-void MyControlSystem::stop() {
-	timedomain.stop();
-}
+// void MyControlSystem::start() {
+// 	timedomain.start();
+// }
+// 
+// void MyControlSystem::stop() {
+// 	timedomain.stop();
+// }

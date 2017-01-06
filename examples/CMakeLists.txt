@@ -7,9 +7,9 @@ include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR})
 #add_subdirectory(logger)
 add_subdirectory(hal)
 
-if(LIBCOMEDI)
+# if(LIBCOMEDI)
 	add_subdirectory(simpleMotorController)
-endif()
+# endif()
 
 if(LIBFLINK)
 	add_subdirectory(flink)
