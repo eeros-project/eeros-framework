@@ -85,7 +85,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 							int channelNumber = std::stoi(chanObj.key().substr(7, chanObj.key().length()));
 						
 							//----------------------------------
-							//TODO create HAL Object for channel
+							// create HAL Object for channel
 							//----------------------------------
 							// check if device already exists and library is loaded?
 							

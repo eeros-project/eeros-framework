@@ -28,6 +28,9 @@ bool HAL::loadModule(std::string moduleName) {
 
 bool HAL::addInput(InputInterface* systemInput) {
 	if(systemInput != nullptr) {
+		if( inputs.find(systemInput->getId()) != inputs.end() ){
+			throw EEROSException("Could not add Input to HAL, signal id '" + systemInput->getId() + "' already exists!");
+		}
 		inputs.insert(std::pair<std::string, InputInterface*>(systemInput->getId(), systemInput));
 		return true;
 	}
@@ -35,6 +38,9 @@ bool HAL::addInput(InputInterface* systemInput) {
 }
 bool HAL::addOutput(OutputInterface* systemOutput) {
 	if(systemOutput != nullptr) {
+		if( outputs.find(systemOutput->getId()) != outputs.end() ){
+			throw EEROSException("Could not add Output to HAL, signal id '" + systemOutput->getId() + "' already exists!");
+		}
 		outputs.insert(std::pair<std::string, OutputInterface*>(systemOutput->getId(), systemOutput));
 		return true;
 	}
