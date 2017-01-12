@@ -113,12 +113,12 @@ else()
 endif()
 
 ## Check for additional libraries
-message(STATUS "looking for additional libraries")
-find_file(LIBCOMEDI "comedilib.h" ${ADDITIONAL_INCLUDE_DIRS})
-if(LIBCOMEDI)
-	message(STATUS "-> libcomedi available")
-	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
-endif()
+# message(STATUS "looking for additional libraries")
+# find_file(LIBCOMEDI "comedilib.h" ${ADDITIONAL_INCLUDE_DIRS})
+# if(LIBCOMEDI)
+# 	message(STATUS "-> libcomedi available")
+# 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
+# endif()
 
 #find_package(flink QUIET)
 #if (FLINK_LIB_DIR)
