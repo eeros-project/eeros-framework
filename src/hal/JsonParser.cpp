@@ -33,6 +33,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	std::string chanType;
 	std::string sigId;
 	std::string chanUnit;
+	bool inverted = false;
 	double scale = 1;
 	double offset = 0;
 	double rangeMin = 0;
@@ -94,7 +95,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 								if(libIt != libHandles.end()){
 									if(!devHandle.empty()){
 									  
-										parseChannelProperties(chanObj, &chanType, &sigId, &scale, &offset, &rangeMin, &rangeMax, &chanUnit);
+										parseChannelProperties(chanObj, &chanType, &sigId, &scale, &offset, &rangeMin, &rangeMax, &chanUnit, &inverted);
 										
 										if(chanType.empty()){
 											chanType = type;
@@ -107,7 +108,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 											}
 											else if(typeIt->second == Logic){
 												std::cout << "create Logic" << std::endl;
-												createLogicObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber);
+												createLogicObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber, inverted);
 											}
 										}
 										else{
@@ -116,6 +117,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										sigId.clear();
 										chanType.clear();
 										chanUnit.clear();
+										inverted = false;
 										scale = 1;
 										offset = 0;
 										rangeMin = 0;
@@ -161,7 +163,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	}
 }
 
-void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType, std::string* sigId, double* scale, double* offset, double* rangeMin, double* rangeMax, std::string *chanUnit){
+void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType, std::string* sigId, double* scale, double* offset, double* rangeMin, double* rangeMax, std::string *chanUnit, bool *inverted){
 	double min = -10.0;
 	double max = 10.0;
 	
@@ -171,6 +173,8 @@ void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType,
 	std::cout << "\t\t\ttype: " << chanObj["type"].string_value() << std::endl;
 	*chanType = chanObj["type"].string_value();
 
+	*inverted = chanObj["inverted"].bool_value();
+	
 	for(const auto &chanProp : chanObj){
 		if(chanProp.key() == "unit"){
 			*chanUnit = chanProp.string_value();
@@ -357,7 +361,7 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 	}
 }
 
-void JsonParser::createLogicObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber){
+void JsonParser::createLogicObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, bool inverted){
 	HAL& hal = HAL::instance();
 	
 	if(libHandle == nullptr || type.empty() || id.empty() || devHandle.empty()){
@@ -374,12 +378,12 @@ void JsonParser::createLogicObject(void *libHandle, std::string type, std::strin
 	if(dirIt != directionOfChannel.end()){
 		if(dirIt->second == In){
 			std::cout << "createIn" << std::endl;
-			Input<bool> *halObj = reinterpret_cast<Input<bool> *(*)(std::string, void*, std::string, uint32_t, uint32_t)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber);
+			Input<bool> *halObj = reinterpret_cast<Input<bool> *(*)(std::string, void*, std::string, uint32_t, uint32_t, bool)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber, inverted);
 			hal.addInput(halObj);
 		}
 		else if(dirIt->second == Out){
 			std::cout << "createOut" << std::endl;
-			Output<bool> *halObj = reinterpret_cast<Output<bool> *(*)(std::string, void*, std::string, uint32_t, uint32_t)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber);
+			Output<bool> *halObj = reinterpret_cast<Output<bool> *(*)(std::string, void*, std::string, uint32_t, uint32_t, bool)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber, inverted);
 			hal.addOutput(halObj);
 		}
 		else{
