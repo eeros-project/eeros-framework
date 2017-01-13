@@ -34,6 +34,7 @@ void ParserTestMainSequence::run() {
 		
 		if(i%5 == 0){
 			std::cout << "enc: " << controlSys->encMot1.getOut().getSignal().getValue() << std::endl;
+			std::cout << "analogIn: " << aIn.get() << std::endl;
 // 			controlSys->pwm1.getIn().getSignal().setValue(0.4);
 // 			pwm1.set(0.2);
 // 			std::cout << "seq_enc: " << enc1.get() << std::endl;
@@ -45,12 +46,12 @@ void ParserTestMainSequence::run() {
 		}
 		
 		if(i%2 == 0){
-			controlSys->dac1.getIn().getSignal().setValue(2.5);
+			controlSys->dac1.getIn().getSignal().setValue(-1);
 // 			controlSys->setPos.getOut().getSignal().setValue(true);
 			controlSys->io1.getIn().getSignal().setValue(true);
 		}
 		else{
-			controlSys->dac1.getIn().getSignal().setValue(-2.5);
+			controlSys->dac1.getIn().getSignal().setValue(-1);
 // 			controlSys->setPos.getOut().getSignal().setValue(false);
 			controlSys->io1.getIn().getSignal().setValue(false);
 		}

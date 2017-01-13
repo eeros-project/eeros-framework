@@ -30,7 +30,7 @@
 								"minOut":	-10.0, 	"maxOut": 	10.0 },
 					   { "id" : "direct",
 								"scale":	0.5,
-								"offset": 	0.5 }
+								"offset": 	0.0 }
 					 ],
 				"range": [ { "id" : "dac",
 							"minIn": 	0, 	"maxIn": 	65535,
@@ -60,6 +60,21 @@
 								"noLimit": 	true }
 					 ],
 				"unit": "rad"
+			}
+		},
+		"subdevice0": {
+			"type": "AnalogIn",
+			"channel0": {
+				"signalId": "aIn",
+				"scale": [ { "id" : "analogIn",
+							"minIn": 	0.0, 	"maxIn": 	4.90,
+							"minOut": 	32770, 	"maxOut": 	48040 }
+					 ],
+				"range": [ { "id" : "analogIn",
+							"minIn":	-10.0, 	"maxIn": 	10.0,
+							"minOut":	0,	"maxOut": 	65535 }
+					 ],
+				"unit": "V"
 			}
 		}
 	}
