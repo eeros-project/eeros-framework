@@ -37,7 +37,8 @@ int main(){
 	std::cout << "ParserTest started..." << std::endl;
   
 	HAL& hal = HAL::instance();
-	hal.readConfigFromFile("/mnt/data/config/HALConfigExample.json");
+// 	hal.readConfigFromFile("/mnt/data/config/HALConfigExample.json");
+	hal.readConfigFromFile("/opt/hal/config/HALConfigComedi.json");
 	
 // 	hal.callOutputFeature("pwm1", "setPwmFrequency", 100.0);
 	

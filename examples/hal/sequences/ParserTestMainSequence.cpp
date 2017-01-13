@@ -27,7 +27,7 @@ void ParserTestMainSequence::run() {
 	
 	// set PWM frequency here for example or in main of application
 	HAL& hal = HAL::instance();	
-	hal.callOutputFeature(&pwm1, "setPwmFrequency", 100.0);
+// 	hal.callOutputFeature(&pwm1, "setPwmFrequency", 100.0);
 	
 	log.info() << "Starting...";
 	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){
@@ -35,7 +35,7 @@ void ParserTestMainSequence::run() {
 		if(i%5 == 0){
 			std::cout << "enc: " << controlSys->encMot1.getOut().getSignal().getValue() << std::endl;
 // 			controlSys->pwm1.getIn().getSignal().setValue(0.4);
-			pwm1.set(0.2);
+// 			pwm1.set(0.2);
 // 			std::cout << "seq_enc: " << enc1.get() << std::endl;
 		}
 		
@@ -44,7 +44,7 @@ void ParserTestMainSequence::run() {
 			hal.callInputFeature("encMot1", "resetFqd");
 		}
 		
-		if(i%4 == 0){
+		if(i%2 == 0){
 			controlSys->dac1.getIn().getSignal().setValue(2.5);
 // 			controlSys->setPos.getOut().getSignal().setValue(true);
 			controlSys->io1.getIn().getSignal().setValue(true);

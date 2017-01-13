@@ -35,7 +35,7 @@
 				"encChannelZ": 9,
 				"scale": [ { "id" : "enc1",
 							"minIn": 	0, "maxIn": 6.28318530718,
-							"minOut":	0, "maxOut": 2000 }
+							"minOut":	0, "maxOut": 4352 }
 					 ],
 				"range": [ { "id" : "enc1",
 								"noLimit": 	true }
