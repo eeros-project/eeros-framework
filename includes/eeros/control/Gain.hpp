@@ -15,7 +15,7 @@ namespace eeros {
 			}
 			
 			Gain(Tgain c) : enabled(true) {
-				gain = c;
+				gain = c; 
 			}
 			
 			virtual void run() {
@@ -78,7 +78,7 @@ namespace eeros {
 			virtual void setGain(Tgain c) {
 				gain = c;
 			}
-			
+
 		protected:
 			Tgain gain;
 			bool enabled;

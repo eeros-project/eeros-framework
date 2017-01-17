@@ -12,6 +12,8 @@ namespace eeros {
 			DummyLogicOutput(std::string id, void* libHandle = nullptr);
 			virtual bool get();
 			virtual void set(bool value);
+		private:
+			bool value;
 		};
 
 	};

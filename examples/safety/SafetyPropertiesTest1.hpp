@@ -2,12 +2,8 @@
 #define SAFETYPROPERTIESTEST1_HPP
 
 #include <eeros/safety/SafetyProperties.hpp>
-#include <eeros/hal/Output.hpp>
-#include <eeros/hal/Input.hpp>
 #include <eeros/safety/InputAction.hpp>
-#include <eeros/safety/inputActions.hpp>
 #include <eeros/safety/OutputAction.hpp>
-#include <eeros/safety/SafetySystem.hpp>
 #include <eeros/core/Executor.hpp>
 	
 using namespace eeros;
@@ -67,7 +63,7 @@ public:
 		slShuttingDown.setOutputActions({ set(out1, false) });
 		slIinitializing.setOutputActions({ set(out1, false) });
 		slInitialized.setOutputActions({ set(out1, false) });
-		slRunning.setOutputActions({ set(out1, true) });
+		slRunning.setOutputActions({ toggle(out1) });
 
 		// Define and add level functions
 		slOff.setLevelAction([&](SafetyContext* privateContext) {Executor::stop();});

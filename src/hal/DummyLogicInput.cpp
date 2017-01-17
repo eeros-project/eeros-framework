@@ -5,5 +5,9 @@ using namespace eeros::hal;
 DummyLogicInput::DummyLogicInput(std::string id, void* libHandle) : Input<bool>(id, libHandle) { }
 
 bool DummyLogicInput::get() {
-	return false;
+	return value;
+}
+
+void DummyLogicInput::set(bool val) {
+	value = val;
 }

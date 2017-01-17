@@ -32,8 +32,8 @@ int main() {
 	signal(SIGPWR, signalHandler);
 	
 	StreamLogWriter w(std::cout);
+	w.show();
 	Logger<LogWriter>::setDefaultWriter(&w);
-	
 	Logger<LogWriter> log;
 	
 	log.info() << "Safety System Example started...";

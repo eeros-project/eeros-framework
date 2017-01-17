@@ -11,6 +11,9 @@ namespace eeros {
 		public:
 			DummyLogicInput(std::string id, void* libHandle = nullptr);
 			virtual bool get();
+			virtual void set(bool val);
+		private:
+			bool value;
 		};
 
 	};

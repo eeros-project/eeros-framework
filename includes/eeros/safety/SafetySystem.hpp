@@ -2,6 +2,7 @@
 #define ORG_EEROS_SAFETY_SAFETYSYSTEM_HPP_
 
 #include <vector>
+#include <mutex>
 #include <eeros/core/Runnable.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetyProperties.hpp>
@@ -11,10 +12,6 @@
 
 namespace eeros {
 	namespace safety {
-		
-		// Forward declarations
-		class SystemInputInterface;
-		class SystemOutputInterface;
 		
 		class SafetySystem : public Runnable {
 		public:
@@ -30,7 +27,7 @@ namespace eeros {
 			
 		private:
 			bool setProperties(SafetyProperties& safetyProperties);
-			
+			std::mutex mtx;
 			SafetyProperties properties;
 			SafetyLevel* currentLevel;
 			SafetyLevel* nextLevel;

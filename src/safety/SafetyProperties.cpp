@@ -25,17 +25,37 @@ namespace eeros {
 		bool SafetyProperties::verify() {
 			bool check = true;
 			
-			// Check in every level
-			for(auto& l : levels) {
+			// Check in every level ...
+			for (auto& l : levels) {
 				// if the output action of every output is defined
-				// TODO
+				std::vector<hal::PeripheralOutputInterface*> copy1 = criticalOutputs;
+				for (auto& action : l->outputAction) {
+					auto output = action->getOutput();
+					std::vector<hal::PeripheralOutputInterface*>::iterator it = copy1.begin();
+					while (it != copy1.end()) {
+						if (*it == output) it = copy1.erase(it); 
+						else ++it;
+					}
+				}
+				if (!copy1.empty()) throw EEROSException("verification of safety properties failed, all critical outputs must be defined in level: " + l->getDescription());
+				check = check && copy1.empty();
 				
 				// if the input action for every critical input is defined
-				// TODO
+				std::vector<hal::PeripheralInputInterface*> copy2 = criticalInputs;
+				for (auto& action : l->inputAction) {
+					auto input = action->getInput();
+					std::vector<hal::PeripheralInputInterface*>::iterator it = copy2.begin();
+					while (it != copy2.end()) {
+						if (*it == input) it = copy2.erase(it); 
+						else ++it;
+					}
+				}
+				if (!copy2.empty()) throw EEROSException("verification of safety properties failed, all critical inputs must be defined in level: " + l->getDescription());
+				check = check && copy2.empty();
 			}
 			
 			// Check entry level
-			check = getEntryLevel() != nullptr;
+			check = check && getEntryLevel() != nullptr;
 			
 			return check;
 		}

@@ -15,9 +15,7 @@ namespace eeros {
 				_clear<T>();
 			}
 			
-			Constant(T v) {
-				value = v;
-			}
+			Constant(T v) : value(v) { }
 			
 			virtual void run() {
 				this->out.getSignal().setValue(value);

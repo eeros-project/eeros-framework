@@ -7,6 +7,10 @@ namespace eeros {
 		uint8_t SafetySystem::instCount = 0;
 		SafetySystem* SafetySystem::instance = nullptr;
 		
+		/** \brief Creates a safety system with given properties 
+		 *  \param safetyProperties a set of safety properties
+		 *  \param period period with which the safety system will be run by the executor
+		 */
 		SafetySystem::SafetySystem(SafetyProperties& safetyProperties, double period) :
 		log('S'),
 		currentLevel(nullptr),
@@ -30,7 +34,7 @@ namespace eeros {
 				return *currentLevel;
 			}
 			else {
-				throw EEROSException("currentLevel not defiend"); // TODO define error number and send error message to logger
+				throw EEROSException("currentLevel not defined"); // TODO define error number and send error message to logger
 			}
 		}
 		
@@ -45,16 +49,21 @@ namespace eeros {
 		}
 		
 		void SafetySystem::triggerEvent(SafetyEvent event, SafetyContext* context) {
-			if (currentLevel) {
-				log.info() << "triggering event: \'" << event.getDescription() << "\'";
-				nextLevel = currentLevel->getDestLevelForEvent(event, context == &privateContext);
-				if (nextLevel != nullptr) {
-					bool transition = (nextLevel != currentLevel);	// stage level change
-					if (transition) log.info() << "new safety level: [" << nextLevel->id << "] \'" << nextLevel->getDescription() << "\'";	
+			if(currentLevel) {
+				log.info() << "triggering event: \'" << event.getDescription() << "\' in level '" << currentLevel->getDescription() << "\'";
+				SafetyLevel* newLevel = currentLevel->getDestLevelForEvent(event, context == &privateContext);
+				if(newLevel != nullptr) {
+					bool transition = (newLevel != currentLevel);	// stage level change
+					// prioritize multiple events, 
+					// can be called by different threads
+					mtx.lock();
+					if(nextLevel == currentLevel) nextLevel = newLevel;
+					else if(newLevel->id < nextLevel->id) nextLevel = newLevel;
+					mtx.unlock();
+					if(transition) log.info() << "new safety level: '" << nextLevel->getDescription() << "\'";	
 				} else {
 					log.error()	<< "no transition for event \'" << event.getDescription()
-								<< "\' in level [" << currentLevel->id << "] \'"
-								<< currentLevel->getDescription() << "\'";
+								<< "\' in level \'" << currentLevel->getDescription() << "\'";
 				}
 			} else {
 				throw EEROSException("current level not defined"); // TODO define error number and send error message to logger
@@ -71,7 +80,7 @@ namespace eeros {
 
 		void SafetySystem::run() {
 			// level must only change before safety system runs or after run method has finished
-			currentLevel = nextLevel; // TODO make atomic
+			if(nextLevel != nullptr) currentLevel = nextLevel; 
 			if(currentLevel != nullptr) {
 
 				// 1) Get currentLevel
@@ -81,14 +90,14 @@ namespace eeros {
 				for(auto ia : level->inputAction) {
 					if(ia != nullptr) {
 						SafetyLevel* oldLevel = currentLevel;
-						if (ia->check(&privateContext)) {
-							SafetyLevel* newLevel = currentLevel;
-							using namespace eeros::logger;
-							eeros::hal::InputInterface* input = (eeros::hal::InputInterface*)(ia->inputInterface);
-							if (oldLevel != newLevel) {
-								log.info()	<< "level changed due to input action: " << input->getId() << endl
-											<< "  previous level: [" << oldLevel->id << "] " << oldLevel->getDescription() << endl
-											<< "  new level:      [" << newLevel->id << "] " << newLevel->getDescription();
+						if(ia->check(&privateContext)) {
+							SafetyLevel* newLevel = nextLevel;
+							using namespace logger;
+							hal::InputInterface* input = (hal::InputInterface*)(ia->getInput());
+							if(oldLevel != newLevel) {
+								log.info()	<< "level changed due to input action: " << input->getId()
+											<< " from level '" << oldLevel->getDescription() << "'"
+											<< " to level '" << newLevel->getDescription() << "'";
 							}
 						}
 					}
@@ -105,7 +114,7 @@ namespace eeros {
 						oa->set();
 					}
 				}
-				currentLevel = nextLevel; // TODO make atomic
+				if(nextLevel != nullptr) currentLevel = nextLevel; 
 			}
 			else {
 				log.error() << "current level is null!";
