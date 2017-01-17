@@ -1,6 +1,6 @@
 {
 	"device0": {
-		"library": "libflinkcomedi.so",
+		"library": "libcomedieeros.so",
 		"devHandle": "/dev/comedi0",
 		"subdevice2": {
 			"type": "DigOut",
