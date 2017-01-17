@@ -2,7 +2,6 @@
 #include "../control/ParserTestControlSystem.hpp"
 #include <eeros/hal/HAL.hpp>
 #include <eeros/safety/InputAction.hpp>
-#include <eeros/safety/inputActions.hpp>
 #include <eeros/safety/OutputAction.hpp>
 #include <eeros/safety/ControlInput.hpp>
 #include <eeros/math/Matrix.hpp>

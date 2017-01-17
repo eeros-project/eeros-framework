@@ -28,10 +28,10 @@ namespace eeros {
 			// Check in every level ...
 			for (auto& l : levels) {
 				// if the output action of every output is defined
-				std::vector<hal::PeripheralOutputInterface*> copy1 = criticalOutputs;
+				std::vector<hal::OutputInterface*> copy1 = criticalOutputs;
 				for (auto& action : l->outputAction) {
 					auto output = action->getOutput();
-					std::vector<hal::PeripheralOutputInterface*>::iterator it = copy1.begin();
+					std::vector<hal::OutputInterface*>::iterator it = copy1.begin();
 					while (it != copy1.end()) {
 						if (*it == output) it = copy1.erase(it); 
 						else ++it;
@@ -41,10 +41,10 @@ namespace eeros {
 				check = check && copy1.empty();
 				
 				// if the input action for every critical input is defined
-				std::vector<hal::PeripheralInputInterface*> copy2 = criticalInputs;
+				std::vector<hal::InputInterface*> copy2 = criticalInputs;
 				for (auto& action : l->inputAction) {
 					auto input = action->getInput();
-					std::vector<hal::PeripheralInputInterface*>::iterator it = copy2.begin();
+					std::vector<hal::InputInterface*>::iterator it = copy2.begin();
 					while (it != copy2.end()) {
 						if (*it == input) it = copy2.erase(it); 
 						else ++it;
