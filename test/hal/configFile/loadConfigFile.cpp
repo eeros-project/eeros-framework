@@ -25,7 +25,7 @@ TEST(ConfigFileLoadTest, validFile){
 		hal.readConfigFromFile("loadConfig.json");
 	}
 	catch(eeros::EEROSException const & err){
-		FAIL();
+		FAIL() << err.what();
 	}
 	catch(...){
 		FAIL();

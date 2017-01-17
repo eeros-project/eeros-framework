@@ -15,10 +15,14 @@
 using namespace eeros;
 using namespace eeros::hal;
 
-JsonParser::JsonParser(){ }
+JsonParser::JsonParser() :
+	log('P') { 
+}
 
-JsonParser::JsonParser(std::string filePath){
+JsonParser::JsonParser(std::string filePath) : log('P') {
 	std::string err;
+	
+	log.trace() << "parsing config file from path: '" + filePath + "'";
 	
 	halRootObj = ucl::Ucl::parse_from_file(filePath.c_str(), err);
 	if(!err.empty()){
@@ -48,7 +52,6 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 				void *createDevHandle = nullptr;
 				std::regex sdRegex("subdevice[0-9]+", std::regex_constants::extended);
 				if(subO.key() == "library"){
-					std::cout << "\tload library for " << subO.string_value() << std::endl;
 					library = subO.string_value();
 					auto libIt = libHandles.find(library);
 					// if library not already in map of opened libraries -> try to open it
@@ -57,32 +60,23 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 						auto libIt = libHandles.find(library);	
 						if(libIt->second == nullptr){
 							libHandles.erase(libIt);
-							std::cout << "could not load library: " << dlerror() << std::endl;
-							throw eeros::EEROSException("could not load library: " + subO.string_value());
-						}
-						else{
-							std::cout << "lib successfully loaded" << std::endl;
+							throw EEROSException(std::string(dlerror()));
 						}
 					}
 				}
 				else if(subO.key() == "devHandle"){
 					devHandle = subO.string_value();
-					std::cout << "\tdev Handle is " << subO.string_value() << std::endl;
 				}
 				else if(std::regex_match(subO.key(), sdRegex)){
-					std::cout << "\t" << subO.key() << std::endl;
 					auto subDevO = subO;
 					int subDevNumber = std::stoi(subDevO.key().substr(9, subDevO.key().length()));
 					for(const auto &chanO : subDevO){
 						std::regex chanRegex("channel[0-9]+", std::regex_constants::extended);
 						std::string subDevParam = chanO.key();
 						if(chanO.key() == "type"){
-							std::cout << "\t\t\ttype: " << chanO.string_value() << std::endl;
 							type = chanO.string_value();
 						}
 						else if(std::regex_match(subDevParam, chanRegex)){
-							std::cout << "\t\t" << subDevParam << std::endl;
-							
 							auto chanObj = chanO;
 							int channelNumber = std::stoi(chanObj.key().substr(7, chanObj.key().length()));
 						
@@ -104,10 +98,8 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										
 										// exception for comedi Fqd
 										if(chanType == "Fqd"){
-											std::cout << "Fqd found" << std::endl;
 											std::regex comediRegex("libcomedi[a-z.A-z]+", std::regex_constants::extended);
-											if(std::regex_match(library, comediRegex)){
-												std::cout << "comedi FQD required" << std::endl;
+											if(std::regex_match(library, comediRegex)){		// exception: comedi fqd regex matches?
 												int channelA = -1;
 												int channelB = -1;
 												int channelZ = -1;
@@ -115,7 +107,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 												channelB = chanObj["encChannelB"].int_value();
 												channelZ = chanObj["encChannelZ"].int_value();
 												if(channelA == -1 || channelB == -1){
-													throw eeros::EEROSException("no channels defined for comedi FQD signalId: '" + sigId + "'" );
+													throw EEROSException("no channels defined for comedi FQD signalId: '" + sigId + "'" );
 												}
 												createComediFqd(libIt->second, chanType, sigId, devHandle, subDevNumber, channelA, channelB, channelZ, scale, offset, rangeMin, rangeMax, chanUnit);
 												channelCreated = true;
@@ -125,17 +117,15 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										auto typeIt = typeOfChannel.find(chanType);
 										if(typeIt != typeOfChannel.end() && !channelCreated){
 											if(typeIt->second == Real){
-												std::cout << "create Real" << std::endl;
 												createRealObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, chanUnit);
 											}
 											else if(typeIt->second == Logic){
-												std::cout << "create Logic" << std::endl;
 												createLogicObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber, inverted);
 											}
 										}
 										else{
 											if(!channelCreated){
-												throw eeros::EEROSException("undefined type: " + chanType + " for " + sigId);
+												throw EEROSException("undefined type: " + chanType + " for " + sigId);
 											}
 										}
 										sigId.clear();
@@ -149,32 +139,23 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										channelCreated = false;
 									}
 									else{
-										throw eeros::EEROSException("no device handle defined for " + subDevParam);
+										throw EEROSException("no device handle defined for " + subDevParam);
 									}
+								}
+								else{
+									throw EEROSException("library not loaded for " + subDevParam + " ('" + library + "')");
 								}
 							}
 							else{
-								throw eeros::EEROSException("no library defined for " + subDevParam);
+								throw EEROSException("no library defined for " + subDevParam);
 							}
-							// check if end of lib
-							
-							
-							
-							
-							
 						}
 						else{
-							std::cout << "\t\tno valid key: " << subDevParam << std::endl;
+							throw EEROSException("no valid key found: " + subDevParam);
 						}
 					}
 					type.clear();
 				}
-			}
-			if(o.key() == "device0"){
-				std::cout << "device0 found" << std::endl;
-			}
-			else{
-				std::cout << "device0 not found" << std::endl;
 			}
 			
 			library.clear();			//make sure that no settings are handed over to next object
@@ -182,17 +163,14 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 		}
 	}
 	else{
-		throw eeros::EEROSException("No parsed HAL root object");
+		throw EEROSException("No parsed HAL root object");
 	}
+	log.trace() << "HAL objects created";
 }
 
 void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType, std::string* sigId, double* scale, double* offset, double* rangeMin, double* rangeMax, std::string *chanUnit, bool *inverted){
 	*sigId = chanObj["signalId"].string_value();
-	std::cout << "\t\t\tsignalId: " << *sigId << std::endl;
-	
-	std::cout << "\t\t\ttype: " << chanObj["type"].string_value() << std::endl;
 	*chanType = chanObj["type"].string_value();
-
 	*inverted = chanObj["inverted"].bool_value();
 	
 	for(const auto &chanProp : chanObj){
@@ -260,7 +238,7 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 				tmpOffset = minMax.number_value();
 			}
 			else{
-				throw eeros::EEROSException("unknown scale property in id: " + id);
+				throw EEROSException("unknown scale property in id: " + id);
 			}
 		}
 		
@@ -278,7 +256,7 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 			i++;
 		}
 		if(pos == -1){
-			throw eeros::EEROSException("no range values found for " + id);
+			throw EEROSException("no range values found for " + id);
 		}
 		
 		if(noRangeLimit && !setScaleDirect){
@@ -311,54 +289,40 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 				*rangeMax = tmpRangeMaxIn;
 			}
 			
-			// calculate new range for next input scale before applying new scale
-			// check if new range is reduced by new block (min value), replace if necessary
-			std::cout << "rangeMinIn: " << tmpRangeMinIn << "\trangeMaxIn: " << tmpRangeMaxIn << std::endl;
-			std::cout << "rangeMinOut: " << tmpRangeMinOut << "\trangeMaxOut: " << tmpRangeMaxOut << std::endl;
-			std::cout << "oldMin: " << *rangeMin << "\toldMax: " << *rangeMax << std::endl;
-			std::cout << "checkMin: " << ((tmpRangeMinIn - *offset) / (*scale)) << std::endl;
-			
+		// calculate new range for next input scale before applying new scale
+		// check if new range is reduced by new block (min value), replace if necessary
+		
 		if(!noRangeLimit){	
 			if( ((tmpRangeMinIn - *offset) / (*scale)) > (*rangeMin) ){
 				*rangeMin = (tmpRangeMinIn - *offset) / (*scale);
-				std::cout << "new rangeMin: " << *rangeMin << std::endl;
 			}
 			
-			std::cout << "checkMax: " << ((tmpRangeMaxIn - *offset) / (*scale)) << std::endl;
 			// check range max value, replace if necessary
 			if( ((tmpRangeMaxIn - *offset) / (*scale)) < (*rangeMax) ){
 				*rangeMax = (tmpRangeMaxIn - *offset) / (*scale);
-				std::cout << "new rangeMax: " << *rangeMax << std::endl;
 			}
 		}
 			
 		// apply new scale
-		std::cout << "tmpScale: " << tmpScale << "\ttmpOffset: " << tmpOffset << std::endl;
-		std::cout << "oldScale: " << *scale << "\toldOffset: " << *offset << std::endl;
 		*offset = (*offset) * tmpScale + tmpOffset;
 		*scale = (*scale) * tmpScale;
-		std::cout << "scale: " << *scale << "\toffset: " << (*offset) << std::endl;
 		
 		if(!noRangeLimit){
-			std::cout << "checkMinOut: " << ((tmpRangeMinOut - *offset) / (*scale)) << std::endl;
-			std::cout << "checkMaxOut: " << ((tmpRangeMaxOut - *offset) / (*scale)) << std::endl;
 			// calculate new output range with new scale
 			// check out max/min
 			if( ((tmpRangeMinOut - *offset) / (*scale)) > (*rangeMin) ){
 				*rangeMin = ((tmpRangeMinOut - *offset) / (*scale));
-				std::cout << "new rangeMin: " << *rangeMin << std::endl;
 			}
 			if( ((tmpRangeMaxOut - *offset) / (*scale)) < (*rangeMax) ){
 				*rangeMax = ((tmpRangeMaxOut - *offset) / (*scale));
-				std::cout << "new rangeMax: " << *rangeMax << std::endl;
 			}
 			
 			if( !std::isfinite(*rangeMin) || !std::isfinite(*rangeMin) ){
-				throw eeros::EEROSException("config for range is invalid, id: " + id);
+				throw EEROSException("config for range is invalid, id: " + id);
 			}
 		}
 		if( !std::isfinite(*scale) || !std::isfinite(*offset) ){
-			throw eeros::EEROSException("config for scale is invalid, id: " + id);
+			throw EEROSException("config for scale is invalid, id: " + id);
 		}
 		
 		setScaleDirect = false;
@@ -391,27 +355,24 @@ void JsonParser::createLogicObject(void *libHandle, std::string type, std::strin
 	std::string createStr = "create" + type;
 	void *createHandle = dlsym(libHandle, createStr.c_str());
 	if(createHandle == nullptr){
-		std::cout << "could not find createMethod: " << dlerror() << std::endl;
-		throw eeros::EEROSException("could not find method in dynamic library");
+		throw EEROSException("could not find create method: " + std::string(dlerror()) + "signalId: '" + id + "'");
 	}
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
 		if(dirIt->second == In){
-			std::cout << "createIn" << std::endl;
 			Input<bool> *halObj = reinterpret_cast<Input<bool> *(*)(std::string, void*, std::string, uint32_t, uint32_t, bool)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber, inverted);
 			hal.addInput(halObj);
 		}
 		else if(dirIt->second == Out){
-			std::cout << "createOut" << std::endl;
 			Output<bool> *halObj = reinterpret_cast<Output<bool> *(*)(std::string, void*, std::string, uint32_t, uint32_t, bool)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber, inverted);
 			hal.addOutput(halObj);
 		}
 		else{
-			throw eeros::EEROSException("undefined direction for channel " + id);
+			throw EEROSException("undefined direction for channel " + id);
 		}
 	}
 	else{
-		throw eeros::EEROSException("undefined direction for channel " + id);
+		throw EEROSException("undefined direction for channel " + id);
 	}
 }
 
@@ -425,27 +386,24 @@ void JsonParser::createRealObject(void *libHandle, std::string type, std::string
 	std::string createStr = "create" + type;
 	void *createHandle = dlsym(libHandle, createStr.c_str());
 	if(createHandle == nullptr){
-		std::cout << "could not find createMethod: " << dlerror() << std::endl;
-		throw eeros::EEROSException("could not find method in dynamic library");
+		throw EEROSException("could not find create method: " + std::string(dlerror()) + "signalId: '" + id + "'");
 	}
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
 		if(dirIt->second == In){
-			std::cout << "createIn" << std::endl;
 			ScalableInput<double> *halObj = reinterpret_cast<ScalableInput<double> *(*)(std::string, void*, std::string, uint32_t, uint32_t, double, double, double, double, std::string)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, unit);
 			hal.addInput(halObj);
 		}
 		else if(dirIt->second == Out){
-			std::cout << "createOut" << std::endl;
 			ScalableOutput<double> *halObj = reinterpret_cast<ScalableOutput<double> *(*)(std::string, void*, std::string, uint32_t, uint32_t, double, double, double, double, std::string)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, unit);
 			hal.addOutput(halObj);
 		}
 		else{
-			throw eeros::EEROSException("undefined direction for channel " + id);
+			throw EEROSException("undefined direction for channel " + id);
 		}
 	}
 	else{
-		throw eeros::EEROSException("undefined direction for channel " + id);
+		throw EEROSException("undefined direction for channel " + id);
 	}
 }
 
@@ -459,8 +417,7 @@ void JsonParser::createComediFqd(void *libHandle, std::string type, std::string 
 	std::string createStr = "create" + type;
 	void *createHandle = dlsym(libHandle, createStr.c_str());
 	if(createHandle == nullptr){
-		std::cout << "could not find createMethod: " << dlerror() << std::endl;
-		throw eeros::EEROSException("could not find method in dynamic library");
+		throw EEROSException("could not find createMethod: " + std::string(dlerror()) + "signalId: '" + id + "'");
 	}
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
@@ -469,10 +426,10 @@ void JsonParser::createComediFqd(void *libHandle, std::string type, std::string 
 			hal.addInput(halObj);
 		}
 		else{
-			throw eeros::EEROSException("wrong direction for comedi FQD channel " + id);
+			throw EEROSException("wrong direction for comedi FQD channel " + id);
 		}
 	}
 	else{
-		throw eeros::EEROSException("undefined direction for channel " + id);
+		throw EEROSException("undefined direction for channel " + id);
 	}
 }

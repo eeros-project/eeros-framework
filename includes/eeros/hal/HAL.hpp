@@ -31,28 +31,28 @@ namespace eeros {
 			static HAL& instance();
 			
 			void* getOutputFeature(std::string name, std::string featureName);
-			void* getOutputFeature(eeros::hal::OutputInterface * obj, std::string featureName);
+			void* getOutputFeature(OutputInterface * obj, std::string featureName);
 			void* getInputFeature(std::string name, std::string featureName);
-			void* getInputFeature(eeros::hal::InputInterface * obj, std::string featureName);
+			void* getInputFeature(InputInterface * obj, std::string featureName);
 			
 			template<typename ... ArgTypes>
 			void callOutputFeature(std::string name, std::string featureName, ArgTypes... args){
 				
-				void (*featureFunction)(eeros::hal::OutputInterface*, ArgTypes...) = reinterpret_cast<void(*)(eeros::hal::OutputInterface*, ArgTypes...)>(getOutputFeature(name, featureName));
+				void (*featureFunction)(OutputInterface*, ArgTypes...) = reinterpret_cast<void(*)(OutputInterface*, ArgTypes...)>(getOutputFeature(name, featureName));
 				
 				if(featureFunction == nullptr){
-					throw eeros::EEROSException("could not find method in dynamic library: " + featureName);
+					throw EEROSException("could not find method in dynamic library: " + featureName);
 				}
 				auto outObj = outputs[name];			//TODO should we allow that!? or can a user do something bad with a feature Function!?
 				featureFunction(outObj, args...);
 			}
 			
 			template<typename ... ArgTypesObj>
-			void callOutputFeature(eeros::hal::OutputInterface *obj, std::string featureName, ArgTypesObj... args){
-								
-				void (*featureFunction)(eeros::hal::OutputInterface*, ArgTypesObj...) = reinterpret_cast<void(*)(eeros::hal::OutputInterface*, ArgTypesObj...)>(getOutputFeature(obj, featureName));
+			void callOutputFeature(OutputInterface *obj, std::string featureName, ArgTypesObj... args){
+				
+				void (*featureFunction)(OutputInterface*, ArgTypesObj...) = reinterpret_cast<void(*)(OutputInterface*, ArgTypesObj...)>(getOutputFeature(obj, featureName));
 				if(featureFunction == nullptr){
-					throw eeros::EEROSException("could not find method in dynamic library: " + featureName);
+					throw EEROSException("could not find method in dynamic library: " + featureName);
 				}
 				featureFunction(obj, args...);
 			}
@@ -60,21 +60,21 @@ namespace eeros {
 			template<typename ... ArgTypesStrIn>
 			void callInputFeature(std::string name, std::string featureName, ArgTypesStrIn... args){
 				
-				void (*featureFunction)(eeros::hal::InputInterface*, ArgTypesStrIn...) = reinterpret_cast<void(*)(eeros::hal::InputInterface*, ArgTypesStrIn...)>(getInputFeature(name, featureName));
+				void (*featureFunction)(InputInterface*, ArgTypesStrIn...) = reinterpret_cast<void(*)(InputInterface*, ArgTypesStrIn...)>(getInputFeature(name, featureName));
 				
 				if(featureFunction == nullptr){
-					throw eeros::EEROSException("could not find method in dynamic library: " + featureName);
+					throw EEROSException("could not find method in dynamic library: " + featureName);
 				}
 				auto inObj = inputs[name];			//TODO should we allow that!? or can a user do something bad with a feature Function!?
 				featureFunction(inObj, args...);
 			}
 			
 			template<typename ... ArgTypesIn>
-			void callInputFeature(eeros::hal::InputInterface *obj, std::string featureName, ArgTypesIn... args){
-								
-				void (*featureFunction)(eeros::hal::InputInterface*, ArgTypesIn...) = reinterpret_cast<void(*)(eeros::hal::InputInterface*, ArgTypesIn...)>(getInputFeature(obj, featureName));
+			void callInputFeature(InputInterface *obj, std::string featureName, ArgTypesIn... args){
+				
+				void (*featureFunction)(InputInterface*, ArgTypesIn...) = reinterpret_cast<void(*)(InputInterface*, ArgTypesIn...)>(getInputFeature(obj, featureName));
 				if(featureFunction == nullptr){
-					throw eeros::EEROSException("could not find method in dynamic library: " + featureName);
+					throw EEROSException("could not find method in dynamic library: " + featureName);
 				}
 				featureFunction(obj, args...);
 			}

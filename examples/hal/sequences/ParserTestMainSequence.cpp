@@ -33,15 +33,15 @@ void ParserTestMainSequence::run() {
 	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){
 		
 		if(i%5 == 0){
-			std::cout << "enc: " << controlSys->encMot1.getOut().getSignal().getValue() << std::endl;
-			std::cout << "analogIn: " << aIn.get() << std::endl;
+			log.info() << "enc: " << controlSys->encMot1.getOut().getSignal().getValue();
+			log.info() << "analogIn: " << aIn.get();
 // 			controlSys->pwm1.getIn().getSignal().setValue(0.4);
 // 			pwm1.set(0.2);
-// 			std::cout << "seq_enc: " << enc1.get() << std::endl;
+// 			log.info() << "seq_enc: " << enc1.get() << std::endl;
 		}
 		
 		if(i%50 == 0){
-			std::cout << "reset fqd: " << std::endl;
+			log.info() << "reset fqd: ";
 			hal.callInputFeature("encMot1", "resetFqd");
 		}
 		

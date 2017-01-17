@@ -17,8 +17,7 @@ bool HAL::readConfigFromFile(std::string file) {
 	
 	parser = JsonParser(file);
 	parser.createHalObjects(hwLibraries);
-	// TODO parse file, load necessary modules and delegate creation of the system in- and output objects
-	return false;
+	return true;
 }
 
 bool HAL::loadModule(std::string moduleName) {
@@ -154,7 +153,7 @@ void * HAL::getOutputFeature(std::string name, std::string featureName){
 	return getOutputFeature(outObj, featureName);
 }
 
-void* HAL::getOutputFeature(eeros::hal::OutputInterface * obj, std::string featureName){
+void* HAL::getOutputFeature(OutputInterface * obj, std::string featureName){
 	return dlsym(obj->getLibHandle(), featureName.c_str());
 }
 
@@ -163,6 +162,6 @@ void * HAL::getInputFeature(std::string name, std::string featureName){
 	return getInputFeature(inObj, featureName);
 }
 
-void* HAL::getInputFeature(eeros::hal::InputInterface * obj, std::string featureName){
+void* HAL::getInputFeature(InputInterface * obj, std::string featureName){
 	return dlsym(obj->getLibHandle(), featureName.c_str());
 }

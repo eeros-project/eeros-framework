@@ -29,14 +29,13 @@ void signalHandler(int signum){
 
 int main(){
 	// Create and initialize logger
-	/*StreamLogWriter w(std::cout);
+	StreamLogWriter w(std::cout);
 	Logger<LogWriter>::setDefaultWriter(&w);
 	Logger<LogWriter> log;
 	
 	w.show();
 	
-	log.info() << "ParserTest started...";*/
-	std::cout << "ParserTest started..." << std::endl;
+	log.info() << "ParserTest started...";
   
 	HAL& hal = HAL::instance();
 // 	hal.readConfigFromFile("/mnt/data/config/HALConfigExample.json");
@@ -73,7 +72,7 @@ int main(){
 // 		std::cout << ".";
 // 	}
 	
-	std::cout << "Shuting down..." << std::endl;
+	log.info() << "Shuting down...";
 		
 	return 0;
 }
