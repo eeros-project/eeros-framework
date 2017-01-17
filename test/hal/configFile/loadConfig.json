@@ -1,0 +1,23 @@
+{
+	"device0": {
+		"library": "libflinkcomedi.so",
+		"devHandle": "/dev/comedi0",
+		"subdevice2": {
+			"type": "DigOut",
+			"channel0": {
+				"signalId": "io1"
+			},
+			"channel1": {
+				"signalId": "ioOut"
+			},
+			"channel2": {
+				"type": "DigIn",
+				"signalId": "ioIn"
+			},
+			"channel3": {
+				"signalId": "ioOut4"
+			}
+		}
+	}
+}
+
