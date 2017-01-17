@@ -22,7 +22,7 @@ JsonParser::JsonParser(std::string filePath){
 	
 	halRootObj = ucl::Ucl::parse_from_file(filePath.c_str(), err);
 	if(!err.empty()){
-		throw new eeros::EEROSException(err);
+		throw eeros::EEROSException(err);
 	}
 }
 
@@ -58,7 +58,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 						if(libIt->second == nullptr){
 							libHandles.erase(libIt);
 							std::cout << "could not load library: " << dlerror() << std::endl;
-							throw new eeros::EEROSException("could not load library: " + subO.string_value());
+							throw eeros::EEROSException("could not load library: " + subO.string_value());
 						}
 						else{
 							std::cout << "lib successfully loaded" << std::endl;
@@ -115,7 +115,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 												channelB = chanObj["encChannelB"].int_value();
 												channelZ = chanObj["encChannelZ"].int_value();
 												if(channelA == -1 || channelB == -1){
-													throw new eeros::EEROSException("no channels defined for comedi FQD signalId: '" + sigId + "'" );
+													throw eeros::EEROSException("no channels defined for comedi FQD signalId: '" + sigId + "'" );
 												}
 												createComediFqd(libIt->second, chanType, sigId, devHandle, subDevNumber, channelA, channelB, channelZ, scale, offset, rangeMin, rangeMax, chanUnit);
 												channelCreated = true;
@@ -149,14 +149,12 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										channelCreated = false;
 									}
 									else{
-										std::cout << "no device handle defined for " << subDevParam << std::endl;
-										throw new eeros::EEROSException("no device handle defined for " + subDevParam);
+										throw eeros::EEROSException("no device handle defined for " + subDevParam);
 									}
 								}
 							}
 							else{
-								std::cout << "no library defined for " << subDevParam << std::endl;
-								throw new eeros::EEROSException("no library defined for " + subDevParam);
+								throw eeros::EEROSException("no library defined for " + subDevParam);
 							}
 							// check if end of lib
 							
@@ -184,7 +182,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 		}
 	}
 	else{
-		throw new eeros::EEROSException("No parsed HAL root object");
+		throw eeros::EEROSException("No parsed HAL root object");
 	}
 }
 
@@ -394,7 +392,7 @@ void JsonParser::createLogicObject(void *libHandle, std::string type, std::strin
 	void *createHandle = dlsym(libHandle, createStr.c_str());
 	if(createHandle == nullptr){
 		std::cout << "could not find createMethod: " << dlerror() << std::endl;
-		throw new eeros::EEROSException("could not find method in dynamic library");
+		throw eeros::EEROSException("could not find method in dynamic library");
 	}
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
@@ -428,7 +426,7 @@ void JsonParser::createRealObject(void *libHandle, std::string type, std::string
 	void *createHandle = dlsym(libHandle, createStr.c_str());
 	if(createHandle == nullptr){
 		std::cout << "could not find createMethod: " << dlerror() << std::endl;
-		throw new eeros::EEROSException("could not find method in dynamic library");
+		throw eeros::EEROSException("could not find method in dynamic library");
 	}
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
@@ -462,7 +460,7 @@ void JsonParser::createComediFqd(void *libHandle, std::string type, std::string 
 	void *createHandle = dlsym(libHandle, createStr.c_str());
 	if(createHandle == nullptr){
 		std::cout << "could not find createMethod: " << dlerror() << std::endl;
-		throw new eeros::EEROSException("could not find method in dynamic library");
+		throw eeros::EEROSException("could not find method in dynamic library");
 	}
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){

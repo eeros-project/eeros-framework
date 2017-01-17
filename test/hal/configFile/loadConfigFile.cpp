@@ -8,15 +8,15 @@ using namespace eeros::hal;
 TEST(ConfigFileLoadTest, noFile){
 	HAL& hal = HAL::instance();
 	
-// 	try{
+	try{
 		hal.readConfigFromFile("");
-// 	}
-// 	catch(eeros::EEROSException const & err){
-// 	      EXPECT_EQ(err.what(), std::string("No such file"));
-// 	}
-// 	catch(...){
-// 		FAIL() << "Expected no such file";
-// 	}
+	}
+	catch(eeros::EEROSException const & err){
+	      EXPECT_EQ(err.what(), std::string("cannot open file : No such file or directory"));
+	}
+	catch(const std::exception& e){
+		FAIL() << "unknown exception thrown: load config file";
+	}
 }
 
 TEST(ConfigFileLoadTest, validFile){

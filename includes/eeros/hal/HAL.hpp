@@ -41,7 +41,7 @@ namespace eeros {
 				void (*featureFunction)(eeros::hal::OutputInterface*, ArgTypes...) = reinterpret_cast<void(*)(eeros::hal::OutputInterface*, ArgTypes...)>(getOutputFeature(name, featureName));
 				
 				if(featureFunction == nullptr){
-					throw new eeros::EEROSException("could not find method in dynamic library: " + featureName);
+					throw eeros::EEROSException("could not find method in dynamic library: " + featureName);
 				}
 				auto outObj = outputs[name];			//TODO should we allow that!? or can a user do something bad with a feature Function!?
 				featureFunction(outObj, args...);
@@ -52,7 +52,7 @@ namespace eeros {
 								
 				void (*featureFunction)(eeros::hal::OutputInterface*, ArgTypesObj...) = reinterpret_cast<void(*)(eeros::hal::OutputInterface*, ArgTypesObj...)>(getOutputFeature(obj, featureName));
 				if(featureFunction == nullptr){
-					throw new eeros::EEROSException("could not find method in dynamic library: " + featureName);
+					throw eeros::EEROSException("could not find method in dynamic library: " + featureName);
 				}
 				featureFunction(obj, args...);
 			}
@@ -63,7 +63,7 @@ namespace eeros {
 				void (*featureFunction)(eeros::hal::InputInterface*, ArgTypesStrIn...) = reinterpret_cast<void(*)(eeros::hal::InputInterface*, ArgTypesStrIn...)>(getInputFeature(name, featureName));
 				
 				if(featureFunction == nullptr){
-					throw new eeros::EEROSException("could not find method in dynamic library: " + featureName);
+					throw eeros::EEROSException("could not find method in dynamic library: " + featureName);
 				}
 				auto inObj = inputs[name];			//TODO should we allow that!? or can a user do something bad with a feature Function!?
 				featureFunction(inObj, args...);
@@ -74,7 +74,7 @@ namespace eeros {
 								
 				void (*featureFunction)(eeros::hal::InputInterface*, ArgTypesIn...) = reinterpret_cast<void(*)(eeros::hal::InputInterface*, ArgTypesIn...)>(getInputFeature(obj, featureName));
 				if(featureFunction == nullptr){
-					throw new eeros::EEROSException("could not find method in dynamic library: " + featureName);
+					throw eeros::EEROSException("could not find method in dynamic library: " + featureName);
 				}
 				featureFunction(obj, args...);
 			}
