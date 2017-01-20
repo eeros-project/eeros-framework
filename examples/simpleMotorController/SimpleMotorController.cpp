@@ -41,27 +41,27 @@ using namespace eeros::sequencer;
 
 
 int main() {
-	std::cout << "Simple Motor Controller Demo started..." << std::endl;
-
 	StreamLogWriter w(std::cout);
 	Logger<LogWriter>::setDefaultWriter(&w);
+	Logger<LogWriter> log;
+	w.show();
 	
-	std::cout << "Initializing Hardware..." << std::endl;
+	log.info() << "Simple Motor Controller Demo started...";
+	
+	log.info() << "Initializing Hardware...";
 // 	initHardware();
 	HAL& hal = HAL::instance();
-	hal.readConfigFromFile("/mnt/data/config/HALConfigFlink.json");
+	hal.readConfigFromFile("/opt/hal/config/HalSimpleMotorControllerComedi.json");
 	
 	// Create the control system
 	MyControlSystem controlSys(0.001);
 	
 	// Create and initialize a safety system
 	MySafetyProperties properties(controlSys);
-	if(!properties.verify()) throw -1;
-	SafetySystem safetySys(properties, 0.01);
+	SafetySystem safetySys(properties, 0.001);
 	
-	SequenceA mainSequence("Main Sequence", safetySys, controlSys, 3.14/5);
 	Sequencer sequencer;
-	
+	SequenceA mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/5);
 	sequencer.start(&mainSequence);
 	
 	auto &executor = Executor::instance();
@@ -71,12 +71,13 @@ int main() {
 	
 	sleep(100);
 
+	safetySys.run();
 	sequencer.shutdown();
 	sleep(3);
 	if(sequencer.getState()!=state::terminated) 
 		sequencer.abort();
 	
 	std::cout << "Example finished..." << std::endl;
-	
+	sleep(5);
 	return 0;
 }

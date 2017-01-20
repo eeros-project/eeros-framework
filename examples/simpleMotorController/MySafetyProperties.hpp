@@ -11,16 +11,6 @@ public:
 	MySafetyProperties(MyControlSystem& controlSys);
 	virtual ~MySafetyProperties();
 	
-protected:
-	// critical outputs
-	eeros::hal::Output<bool>* enable;
-	
-	// critical inputs
-	eeros::hal::Input<bool>* emergency;
-	eeros::hal::Input<double>* q;
-		
-	MyControlSystem& controlSys;
-	
 	// Define all possible events
 	eeros::safety::SafetyEvent doSystemOn;
 	eeros::safety::SafetyEvent doSystemOff;
@@ -41,6 +31,17 @@ protected:
 	eeros::safety::SafetyLevel stoppingControl;
 	eeros::safety::SafetyLevel powerOn;
 	eeros::safety::SafetyLevel moving;
+	
+protected:
+	// critical outputs
+	eeros::hal::Output<bool>* enable;
+	
+	// critical inputs
+	eeros::hal::Input<bool>* emergency;
+	eeros::hal::Input<double>* q;
+		
+	MyControlSystem& controlSys;
+	
 };
 
 #endif // MYSAFETYPROPERTIES_HPP_

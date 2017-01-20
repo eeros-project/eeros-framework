@@ -2,7 +2,7 @@
 #include "MyControlSystem.hpp"
 
 #include <eeros/hal/HAL.hpp>
-#include <eeros/safety/inputActions.hpp>
+#include <eeros/safety/InputAction.hpp>
 #include <eeros/safety/OutputAction.hpp>
 
 #include <unistd.h>
@@ -47,9 +47,16 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	
 	// ############ Define critical inputs ############
 	emergency = hal.getLogicInput("emergency");
-	q = hal.getRealInput("q");
 	
-	criticalInputs = { emergency, q };
+	criticalInputs = { emergency };
+	
+	addLevel(off);
+	addLevel(systemOn);
+	addLevel(startingControl);
+	addLevel(stoppingControl);
+	addLevel(powerOn);
+	addLevel(moving);
+	addLevel(emergencyState);
 	
 	off		.addEvent(doSystemOn,                     systemOn,                   kPublicEvent  );
 	systemOn	.addEvent(startControl,                   startingControl,            kPublicEvent  );
@@ -73,6 +80,14 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	powerOn		.setInputActions( { check(emergency, true , doEmergency) });
 	moving		.setInputActions( { check(emergency, true , doEmergency) });
 	
+	off		.setOutputActions( { set(enable, false) } );;
+	emergencyState	.setOutputActions( { set(enable, false) } );;
+	systemOn	.setOutputActions( { set(enable, false) } );;
+	startingControl	.setOutputActions( { set(enable, false) } );;
+	stoppingControl	.setOutputActions( { set(enable, false) } );;
+	powerOn		.setOutputActions( { set(enable, false) } );;
+	moving		.setOutputActions( { set(enable, true) } );;
+	
 	// Define and add level functions
 	off.setLevelAction([&](SafetyContext* privateContext) {
 		privateContext->triggerEvent(doSystemOn);
@@ -83,16 +98,26 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	});
 	
 	startingControl.setLevelAction([&](SafetyContext* privateContext) {
-		controlSys.start();
-		privateContext->triggerEvent(startControlDone);
+		// TODO start controlSys if Executor allows this
+		static int cnt = 0;
+		cnt++;
+		if(cnt > 5000){	// wait 500ms
+			privateContext->triggerEvent(startControlDone);
+		}
 	});
 	
 	stoppingControl.setLevelAction([&](SafetyContext* privateContext) {
-		controlSys.stop();
+		// TODO stop controlSys if Executor allows this
 		privateContext->triggerEvent(stopControlDone);
 	});
 	
 	powerOn.setLevelAction([&](SafetyContext* privateContext) {
+// 		static int cnt = 0;
+// 		cnt++;
+// 		if(cnt > 100){
+// 			cnt = 0;
+// 			std::cout << "[" << "safety" << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue()<< std::endl;
+// 		}
 		privateContext->triggerEvent(startMoving); // TODO read input
 	});
 	

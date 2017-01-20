@@ -7,9 +7,10 @@ MyControlSystem::MyControlSystem(double ts) :
 	setpoint(0.0),
 	setpointV(6),
 	enc("q"),
-	posController(174.5),
-	speedController(565.48),
-//	speedController(0),
+// 	posController(174.5),
+	posController(10),
+// 	speedController(565.48),
+	speedController(100),
 	inertia(14.2e-7),
 	invMotConst(1/15.7e-3 * 2.0),
 	dac("dac"),
@@ -63,7 +64,12 @@ MyControlSystem::MyControlSystem(double ts) :
 	timedomain.addBlock(&invMotConst);
 	timedomain.addBlock(&dac);
 
+	eeros::task::Periodic td("control system",ts, timedomain);
 	eeros::Executor::instance().add(timedomain);
+}
+
+MyControlSystem::~MyControlSystem(){
+	
 }
 
 // void MyControlSystem::start() {
