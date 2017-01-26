@@ -61,7 +61,7 @@ int main() {
 	SafetySystem safetySys(properties, 0.001);
 	
 	Sequencer sequencer;
-	SequenceA mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/5);
+	SequenceA mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/10);
 	sequencer.start(&mainSequence);
 	
 	auto &executor = Executor::instance();

@@ -121,6 +121,10 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 		privateContext->triggerEvent(startMoving); // TODO read input
 	});
 	
+	moving.setLevelAction([&](SafetyContext* privateContext) {
+		// moving
+	});
+	
 	// Define entry level
 	setEntryLevel(off);
 }

@@ -29,7 +29,7 @@ void SequenceA::run() {
 		for(int i = 0; i < 10; i++) {
 			log.info() << "[" << getName() << "] " << "setting angle to " << a;
 			controlSys.setpoint.setValue(a);
-// 			controlSys.dac.getIn().getSignal().setValue(2.5);
+// 			controlSys.dac.getIn().getSignal().setValue(0.5);
 			a += angle;
 			sleep(1);
 			log.info() << "[" << getName() << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
@@ -39,6 +39,7 @@ void SequenceA::run() {
 		sleep(1);
 		log.info() << "[" << getName() << "] " << "setting angle to " << -3.14;
 		controlSys.setpoint.setValue(-3.14);
+// 		controlSys.setpoint.setValue(3.14);
 // 		controlSys.dac.getIn().getSignal().setValue(-2.5);
 			
 		sleep(1);

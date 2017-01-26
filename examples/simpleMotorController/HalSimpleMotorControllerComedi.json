@@ -21,12 +21,17 @@
 				"signalId": "dac",
 				"scale": [ { "id" : "dac",
 								"minIn": 	0, 	"maxIn": 	65535,
-								"minOut": 	-10.0, "maxOut": 	10.0 }
+								"minOut": 	-10.0, "maxOut": 	10.0 },
+					   { "id" : "drive",
+								"minIn": 	-10.0, 	"maxIn": 	10.0,
+								"minOut":	-13.5, 	"maxOut": 	13.5 },
 					 ],
 				"range": [ { "id" : "dac",
 							"minIn":	0,  	"maxIn": 	65536,
-							"minOut":	-10.0,	"maxOut": 	10.0 
-										  }
+							"minOut":	-10.0,	"maxOut": 	10.0 },
+					   { "id" : "drive",
+								"minIn": 	-10.0, 	"maxIn": 	10.0,
+								"minOut":	-13.5, 	"maxOut": 	13.5 },
 					 ],
 				"unit": "V"
 			}

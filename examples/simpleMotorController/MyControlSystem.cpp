@@ -7,12 +7,10 @@ MyControlSystem::MyControlSystem(double ts) :
 	setpoint(0.0),
 	setpointV(6),
 	enc("q"),
-// 	posController(174.5),
-	posController(10),
-// 	speedController(565.48),
-	speedController(100),
-	inertia(14.2e-7),
-	invMotConst(1/15.7e-3 * 2.0),
+	posController(174.5),
+	speedController(565.48),
+	inertia(9.49e-7),
+	invMotConst(1/16.3e-3),
 	dac("dac"),
 	timedomain("Main time domain", ts, true) {
 	
@@ -54,7 +52,8 @@ MyControlSystem::MyControlSystem(double ts) :
 	
 	timedomain.addBlock(&setpoint);
 // 	timedomain.addBlock(&setpointV);
-//	timedomain.addBlock(&diff2);
+	timedomain.addBlock(&diff2);
+	timedomain.addBlock(&diff1);
 	timedomain.addBlock(&enc);
 	timedomain.addBlock(&sum1);
 	timedomain.addBlock(&posController);
@@ -71,11 +70,3 @@ MyControlSystem::MyControlSystem(double ts) :
 MyControlSystem::~MyControlSystem(){
 	
 }
-
-// void MyControlSystem::start() {
-// 	timedomain.start();
-// }
-// 
-// void MyControlSystem::stop() {
-// 	timedomain.stop();
-// }
