@@ -12,7 +12,7 @@ public:
 	SequenceA(std::string name, eeros::sequencer::Sequencer& sequencer, eeros::safety::SafetySystem& safetySys, MySafetyProperties& properties, MyControlSystem& controlSys, double angle);
 	
 	virtual bool checkPreCondition();
-// 	virtual bool checkPostCondition();
+	virtual bool checkPostCondition();
 	
 	virtual void run();
 	virtual void exit();

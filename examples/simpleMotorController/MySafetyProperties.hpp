@@ -21,7 +21,8 @@ public:
 	eeros::safety::SafetyEvent startMoving;
 	eeros::safety::SafetyEvent stopMoving;
 	eeros::safety::SafetyEvent doEmergency;
-	eeros::safety::SafetyEvent resetEmergency;
+	eeros::safety::SafetyEvent resetEmergency;	
+	eeros::safety::SafetyEvent abort;
 	
 	// Name all levels
 	eeros::safety::SafetyLevel off;

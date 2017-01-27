@@ -4,6 +4,7 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/safety/InputAction.hpp>
 #include <eeros/safety/OutputAction.hpp>
+#include <eeros/core/Executor.hpp>
 
 #include <unistd.h>
 #include <iostream>
@@ -34,7 +35,8 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	startMoving("Start moving"),
 	stopMoving("Stop moving"),
 	doEmergency("Emergency"),
-	resetEmergency("Reset emergency")
+	resetEmergency("Reset emergency"),
+	abort("abort")
 	
 	{
 	
@@ -62,7 +64,7 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	systemOn	.addEvent(startControl,                   startingControl,            kPublicEvent  );
 	systemOn	.addEvent(doSystemOff,                    off,                        kPublicEvent  );
 	startingControl	.addEvent(startControlDone,               powerOn,                    kPrivateEvent );
-	stoppingControl	.addEvent(stopControlDone,                systemOn,                   kPrivateEvent );
+	stoppingControl	.addEvent(stopControlDone,                off,                   kPrivateEvent );
 	powerOn		.addEvent(startMoving,                    moving,                     kPublicEvent  );
 	powerOn		.addEvent(stopControl,                    powerOn,                    kPublicEvent  );
 	moving		.addEvent(stopMoving,                     powerOn,                    kPublicEvent  );
@@ -70,6 +72,7 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	
 	// Add events to multiple levels
 	addEventToLevelAndAbove(systemOn, doEmergency, emergencyState, kPublicEvent);
+	addEventToLevelAndAbove(startingControl, abort, stoppingControl, kPublicEvent);
 		
 	// ############ Define input states and events for all levels ############
 	off		.setInputActions( { ignore(emergency) });
@@ -90,7 +93,7 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	
 	// Define and add level functions
 	off.setLevelAction([&](SafetyContext* privateContext) {
-		privateContext->triggerEvent(doSystemOn);
+		Executor::stop();
 	});
 	
 	systemOn.setLevelAction([&](SafetyContext* privateContext) {
@@ -127,6 +130,11 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	
 	// Define entry level
 	setEntryLevel(off);
+	
+	exitFunction = ([&](SafetyContext* privateContext){
+		privateContext->triggerEvent(abort);
+	});
+	
 }
 
 MySafetyProperties::~MySafetyProperties() {

@@ -15,7 +15,6 @@ SequenceA::SequenceA(std::string name, eeros::sequencer::Sequencer& sequencer, S
 
 void SequenceA::run() {
 	log.info() << "[" + getName() + " started]";
-	std::cout << "sequence run" << std::endl;
 	
 	while(safetySys.getCurrentLevel() < safetyProp.moving){
 		if(isTerminating()) break;
@@ -25,46 +24,41 @@ void SequenceA::run() {
 	
 	while(!isTerminating()){
 		double a = 0;
-		sleep(5);
-		for(int i = 0; i < 10; i++) {
+		for(int i = 0; (i < 10) && (!isTerminating()) ; i++) {
 			log.info() << "[" << getName() << "] " << "setting angle to " << a;
 			controlSys.setpoint.setValue(a);
-// 			controlSys.dac.getIn().getSignal().setValue(0.5);
 			a += angle;
 			sleep(1);
 			log.info() << "[" << getName() << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
 			sleep(1);
 		}
 		
-		sleep(1);
-		log.info() << "[" << getName() << "] " << "setting angle to " << -3.14;
-		controlSys.setpoint.setValue(-3.14);
-// 		controlSys.setpoint.setValue(3.14);
-// 		controlSys.dac.getIn().getSignal().setValue(-2.5);
-			
-		sleep(1);
-		log.info() << "[" << getName() << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
-		sleep(1);
+		if(!isTerminating()){
+			sleep(1);
+			log.info() << "[" << getName() << "] " << "setting angle to " << -3.14;
+			controlSys.setpoint.setValue(-3.14);
+				
+			sleep(1);
+			log.info() << "[" << getName() << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
+			sleep(1);
+		}
 	}
 }
 
-bool SequenceA::isTerminating() {
+inline bool SequenceA::isTerminating() {
 	return sequencer->getState() == state::terminating;
 }
 
 void SequenceA::exit() {
-	log.info() << "[" << getName() << "] " << "Exit started...";
-	safetySys.triggerEvent(safetyProp.stopMoving);
-	sleep(1);
-	log.info() << "[" << getName() << "] " << "Exit done!";
+	log.info() << "[" << getName() << "] " << "Exit done.";
 }
 
 bool SequenceA::checkPreCondition() {
-// 	return safetySys.getCurrentLevel() >= safetyProp.moving;
+	log.info() << "[" << getName() << "] " << "Checking precondition...";
 	return true;
 }
 
-// bool SequenceA::checkPostCondition() {
-// 	log.info() << "[" << getName() << "] " << "Checking postcondition...";
-// 	return true;
-// }
+bool SequenceA::checkPostCondition() {
+	log.info() << "[" << getName() << "] " << "Checking postcondition...";
+	return true;
+}

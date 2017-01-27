@@ -3,6 +3,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include <eeros/hal/HAL.hpp>
 // #include <eeros/hal/ComediFqd.hpp>
@@ -39,8 +40,15 @@ using namespace eeros::sequencer;
 // 	hal.addOutput(new ComediDac("dac", comedi0, 1, 0));
 // }
 
+void signalHandler(int signum){
+	SafetySystem::exitHandler();
+}
 
 int main() {
+	signal(SIGINT, signalHandler);
+	signal(SIGKILL, signalHandler);
+	signal(SIGTERM, signalHandler);
+	
 	StreamLogWriter w(std::cout);
 	Logger<LogWriter>::setDefaultWriter(&w);
 	Logger<LogWriter> log;
@@ -49,7 +57,6 @@ int main() {
 	log.info() << "Simple Motor Controller Demo started...";
 	
 	log.info() << "Initializing Hardware...";
-// 	initHardware();
 	HAL& hal = HAL::instance();
 	hal.readConfigFromFile("/opt/hal/config/HalSimpleMotorControllerComedi.json");
 	
@@ -66,18 +73,19 @@ int main() {
 	
 	auto &executor = Executor::instance();
 	executor.setMainTask(safetySys);
+	safetySys.triggerEvent(properties.doSystemOn);
 	
 	executor.run();
 	
-	sleep(100);
-
-	safetySys.run();
-	sequencer.shutdown();
-	sleep(3);
-	if(sequencer.getState()!=state::terminated) 
-		sequencer.abort();
+	
+	while(sequencer.getState()!=state::terminated) {
+		sequencer.shutdown();
+	
+		sleep(3);
+	}
+	
+	sequencer.abort();
 	
 	std::cout << "Example finished..." << std::endl;
-	sleep(5);
 	return 0;
 }

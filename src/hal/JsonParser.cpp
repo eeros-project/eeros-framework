@@ -16,10 +16,10 @@ using namespace eeros;
 using namespace eeros::hal;
 
 JsonParser::JsonParser() :
-	log('P') { 
+	log('H') { 
 }
 
-JsonParser::JsonParser(std::string filePath) : log('P') {
+JsonParser::JsonParser(std::string filePath) : log('H') {
 	std::string err;
 	
 	log.trace() << "parsing config file from path: '" + filePath + "'";
