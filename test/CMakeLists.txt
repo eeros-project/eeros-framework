@@ -5,7 +5,9 @@ include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR} ${EEROS_SOU
 
 set(TEST_DATA_DIR ${CMAKE_SOURCE_DIR}/test/data)
 
-# load googletest
+##########################
+# load and add googletest
+##########################
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in ${EEROS_BINARY_DIR}/test/googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
@@ -39,8 +41,9 @@ endif()
 
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "googletest-download" "googletest-src" "googletest-build")
 
-# Framework components
-
+#######################
+# EEROS test sources
+#######################
 
 macro(add_eeros_test_sources)
     file(RELATIVE_PATH _relPath "${PROJECT_SOURCE_DIR}/test" "${CMAKE_CURRENT_SOURCE_DIR}")
