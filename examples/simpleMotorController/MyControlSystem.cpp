@@ -5,7 +5,6 @@ using namespace eeros::control;
 
 MyControlSystem::MyControlSystem(double ts) : 
 	setpoint(0.0),
-	setpointV(6),
 	enc("q"),
 	posController(174.5),
 	speedController(565.48),
@@ -41,17 +40,14 @@ MyControlSystem::MyControlSystem(double ts) :
 	posController.getIn().connect(sum1.getOut());
 	diff2.getIn().connect(setpoint.getOut());
 	sum2.getIn(0).connect(posController.getOut());
-// 	sum2.getIn(0).connect(setpointV.getOut());
 	sum2.getIn(1).connect(diff1.getOut());
 	sum2.getIn(2).connect(diff2.getOut());
 	speedController.getIn().connect(sum2.getOut());
 	inertia.getIn().connect(speedController.getOut());
 	invMotConst.getIn().connect(inertia.getOut());
 	dac.getIn().connect(invMotConst.getOut());
-// 	dac.getIn().connect(setpointV.getOut());
 	
 	timedomain.addBlock(&setpoint);
-// 	timedomain.addBlock(&setpointV);
 	timedomain.addBlock(&diff2);
 	timedomain.addBlock(&diff1);
 	timedomain.addBlock(&enc);

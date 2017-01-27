@@ -15,11 +15,7 @@ public:
 	MyControlSystem(double ts);
 	~MyControlSystem();
 	
-// 	void start();
-// 	void stop();
-	
 	eeros::control::Constant<> setpoint;
-	eeros::control::Constant<> setpointV;
 	eeros::control::PeripheralInput<double> enc;
 	eeros::control::D<> diff1;
 	eeros::control::Sum<2> sum1;

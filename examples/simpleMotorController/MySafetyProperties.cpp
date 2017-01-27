@@ -115,12 +115,6 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	});
 	
 	powerOn.setLevelAction([&](SafetyContext* privateContext) {
-// 		static int cnt = 0;
-// 		cnt++;
-// 		if(cnt > 100){
-// 			cnt = 0;
-// 			std::cout << "[" << "safety" << "] " << "enc =  " << controlSys.enc.getOut().getSignal().getValue()<< std::endl;
-// 		}
 		privateContext->triggerEvent(startMoving); // TODO read input
 	});
 	
