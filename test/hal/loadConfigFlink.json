@@ -1,0 +1,23 @@
+{
+	"device0": {
+		"library": "libflinkeeros.so",
+		"devHandle": "/dev/flink0",
+		"subdevice2": {
+			"type": "DigOut",
+			"channel0": {
+				"signalId": "io1"
+			},
+			"channel1": {
+				"signalId": "ioOut"
+			},
+			"channel2": {
+				"type": "DigIn",
+				"signalId": "ioIn"
+			},
+			"channel3": {
+				"signalId": "ioOut4"
+			}
+		}
+	}
+}
+

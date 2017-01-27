@@ -1,7 +1,7 @@
 
 ##### UNIT TESTS #####
 
-include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR})
+include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR} ${EEROS_SOURCE_DIR}/test)
 
 set(TEST_DATA_DIR ${CMAKE_SOURCE_DIR}/test/data)
 
@@ -65,8 +65,14 @@ add_subdirectory(hal)
 
 add_eeros_test_sources(RunAllTests.cpp)
 
-add_custom_command(OUTPUT copyConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/test/hal/loadConfig.json" "${EEROS_BINARY_DIR}/test/")
-
-add_executable(unitTests ${EEROS_TEST_SRCS} copyConfig)
+add_executable(unitTests ${EEROS_TEST_SRCS})
 target_link_libraries(unitTests ${EXTERNAL_LIBS} eeros dl gtest_main)
 add_test(NAME eeros_unit_tests COMMAND unitTests)
+
+set( HAL_CONFIG_FILES
+      ${EEROS_SOURCE_DIR}/test/hal/loadConfigComedi.json
+      ${EEROS_SOURCE_DIR}/test/hal/loadConfigFlink.json)
+      
+foreach( halConfig_i ${HAL_CONFIG_FILES})
+          add_custom_command(TARGET unitTests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${halConfig_i} "${EEROS_BINARY_DIR}/test/")
+endforeach( halConfig_i )
