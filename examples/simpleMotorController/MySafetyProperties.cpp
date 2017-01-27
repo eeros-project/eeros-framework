@@ -104,7 +104,7 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 		// TODO start controlSys if Executor allows this
 		static int cnt = 0;
 		cnt++;
-		if(cnt > 5000){	// wait 500ms
+		if(cnt > 500){	// wait 500ms
 			privateContext->triggerEvent(startControlDone);
 		}
 	});

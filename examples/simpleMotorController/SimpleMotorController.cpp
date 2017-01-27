@@ -86,6 +86,6 @@ int main() {
 	
 	sequencer.abort();
 	
-	std::cout << "Example finished..." << std::endl;
+	log.info() << "Example finished...";
 	return 0;
 }
