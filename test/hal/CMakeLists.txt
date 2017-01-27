@@ -1,3 +1,2 @@
-
-add_subdirectory(configFile)
+add_eeros_test_sources(loadConfigFile.cpp)
 

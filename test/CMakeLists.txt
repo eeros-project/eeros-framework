@@ -41,8 +41,32 @@ set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "googletest-d
 
 # Framework components
 
+
+macro(add_eeros_test_sources)
+    file(RELATIVE_PATH _relPath "${PROJECT_SOURCE_DIR}/test" "${CMAKE_CURRENT_SOURCE_DIR}")
+    foreach(_test ${ARGN})
+        if(_relPath)
+            list(APPEND EEROS_TEST_SRCS "${_relPath}/${_test}")
+        else()
+            list(APPEND EEROS_TEST_SRCS "${_test}")
+        endif()
+    endforeach()
+    if(_relPath)
+        # propagate EEROS_TEST_SRCS to parent directory
+        set(EEROS_TEST_SRCS ${EEROS_TEST_SRCS} PARENT_SCOPE)
+    endif()
+endmacro()
+
 #add_subdirectory(core)
 #add_subdirectory(math)
 #add_subdirectory(control)
 #add_subdirectory(safety)
 add_subdirectory(hal)
+
+add_eeros_test_sources(RunAllTests.cpp)
+
+add_custom_command(OUTPUT copyConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/test/hal/loadConfig.json" "${EEROS_BINARY_DIR}/test/")
+
+add_executable(unitTests ${EEROS_TEST_SRCS} copyConfig)
+target_link_libraries(unitTests ${EXTERNAL_LIBS} eeros dl gtest_main)
+add_test(NAME eeros_unit_tests COMMAND unitTests)

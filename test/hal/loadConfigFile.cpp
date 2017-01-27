@@ -5,7 +5,7 @@
 using namespace eeros;
 using namespace eeros::hal;
 
-TEST(ConfigFileLoadTest, noFile){
+TEST(hal_ConfigFileLoadTest, noFile){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -19,7 +19,7 @@ TEST(ConfigFileLoadTest, noFile){
 	}
 }
 
-TEST(ConfigFileLoadTest, validFile){
+TEST(hal_ConfigFileLoadTest, validFile){
 	HAL& hal = HAL::instance();
 	try{
 		hal.readConfigFromFile("loadConfig.json");
@@ -31,14 +31,4 @@ TEST(ConfigFileLoadTest, validFile){
 		FAIL();
 	}
 	SUCCEED();
-}
-
-
-int main(int argc, char **argv){
-
-	::testing::InitGoogleTest(&argc, argv);
-	
-	return RUN_ALL_TESTS();
-  
-	
 }
