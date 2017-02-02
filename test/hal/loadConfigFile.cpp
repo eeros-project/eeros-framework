@@ -20,24 +20,3 @@ TEST(hal_ConfigFileLoadTest, noFile){
 	}
 }
 
-TEST(hal_ConfigFileLoadTest, validFile){
-	HAL& hal = HAL::instance();
-	try{
-		if(libcomedi){
-			hal.readConfigFromFile("loadConfigComedi.json");
-		}
-		else if(libflink){
-			hal.readConfigFromFile("loadConfigFlink.json");
-		}
-		else{
-			FAIL();
-		}
-	}
-	catch(eeros::EEROSException const & err){
-		FAIL() << err.what();
-	}
-	catch(...){
-		FAIL();
-	}
-	SUCCEED();
-}

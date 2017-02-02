@@ -10,7 +10,7 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/hal/HALFeatures.hpp>
 #include <stdexcept>
-#include <ucl.h>
+#include <ucl++.h>
 
 using namespace eeros;
 using namespace eeros::hal;
@@ -24,7 +24,9 @@ JsonParser::JsonParser(std::string filePath) : log('H') {
 	
 	log.trace() << "parsing config file from path: '" + filePath + "'";
 	
-	halRootObj = ucl::Ucl::parse_from_file(filePath.c_str(), err);
+	std::map<std::string, std::string> vars = {{"duplicate", "error"}};
+	
+	halRootObj = ucl::Ucl::parse_from_file(filePath.c_str() , vars, err);
 	if(!err.empty()){
 		throw eeros::EEROSException(err);
 	}

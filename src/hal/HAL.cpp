@@ -33,7 +33,7 @@ bool HAL::addInput(InputInterface* systemInput) {
 		inputs.insert(std::pair<std::string, InputInterface*>(systemInput->getId(), systemInput));
 		return true;
 	}
-	return false;
+	throw EEROSException("System input is null");
 }
 bool HAL::addOutput(OutputInterface* systemOutput) {
 	if(systemOutput != nullptr) {
@@ -43,7 +43,7 @@ bool HAL::addOutput(OutputInterface* systemOutput) {
 		outputs.insert(std::pair<std::string, OutputInterface*>(systemOutput->getId(), systemOutput));
 		return true;
 	}
-	return false;
+	throw EEROSException("System output is null");
 }
 
 OutputInterface* HAL::getOutput(std::string name, bool exclusive) {

@@ -18,8 +18,6 @@ using namespace eeros::hal;
 using namespace eeros::safety;
 using namespace eeros::sequencer;
 
-#define LIBCOMEDI 1
-
 volatile bool running = true;
 const double dt = 0.001;
 

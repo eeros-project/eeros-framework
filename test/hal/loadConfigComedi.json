@@ -10,12 +10,42 @@
 			"channel1": {
 				"signalId": "ioOut"
 			},
+			"channel1": {
+				"signalId": "ioOut"
+			},
 			"channel2": {
 				"type": "DigIn",
 				"signalId": "ioIn"
 			},
 			"channel3": {
 				"signalId": "ioOut4"
+			}
+		},
+		"subdevice1": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "dac1",
+				"scale": [ { "id" : "dac",
+								"minIn": 	0, 	"maxIn": 	65535,
+								"minOut": 	-10.0, "maxOut": 	10.0 },
+					   { "id" : "test",
+								"minIn": 	-5.0, 	"maxIn": 	5.0,
+								"minOut":	-10.0, 	"maxOut": 	10.0 },
+					   { "id" : "direct",
+								"scale":	0.5,
+								"offset": 	0.0 }
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn": 	0, 	"maxIn": 	65535,
+							"minOut": 	-10.0, 	"maxOut": 	10.0 },
+					   { "id" : "test",
+							"minIn": 	-5.0, 	"maxIn": 	5.0,
+							"minOut": 	-10.0, 	"maxOut": 	10.0 },
+					   { "id" : "direct",
+							"minIn":	-10.0,  "maxIn": 	10.0,
+							"minOut":	-10.0,	"maxOut": 	10.0 }
+					 ],
+				"unit": "V"
 			}
 		}
 	}

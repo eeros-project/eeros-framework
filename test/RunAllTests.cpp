@@ -2,6 +2,7 @@
 
 #include <getopt.h>
 #include <TestVariables.hpp>
+#include <EerosEnvironment.hpp>
 #include <eeros/core/EEROSException.hpp>
 
 /**
@@ -15,6 +16,8 @@
 
 bool libcomedi = false;
 bool libflink = false;
+
+using namespace eeros::test;
 
 int main(int argc, char **argv){
 
@@ -72,6 +75,8 @@ int main(int argc, char **argv){
 	delete [] rArray;
 	
 	// init googleTest and run
+	testing::Environment* const eeros_env = testing::AddGlobalTestEnvironment(new EerosEnvironment);
+	
 	::testing::InitGoogleTest(&argc, argv);
 		
 	return RUN_ALL_TESTS();

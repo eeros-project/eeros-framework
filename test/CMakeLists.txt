@@ -67,6 +67,7 @@ endmacro()
 add_subdirectory(hal)
 
 add_eeros_test_sources(RunAllTests.cpp)
+add_eeros_test_sources(EerosEnvironment.cpp)
 
 add_executable(unitTests ${EEROS_TEST_SRCS})
 target_link_libraries(unitTests ${EXTERNAL_LIBS} eeros dl gtest_main)
