@@ -16,9 +16,6 @@
 			},
 			"channel3": {
 				"signalId": "ioOut4"
-			},
-			"channel0": {
-				"signalId": "io1"
 			}
 		},
 		"subdevice1": {

@@ -10,9 +10,6 @@
 			"channel1": {
 				"signalId": "ioOut"
 			},
-			"channel1": {
-				"signalId": "ioOut"
-			},
 			"channel2": {
 				"type": "DigIn",
 				"signalId": "ioIn"

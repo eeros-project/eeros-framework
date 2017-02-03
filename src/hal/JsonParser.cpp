@@ -24,9 +24,7 @@ JsonParser::JsonParser(std::string filePath) : log('H') {
 	
 	log.trace() << "parsing config file from path: '" + filePath + "'";
 	
-	std::map<std::string, std::string> vars = {{"duplicate", "error"}};
-	
-	halRootObj = ucl::Ucl::parse_from_file(filePath.c_str() , vars, err);
+	halRootObj = ucl::Ucl::parse_from_file_strategy(filePath.c_str(), UCL_DUPLICATE_ERROR, err);
 	if(!err.empty()){
 		throw eeros::EEROSException(err);
 	}
