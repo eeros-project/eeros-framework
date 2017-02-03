@@ -46,6 +46,42 @@ bool HAL::addOutput(OutputInterface* systemOutput) {
 	throw EEROSException("System output is null");
 }
 
+void HAL::releaseInput(std::string name) {
+	bool found = false;
+	auto inIt = nonExclusiveInputs.find(inputs[name]);
+	if(inIt != nonExclusiveInputs.end()){
+		nonExclusiveInputs.erase(inIt);
+		found = true;
+	}
+	  
+	inIt = exclusiveReservedInputs.find(inputs[name]);
+	if(inIt != exclusiveReservedInputs.end()){
+		exclusiveReservedInputs.erase(inIt);
+		found = true;
+	}
+	if(!found){
+		throw EEROSException("Could not release system input '" + name + "', id not found.");
+	}
+}
+
+void HAL::releaseOutput(std::string name) {
+	bool found = false;
+	auto outIt = nonExclusiveOutputs.find(outputs[name]);
+	if(outIt != nonExclusiveOutputs.end()){
+		nonExclusiveOutputs.erase(outIt);
+		found = true;
+	}
+	
+	outIt = exclusiveReservedOutputs.find(outputs[name]);
+	if(outIt != exclusiveReservedOutputs.end()){
+		exclusiveReservedOutputs.erase(outIt);
+		found = true;
+	}
+	if(!found){
+		throw EEROSException("Could not release system output '" + name + "', id not found.");
+	}
+}
+
 OutputInterface* HAL::getOutput(std::string name, bool exclusive) {
 	if( exclusiveReservedOutputs.find(outputs[name]) != exclusiveReservedOutputs.end() ) throw EEROSException("System output '" + name + "' is exclusive reserved!");
 	

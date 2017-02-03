@@ -22,6 +22,8 @@ namespace eeros {
 			InputInterface* getInput(std::string name, bool exclusive = true);
 			Input<bool>* getLogicInput(std::string name, bool exclusive = true);
 			Input<double>* getRealInput(std::string name, bool exclusive = true);
+			void releaseInput(std::string name);
+			void releaseOutput(std::string name);
 			
 			bool addInput(InputInterface* systemInput);
 			bool addOutput(OutputInterface* systemOutput);
@@ -29,12 +31,7 @@ namespace eeros {
 			bool readConfigFromFile(std::string file);
 			
 			static HAL& instance();
-			
-			void* getOutputFeature(std::string name, std::string featureName);
-			void* getOutputFeature(OutputInterface * obj, std::string featureName);
-			void* getInputFeature(std::string name, std::string featureName);
-			void* getInputFeature(InputInterface * obj, std::string featureName);
-			
+						
 			template<typename ... ArgTypes>
 			void callOutputFeature(std::string name, std::string featureName, ArgTypes... args){
 				
@@ -85,6 +82,11 @@ namespace eeros {
 			HAL& operator=(const HAL&);
 			
 			bool loadModule(std::string moduleName);
+			
+			void* getOutputFeature(std::string name, std::string featureName);
+			void* getOutputFeature(OutputInterface * obj, std::string featureName);
+			void* getInputFeature(std::string name, std::string featureName);
+			void* getInputFeature(InputInterface * obj, std::string featureName);
 			
 			std::unordered_set<OutputInterface*> exclusiveReservedOutputs;
 			std::unordered_set<OutputInterface*> nonExclusiveOutputs;
