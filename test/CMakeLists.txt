@@ -68,6 +68,7 @@ add_subdirectory(hal)
 
 add_eeros_test_sources(RunAllTests.cpp)
 add_eeros_test_sources(EerosEnvironment.cpp)
+add_eeros_test_sources(EerosEnvironmentInvalidConfig.cpp)
 
 add_executable(unitTests ${EEROS_TEST_SRCS})
 target_link_libraries(unitTests ${EXTERNAL_LIBS} eeros dl gtest_main)
@@ -75,7 +76,11 @@ add_test(NAME eeros_unit_tests COMMAND unitTests)
 
 set( HAL_CONFIG_FILES
       ${EEROS_SOURCE_DIR}/test/hal/loadConfigComedi.json
-      ${EEROS_SOURCE_DIR}/test/hal/loadConfigFlink.json)
+      ${EEROS_SOURCE_DIR}/test/hal/invalidScaleComedi.json
+      ${EEROS_SOURCE_DIR}/test/hal/invalidChannelComedi.json
+      ${EEROS_SOURCE_DIR}/test/hal/loadConfigFlink.json
+      ${EEROS_SOURCE_DIR}/test/hal/invalidScaleFlink.json
+      ${EEROS_SOURCE_DIR}/test/hal/invalidChannelFlink.json)
       
 foreach( halConfig_i ${HAL_CONFIG_FILES})
           add_custom_command(TARGET unitTests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${halConfig_i} "${EEROS_BINARY_DIR}/test/")

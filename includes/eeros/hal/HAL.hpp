@@ -6,6 +6,8 @@
 #include <unordered_set>
 #include <eeros/hal/Input.hpp>
 #include <eeros/hal/Output.hpp>
+#include <eeros/hal/ScalableOutput.hpp>
+#include <eeros/hal/ScalableInput.hpp>
 #include <eeros/hal/JsonParser.hpp>
 #include <eeros/core/EEROSException.hpp>
 #include <iostream>
@@ -18,10 +20,10 @@ namespace eeros {
 		public:
 			OutputInterface* getOutput(std::string name, bool exclusive = true);
 			Output<bool>* getLogicOutput(std::string name, bool exclusive = true);
-			Output<double>* getRealOutput(std::string name, bool exclusive = true);
+			ScalableOutput<double>* getRealOutput(std::string name, bool exclusive = true);
 			InputInterface* getInput(std::string name, bool exclusive = true);
 			Input<bool>* getLogicInput(std::string name, bool exclusive = true);
-			Input<double>* getRealInput(std::string name, bool exclusive = true);
+			ScalableInput<double>* getRealInput(std::string name, bool exclusive = true);
 			void releaseInput(std::string name);
 			void releaseOutput(std::string name);
 			

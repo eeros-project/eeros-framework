@@ -322,7 +322,7 @@ void JsonParser::calcScale(ucl::Ucl obj, double *scale, double *offset, double *
 			}
 		}
 		if( !std::isfinite(*scale) || !std::isfinite(*offset) ){
-			throw EEROSException("config for scale is invalid, id: " + id);
+			throw EEROSException("config of scale is invalid, id: '" + id + "'");
 		}
 		
 		setScaleDirect = false;

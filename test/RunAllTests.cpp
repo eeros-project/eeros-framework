@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include <TestVariables.hpp>
 #include <EerosEnvironment.hpp>
+#include <EerosEnvironmentInvalidConfig.hpp>
 #include <eeros/core/EEROSException.hpp>
 
 /**
@@ -75,6 +76,11 @@ int main(int argc, char **argv){
 	delete [] rArray;
 	
 	// init googleTest and run
+	
+	// environment with invalid config for tests
+	testing::Environment* const eeros_env_invalid = testing::AddGlobalTestEnvironment(new EerosEnvironmentInvalidConfig);
+	
+	// environment with valid config for tests
 	testing::Environment* const eeros_env = testing::AddGlobalTestEnvironment(new EerosEnvironment);
 	
 	::testing::InitGoogleTest(&argc, argv);

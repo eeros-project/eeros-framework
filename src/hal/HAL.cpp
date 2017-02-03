@@ -115,8 +115,8 @@ Output<bool>* HAL::getLogicOutput(std::string name, bool exclusive) {
 	return out;
 }
 
-Output<double>* HAL::getRealOutput(std::string name, bool exclusive) {
-	Output<double>* out = dynamic_cast<Output<double>*>(outputs[name]);
+ScalableOutput<double>* HAL::getRealOutput(std::string name, bool exclusive) {
+	ScalableOutput<double>* out = dynamic_cast<ScalableOutput<double>*>(outputs[name]);
 	if(out == nullptr) throw EEROSException("Real system output '" + name + "' not found!");
 	
 	if( exclusiveReservedOutputs.find(outputs[name]) != exclusiveReservedOutputs.end() ) throw EEROSException("Real system output '" + name + "' is exclusive reserved!");
@@ -166,8 +166,8 @@ Input<bool>* HAL::getLogicInput(std::string name, bool exclusive) {
 	return in;
 }
 
-Input<double>* HAL::getRealInput(std::string name, bool exclusive) {
-	Input<double>* in = dynamic_cast<Input<double>*>(inputs[name]);
+ScalableInput<double>* HAL::getRealInput(std::string name, bool exclusive) {
+	ScalableInput<double>* in = dynamic_cast<ScalableInput<double>*>(inputs[name]);
 	if(in == nullptr) throw EEROSException("Real system input '" + name + "' not found!");
 	
 	if( exclusiveReservedInputs.find(inputs[name]) != exclusiveReservedInputs.end() ) throw EEROSException("Real system input '" + name + "' is exclusive reserved!");
