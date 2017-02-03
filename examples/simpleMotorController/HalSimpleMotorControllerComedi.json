@@ -7,11 +7,9 @@
 			"channel1": {
 				"signalId": "emergency",
 				"inverted": true
-			}
-		},
-		"subdevice2": {
-			"type": "DigOut",
+			},
 			"channel0": {
+				"type":	    "DigOut",
 				"signalId": "enable",
 			}
 		},
