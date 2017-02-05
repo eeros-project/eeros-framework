@@ -176,9 +176,9 @@ int main(int argc, char* argv[]) {
 	
 	// Create and initialize logger
 	SysLogWriter w("Simple Sequencer Example");
-	Logger<LogWriter>::setDefaultWriter(&w);
-	Logger<LogWriter> log;
-	if(verbose) w.show(~0);
+	Logger::setDefaultWriter(&w);
+	Logger log;
+	if(verbose) w.show(LogLevel::TRACE);
 	
 	log.info() << "Simple Sequencer Example started...";
 	

@@ -2,8 +2,8 @@
 #define ORG_EEROS_LOGGER_SYSLOGWRITER_HPP_
 
 #include <eeros/logger/LogWriter.hpp>
+#include <eeros/logger/Logger.hpp>
 #include <sstream>
-#include <mutex>
 
 namespace eeros {
 	namespace logger {
@@ -12,27 +12,15 @@ namespace eeros {
 			SysLogWriter(const std::string name);
 			virtual ~SysLogWriter();
 			
-			virtual void show(unsigned level = ~0);
-			
-			virtual void begin(unsigned level, unsigned category);
-			virtual void end();
-			
-			virtual void endl();
-			
-			virtual LogWriter& operator<<(int value);
-			virtual LogWriter& operator<<(unsigned int value);
-			virtual LogWriter& operator<<(long value);
-			virtual LogWriter& operator<<(double value);
-			virtual LogWriter& operator<<(const std::string& value);
-			virtual LogWriter& operator<<(void (*f)(LogWriter&));
-			
+			virtual void show(LogLevel level = LogLevel::TRACE);	
+			virtual void begin(std::ostringstream& os, LogLevel level, unsigned category);
+			virtual void end(std::ostringstream& os);
+			virtual void endl(std::ostringstream& os);
+						
 		private:
 			std::string name;
-			std::ostringstream out;
-			unsigned level;
-			std::mutex mtx;
-			std::unique_lock<std::mutex> lck;
-			unsigned visibleLevel;
+			LogLevel level;
+			LogLevel visibleLevel;
 			bool enabled;
 		};
 	}

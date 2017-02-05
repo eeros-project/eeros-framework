@@ -20,7 +20,7 @@ using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;
 namespace {
-	using Logger = eeros::logger::Logger<eeros::logger::LogWriter>;
+	using Logger = eeros::logger::Logger;
 }
 
 class SafetyPropertiesTest : public SafetyProperties {

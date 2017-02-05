@@ -23,7 +23,7 @@ using namespace eeros;
 
 namespace {
 
-	using Logger = logger::Logger<logger::LogWriter>;
+	using Logger = logger::Logger;
 
 	struct TaskThread {
 		TaskThread(double period, task::Periodic &task, task::HarmonicTaskList tasks) :

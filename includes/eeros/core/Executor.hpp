@@ -7,7 +7,6 @@
 #include <eeros/core/PeriodicCounter.hpp>
 #include <eeros/task/Periodic.hpp>
 #include <eeros/logger/Logger.hpp>
-#include <eeros/logger/LogWriter.hpp>
 
 namespace eeros {
 
@@ -42,7 +41,7 @@ namespace eeros {
 	private:
 		void assignPriorities();
 
-		logger::Logger<logger::LogWriter> log;
+		logger::Logger log;
 		double period;
 		task::Periodic *mainTask;
 		std::vector<task::Periodic> tasks;

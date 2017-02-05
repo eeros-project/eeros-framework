@@ -2,7 +2,6 @@
 #include <thread>
 
 #include <eeros/logger/Logger.hpp>
-#include <eeros/logger/LogWriter.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/core/Version.hpp>
 #include <eeros/core/Executor.hpp>
@@ -14,7 +13,7 @@
  * example with one harmonic task
  */ 
 namespace {
-	using Logger = eeros::logger::Logger<eeros::logger::LogWriter>;
+	using Logger = eeros::logger::Logger;
 }
 
 int main() {
@@ -28,7 +27,7 @@ int main() {
 	log.trace() << "harmonic tasks example";
 	log.trace() << "eeros " << eeros::Version::string;
 
-	eeros::Executor &executor = eeros::Executor::instance();
+	eeros::Executor& executor = eeros::Executor::instance();
 
 	eeros::task::Lambda ls ([&] () { });
 	eeros::task::Periodic ss("ss", dt, ls);

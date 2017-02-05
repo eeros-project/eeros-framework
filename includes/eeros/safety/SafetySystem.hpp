@@ -23,7 +23,7 @@ namespace eeros {
 			double getPeriod() const;
 			void run();
 			static void exitHandler();
-			logger::Logger<logger::LogWriter> log;
+			logger::Logger log;
 			
 		private:
 			bool setProperties(SafetyProperties& safetyProperties);

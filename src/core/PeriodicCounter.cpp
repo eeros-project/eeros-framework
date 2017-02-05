@@ -62,10 +62,10 @@ void PeriodicCounter::reset() {
 	reset_counter = (int)(reset_after / counter_period);
 }
 
-void PeriodicCounter:: operator >> (eeros::logger::LogEntry<logger::LogWriter> &event) {
+void PeriodicCounter:: operator >> (eeros::logger::LogEntry &event) {
 	using namespace eeros::logger;
 
-	auto l = [](LogEntry<LogWriter> &e, Statistics &x) -> decltype(e) {
+	auto l = [](LogEntry &e, Statistics &x) -> decltype(e) {
 		return e << pretty(x.mean) << "\t" << pretty(x.variance) << "\t" << pretty(x.min) << "\t" << pretty(x.max);
 	};
 
@@ -83,7 +83,7 @@ void PeriodicCounter:: operator >> (eeros::logger::LogEntry<logger::LogWriter> &
 	event << "count = " << period.count;
 }
 
-void PeriodicCounter:: operator >> (eeros::logger::LogEntry<logger::LogWriter> &&event) {
+void PeriodicCounter:: operator >> (eeros::logger::LogEntry &&event) {
 	*this >> event;
 }
 

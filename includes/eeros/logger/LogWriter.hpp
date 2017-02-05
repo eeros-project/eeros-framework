@@ -2,26 +2,21 @@
 #define ORG_EEROS_LOGGER_LOGWRITER_HPP_
 
 #include <eeros/logger/Writer.hpp>
-#include <string>
 
-namespace eeros
-{
-	namespace logger
-	{
-		class LogWriter : public Writer
-		{
+namespace eeros {
+	namespace logger {
+		enum class LogLevel;
+		
+		class LogWriter : public Writer {
 		public:
 			virtual ~LogWriter() { }
-			virtual void endl() = 0;
-			virtual LogWriter& operator<<(int value) = 0;
-			virtual LogWriter& operator<<(unsigned int value) = 0;
-			virtual LogWriter& operator<<(long value) = 0;
-			virtual LogWriter& operator<<(double value) = 0;
-			virtual LogWriter& operator<<(const std::string& value) = 0;
-			virtual LogWriter& operator<<(void (*f)(LogWriter&)) = 0;
+			virtual void begin(std::ostringstream& os, LogLevel level, unsigned category) = 0;	
+			virtual void end(std::ostringstream& os) = 0;
+			virtual void endl(std::ostringstream& os) = 0;
 		};
 
 		void endl(LogWriter& w);
+		std::ostringstream& operator<<(std::ostringstream& os, void (*f)(LogWriter&));
 	}
 }
 

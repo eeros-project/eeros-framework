@@ -1,27 +1,36 @@
 #ifndef ORG_EEROS_LOGGER_LOGENTRY_HPP_
 #define ORG_EEROS_LOGGER_LOGENTRY_HPP_
+#include <eeros/logger/LogWriter.hpp>
 
 namespace eeros {
 	namespace logger {
-		template < typename TWriter >
+		
 		class LogEntry {
 		public:
-			LogEntry(TWriter* writer, unsigned level, unsigned category = 0) : w(writer) {
-				if(w != nullptr) w->begin(level, category);
+			LogEntry(LogWriter* writer, LogLevel level, unsigned category = 0) : w(writer) {
+				if(w != nullptr) w->begin(os, level, category);
 			}
+			LogEntry(const LogEntry&);
 			
-			~LogEntry() {
-				if(w != nullptr) w->end();
+			virtual ~LogEntry() {
+				if(w != nullptr) w->end(os);
 			}
-			
-			template < typename T >
-			LogEntry<TWriter>& operator<<(T value) {
-				if(w != nullptr) (*w) << value;
+
+			template <typename T>
+			LogEntry& operator<<(T value) {
+				os << value;
 				return *this;
 			}
 			
-			TWriter* w;
+			LogEntry& operator<<(void (*f)(LogWriter&) ) {
+				w->endl(os);
+				return *this;
+			}
+		private:
+			LogWriter* w;
+			std::ostringstream os;
 		};
+		
 	}
 }
 

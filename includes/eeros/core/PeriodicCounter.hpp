@@ -16,7 +16,7 @@ namespace eeros {
 		using time_point = clk::time_point;
 
 	public:
-		using Logger = logger::Logger<logger::LogWriter>;
+		using Logger = logger::Logger;
 		using MonitorFunc = std::function<void(PeriodicCounter&, Logger&)>;
 
 		PeriodicCounter(double period = 0, unsigned logger_category = 0);
@@ -29,8 +29,8 @@ namespace eeros {
 		void tock();
 		void reset();
 
-		void operator >> (eeros::logger::LogEntry<eeros::logger::LogWriter> &event);
-		void operator >> (eeros::logger::LogEntry<eeros::logger::LogWriter> &&event);
+		void operator >> (eeros::logger::LogEntry &event);
+		void operator >> (eeros::logger::LogEntry &&event);
 
 		Statistics period;
 		Statistics jitter;

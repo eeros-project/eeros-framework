@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <sstream>
 #include <map>
 #include <functional>
 #include <eeros/safety/InputAction.hpp>
@@ -57,8 +58,13 @@ namespace eeros {
 			std::vector<InputAction*> inputAction;
 			std::vector<OutputAction*> outputAction;
 		};
+		
+		/********** Print functions **********/
+		std::ostream& operator<<(std::ostream& os, eeros::safety::SafetyEvent& event);
+		std::ostream& operator<<(std::ostream& os, eeros::safety::SafetyEvent* event);
+		std::ostream& operator<<(std::ostream& os, eeros::safety::SafetyLevel& level);
+		std::ostream& operator<<(std::ostream& os, eeros::safety::SafetyLevel* level);
 
-	};
-};
-
+	}
+}
 #endif // ORG_EEROS_SAFETY_SAFETYLEVEL_HPP_

@@ -2,38 +2,37 @@
 #define ORG_EEROS_LOGGER_LOGGER_HPP_
 
 #include <eeros/logger/LogEntry.hpp>
+#include <eeros/logger/LogWriter.hpp>
+#include <sstream>
+#include <string>
+#include <iostream>
 
 namespace eeros {
 	namespace logger {
 		
-		template < typename TWriter >
+		enum class LogLevel {FATAL, ERROR, WARN, INFO, TRACE};
+		
 		class Logger {
 		public:
 			Logger(unsigned category = 0) : w(defaultWriter), category(category) { }
+			virtual ~Logger() { }
 			
-			void set(TWriter* writer) { w = writer; }
-			void set(TWriter& writer) { w = &writer; }
-			TWriter* get() { return w; }
+			void set(LogWriter* writer) { w = writer; }
+			void set(LogWriter& writer) { w = &writer; }
+			LogWriter* get() { return w; }
 			
-			LogEntry<TWriter> fatal() { return LogEntry<TWriter>(w, 0, category); }
-			LogEntry<TWriter> error() { return LogEntry<TWriter>(w, 1, category); }
-			LogEntry<TWriter> warn()  { return LogEntry<TWriter>(w, 2, category); }
-			LogEntry<TWriter> info()  { return LogEntry<TWriter>(w, 3, category); }
-			LogEntry<TWriter> trace() { return LogEntry<TWriter>(w, 4, category); }
+			LogEntry fatal() { return LogEntry(w, LogLevel::FATAL, category); }
+			LogEntry error() { return LogEntry(w, LogLevel::ERROR, category); }
+			LogEntry warn() { return LogEntry(w, LogLevel::WARN, category); }
+			LogEntry info() { return LogEntry(w, LogLevel::INFO, category); }
+			LogEntry trace() { return LogEntry(w, LogLevel::TRACE, category); }
 			
-			LogEntry<TWriter> operator <<(unsigned level) { return LogEntry<TWriter>(w, level, category); }
-			
-			
-			static void setDefaultWriter(TWriter* writer) { defaultWriter = writer; }
+			static void setDefaultWriter(LogWriter* writer) { defaultWriter = writer; }
 		private:
-			TWriter* w;
+			LogWriter* w;
 			unsigned category;
-			
-			static TWriter* defaultWriter;
+			static LogWriter* defaultWriter;
 		};
-		
-		template < typename TWriter >
-		TWriter* Logger<TWriter>::defaultWriter = nullptr;
 	}
 }
 

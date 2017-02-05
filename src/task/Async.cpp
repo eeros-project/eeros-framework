@@ -46,7 +46,7 @@ void Async::join() {
 }
 
 void Async::run_thread() {
-	logger::Logger<logger::LogWriter> log('A');
+	logger::Logger log('A');
 
 	const auto pid = getpid();
 	const auto tid = gettid();

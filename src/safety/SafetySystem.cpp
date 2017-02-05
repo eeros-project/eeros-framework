@@ -50,7 +50,7 @@ namespace eeros {
 		
 		void SafetySystem::triggerEvent(SafetyEvent event, SafetyContext* context) {
 			if(currentLevel) {
-				log.info() << "triggering event: \'" << event.getDescription() << "\' in level '" << currentLevel->getDescription() << "\'";
+				log.info() << "triggering event: \'" << event << "\' in level '" << currentLevel << "\'";
 				SafetyLevel* newLevel = currentLevel->getDestLevelForEvent(event, context == &privateContext);
 				if(newLevel != nullptr) {
 					bool transition = (newLevel != currentLevel);	// stage level change
@@ -60,10 +60,10 @@ namespace eeros {
 					if(nextLevel == currentLevel) nextLevel = newLevel;
 					else if(newLevel->id < nextLevel->id) nextLevel = newLevel;
 					mtx.unlock();
-					if(transition) log.info() << "new safety level: '" << nextLevel->getDescription() << "\'";	
+					if(transition) log.info() << "new safety level: '" << nextLevel << "\'";	
 				} else {
-					log.error()	<< "no transition for event \'" << event.getDescription()
-								<< "\' in level \'" << currentLevel->getDescription() << "\'";
+					log.error()	<< "no transition for event \'" << event
+								<< "\' in level \'" << currentLevel << "\'";
 				}
 			} else {
 				throw EEROSException("current level not defined"); // TODO define error number and send error message to logger
@@ -96,8 +96,8 @@ namespace eeros {
 							hal::PeripheralInputInterface* input = (hal::PeripheralInputInterface*)(ia->getInput());
 							if(oldLevel != newLevel) {
 								log.info()	<< "level changed due to input action: " << input->getId()
-											<< " from level '" << oldLevel->getDescription() << "'"
-											<< " to level '" << newLevel->getDescription() << "'";
+											<< " from level '" << oldLevel << "'"
+											<< " to level '" << newLevel << "'";
 							}
 						}
 					}

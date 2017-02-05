@@ -1,15 +1,12 @@
-//#include <initializer_list>
+#include <eeros/logger/Logger.hpp>
+#include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/hal/HAL.hpp>
 #include <eeros/core/EEROSException.hpp>
 #include <eeros/core/Executor.hpp>
-#include <eeros/logger/StreamLogWriter.hpp>
-#include <eeros/logger/Logger.hpp>
 #include <eeros/task/Lambda.hpp>
 #include <eeros/hal/DummyLogicInput.hpp>
 #include <eeros/hal/DummyLogicOutput.hpp>
-#include <unistd.h>
-#include <iostream>
 #include <signal.h>
 
 #include "SafetyPropertiesTest1.hpp"
@@ -32,9 +29,8 @@ int main() {
 	signal(SIGPWR, signalHandler);
 	
 	StreamLogWriter w(std::cout);
-	w.show();
-	Logger<LogWriter>::setDefaultWriter(&w);
-	Logger<LogWriter> log;
+	Logger::setDefaultWriter(&w);
+	Logger log;
 	
 	log.info() << "Safety System Example started...";
 	
@@ -51,7 +47,7 @@ int main() {
 	safetySys.triggerEvent(ssProperties.seStartInitializing);
 
 	// Create and run executor
-	auto executor = eeros::Executor::instance();
+	auto& executor = eeros::Executor::instance();
 	executor.setMainTask(safetySys);
 	
 	eeros::task::Lambda l1 ([&] () {

@@ -35,7 +35,7 @@ namespace eeros {
 			virtual void init();
 			virtual void exit();
 			
-			eeros::logger::Logger<eeros::logger::LogWriter> log;
+			eeros::logger::Logger log;
 			std::string name;
 			Sequencer* sequencer;
 		};

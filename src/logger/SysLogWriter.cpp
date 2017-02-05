@@ -3,7 +3,11 @@
 
 using namespace eeros::logger;
 
-SysLogWriter::SysLogWriter(const std::string name) : name(name), visibleLevel(3), enabled(false), lck(mtx, std::defer_lock) {
+SysLogWriter::SysLogWriter(const std::string name) : 
+	name(name), 
+	visibleLevel(LogLevel::INFO), 
+	enabled(false)
+{
 	openlog(this->name.c_str(), LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);
 }
 
@@ -11,119 +15,69 @@ SysLogWriter::~SysLogWriter() {
 	closelog();
 }
 
-void SysLogWriter::show(unsigned level) {
+void SysLogWriter::show(LogLevel level) {
 	visibleLevel = level;
 }
 
-void SysLogWriter::begin(unsigned level, unsigned category) {
+void SysLogWriter::begin(std::ostringstream& os, LogLevel level, unsigned category) {
 	enabled = (level <= visibleLevel);
 	if(!enabled) return;
 	
 	this->level = level;
 	
-	lck.lock();
-	
 	using namespace std;
 	
-	if (category == 0) {
-		out << ' ';
-	}
+	if (category == 0) os << ' ';
 	else {
 		if (category >= 'A' && category <= 'Z')
-			out << (char)category;
+			os << (char)category;
 		else
-			out << category;
+			os << category;
 	}
-	out << ' ';
+	os << ' ';
 
 	switch(level) {
-		case 0: out << "F"; break; // fatal
-		case 1: out << "E"; break; // error
-		case 2: out << "W"; break; // warning
-		case 3: out << "I"; break; // info
-		case 4: out << "T"; break; // trace
-		default: out << level; break;
+		case LogLevel::FATAL: os << "F"; break; // fatal
+		case LogLevel::ERROR: os << "E"; break; // error
+		case LogLevel::WARN: os << "W"; break; // warning
+		case LogLevel::INFO: os << "I"; break; // info
+		case LogLevel::TRACE: os << "T"; break; // trace
+		default: os << 5; break;
 	}
-	out << ":  ";
+	os << ":  ";
+	return;
 }
 
-void SysLogWriter::end() {
-	if(!enabled) return;
-//	out << std::endl;
+void SysLogWriter::end(std::ostringstream& os) {
+	if(!enabled) {
+		os.clear();
+		os.str("");
+		return;
+	}
 	
 	switch(level) {
-		case 0:
-			syslog(LOG_ALERT, "%s", out.str().c_str());
+		case LogLevel::FATAL:
+			syslog(LOG_ALERT, "%s", os.str().c_str());
 			break;
-		case 1:
-			syslog(LOG_ERR, "%s", out.str().c_str());
+		case LogLevel::ERROR:
+			syslog(LOG_ERR, "%s", os.str().c_str());
 			break;
-		case 2:
-			syslog(LOG_WARNING, "%s", out.str().c_str());
+		case LogLevel::WARN:
+			syslog(LOG_WARNING, "%s", os.str().c_str());
 			break;
-		case 3:
-			syslog(LOG_INFO, "%s", out.str().c_str());
+		case LogLevel::INFO:
+			syslog(LOG_INFO, "%s", os.str().c_str());
 			break;
-		case 4:
-			syslog(LOG_DEBUG, "%s", out.str().c_str());
+		case LogLevel::TRACE:
+			syslog(LOG_DEBUG, "%s", os.str().c_str());
 			break;
 		default:
-			syslog(LOG_INFO, "%s", out.str().c_str());
+			syslog(LOG_INFO, "%s", os.str().c_str());
 			break;
 	}
-	
-	out.seekp(0);
-	out.str("");
-	out.clear();
-	
-	lck.unlock();
 }
 
-void SysLogWriter::endl() {
+void SysLogWriter::endl(std::ostringstream& os) {
 	if(!enabled) return;
-	out << " \u21A9 ";
+	os << " \u21A9 ";
 }
-
-LogWriter& SysLogWriter::operator <<(int value) {
-	if(enabled)
-		out << value;
-	
-	return *this;
-}
-
-LogWriter& SysLogWriter::operator <<(unsigned int value) {
-	if(enabled)
-		out << value;
-	
-	return *this;
-}
-
-LogWriter& SysLogWriter::operator<<(long value) {
-	if(enabled)
-		out << value;
-	
-	return *this;
-}
-
-LogWriter& SysLogWriter::operator <<(double value) {
-	if(enabled)
-		out << value;
-	
-	return *this;
-}
-
-LogWriter& SysLogWriter::operator <<(const std::string& value) {
-	if(enabled)
-		out << value;
-	
-	return *this;
-}
-
-LogWriter& SysLogWriter::operator <<(void (*f)(LogWriter&)) {
-	if(enabled)
-		if(f != nullptr)
-			f(*this);
-	
-	return *this;
-}
-

@@ -2,7 +2,6 @@
 #define ORG_EEROS_CORE_THREAD_HPP_
 
 #include <eeros/logger/Logger.hpp>
-#include <eeros/logger/LogWriter.hpp>
 
 #include <thread>
 #include <functional>
@@ -25,7 +24,7 @@ namespace eeros {
 		virtual void run();
 		
 		std::thread t;
-		eeros::logger::Logger<eeros::logger::LogWriter> log;
+		eeros::logger::Logger log;
 	};
 };
 
