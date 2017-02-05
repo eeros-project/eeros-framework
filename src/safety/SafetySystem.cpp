@@ -43,6 +43,7 @@ namespace eeros {
 				properties = safetyProperties;
 				currentLevel = properties.getEntryLevel();
 				nextLevel = currentLevel;
+				log.warn() << "safety system verified: " << (int)properties.levels.size() << " safety levels are present";
 				return true;
 			}
 			return false;
