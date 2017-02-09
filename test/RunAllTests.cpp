@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <getopt.h>
+// #include <unistd.h>
 #include <TestVariables.hpp>
 #include <EerosEnvironment.hpp>
 #include <EerosEnvironmentInvalidConfig.hpp>
@@ -8,10 +9,12 @@
 
 /**
  * 
- * execute all unit tests with comedilib: ./unitTests  --library comedi
- * execute all unit tests with flinklib: ./unitTests  --library flink
- * execute hal unit tests with comedilib: ./unitTests --library comedi --gtest_filter=hal_*
- * execute math unit tests: ./unitTests --gtest_filter=math_*
+ * execute all unit tests with comedilib: 	./unitTests  --library comedi
+ * or with short option: 			./unitTests -l comedi
+ * execute all unit tests with flinklib: 	./unitTests  --library flink
+ * execute hal unit tests with comedilib: 	./unitTests --library comedi --gtest_filter=hal_*
+ * or with short option:			./unitTests -l comedi --gtest_filter=hal_*
+ * execute math unit tests: 			./unitTests --gtest_filter=math_*
  * 
  * */
 
@@ -25,22 +28,22 @@ int main(int argc, char **argv){
 	// available long_options
 	static struct option long_options[] =
 	{
-	    {"library", optional_argument, NULL, 'l'},
-	    {"gtest_filter", optional_argument, NULL, 'g'},
-	    {NULL, 0, NULL, 0}
+	    {"library", 	required_argument, NULL, 'l'},
+	    {"gtest_filter", 	optional_argument, NULL, 'g'},
+	    {NULL, 		0, 		   NULL,  0 }
 	};
   
 	// create copy of argv
-	int rArgc = argc;
-	auto rArray = new char*[rArgc+1];
-	for(int i=0; i <= rArgc; i++) {
-		rArray[i] = argv[i];
+	int copyArgc = argc;
+	auto copyArgv = new char*[copyArgc+1];
+	for(int i=0; i <= copyArgc; i++) {
+		copyArgv[i] = argv[i];
 	}
 
 	// Error message if long dashes (en dash) are used
 	int i;
-	for (i=0; i < rArgc; i++) {
-		 if ((rArray[i][0] == 226) && (rArray[i][1] == 128) && (rArray[i][2] == 147)) {
+	for (i=0; i < copyArgc; i++) {
+		 if ((copyArgv[i][0] == 226) && (copyArgv[i][1] == 128) && (copyArgv[i][2] == 147)) {
 			fprintf(stderr, "Error: Invalid arguments. En dashes are used.\n");
 			return -1;
 		 }
@@ -49,22 +52,27 @@ int main(int argc, char **argv){
 	/* Compute command line arguments */
 	int c;
 	std::string libStr;
-	while ((c = getopt_long(rArgc, rArray, "l:g:", long_options, NULL)) != -1) {
+	while ((c = getopt_long(copyArgc, copyArgv, "l:", long_options, NULL)) != -1) {
 		switch(c) {
 			case 'l': // lib found
-				libStr.assign(rArray[optind]);
-				if(libStr == "comedi"){
-					libcomedi = true;
-				}
-				else if(libStr == "flink"){
-					libflink = true;
+				if(optarg){
+					libStr = optarg;
+					if(libStr == "comedi"){
+						libcomedi = true;
+					}
+					else if(libStr == "flink"){
+						libflink = true;
+					}
+					else{
+						throw eeros::EEROSException("unknown library given as argument: " + libStr);
+					}
 				}
 				else{
-					throw eeros::EEROSException("unknown library given as argument: " + libStr);
+					throw eeros::EEROSException("optarg empty!");
 				}
 				break;
 			case 'g':
-				//googleTest argument -> ignore
+				//ignore -> googleTest argument
 				break;
 			default:
 				// ignore all other args
@@ -73,7 +81,7 @@ int main(int argc, char **argv){
 	}
 	
 	// cleanup copy of argv
-	delete [] rArray;
+	delete [] copyArgv;
 	
 	// init googleTest and run
 	
