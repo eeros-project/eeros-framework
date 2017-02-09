@@ -7,6 +7,7 @@ include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR})
 #add_subdirectory(logger)
 #add_subdirectory(rtTest)
 add_subdirectory(hal)
+add_subdirectory(sim)
 
 # if(LIBCOMEDI)
 add_subdirectory(simpleMotorController)
@@ -15,5 +16,3 @@ add_subdirectory(simpleMotorController)
 #if(LIBFLINK)
 #	add_subdirectory(flink)
 #endif()
-
-

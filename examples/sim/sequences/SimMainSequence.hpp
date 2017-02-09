@@ -1,16 +1,16 @@
-#ifndef CH_NTB_PARSERTESTMAINSEQUENCE_HPP_
-#define CH_NTB_PARSERTESTMAINSEQUENCE_HPP_
+#ifndef CH_NTB_SIMMAINSEQUENCE_HPP_
+#define CH_NTB_SIMMAINSEQUENCE_HPP_
 
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/safety/SafetySystem.hpp>
-#include "../control/ParserTestControlSystem.hpp"
+#include "../control/SimControlSystem.hpp"
 #include <eeros/hal/HAL.hpp>
 #include <eeros/hal/Output.hpp>
 
-class ParserTestMainSequence : public eeros::sequencer::Sequence<void> {
+class SimMainSequence : public eeros::sequencer::Sequence<void> {
 
 public:
-	ParserTestMainSequence(eeros::sequencer::Sequencer* sequencer, ParserTestControlSystem* controlSys, eeros::safety::SafetySystem* safetySys);
+	SimMainSequence(eeros::sequencer::Sequencer* sequencer, SimControlSystem* controlSys, eeros::safety::SafetySystem* safetySys);
 	
 	virtual bool checkPreCondition();
 	virtual void run();
@@ -19,13 +19,13 @@ public:
 private:
 	bool isTerminating();
 	
-	ParserTestControlSystem* controlSys;
+	SimControlSystem* controlSys;
 	eeros::safety::SafetySystem* safetySys;
 	
 	eeros::hal::HAL& hal = eeros::hal::HAL::instance();
-	eeros::hal::Input<double> &aIn = *hal.getRealInput("aIn");
+// 	eeros::hal::Input<double> &aIn = *hal.getRealInput("aIn");
 // 	eeros::hal::Output<double> &pwm1 = *hal.getRealOutput("pwm1");
 // 	eeros::hal::Input<double> &enc1 = *hal.getRealInput("encMot1", false);
 };
 		
-#endif // CH_NTB_PARSERTESTMAINSEQUENCE_HPP_  
+#endif // CH_NTB_SIMMAINSEQUENCE_HPP_  
