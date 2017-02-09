@@ -25,7 +25,7 @@ void signalHandler(int signum){
 	running = false;
 }
 
-int main(){
+int main(int argc, char **argv){
 	// Create and initialize logger
 	StreamLogWriter w(std::cout);
 	Logger<LogWriter>::setDefaultWriter(&w);
@@ -36,14 +36,13 @@ int main(){
 	log.info() << "ParserTest started...";
   
 	HAL& hal = HAL::instance();
-// 	hal.readConfigFromFile("/mnt/data/config/HALConfigExample.json");
-	hal.readConfigFromFile("/opt/hal/config/HALConfigComedi.json");
+	hal.readConfigFromFile(&argc, argv);
 	
 // 	hal.callOutputFeature("pwm1", "setPwmFrequency", 100.0);
 	
 	ParserTestControlSystem* parserTestCtrlSys; 
 	parserTestCtrlSys = new ParserTestControlSystem(dt);
-		
+	
 	// Create safety system
 	ParserTestSafetyProperties safetyProperties(parserTestCtrlSys);
 	SafetySystem safetySystem(safetyProperties, dt);

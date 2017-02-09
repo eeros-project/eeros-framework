@@ -26,7 +26,7 @@ JsonParser::JsonParser(std::string filePath) : log('H') {
 	
 	halRootObj = ucl::Ucl::parse_from_file_strategy(filePath.c_str(), UCL_DUPLICATE_ERROR, err);
 	if(!err.empty()){
-		throw eeros::EEROSException(err);
+		throw eeros::EEROSException(err + ": path: " + filePath);
 	}
 }
 

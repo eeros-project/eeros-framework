@@ -13,7 +13,8 @@ namespace eeros {
 			virtual void TearDown();
 			
 		private:
-			
+			int* envArgc;
+			char** envArgv;
 		};
 
 	};

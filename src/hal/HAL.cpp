@@ -1,11 +1,12 @@
 #include <eeros/hal/HAL.hpp>
 #include <dlfcn.h>
+#include <getopt.h>
 
 using namespace eeros;
 using namespace eeros::hal;
 
-HAL::HAL() { }
-HAL::HAL(const HAL&) { }
+HAL::HAL() : log('H')  { }
+HAL::HAL(const HAL&) : log('H') { }
 HAL& HAL::operator=(const HAL&) { }
 
 HAL& HAL::instance() {
@@ -16,6 +17,62 @@ HAL& HAL::instance() {
 bool HAL::readConfigFromFile(std::string file) {
 	
 	parser = JsonParser(file);
+	parser.createHalObjects(hwLibraries);
+	return true;
+}
+
+bool HAL::readConfigFromFile(int* argc, char** argv) {
+  
+	// available long_options
+	static struct option long_options_hal[] =
+	{
+	    {"config", 		required_argument, NULL, 'c'},
+	    {"configFile", 	required_argument, NULL, 'f'},
+	    {NULL, 		0, 		   NULL,  0 }
+	};
+	
+	// Error message if long dashes (en dash) are used
+	int i;
+	for (i=0; i < *argc; i++) {
+		 if ((argv[i][0] == 226) && (argv[i][1] == 128) && (argv[i][2] == 147)) {
+			fprintf(stderr, "Error: Invalid arguments. En dashes are used.\n");
+			return -1;
+		 }
+	}
+	
+	/* Compute command line arguments */
+	int c;
+	std::string configPath;
+	while ((c = getopt_long(*argc, argv, "c:f:", long_options_hal, NULL)) != -1) {
+		switch(c) {
+			case 'c': 	// config found
+				if(optarg){
+					configPath = optarg;
+				}
+				else{
+					throw eeros::EEROSException("optarg empty, no path given!");
+				}
+				break;
+			case 'f': 	// configFile found
+				if(optarg){
+					configPath = optarg;
+				}
+				else{
+					throw eeros::EEROSException("optarg empty, no path given!");
+				}
+				break;
+			case '?':
+				if(optopt == 'c') log.trace() << "Option -" << optopt << " requires an argument.";
+				else if(isprint(optopt)) log.trace() << "Unknown option `-" << optopt <<"'.";
+				else log.trace() << "Unknown option character `\\x" << optopt << "'.";
+				break;
+			default:
+				// ignore all other args
+				break;
+		}
+	}
+	
+	parser = JsonParser(configPath);
 	parser.createHalObjects(hwLibraries);
 	return true;
 }

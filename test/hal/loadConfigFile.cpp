@@ -14,7 +14,7 @@ TEST(hal_LoadConfigFileTest, noFile){
 		hal.readConfigFromFile("");
 	}
 	catch(eeros::EEROSException const & err){
-	      EXPECT_EQ(err.what(), std::string("cannot open file : No such file or directory"));
+	      EXPECT_EQ(err.what(), std::string("cannot open file : No such file or directory: path: "));
 	}
 	catch(const std::exception& e){
 		FAIL() << "unknown exception thrown: load config file";

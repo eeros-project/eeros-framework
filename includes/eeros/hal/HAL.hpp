@@ -31,6 +31,7 @@ namespace eeros {
 			bool addOutput(OutputInterface* systemOutput);
 			
 			bool readConfigFromFile(std::string file);
+			bool readConfigFromFile(int* argc, char** argv);
 			
 			static HAL& instance();
 						
@@ -100,6 +101,8 @@ namespace eeros {
 			
 			std::map<std::string, void*> hwLibraries;
 			JsonParser parser;
+			
+			logger::Logger<logger::LogWriter> log;
 			
 		};
 

@@ -35,7 +35,7 @@ void EerosEnvironmentInvalidConfig::SetUp() {
 		}
 	}
 	else {
-		throw eeros::EEROSException("no config loaded");
+		throw eeros::EEROSException("no library selected with command line arguments (--library foo)");
 	}
 }
 

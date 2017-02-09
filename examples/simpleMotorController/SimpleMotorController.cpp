@@ -25,7 +25,7 @@ void signalHandler(int signum){
 	SafetySystem::exitHandler();
 }
 
-int main() {
+int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
 	signal(SIGKILL, signalHandler);
 	signal(SIGTERM, signalHandler);
@@ -39,7 +39,7 @@ int main() {
 	
 	log.info() << "Initializing Hardware...";
 	HAL& hal = HAL::instance();
-	hal.readConfigFromFile("/opt/hal/config/HalSimpleMotorControllerComedi.json");
+	hal.readConfigFromFile(&argc, argv);
 	
 	// Create the control system
 	MyControlSystem controlSys(0.001);

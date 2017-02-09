@@ -29,7 +29,8 @@ int main(int argc, char **argv){
 	static struct option long_options[] =
 	{
 	    {"library", 	required_argument, NULL, 'l'},
-	    {"gtest_filter", 	optional_argument, NULL, 'g'},
+	    {"gtest_filter", 	required_argument, NULL, 'g'},
+	    {"config", 		required_argument, NULL, 'c'},
 	    {NULL, 		0, 		   NULL,  0 }
 	};
   
@@ -39,7 +40,7 @@ int main(int argc, char **argv){
 	for(int i=0; i <= copyArgc; i++) {
 		copyArgv[i] = argv[i];
 	}
-
+	
 	// Error message if long dashes (en dash) are used
 	int i;
 	for (i=0; i < copyArgc; i++) {
@@ -49,10 +50,10 @@ int main(int argc, char **argv){
 		 }
 	}
 	
-	/* Compute command line arguments */
+	// Compute command line arguments
 	int c;
 	std::string libStr;
-	while ((c = getopt_long(copyArgc, copyArgv, "l:", long_options, NULL)) != -1) {
+	while ((c = getopt_long(copyArgc, copyArgv, "l:g:c:", long_options, NULL)) != -1) {
 		switch(c) {
 			case 'l': // lib found
 				if(optarg){
@@ -74,16 +75,19 @@ int main(int argc, char **argv){
 			case 'g':
 				//ignore -> googleTest argument
 				break;
+			case 'c':
+				//ignore -> hal config argument
+				break;
+			case '?':
+				std::cout << "unknown argument" << std::endl;
+				break;
 			default:
 				// ignore all other args
 				break;
 		}
 	}
 	
-	// cleanup copy of argv
 	delete [] copyArgv;
-	
-	// init googleTest and run
 	
 	// environment with invalid config for tests
 	testing::Environment* const eeros_env_invalid = testing::AddGlobalTestEnvironment(new EerosEnvironmentInvalidConfig);
@@ -91,6 +95,7 @@ int main(int argc, char **argv){
 	// environment with valid config for tests
 	testing::Environment* const eeros_env = testing::AddGlobalTestEnvironment(new EerosEnvironment);
 	
+	// init googleTest and run
 	::testing::InitGoogleTest(&argc, argv);
 		
 	return RUN_ALL_TESTS();
