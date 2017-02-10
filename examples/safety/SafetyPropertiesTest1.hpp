@@ -36,6 +36,11 @@ public:
 		in1 = hal.getLogicInput("in1");
 		criticalInputs = { in1 };
 		
+		// ############ Get test in and outputs ############ 
+		outTest = hal.getLogicOutput("outTest");
+		outTest->set(false);
+		inTest = hal.getLogicInput("inTest");
+		
 		// ############ Add levels ############
 		addLevel(slOff);
 		addLevel(slShuttingDown);
@@ -55,8 +60,8 @@ public:
 		slOff.setInputActions({ ignore(in1) });
 		slShuttingDown.setInputActions({ ignore(in1) });
 		slIinitializing.setInputActions({ ignore(in1) });
-		slInitialized.setInputActions({ check(in1, true, seStartRunning) });
-		slRunning.setInputActions({ check(in1, false, seStopRunning) });
+		slInitialized.setInputActions({ check(in1, false, seStartRunning) });
+		slRunning.setInputActions({ check(in1, true, seStopRunning) });
 
 		// ############ Define output states and events for all levels ############
 		slOff.setOutputActions({ set(out1, false) });
@@ -68,7 +73,22 @@ public:
 		// Define and add level functions
 		slOff.setLevelAction([&](SafetyContext* privateContext) {Executor::stop();});
 		slShuttingDown.setLevelAction([&](SafetyContext* privateContext) {privateContext->triggerEvent(seSwitchingOff);});
-
+		slInitialized.setLevelAction([&](SafetyContext* privateContext) {
+			static int delayTilSwitch = 0;
+			delayTilSwitch++;
+			if(delayTilSwitch > 5){
+				outTest->set(true);	// switch on in1 via sim-eeros
+				delayTilSwitch = 0;
+			}
+		});
+		slRunning.setLevelAction([&](SafetyContext* privateContext){
+			static int delayTilSwitchBack = 0;
+			delayTilSwitchBack++;
+			if(delayTilSwitchBack > 5){
+				outTest->set(false);	// switch off in1 via sim-eeros
+				delayTilSwitchBack = 0;
+			}
+		});
 		// Define entry level
 		setEntryLevel(slOff);
 		
@@ -82,6 +102,11 @@ public:
 	
 	// critical inputs
 	Input<bool>* in1;
+	
+	// test inputs
+	Input<bool>* inTest;
+	// test outputs
+	Output<bool>* outTest;
 	
 	SafetyEvent seStartInitializing;
 	SafetyEvent seInitializingDone;
