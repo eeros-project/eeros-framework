@@ -1,7 +1,7 @@
 {
 	"device0": {
 		"library": "libsimeeros.so",
-		"devHandle": "sim0",
+		"devHandle": "reflect",
 		"subdevice0": {
 			"type": "DigOut",
 			"channel0": {
@@ -12,6 +12,18 @@
 			"type": "DigIn",
 			"channel0": {
 				"signalId": "in0"
+			}
+		},
+		"subdevice2": {
+			"type": "DigIn",
+			"channel0":{
+				"signalId": "in1"
+			}
+		},
+		"subdevice3": {
+			"type": "DigOut",
+			"channel0":{
+				"signalId": "out1"
 			}
 		}
 	}

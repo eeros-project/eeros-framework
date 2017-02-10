@@ -30,18 +30,20 @@ void SimMainSequence::run() {
 	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){
 		
 		if(i%5 == 0){
-			log.info() << "in0: " << controlSys->in0.getOut().getSignal().getValue();
+			log.info() << "simOut_in0: " << controlSys->simOut_in0.getOut().getSignal().getValue() << "\tsimIn_in1: " << simIn_in1.get();
 		}
 		
 		if(i%50 == 0){
 			if(set){
 				log.info() << "set false";
-				controlSys->out0.getIn().getSignal().setValue(false);
+				controlSys->simOut_out0.getIn().getSignal().setValue(false);
+				simIn_out1.set(false);
 				set = false;
 			}
 			else{
 				log.info() << "set true";
-				controlSys->out0.getIn().getSignal().setValue(true);
+				controlSys->simOut_out0.getIn().getSignal().setValue(true);
+				simIn_out1.set(true);
 				set = true;
 			}
 				

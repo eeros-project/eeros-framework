@@ -13,8 +13,8 @@ public:
 	SimControlSystem(double ts);
 	virtual ~SimControlSystem();
 	
-	eeros::control::PeripheralOutput<bool> out0;
-	eeros::control::PeripheralInput<bool> in0;
+	eeros::control::PeripheralOutput<bool> simOut_out0;
+	eeros::control::PeripheralInput<bool> simOut_in0;
 	eeros::control::TimeDomain timedomain;
   
 private:
