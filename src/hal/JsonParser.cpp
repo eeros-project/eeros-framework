@@ -355,7 +355,7 @@ void JsonParser::createLogicObject(void *libHandle, std::string type, std::strin
 	std::string createStr = "create" + type;
 	void *createHandle = dlsym(libHandle, createStr.c_str());
 	if(createHandle == nullptr){
-		throw EEROSException("could not find create method: " + std::string(dlerror()) + "signalId: '" + id + "'");
+		throw EEROSException("could not find create method: '" + std::string(dlerror()) + "' signalId: '" + id + "'");
 	}
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){
@@ -386,7 +386,7 @@ void JsonParser::createRealObject(void *libHandle, std::string type, std::string
 	std::string createStr = "create" + type;
 	void *createHandle = dlsym(libHandle, createStr.c_str());
 	if(createHandle == nullptr){
-		throw EEROSException("could not find create method: " + std::string(dlerror()) + "signalId: '" + id + "'");
+		throw EEROSException("could not find create method: '" + std::string(dlerror()) + "' signalId: '" + id + "'");
 	}
 	auto dirIt = directionOfChannel.find(type);
 	if(dirIt != directionOfChannel.end()){

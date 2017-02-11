@@ -15,6 +15,11 @@ public:
 	
 	eeros::control::PeripheralOutput<bool> simOut_out0;
 	eeros::control::PeripheralInput<bool> simOut_in0;
+	
+// 	eeros::control::PeripheralOutput<double> aOut0;
+	eeros::control::PeripheralInput<double> aInTest0;
+	eeros::control::PeripheralInput<double> aIn2;
+	eeros::control::PeripheralOutput<double> aOutTest2;
 	eeros::control::TimeDomain timedomain;
   
 private:
