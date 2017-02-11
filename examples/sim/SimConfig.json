@@ -23,7 +23,8 @@
 		"subdevice3": {
 			"type": "DigOut",
 			"channel0":{
-				"signalId": "out1"
+				"signalId": "out1",
+				"inverted": true
 			}
 		},
 		"subdevice4": {
