@@ -18,8 +18,9 @@
  * 
  * */
 
-bool libcomedi = false;
-bool libflink = false;
+bool libcomedi = false;		// comedi-eeros
+bool libflink = false;		// flink-eeros
+bool libsim = false;		// sim-eeros
 
 using namespace eeros::test;
 
@@ -63,6 +64,9 @@ int main(int argc, char **argv){
 					}
 					else if(libStr == "flink"){
 						libflink = true;
+					}
+					else if(libStr == "sim"){
+						libsim = true;
 					}
 					else{
 						throw eeros::EEROSException("unknown library given as argument: " + libStr);

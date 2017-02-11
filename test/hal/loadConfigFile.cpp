@@ -172,3 +172,41 @@ TEST(hal_configFileTest, rangeAnalogOut3){
 		FAIL() << e.what();
 	}
 }
+
+TEST(hal_configFileTest, scaleAnalogIn0){
+	HAL& hal = HAL::instance();
+	
+	try{
+		eeros::hal::ScalableInput<double> &aIn0 = *hal.getRealInput("aIn0");
+		
+		EXPECT_NEAR(3116.3265306122448979, aIn0.getScale(), 0.000000000000001);
+		EXPECT_NEAR(32770, aIn0.getOffset(), 000000000000001);
+		
+		hal.releaseInput("aIn0");
+	}
+	catch(eeros::EEROSException const & err){
+		FAIL() << err.what();
+	}
+	catch(const std::exception& e){
+		FAIL() << e.what();
+	}
+}
+
+TEST(hal_configFileTest, rangeAnalogIn0){
+	HAL& hal = HAL::instance();
+	
+	try{
+		eeros::hal::ScalableInput<double> &aIn0 = *hal.getRealInput("aIn0");
+		
+		EXPECT_NEAR(10.0, aIn0.getMaxIn(), 0.000000000000001);
+		EXPECT_NEAR(-10.0, aIn0.getMinIn(), 0.000000000000001);
+		
+		hal.releaseInput("aIn0");
+	}
+	catch(eeros::EEROSException const & err){
+		FAIL() << err.what();
+	}
+	catch(const std::exception& e){
+		FAIL() << e.what();
+	}
+}

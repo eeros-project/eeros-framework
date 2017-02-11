@@ -1,0 +1,14 @@
+{
+	"device0": {
+		"library": "libflinkeeros.so",
+		"devHandle": "/dev/flink0",
+		"subdevice0": {
+			"type": "DInvalidOut",
+			"channel0": {
+				"signalId": "digOutDummy",
+				"inverted": true
+			}
+		}
+	}
+}
+

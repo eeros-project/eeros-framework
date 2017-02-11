@@ -1,8 +1,8 @@
 {
 	"device0": {
-		"library": "libcomedieeros.so",
-		"devHandle": "/dev/comedi0",
-		"subdevice2": {
+		"library": "libsimeeros.so",
+		"devHandle": "reflect",
+		"subdevice0": {
 			"type": "DigOut",
 			"channel0": {
 				"signalId": "io1"
@@ -10,15 +10,17 @@
 			"channel1": {
 				"signalId": "ioOut"
 			},
-			"channel2": {
-				"type": "DigIn",
-				"signalId": "ioIn"
-			},
 			"channel3": {
 				"signalId": "ioOut4"
 			}
 		},
 		"subdevice1": {
+			"type": "DigIn",
+			"channel2": {
+				"signalId": "ioIn"
+			},
+		},
+		"subdevice4": {
 			"type": "AnalogOut",
 			"channel0": {
 				"signalId": "aOut0",
@@ -94,7 +96,7 @@
 				"unit": "V"
 			}
 		},
-		"subdevice0": {
+		"subdevice6": {
 			"type": "AnalogIn",
 			"channel0": {
 				"signalId": "aIn0",

@@ -15,6 +15,9 @@ void EerosEnvironment::SetUp() {
 	else if(libflink) {
 		hal.readConfigFromFile("loadConfigFlink.json");
 	}
+	else if(libsim) {
+		hal.readConfigFromFile("loadConfigSim.json");
+	}
 	else {
 		throw eeros::EEROSException("no config loaded");
 	}
