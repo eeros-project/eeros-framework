@@ -46,7 +46,7 @@ int main(int argc, char **argv){
 	
 	// Sequencer
 	Sequencer sequencer;
-	SimMainSequence mainSequence(&sequencer, simCtrlSys, &safetySystem);
+	SimMainSequence mainSequence(&sequencer, simCtrlSys, &safetySystem, &safetyProperties);
 	sequencer.start(&mainSequence);
 	
 	// Set executor & create safety system

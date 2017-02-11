@@ -8,16 +8,6 @@
 	
 	class SimControlSystem;
 	
-	// Define events
-	enum {
-	  doOff = 1,
-	};
-	
-	// Define levels
-	enum {
-	  off = 1,
-	};
-	
 	class SimSafetyProperties : public eeros::safety::SafetyProperties {
 
 		public:
@@ -26,10 +16,14 @@
 		
 			// outputs
 			// inputs
+			
+			eeros::safety::SafetyLevel slOff;
+			eeros::safety::SafetyLevel slRunning;
 		
 		private:
 			SimControlSystem* controlSys;
-			eeros::safety::SafetyLevel slOff;
+			
+			eeros::safety::SafetyEvent seRun;
 	};
 
 	#endif // CH_NTB_SIMSAFETYPROPERTIES_HPP_

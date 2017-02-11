@@ -13,8 +13,8 @@ using namespace eeros::safety;
 using namespace eeros::hal;
 
 
-SimMainSequence::SimMainSequence(Sequencer* sequencer, SimControlSystem* controlSys, SafetySystem* safetySys) :
-							Sequence<void>("main", sequencer), controlSys(controlSys), safetySys(safetySys) {
+SimMainSequence::SimMainSequence(Sequencer* sequencer, SimControlSystem* controlSys, SafetySystem* safetySys, SimSafetyProperties* properties ) :
+							Sequence<void>("main", sequencer), controlSys(controlSys), safetySys(safetySys), safetyProp(properties) {
 	
 }
 
@@ -23,6 +23,11 @@ bool SimMainSequence::checkPreCondition() {
 }
 
 void SimMainSequence::run() {
+	while(safetySys->getCurrentLevel() < safetyProp->slRunning){
+		if(isTerminating()) break;
+		usleep(10000);
+	}
+	
 	bool set = false;
 	bool toggleAnalog = false;
 	log.trace() << "[ Main Sequence Started ]";

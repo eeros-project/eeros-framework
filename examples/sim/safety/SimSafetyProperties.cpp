@@ -16,7 +16,12 @@ using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;
 
-SimSafetyProperties::SimSafetyProperties(SimControlSystem* cs) : slOff("System off"), controlSys(cs) {
+SimSafetyProperties::SimSafetyProperties(SimControlSystem* cs) : controlSys(cs), 
+	  slOff("System off"),
+	  slRunning("running"),
+	  
+	  seRun("start running")
+	 {
 
 // 	  HAL& hal = HAL::instance();
   
@@ -27,15 +32,24 @@ SimSafetyProperties::SimSafetyProperties(SimControlSystem* cs) : slOff("System o
 	// ############ Define Levels ############
 	
 	addLevel(slOff);
+	addLevel(slRunning);
 	
 	// ############ Add events to the levels ############
 	
 	// ############ Define input states and events for all levels ############
-		
+	slOff.addEvent(seRun, slRunning, kPublicEvent);
+	
 	// Define output states and events for all levels 
 
 	// *** Define and add level functions *** //
-
+	slOff.setLevelAction([&](SafetyContext* privateContext){
+		static int cnt = 0;
+		cnt++;
+		if(cnt > 2000){
+			privateContext->triggerEvent(seRun);
+		}
+	});
+	
 	// Define entry level
 	setEntryLevel(slOff);
 }

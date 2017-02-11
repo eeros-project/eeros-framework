@@ -4,13 +4,14 @@
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 #include "../control/SimControlSystem.hpp"
+#include "../safety/SimSafetyProperties.hpp"
 #include <eeros/hal/HAL.hpp>
 #include <eeros/hal/Output.hpp>
 
 class SimMainSequence : public eeros::sequencer::Sequence<void> {
 
 public:
-	SimMainSequence(eeros::sequencer::Sequencer* sequencer, SimControlSystem* controlSys, eeros::safety::SafetySystem* safetySys);
+	SimMainSequence(eeros::sequencer::Sequencer* sequencer, SimControlSystem* controlSys, eeros::safety::SafetySystem* safetySys, SimSafetyProperties* properties);
 	
 	virtual bool checkPreCondition();
 	virtual void run();
@@ -21,6 +22,7 @@ private:
 	
 	SimControlSystem* controlSys;
 	eeros::safety::SafetySystem* safetySys;
+	SimSafetyProperties* safetyProp;
 	
 	eeros::hal::HAL& hal = eeros::hal::HAL::instance();
 	eeros::hal::Input<bool> &simIn_in1 = *hal.getLogicInput("in1");
