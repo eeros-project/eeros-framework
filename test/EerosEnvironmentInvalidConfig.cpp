@@ -9,6 +9,14 @@ void EerosEnvironmentInvalidConfig::SetUp() {
 	std::cout << "[----------] set-up invalid config EEROS test environment" << std::endl;
 	HAL& hal = HAL::instance();
 	
+	try {
+		hal.readConfigFromFile("invalidLib.json");
+	}
+	catch(eeros::EEROSException const & err){
+		ASSERT_EQ(err.what(), std::string("libinvalideeros.so: cannot open shared object file: No such file or directory"));
+		std::cout << "[----------] invalid library in config detected, test successful!" << std::endl;
+	}
+		
 	if(libcomedi) {
 		try {
 			hal.readConfigFromFile("invalidScaleComedi.json");

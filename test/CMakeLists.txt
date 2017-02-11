@@ -86,7 +86,8 @@ set( HAL_CONFIG_FILES
       ${EEROS_SOURCE_DIR}/test/hal/invalidChannelSim.json
       ${EEROS_SOURCE_DIR}/test/hal/invalidTypeComedi.json
       ${EEROS_SOURCE_DIR}/test/hal/invalidTypeFlink.json
-      ${EEROS_SOURCE_DIR}/test/hal/invalidTypeSim.json )
+      ${EEROS_SOURCE_DIR}/test/hal/invalidTypeSim.json
+      ${EEROS_SOURCE_DIR}/test/hal/invalidLib.json )
       
 foreach( halConfig_i ${HAL_CONFIG_FILES})
           add_custom_command(TARGET unitTests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${halConfig_i} "${EEROS_BINARY_DIR}/test/")
