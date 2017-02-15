@@ -17,6 +17,7 @@ namespace eeros {
 				for(uint8_t i = 0; i < N; i++) {
 					negated[i] = false;
 				}
+				out.getSignal().clear();
 			}
 
 			virtual void run() {
@@ -47,6 +48,12 @@ namespace eeros {
 			Output<T> out;
 			bool negated[N];
 		};
+		
+		/********** Print functions **********/
+		template <uint8_t N, typename T>
+		std::ostream& operator<<(std::ostream& os, Sum<N,T>& sum) {
+			os << "Block sum: '" << sum.getName() << "'"; 
+		}
 
 	};
 };

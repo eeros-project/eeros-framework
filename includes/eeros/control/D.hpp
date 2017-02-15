@@ -10,7 +10,9 @@ namespace eeros {
 		class D: public Block1i1o<T> {
 			
 		public:
-			D() : first(true) { }
+			D() : first(true) {
+				this->out.getSignal().clear();
+			}
 			
 			virtual void run() {
 				if(first) {  // first run, no previous value available -> set output to zero

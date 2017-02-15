@@ -1,6 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_INPUT_HPP_
 #define ORG_EEROS_CONTROL_INPUT_HPP_
 
+#include <stdexcept>
 #include <eeros/control/Signal.hpp>
 #include <eeros/control/Output.hpp>
 
@@ -34,8 +35,7 @@ namespace eeros {
 			
 			virtual Signal<T>& getSignal() {
 				if(isConnected()) return connectedOutput->getSignal();
-				// TODO error message or throw exception
-				return Signal<T>::getIllegalSignal();
+				throw std::runtime_error("Read from a unconnected input");
 			}
 			
 		protected:

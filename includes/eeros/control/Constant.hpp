@@ -13,9 +13,12 @@ namespace eeros {
 		public:
 			Constant() {
 				_clear<T>();
+				this->out.getSignal().clear();
 			}
 			
-			Constant(T v) : value(v) { }
+			Constant(T v) : value(v) { 
+				this->out.getSignal().clear();
+			}
 			
 			virtual void run() {
 				this->out.getSignal().setValue(value);
@@ -25,19 +28,30 @@ namespace eeros {
 			virtual void setValue(T newValue) {
 				value = newValue;
 			}
-			
+
+			template <typename X>
+			friend std::ostream& operator<<(std::ostream& os, Constant<X>& c);
+
 		protected:
 			T value;
 			
 		private:
 			template <typename S> typename std::enable_if<std::is_arithmetic<S>::value>::type _clear() {
 				value = 0;
+				this->out.getSignal().setValue(value);
 			}
 			
 			template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value>::type _clear() {
 				value.fill(0);
+				this->out.getSignal().setValue(value);
 			}
 		};
+		
+		/********** Print functions **********/
+		template <typename T>
+		std::ostream& operator<<(std::ostream& os, Constant<T>& c) {
+			os << "Block constant: '" << c.getName() << "' init val = " << c.value; 
+		}
 	};
 };
 

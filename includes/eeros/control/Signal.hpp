@@ -28,8 +28,8 @@ namespace eeros {
 				return name;
 			}
 			
-			virtual void setName(std::string n) {
-				name = name;
+			virtual void setName(std::string name) {
+				this->name = name;
 			}
 			
 			virtual std::string getLabel() const {
@@ -124,7 +124,17 @@ namespace eeros {
 		
 		template < typename T>
 		Signal<T> Signal<T>::illegalSignal;
-		
+	
+		/********** Print functions **********/
+		template <typename T>
+		std::ostream& operator<<(std::ostream& os, Signal<T>& signal) {
+			os << "Signal: '" << signal.getName() << "' timestamp = " << signal.getTimestamp() << " value = " << signal.getValue(); 
+		}
+		template <typename T>
+		std::ostream& operator<<(std::ostream& os, Signal<T>* signal) {
+			os << "Signal: '" << signal.getName() << "' timestamp = " << signal.getTimestamp() << " value = " << signal.getValue(); 
+		}
+
 	};
 };
 

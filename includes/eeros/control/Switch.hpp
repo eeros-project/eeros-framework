@@ -11,7 +11,9 @@ namespace eeros {
 		template < uint8_t N = 2, typename T = double >
 		class Switch : public Block {
 		public:
-			Switch(uint8_t initInputIndex) : currentInput(initInputIndex) { }
+			Switch(uint8_t initInputIndex) : currentInput(initInputIndex) { 
+				out.getSignal().clear();
+			}
 			
 			virtual void run() {
 				this->out.getSignal().setValue(this->in[currentInput].getSignal().getValue());

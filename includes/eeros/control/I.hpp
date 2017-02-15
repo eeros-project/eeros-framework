@@ -1,21 +1,15 @@
 #ifndef ORG_EEROS_CONTROL_I_HPP_
 #define ORG_EEROS_CONTROL_I_HPP_
 
-#include <eeros/control/Block.hpp>
-#include <eeros/control/Input.hpp>
-#include <eeros/core/System.hpp>
-
-#include <iostream>
+#include <eeros/control/Block1i1o.hpp>
 
 namespace eeros {
 	namespace control {
 
 		template < typename T = double >
-		class I: public eeros::control::Block {
-			
+		class I: public Block1i1o<T> {
 		public:
-			I() : first(true) { }
-			
+			I() : first(true), enabled(false) { }
 			
 			virtual void run() {
 				if(first) {  // first run, no previous value available -> set output to zero
@@ -31,7 +25,7 @@ namespace eeros {
 					double dt = (tin - tprev);
 					T valin = this->in.getSignal().getValue();
 					T valprev = this->prev.getValue();
-					
+					T output;
 					if(enabled)
 						output = valprev + valin * dt;
 					else
@@ -49,33 +43,22 @@ namespace eeros {
 			virtual void disable() {
 				this->enabled = false;
 			}
-			virtual void setInitCondition(T pos) {
-				this->prev.setValue(pos);
+			virtual void setInitCondition(T val) {
+				this->prev.setValue(val);
 				this->prev.setTimestamp(this->out.getSignal().getTimestamp());
 			}
 			
-			virtual eeros::control::Input<T>& getIn() {
-				return in;
-			}
-			virtual eeros::control::Output<T>& getOut() {
-				return out;
-			}
-			virtual eeros::control::Input<bool>& getEnable() {
-				return enable_ext;
-			}
-
-			eeros::control::Signal<T> prev;
-			
-// 		protected:
+		protected:
 			bool first;
-			bool enabled = false;
-			T output; 
-			
-			eeros::control::Input<T> in;
-			eeros::control::Output<T> out;
-			eeros::control::Input<bool> enable_ext;
-			
+			bool enabled;
+			Signal<T> prev;
 		};
+		
+		/********** Print functions **********/
+		template <typename T>
+		std::ostream& operator<<(std::ostream& os, I<T>& i) {
+			os << "Block integrator: '" << i.getName(); 
+		}
 	};
 };
 #endif /* ORG_EEROS_CONTROL_I_HPP_ */

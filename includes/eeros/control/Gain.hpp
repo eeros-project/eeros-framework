@@ -12,10 +12,12 @@ namespace eeros {
 		public:
 			Gain() : enabled(true) {
 				gain = 1;
+				this->out.getSignal().clear();
 			}
 			
 			Gain(Tgain c) : enabled(true) {
 				gain = c; 
+				this->out.getSignal().clear();
 			}
 			
 			virtual void run() {
@@ -39,7 +41,10 @@ namespace eeros {
 			virtual void setGain(Tgain c) {
 				gain = c;
 			}
-			
+
+			template <typename Xout, typename Xgain>
+			friend std::ostream& operator<<(std::ostream& os, Gain<Xout,Xgain>& gain);
+
 		protected:
 			Tgain gain;
 			bool enabled;
@@ -51,10 +56,12 @@ namespace eeros {
 		public:
 			Gain() : enabled(true) {
 				gain = 1;
+				this->out.getSignal().clear();
 			}
 			
 			Gain(Tgain c) : enabled(true) {
 				gain = c;
+				this->out.getSignal().clear();
 			}
 			
 			virtual void run() {
@@ -83,6 +90,13 @@ namespace eeros {
 			Tgain gain;
 			bool enabled;
 		};
+		
+				/********** Print functions **********/
+		template <typename Tout, typename Tgain>
+		std::ostream& operator<<(std::ostream& os, Gain<Tout,Tgain>& gain) {
+			os << "Block gain: '" << gain.getName() << "' gain val = " << gain.gain; 
+		}
+
 	};
 };
 

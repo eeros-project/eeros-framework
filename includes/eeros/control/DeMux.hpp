@@ -12,7 +12,9 @@ namespace eeros {
 		template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T> >
 		class DeMux: public Block {
 		public:
-			DeMux() { }
+			DeMux() { 
+				for(int i = 0; i < N; i++) this->out[i].getSignal().clear();
+			}
 			
 			virtual void run() {
 				for(int i = 0; i < N; i++) {

@@ -12,7 +12,7 @@ namespace eeros {
 			
 		public:
 			Step(T initValue = 0, T stepHeight = 1, double delayTime = 1) {
-				
+				this->out.getSignal().clear();
 			}
 			
 			
@@ -46,6 +46,9 @@ namespace eeros {
 				this->stepTime = delayTime;
 			}
 
+			template <typename X>
+			friend std::ostream& operator<<(std::ostream& os, Step<X>& step);
+			
 		protected:
 			T initValue;
 			T stepHeight;
@@ -53,6 +56,12 @@ namespace eeros {
 			bool stepDone;
 			bool first;
 		};
+
+		/********** Print functions **********/
+		template <typename T>
+		std::ostream& operator<<(std::ostream& os, Step<T>& step) {
+			os << "Block step: '" << step.getName() << "' init val = " << step.initValue << " step height = " << step.stepHeight << " delay time = " << step.stepTime; 
+		}
 
 	};
 };

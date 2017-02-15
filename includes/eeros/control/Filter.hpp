@@ -11,7 +11,7 @@
 namespace eeros {
 	namespace control {
 		
-		class Filter: public eeros::control::Block1i1o<eeros::math::Vector2> {
+		class Filter: public Block1i1o<math::Vector2> {
 			
 		public:
 			Filter(double k);
