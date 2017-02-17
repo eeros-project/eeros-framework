@@ -17,10 +17,10 @@ using namespace eeros::hal;
 using namespace eeros::safety;
 
 SimSafetyProperties::SimSafetyProperties(SimControlSystem* cs) : controlSys(cs), 
-	  slOff("System off"),
-	  slRunning("running"),
+	  slOff("System off")
+// 	  slRunning("running"),
 	  
-	  seRun("start running")
+// 	  seRun("start running")
 	 {
 
 // 	  HAL& hal = HAL::instance();
@@ -32,23 +32,23 @@ SimSafetyProperties::SimSafetyProperties(SimControlSystem* cs) : controlSys(cs),
 	// ############ Define Levels ############
 	
 	addLevel(slOff);
-	addLevel(slRunning);
-	
-	// ############ Add events to the levels ############
-	
-	// ############ Define input states and events for all levels ############
-	slOff.addEvent(seRun, slRunning, kPublicEvent);
-	
-	// Define output states and events for all levels 
-
-	// *** Define and add level functions *** //
-	slOff.setLevelAction([&](SafetyContext* privateContext){
-		static int cnt = 0;
-		cnt++;
-		if(cnt > 2000){
-			privateContext->triggerEvent(seRun);
-		}
-	});
+// 	addLevel(slRunning);
+// 	
+// 	// ############ Add events to the levels ############
+// 	
+// 	// ############ Define input states and events for all levels ############
+// 	slOff.addEvent(seRun, slRunning, kPublicEvent);
+// 	
+// 	// Define output states and events for all levels 
+// 
+// 	// *** Define and add level functions *** //
+// 	slOff.setLevelAction([&](SafetyContext* privateContext){
+// // 		static int cnt = 0;
+// // 		cnt++;
+// // 		if(cnt > 2000){
+// 			privateContext->triggerEvent(seRun);
+// // 		}
+// 	});
 	
 	// Define entry level
 	setEntryLevel(slOff);

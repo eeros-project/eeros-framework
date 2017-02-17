@@ -28,9 +28,6 @@ private:
 	eeros::hal::Input<bool> &simIn_in1 = *hal.getLogicInput("in1");
 	eeros::hal::Output<bool> &simIn_out1 = *hal.getLogicOutput("out1");
 	
-	eeros::hal::Output<double> &aOut0 = *hal.getRealOutput("aOut0");
-// 	eeros::hal::Input<double> &aIn2 = *hal.getRealInput("aIn2");
-// 	eeros::hal::Output<double> &aOutTest2 = *hal.getRealOutput("aOutTest2");
 };
 		
 #endif // CH_NTB_SIMMAINSEQUENCE_HPP_  

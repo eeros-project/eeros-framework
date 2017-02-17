@@ -18,12 +18,12 @@
 			// inputs
 			
 			eeros::safety::SafetyLevel slOff;
-			eeros::safety::SafetyLevel slRunning;
+// 			eeros::safety::SafetyLevel slRunning;
 		
 		private:
 			SimControlSystem* controlSys;
 			
-			eeros::safety::SafetyEvent seRun;
+// 			eeros::safety::SafetyEvent seRun;
 	};
 
 	#endif // CH_NTB_SIMSAFETYPROPERTIES_HPP_

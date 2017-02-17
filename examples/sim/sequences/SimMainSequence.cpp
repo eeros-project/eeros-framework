@@ -23,18 +23,18 @@ bool SimMainSequence::checkPreCondition() {
 }
 
 void SimMainSequence::run() {
-	while(safetySys->getCurrentLevel() < safetyProp->slRunning){
-		if(isTerminating()) break;
-		usleep(10000);
-	}
+// 	while(safetySys->getCurrentLevel() < safetyProp->slRunning){
+// 		if(isTerminating()) break;
+// 		usleep(100);
+// 	}
 	
 	bool set = false;
 	bool toggleAnalog = false;
 	log.trace() << "[ Main Sequence Started ]";
 	
 	log.info() << "Starting...";
-	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){
-		
+	for(int i = 0; (i < 1000000) && (!isTerminating()); i++){	  
+	  
 		if(i%5 == 0){
 			log.info() << "simOut_in0:\t" << controlSys->simOut_in0.getOut().getSignal().getValue() << "\tsimIn_in1:\t" << simIn_in1.get();
 			log.info() << "aInTest0:\t" << controlSys->aInTest0.getOut().getSignal().getValue() << 
@@ -59,18 +59,14 @@ void SimMainSequence::run() {
 		if(i%100 == 0){
 			if(toggleAnalog){
 				log.info() << "set aOut to 6, test aOut2 to -3.2";
-// 				controlSys->aOut0.getIn().getSignal().setValue(6.0);
-				aOut0.set(6.0);
-				controlSys->aOutTest2.getIn().getSignal().setValue(-3.2);
-// 				aOutTest2.set(-3.0);
+				controlSys->setAOut0.setValue(6.0);
+				controlSys->setAOutTest2.setValue(-3.2);
 				toggleAnalog = false;
 			}
 			else{
 				log.info() << "set aOut to -2, test aOut2 to 7.6";
-// 				controlSys->aOut0.getIn().getSignal().setValue(-2.0);
-				aOut0.set(-2.0);
-				controlSys->aOutTest2.getIn().getSignal().setValue(7.6);
-// 				aOutTest2.set(7.5);
+				controlSys->setAOut0.setValue(-2.0);
+				controlSys->setAOutTest2.setValue(7.6);
 				toggleAnalog = true;
 			}
 		}

@@ -172,7 +172,7 @@ Output<bool>* HAL::getLogicOutput(std::string name, bool exclusive) {
 	return out;
 }
 
-ScalableOutput<double>* HAL::getRealOutput(std::string name, bool exclusive) {
+ScalableOutput<double>* HAL::getScalableOutput(std::string name, bool exclusive) {
 	ScalableOutput<double>* out = dynamic_cast<ScalableOutput<double>*>(outputs[name]);
 	if(out == nullptr) throw EEROSException("Real system output '" + name + "' not found!");
 	
@@ -223,7 +223,7 @@ Input<bool>* HAL::getLogicInput(std::string name, bool exclusive) {
 	return in;
 }
 
-ScalableInput<double>* HAL::getRealInput(std::string name, bool exclusive) {
+ScalableInput<double>* HAL::getScalableInput(std::string name, bool exclusive) {
 	ScalableInput<double>* in = dynamic_cast<ScalableInput<double>*>(inputs[name]);
 	if(in == nullptr) throw EEROSException("Real system input '" + name + "' not found!");
 	
