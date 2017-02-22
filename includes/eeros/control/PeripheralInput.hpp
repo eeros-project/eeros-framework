@@ -14,7 +14,7 @@ namespace eeros {
 
 		public:
 			PeripheralInput(std::string id) : hal(hal::HAL::instance()) {
-				this->out.getSignal.clear();
+				this->out.getSignal().clear();
 				systemInput = dynamic_cast<eeros::hal::PeripheralInput<T>*>(hal.getPeripheralInput(id));
 				if(systemInput == nullptr) throw EEROSException("Peripheral input '" + id + "' not found!");
 			}

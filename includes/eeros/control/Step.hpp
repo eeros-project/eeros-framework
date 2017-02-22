@@ -11,18 +11,19 @@ namespace eeros {
 		class Step : public Block1o<T> {
 			
 		public:
-			Step(T initValue = 0, T stepHeight = 1, double delayTime = 1) {
+			Step(T initValue = 0, T stepHeight = 1, double delayTime = 1) : initValue(initValue), stepHeight(stepHeight), delayTime(delayTime) {
+				first = true;
 				this->out.getSignal().clear();
 			}
 			
 			
 			virtual void run() {
 				if(first) {
-					stepTime += System::getTime();
+					delayTime += System::getTime();
 					this->out.getSignal().setValue(initValue);
 					first = false;
 				}
-				else if(!stepDone && System::getTime() >= stepTime) {
+				else if(!stepDone && System::getTime() >= delayTime) {
 					this->out.getSignal().setValue(initValue + stepHeight);
 					stepDone = true;
 				}
@@ -43,7 +44,7 @@ namespace eeros {
 			}
 			
 			virtual void setDelayTime(double delayTime) {
-				this->stepTime = delayTime;
+				this->delayTime = delayTime;
 			}
 
 			template <typename X>
@@ -52,7 +53,7 @@ namespace eeros {
 		protected:
 			T initValue;
 			T stepHeight;
-			double stepTime;
+			double delayTime;
 			bool stepDone;
 			bool first;
 		};
@@ -60,7 +61,7 @@ namespace eeros {
 		/********** Print functions **********/
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, Step<T>& step) {
-			os << "Block step: '" << step.getName() << "' init val = " << step.initValue << " step height = " << step.stepHeight << " delay time = " << step.stepTime; 
+			os << "Block step: '" << step.getName() << "' init val = " << step.initValue << " step height = " << step.stepHeight << " delay time = " << step.delayTime; 
 		}
 
 	};
