@@ -7,7 +7,7 @@
 using namespace eeros;
 using namespace eeros::hal;
 
-TEST(hal_LoadConfigFileTest, noFile){
+TEST(halLoadConfigFileTest, noFile){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -21,7 +21,7 @@ TEST(hal_LoadConfigFileTest, noFile){
 	}
 }
 
-TEST(hal_configFileTest, scaleOffsetAnalogOut0){
+TEST(halConfigFileTest, scaleOffsetAnalogOut0){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -40,7 +40,7 @@ TEST(hal_configFileTest, scaleOffsetAnalogOut0){
 	}
 }
 
-TEST(hal_configFileTest, scaleOffsetAnalogOut1){
+TEST(halConfigFileTest, scaleOffsetAnalogOut1){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -59,7 +59,7 @@ TEST(hal_configFileTest, scaleOffsetAnalogOut1){
 	}
 }
 
-TEST(hal_configFileTest, scaleOffsetAnalogOut2){
+TEST(halConfigFileTest, scaleOffsetAnalogOut2){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -78,7 +78,7 @@ TEST(hal_configFileTest, scaleOffsetAnalogOut2){
 	}
 }
 
-TEST(hal_configFileTest, scaleOffsetAnalogOut3){
+TEST(halConfigFileTest, scaleOffsetAnalogOut3){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -97,7 +97,7 @@ TEST(hal_configFileTest, scaleOffsetAnalogOut3){
 	}
 }
 
-TEST(hal_configFileTest, rangeAnalogOut0){
+TEST(halConfigFileTest, rangeAnalogOut0){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -116,7 +116,7 @@ TEST(hal_configFileTest, rangeAnalogOut0){
 	}
 }
 
-TEST(hal_configFileTest, rangeAnalogOut1){
+TEST(halConfigFileTest, rangeAnalogOut1){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -135,7 +135,7 @@ TEST(hal_configFileTest, rangeAnalogOut1){
 	}
 }
 
-TEST(hal_configFileTest, rangeAnalogOut2){
+TEST(halConfigFileTest, rangeAnalogOut2){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -154,7 +154,7 @@ TEST(hal_configFileTest, rangeAnalogOut2){
 	}
 }
 
-TEST(hal_configFileTest, rangeAnalogOut3){
+TEST(halConfigFileTest, rangeAnalogOut3){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -173,7 +173,7 @@ TEST(hal_configFileTest, rangeAnalogOut3){
 	}
 }
 
-TEST(hal_configFileTest, scaleAnalogIn0){
+TEST(halConfigFileTest, scaleAnalogIn0){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -192,7 +192,7 @@ TEST(hal_configFileTest, scaleAnalogIn0){
 	}
 }
 
-TEST(hal_configFileTest, rangeAnalogIn0){
+TEST(halConfigFileTest, rangeAnalogIn0){
 	HAL& hal = HAL::instance();
 	
 	try{

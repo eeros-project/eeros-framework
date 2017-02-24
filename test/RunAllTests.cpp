@@ -12,9 +12,9 @@
  * execute all unit tests with comedilib: 	./unitTests  --library comedi
  * or with short option: 			./unitTests -l comedi
  * execute all unit tests with flinklib: 	./unitTests  --library flink
- * execute hal unit tests with comedilib: 	./unitTests --library comedi --gtest_filter=hal_*
- * or with short option:			./unitTests -l comedi --gtest_filter=hal_*
- * execute math unit tests: 			./unitTests --gtest_filter=math_*
+ * execute hal unit tests with comedilib: 	./unitTests --library comedi --gtest_filter=hal*
+ * or with short option:			./unitTests -l comedi --gtest_filter=hal*
+ * execute math unit tests: 			./unitTests --gtest_filter=math*
  * 
  * */
 

@@ -6,7 +6,7 @@
 using namespace eeros;
 using namespace eeros::hal;
 
-TEST(hal_HalManagerTest, availableDigInOut){
+TEST(halHalManagerTest, availableDigInOut){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -34,7 +34,7 @@ TEST(hal_HalManagerTest, availableDigInOut){
 	}
 }
 
-TEST(hal_HalManagerTest, notAvailableDigInOut){
+TEST(halHalManagerTest, notAvailableDigInOut){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -49,7 +49,7 @@ TEST(hal_HalManagerTest, notAvailableDigInOut){
 	}
 }
 
-TEST(hal_HalManagerTest, emptySignalIdLogicIn){
+TEST(halHalManagerTest, emptySignalIdLogicIn){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -64,7 +64,7 @@ TEST(hal_HalManagerTest, emptySignalIdLogicIn){
 	}
 }
 
-TEST(hal_HalManagerTest, emptySignalIdLogicOut){
+TEST(halHalManagerTest, emptySignalIdLogicOut){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -79,7 +79,7 @@ TEST(hal_HalManagerTest, emptySignalIdLogicOut){
 	}
 }
 
-TEST(hal_HalManagerTest, emptySignalIdRealIn){
+TEST(halHalManagerTest, emptySignalIdRealIn){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -94,7 +94,7 @@ TEST(hal_HalManagerTest, emptySignalIdRealIn){
 	}
 }
 
-TEST(hal_HalManagerTest, emptySignalIdRealOut){
+TEST(halHalManagerTest, emptySignalIdRealOut){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -109,7 +109,7 @@ TEST(hal_HalManagerTest, emptySignalIdRealOut){
 	}
 }
 
-TEST(hal_HalManagerTest, wrongTypeRealIn){
+TEST(halHalManagerTest, wrongTypeRealIn){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -124,7 +124,7 @@ TEST(hal_HalManagerTest, wrongTypeRealIn){
 	}
 }
 
-TEST(hal_HalManagerTest, wrongTypeRealOut){
+TEST(halHalManagerTest, wrongTypeRealOut){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -139,7 +139,7 @@ TEST(hal_HalManagerTest, wrongTypeRealOut){
 	}
 }
 
-TEST(hal_HalManagerTest, wrongTypeLogicIn){
+TEST(halHalManagerTest, wrongTypeLogicIn){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -154,7 +154,7 @@ TEST(hal_HalManagerTest, wrongTypeLogicIn){
 	}
 }
 
-TEST(hal_HalManagerTest, wrongTypeLogicOut){
+TEST(halHalManagerTest, wrongTypeLogicOut){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -169,7 +169,7 @@ TEST(hal_HalManagerTest, wrongTypeLogicOut){
 	}
 }
 
-TEST(hal_HalManagerTest, wrongDirectionLogicIn){
+TEST(halHalManagerTest, wrongDirectionLogicIn){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -184,7 +184,7 @@ TEST(hal_HalManagerTest, wrongDirectionLogicIn){
 	}
 }
 
-TEST(hal_HalManagerTest, wrongDirectionLogicOut){
+TEST(halHalManagerTest, wrongDirectionLogicOut){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -199,7 +199,7 @@ TEST(hal_HalManagerTest, wrongDirectionLogicOut){
 	}
 }
 
-TEST(hal_HalManagerTest, wrongDirectionRealIn){
+TEST(halHalManagerTest, wrongDirectionRealIn){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -214,7 +214,7 @@ TEST(hal_HalManagerTest, wrongDirectionRealIn){
 	}
 }
 
-TEST(hal_HalManagerTest, wrongDirectionRealOut){
+TEST(halHalManagerTest, wrongDirectionRealOut){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -229,7 +229,7 @@ TEST(hal_HalManagerTest, wrongDirectionRealOut){
 	}
 }
 
-TEST(hal_HalManagerTest, claimReservedInput){
+TEST(halHalManagerTest, claimReservedInput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -247,7 +247,7 @@ TEST(hal_HalManagerTest, claimReservedInput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveInput){
+TEST(halHalManagerTest, claimNonExclusiveInput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -265,7 +265,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveInput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveInput){
+TEST(halHalManagerTest, claimNonExclusiveThenExclusiveInput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -285,7 +285,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveInput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveInputFail){
+TEST(halHalManagerTest, claimNonExclusiveThenExclusiveInputFail){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -303,7 +303,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveInputFail){
 	}
 }
 
-TEST(hal_HalManagerTest, claimReservedNonExclusiveInput){
+TEST(halHalManagerTest, claimReservedNonExclusiveInput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -321,7 +321,7 @@ TEST(hal_HalManagerTest, claimReservedNonExclusiveInput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimReservedOutput){
+TEST(halHalManagerTest, claimReservedOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -339,7 +339,7 @@ TEST(hal_HalManagerTest, claimReservedOutput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveOutput){
+TEST(halHalManagerTest, claimNonExclusiveOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -357,7 +357,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveOutput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveOutput){
+TEST(halHalManagerTest, claimNonExclusiveThenExclusiveOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -377,7 +377,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveOutput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveOutputFail){
+TEST(halHalManagerTest, claimNonExclusiveThenExclusiveOutputFail){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -395,7 +395,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveOutputFail){
 	}
 }
 
-TEST(hal_HalManagerTest, claimReservedNonExclusiveOutput){
+TEST(halHalManagerTest, claimReservedNonExclusiveOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -413,7 +413,7 @@ TEST(hal_HalManagerTest, claimReservedNonExclusiveOutput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimReservedRealInput){
+TEST(halHalManagerTest, claimReservedRealInput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -431,7 +431,7 @@ TEST(hal_HalManagerTest, claimReservedRealInput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveRealInput){
+TEST(halHalManagerTest, claimNonExclusiveRealInput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -449,7 +449,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveRealInput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveRealInput){
+TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealInput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -469,7 +469,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveRealInput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveRealInputFail){
+TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealInputFail){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -487,7 +487,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveRealInputFail){
 	}
 }
 
-TEST(hal_HalManagerTest, claimReservedNonExclusiveRealInput){
+TEST(halHalManagerTest, claimReservedNonExclusiveRealInput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -505,7 +505,7 @@ TEST(hal_HalManagerTest, claimReservedNonExclusiveRealInput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimReservedRealOutput){
+TEST(halHalManagerTest, claimReservedRealOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -523,7 +523,7 @@ TEST(hal_HalManagerTest, claimReservedRealOutput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveRealOutput){
+TEST(halHalManagerTest, claimNonExclusiveRealOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -541,7 +541,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveRealOutput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveRealOutput){
+TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -561,7 +561,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveRealOutput){
 	}
 }
 
-TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveRealOutputFail){
+TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealOutputFail){
 	HAL& hal = HAL::instance();
 	
 	try{
@@ -579,7 +579,7 @@ TEST(hal_HalManagerTest, claimNonExclusiveThenExclusiveRealOutputFail){
 	}
 }
 
-TEST(hal_HalManagerTest, claimReservedNonExclusiveRealOutput){
+TEST(halHalManagerTest, claimReservedNonExclusiveRealOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
