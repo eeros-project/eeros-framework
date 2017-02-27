@@ -52,6 +52,10 @@ namespace eeros {
 			return description;
 		}
 
+		uint32_t SafetyLevel::getNofActivations() {
+			return nofActivations;
+		}
+
 		SafetyLevel* SafetyLevel::getDestLevelForEvent(SafetyEvent event, bool privateEventOk) {
 			auto it = transitions.find(event.id);
 			if(it != transitions.end()) {

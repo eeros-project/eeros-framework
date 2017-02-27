@@ -1,2 +1,5 @@
 add_executable(safetySystemTest1 SafetySystemTest1.cpp)
 target_link_libraries(safetySystemTest1 eeros pthread)
+
+add_executable(safetySystemTest2 SafetySystemTest2.cpp)
+target_link_libraries(safetySystemTest2 eeros pthread)

@@ -37,6 +37,7 @@ namespace eeros {
 			SafetyLevel(std::string description);
 			virtual ~SafetyLevel();
 			std::string getDescription();
+			uint32_t getNofActivations();
 			SafetyLevel* getDestLevelForEvent(SafetyEvent event, bool privateEventOk = false);
 			void addEvent(SafetyEvent event, SafetyLevel& nextLevel, EventType type = kPrivateEvent);
 			void setInputAction(InputAction* action); // TODO rename to add...
@@ -53,6 +54,7 @@ namespace eeros {
 		private:
 			std::function<void (SafetyContext*)> action;
 			int32_t id;
+			uint32_t nofActivations;
 			std::string description;
 			std::map<uint32_t, std::pair<SafetyLevel*, EventType>> transitions;
 			std::vector<InputAction*> inputAction;

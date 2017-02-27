@@ -42,6 +42,7 @@ namespace eeros {
 			if(safetyProperties.verify()) {
 				properties = safetyProperties;
 				currentLevel = properties.getEntryLevel();
+				currentLevel->nofActivations = 0;
 				nextLevel = currentLevel;
 				log.warn() << "safety system verified: " << (int)properties.levels.size() << " safety levels are present";
 				return true;
@@ -58,8 +59,13 @@ namespace eeros {
 					// prioritize multiple events, 
 					// can be called by different threads
 					mtx.lock();
-					if(nextLevel == currentLevel) nextLevel = newLevel;
-					else if(newLevel->id < nextLevel->id) nextLevel = newLevel;
+					if(nextLevel == currentLevel) {
+						nextLevel = newLevel;
+						nextLevel->nofActivations = 0;
+					} else if(newLevel->id < nextLevel->id) {
+						nextLevel = newLevel;
+						nextLevel->nofActivations = 0;
+					}
 					mtx.unlock();
 					if(transition) log.info() << "new safety level: '" << nextLevel << "\'";	
 				} else {
@@ -86,6 +92,7 @@ namespace eeros {
 
 				// 1) Get currentLevel
 				SafetyLevel* level = currentLevel;
+				level->nofActivations++;
 				
 				// 2) Read inputs
 				for(auto ia : level->inputAction) {
