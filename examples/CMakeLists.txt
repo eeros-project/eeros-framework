@@ -8,11 +8,5 @@ add_subdirectory(safety)
 #add_subdirectory(rtTest)
 add_subdirectory(hal)
 add_subdirectory(sim)
-
-# if(LIBCOMEDI)
 add_subdirectory(simpleMotorController)
-# endif()
 
-#if(LIBFLINK)
-#	add_subdirectory(flink)
-#endif()
