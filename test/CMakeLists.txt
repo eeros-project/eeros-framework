@@ -39,8 +39,6 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "googletest-download" "googletest-src" "googletest-build")
-
 #######################
 # EEROS test sources
 #######################

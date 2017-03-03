@@ -140,10 +140,6 @@ if(result)
   message(FATAL_ERROR "Build step for libucl failed: ${result}")
 endif()
 
-# Prevent overriding the parent project's compiler/linker
-# settings on Windows
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
 # Add libucl directly to our build. This defines
 # the libucl target.
 add_subdirectory(${EEROS_BINARY_DIR}/libucl-src
@@ -151,9 +147,6 @@ add_subdirectory(${EEROS_BINARY_DIR}/libucl-src
 
 include_directories("${libucl_SOURCE_DIR}/include")
 link_directories(${libucl_BINARY_DIR})
-
-# set property to remove libucl directories on clean
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "libucl-download" "libucl-src" "libucl-build")
 
 ###### libucl ######
 
