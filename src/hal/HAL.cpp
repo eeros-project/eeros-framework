@@ -1,5 +1,5 @@
 #include <eeros/hal/HAL.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 
 using namespace eeros;
 using namespace eeros::hal;
@@ -44,18 +44,18 @@ PeripheralOutputInterface* HAL::getPeripheralOutput(std::string name, bool exclu
 
 PeripheralOutput<bool>* HAL::getLogicPeripheralOutput(std::string name, bool exclusive) {
 	PeripheralOutput<bool>* out = dynamic_cast<PeripheralOutput<bool>*>(outputs[name]);
-	if(out == nullptr) throw EEROSException("Logic system output '" + name + "' not found!");
+	if(out == nullptr) throw Fault("Logic system output '" + name + "' not found!");
 	if(exclusive) {
-		if(!exclusiveReservedOutputs.insert(out).second) throw EEROSException("Logic system output '" + name + "' is exclusive reserved!");
+		if(!exclusiveReservedOutputs.insert(out).second) throw Fault("Logic system output '" + name + "' is exclusive reserved!");
 	}
 	return out;
 }
 
 PeripheralOutput<double>* HAL::getRealPeripheralOutput(std::string name, bool exclusive) {
 	PeripheralOutput<double>* out = dynamic_cast<PeripheralOutput<double>*>(outputs[name]);
-	if(out == nullptr) throw EEROSException("Real system output '" + name + "' not found!");
+	if(out == nullptr) throw Fault("Real system output '" + name + "' not found!");
 	if(exclusive) {
-		if(!exclusiveReservedOutputs.insert(out).second) throw EEROSException("Real system output '" + name + "' is exclusive reserved!");
+		if(!exclusiveReservedOutputs.insert(out).second) throw Fault("Real system output '" + name + "' is exclusive reserved!");
 	}
 	return out;
 }
@@ -66,18 +66,18 @@ PeripheralInputInterface* HAL::getPeripheralInput(std::string name, bool exclusi
 
 PeripheralInput<bool>* HAL::getLogicPeripheralInput(std::string name, bool exclusive) {
 	PeripheralInput<bool>* in = dynamic_cast<PeripheralInput<bool>*>(inputs[name]);
-	if(in == nullptr) throw EEROSException("Logic system input '" + name + "' not found!");
+	if(in == nullptr) throw Fault("Logic system input '" + name + "' not found!");
 	if(exclusive) {
-		if(!exclusiveReservedInputs.insert(in).second) throw EEROSException("Logic system input '" + name + "' is exclusive reserved!");
+		if(!exclusiveReservedInputs.insert(in).second) throw Fault("Logic system input '" + name + "' is exclusive reserved!");
 	}
 	return in;
 }
 
 PeripheralInput<double>* HAL::getRealPeripheralInput(std::string name, bool exclusive) {
 	PeripheralInput<double>* in = dynamic_cast<PeripheralInput<double>*>(inputs[name]);
-	if(in == nullptr) throw EEROSException("Real system input '" + name + "' not found!");
+	if(in == nullptr) throw Fault("Real system input '" + name + "' not found!");
 	if(exclusive) {
-		if(!exclusiveReservedInputs.insert(in).second) throw EEROSException("Real system input '" + name + "' is exclusive reserved!");
+		if(!exclusiveReservedInputs.insert(in).second) throw Fault("Real system input '" + name + "' is exclusive reserved!");
 	}
 	return in;
 }

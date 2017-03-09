@@ -12,19 +12,16 @@ namespace eeros {
 		public:
 			Gain() : enabled(true) {
 				gain = 1;
-				this->out.getSignal().clear();
 			}
 			
 			Gain(Tgain c) : enabled(true) {
 				gain = c; 
-				this->out.getSignal().clear();
 			}
 			
 			virtual void run() {
 				if(enabled) {
 					this->out.getSignal().setValue(gain * this->in.getSignal().getValue());
-				}
-				else {
+				} else {
 					this->out.getSignal().setValue(this->in.getSignal().getValue());
 				}
 				this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
@@ -67,8 +64,7 @@ namespace eeros {
 			virtual void run() {
 				if(enabled) {
 					this->out.getSignal().setValue(this->in.getSignal().getValue().multiplyElementWise(gain));
-				}
-				else {
+				} else {
 					this->out.getSignal().setValue(this->in.getSignal().getValue());
 				}
 				this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());

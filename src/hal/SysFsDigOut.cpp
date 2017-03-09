@@ -1,5 +1,5 @@
 #include <eeros/hal/SysFsDigOut.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 
 using namespace eeros::hal;
 
@@ -10,7 +10,7 @@ SysFsDigOut::SysFsDigOut(std::string id, unsigned int gpio, bool inverted) : Per
 	// Export GPIO
 	exportFile.open("/sys/class/gpio/export");
 	if(!exportFile.is_open()) {
-		throw EEROSException("Failed to export GPIO" +  std::to_string(gpio) + "!");
+		throw Fault("Failed to export GPIO" +  std::to_string(gpio) + "!");
 	}
 	exportFile << gpio;
 	exportFile.close();
@@ -18,7 +18,7 @@ SysFsDigOut::SysFsDigOut(std::string id, unsigned int gpio, bool inverted) : Per
 	// Set GPIO direction to output
 	directionFile.open(basePath + "direction");
 	if(!directionFile.is_open()) {
-		throw EEROSException("Failed to set direction to output for GPIO" +  std::to_string(gpio) + "!");
+		throw Fault("Failed to set direction to output for GPIO" +  std::to_string(gpio) + "!");
 	}
 	directionFile << "out";
 	directionFile.close();
@@ -26,7 +26,7 @@ SysFsDigOut::SysFsDigOut(std::string id, unsigned int gpio, bool inverted) : Per
 	// Open value file
 	valueFile.open(basePath + "value");
 	if(!valueFile.is_open()) {
-		throw EEROSException("Failed to open value file for GPIO" +  std::to_string(gpio) + "!");
+		throw Fault("Failed to open value file for GPIO" +  std::to_string(gpio) + "!");
 	}
 }
 

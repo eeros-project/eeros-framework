@@ -1,6 +1,5 @@
 #include <eeros/safety/SafetyContext.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
-#include <eeros/core/EEROSException.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 
 using namespace eeros::safety;

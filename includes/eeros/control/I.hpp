@@ -2,6 +2,7 @@
 #define ORG_EEROS_CONTROL_I_HPP_
 
 #include <eeros/control/Block1i1o.hpp>
+#include <iostream>
 
 namespace eeros {
 	namespace control {
@@ -30,7 +31,7 @@ namespace eeros {
 						output = valprev + valin * dt;
 					else
 						output = valprev;
-					
+
 					this->out.getSignal().setValue(output);
 					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
 					this->prev = this->out.getSignal();

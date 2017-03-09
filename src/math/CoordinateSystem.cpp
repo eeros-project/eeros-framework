@@ -1,5 +1,5 @@
 #include <eeros/math/Frame.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 
 using namespace eeros;
 using namespace eeros::math;
@@ -14,7 +14,7 @@ CoordinateSystem::CoordinateSystem(std::string id) : id(id) {
 	if(!CoordinateSystem::list.insert( {id, this} ).second) {
 		std::stringstream msg;
 		msg << "Coordinate system with id '" << id << "' exists already, pleace choose a unique name!";
-		throw EEROSException(msg.str());
+		throw Fault(msg.str());
 	}
 }
 

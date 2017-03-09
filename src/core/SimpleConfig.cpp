@@ -1,5 +1,5 @@
 #include <eeros/core/SimpleConfig.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 
 #include <fstream>
 
@@ -22,7 +22,7 @@ SimpleConfig::~SimpleConfig() { }
 
 bool SimpleConfig::save(const char *path) {
 	if (path == nullptr) path = this->path;
-	if (path == nullptr) throw EEROSException("path is null");
+	if (path == nullptr) throw Fault("path is null");
 	char buffer[buffer_size + 1];
 	std::ofstream file(path);
 	if (file.fail()) return false;
@@ -43,7 +43,7 @@ bool SimpleConfig::save(const char *path) {
 
 bool SimpleConfig::load(const char *path) {
 	if (path == nullptr) path = this->path;
-	if (path == nullptr) throw EEROSException("path is null");
+	if (path == nullptr) throw Fault("path is null");
 	char buffer[buffer_size + 1];
 	std::ifstream file(path);
 	if (file.fail()) return false;

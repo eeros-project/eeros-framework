@@ -4,26 +4,38 @@
 #include <list>
 #include <string>
 #include <eeros/core/Runnable.hpp>
+#include <eeros/control/NotConnectedFault.hpp>
+#include <eeros/control/NaNOutputFault.hpp>
+#include <eeros/safety/SafetySystem.hpp>
+#include <eeros/safety/SafetyLevel.hpp>
 
 namespace eeros {
 	namespace control {
 
+		using namespace safety;
+
 		class TimeDomain : public virtual Runnable {
 		public:
-			TimeDomain(std::string name, double period, bool realtime);
+			TimeDomain(std::string name, double period, bool realtime, SafetySystem* ss = nullptr, SafetyEvent* e = nullptr);
 			virtual void addBlock(Runnable* block);
+			virtual void removeBlock(Runnable* block);
 			
 			std::string getName();
 			double getPeriod();
 			bool getRealtime();
 
 			virtual void run();
+			virtual void start();
+			virtual void stop();
 			
 		private:
 			std::string name;
 			double period;
 			bool realtime;
+			bool running = true;
 			std::list<Runnable*> blocks;
+			SafetySystem* safetySystem;
+			SafetyEvent* safetyEvent;
 		};
 
 	};

@@ -2,7 +2,6 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/hal/HAL.hpp>
-#include <eeros/core/EEROSException.hpp>
 #include <eeros/core/Executor.hpp>
 #include <eeros/task/Lambda.hpp>
 #include <eeros/hal/DummyLogicInput.hpp>

@@ -1,5 +1,5 @@
 #include <eeros/math/Frame.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 
 using namespace eeros;
 using namespace eeros::math;
@@ -11,7 +11,7 @@ Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b) : a(a), b(b) 
 	if(getFrame(a, b) != nullptr) {
 		std::stringstream msg;
 		msg << "Frame with a = '" << a << "' and b = '" << b << "' exists already!";
-		throw EEROSException(msg.str());
+		throw Fault(msg.str());
 	}
 	list.push_back(this);
 }
@@ -20,7 +20,7 @@ Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b, const eeros::
 	if(getFrame(a, b) != nullptr) {
 		std::stringstream msg;
 		msg << "Frame with a = '" << a << "' and b = '" << b << "' exists already!";
-		throw EEROSException(msg.str());
+		throw Fault(msg.str());
 	}
 	list.push_back(this);
 }
@@ -30,7 +30,7 @@ Frame::Frame(const CoordinateSystem& a, const CoordinateSystem& b, const eeros::
 	if(getFrame(a, b) != nullptr) {
 		std::stringstream msg;
 		msg << "Frame with a = '" << a << "' and b = '" << b << "' exists already!";
-		throw EEROSException(msg.str());
+		throw Fault(msg.str());
 	}
 	list.push_back(this);
 }
@@ -70,7 +70,7 @@ const CoordinateSystem& Frame::getToCoordinateSystem() const {
 
 Frame Frame::operator*(const Frame& right) const {
 	if(b != right.a) {
-		throw EEROSException("Frame coordinate systems incompatible!");
+		throw Fault("Frame coordinate systems incompatible!");
 	}
 	Frame result(a, right.b, T * right.T);
 	return result;

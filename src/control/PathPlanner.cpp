@@ -116,7 +116,7 @@ bool PathPlanner::move(std::string filename, double time_tot, AxisVector end_pos
 	
 	std::fstream file;
 	file.open(filename, std::fstream::in);
-	if(!file.is_open()) throw EEROSException("File for loading ref. systems is not open!");
+	if(!file.is_open()) throw Fault("File for loading ref. systems is not open!");
 
 // 	std::array<double, 100> input_time; 
 // 	std::array<double, 100> input_jerk; 

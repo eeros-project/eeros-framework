@@ -1,5 +1,5 @@
 #include <eeros/safety/SafetyProperties.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 
 #include <sstream>
 
@@ -37,7 +37,7 @@ namespace eeros {
 						else ++it;
 					}
 				}
-				if (!copy1.empty()) throw EEROSException("verification of safety properties failed, all critical outputs must be defined in level: " + l->getDescription());
+				if (!copy1.empty()) throw Fault("verification of safety properties failed, all critical outputs must be defined in level: " + l->getDescription());
 				check = check && copy1.empty();
 				
 				// if the input action for every critical input is defined
@@ -50,7 +50,7 @@ namespace eeros {
 						else ++it;
 					}
 				}
-				if (!copy2.empty()) throw EEROSException("verification of safety properties failed, all critical inputs must be defined in level: " + l->getDescription());
+				if (!copy2.empty()) throw Fault("verification of safety properties failed, all critical inputs must be defined in level: " + l->getDescription());
 				check = check && copy2.empty();
 			}
 			

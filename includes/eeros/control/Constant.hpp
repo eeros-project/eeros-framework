@@ -13,12 +13,9 @@ namespace eeros {
 		public:
 			Constant() {
 				_clear<T>();
-				this->out.getSignal().clear();
 			}
 			
-			Constant(T v) : value(v) { 
-				this->out.getSignal().clear();
-			}
+			Constant(T v) : value(v) { }
 			
 			virtual void run() {
 				this->out.getSignal().setValue(value);
@@ -37,13 +34,11 @@ namespace eeros {
 			
 		private:
 			template <typename S> typename std::enable_if<std::is_arithmetic<S>::value>::type _clear() {
-				value = 0;
-				this->out.getSignal().setValue(value);
+				value = std::numeric_limits<double>::quiet_NaN();
 			}
 			
 			template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value>::type _clear() {
-				value.fill(0);
-				this->out.getSignal().setValue(value);
+				value.fill(std::numeric_limits<double>::quiet_NaN());
 			}
 		};
 		

@@ -1,5 +1,5 @@
 #include <eeros/core/Config.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 
 #include <string>
 #include <sstream>
@@ -16,7 +16,7 @@ void Config::loadDefaults() { }
 void Config::add(const char *name, int &value) {
 	auto k = properties.find(name);
 	if (k != properties.end()) {
-		throw eeros::EEROSException(std::string("Property '") + name + "' already added.");
+		throw eeros::Fault(std::string("Property '") + name + "' already added.");
 	}
 	properties[name] = ConfigPropertyAccessor{
 		[&value] (const char *name, char *buffer, int size) -> int {
@@ -36,7 +36,7 @@ void Config::add(const char *name, int &value) {
 void Config::add(const char *name, double &value) {
 	auto k = properties.find(name);
 	if (k != properties.end()) {
-		throw eeros::EEROSException(std::string("Property '") + name + "' already added.");
+		throw eeros::Fault(std::string("Property '") + name + "' already added.");
 	}
 	properties[name] = ConfigPropertyAccessor{
 		[&value] (const char *name, char *buffer, int size) -> int {
@@ -55,11 +55,11 @@ void Config::add(const char *name, double &value) {
 
 void Config::add(const char *name, std::size_t length, int *start, int *end, int default_value) {
 	if (start + length != end) {
-		throw eeros::EEROSException(std::string("Property '") + name + "': array length inconsistent");
+		throw eeros::Fault(std::string("Property '") + name + "': array length inconsistent");
 	}
 	auto k = properties.find(name);
 	if (k != properties.end()) {
-		throw eeros::EEROSException(std::string("Property '") + name + "' already added.");
+		throw eeros::Fault(std::string("Property '") + name + "' already added.");
 	}
 	properties[name] = ConfigPropertyAccessor{
 		[length, start] (const char *name, char *buffer, int size) -> int {
@@ -70,7 +70,7 @@ void Config::add(const char *name, std::size_t length, int *start, int *end, int
 			}
 			auto property_value_string = ss.str();
 			int n = property_value_string.length();
-			if (n + 1 >= size) throw eeros::EEROSException(std::string("Property '") + name + "': buffer too small");
+			if (n + 1 >= size) throw eeros::Fault(std::string("Property '") + name + "': buffer too small");
 			const char *property_value = property_value_string.c_str();
 			strncpy(buffer, property_value, n);
 			buffer[n] = 0;
@@ -86,7 +86,7 @@ void Config::add(const char *name, std::size_t length, int *start, int *end, int
 			while (true) {
 				if (buffer[i] == ',' || i >= size) {
 					int n = (i - j);
-					if (n >= value_buffer_size) throw eeros::EEROSException(std::string("Property '") + name + "': buffer too small");
+					if (n >= value_buffer_size) throw eeros::Fault(std::string("Property '") + name + "': buffer too small");
 					if (n <= 0) break;
 					strncpy(value_buffer,&buffer[j], n);
 					value_buffer[n] = 0;
@@ -107,11 +107,11 @@ void Config::add(const char *name, std::size_t length, int *start, int *end, int
 
 void Config::add(const char *name, std::size_t length, double *start, double *end, double default_value) {
 	if (start + length != end) {
-		throw eeros::EEROSException(std::string("Property '") + name + "': array length inconsistent");
+		throw eeros::Fault(std::string("Property '") + name + "': array length inconsistent");
 	}
 	auto k = properties.find(name);
 	if (k != properties.end()) {
-		throw eeros::EEROSException(std::string("Property '") + name + "' already added.");
+		throw eeros::Fault(std::string("Property '") + name + "' already added.");
 	}
 	properties[name] = ConfigPropertyAccessor{
 		[length, start] (const char *name, char *buffer, int size) -> int {
@@ -122,7 +122,7 @@ void Config::add(const char *name, std::size_t length, double *start, double *en
 			}
 			auto property_value_string = ss.str();
 			int n = property_value_string.length();
-			if (n >= size) throw eeros::EEROSException(std::string("Property '") + name + "': buffer too small");
+			if (n >= size) throw eeros::Fault(std::string("Property '") + name + "': buffer too small");
 			const char *property_value = property_value_string.c_str();
 			strncpy(buffer, property_value, n);
 			return n;
@@ -137,7 +137,7 @@ void Config::add(const char *name, std::size_t length, double *start, double *en
 		while (true) {
 			if (buffer[i] == ',' || i >= size) {
 				int n = (i - j);
-				if (n >= value_buffer_size) throw eeros::EEROSException(std::string("Property '") + name + "': buffer too small");
+				if (n >= value_buffer_size) throw eeros::Fault(std::string("Property '") + name + "': buffer too small");
 				if (n <= 0) break;
 				strncpy(value_buffer,&buffer[j], n);
 				value_buffer[n] = 0;

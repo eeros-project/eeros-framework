@@ -1,5 +1,5 @@
 #include <eeros/safety/SafetySystem.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 
 namespace eeros {
 	namespace safety {
@@ -17,10 +17,10 @@ namespace eeros {
 		privateContext(this),
 		period(period) {
 			if(++instCount > 1) { // only one instance is allowed
-				throw EEROSException("only one instance of the safety system is allowed");
+				throw Fault("only one instance of the safety system is allowed");
 			}
 			if(!setProperties(safetyProperties)) {
-				throw EEROSException("verification of safety properties failed!");
+				throw Fault("verification of safety properties failed!");
 			}
 			instance = this;
 		}
@@ -34,7 +34,7 @@ namespace eeros {
 				return *currentLevel;
 			}
 			else {
-				throw EEROSException("currentLevel not defined"); // TODO define error number and send error message to logger
+				throw Fault("currentLevel not defined"); // TODO define error number and send error message to logger
 			}
 		}
 		
@@ -73,7 +73,7 @@ namespace eeros {
 								<< "\' in level \'" << currentLevel << "\'";
 				}
 			} else {
-				throw EEROSException("current level not defined"); // TODO define error number and send error message to logger
+				throw Fault("current level not defined"); // TODO define error number and send error message to logger
 			}
 		}
 		

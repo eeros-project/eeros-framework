@@ -1,6 +1,6 @@
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 #include <cstdio>
 
 using namespace eeros;
@@ -23,7 +23,7 @@ void Sequencer::run() {
 				if(mode == mode::automatic) shutdown();
 				else state = state::idle;
 			}
-			catch(EEROSException& e) {
+			catch(Fault& e) {
 				log.warn() << "Uncaught exception, switching to step mode." << logger::endl << e.what();
 				currentSequence = nullptr;
 				stepMode();
@@ -110,7 +110,7 @@ void Sequencer::toggleMode() {
 void Sequencer::yield() {
 	if(abortSequence) {
 		abortSequence = false;
-		throw EEROSException("Sequence aborted");
+		throw Fault("Sequence aborted");
 	}
 	else if(mode == mode::stepping) {
 		std::unique_lock<std::mutex> lck(mtx);

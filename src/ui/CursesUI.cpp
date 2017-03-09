@@ -1,5 +1,5 @@
 #include <eeros/ui/CursesUI.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 #include <curses.h>
 #include <sstream>
@@ -22,7 +22,7 @@ void closeUI() {
 
 CursesUI::CursesUI(Sequencer& sequencer) : sequencer(sequencer), state(idle) {
 	if(++instanceCounter > 1) {
-		throw EEROSException("Only a single user interface can exist at the same time!");
+		throw Fault("Only a single user interface can exist at the same time!");
 	}
 }
 

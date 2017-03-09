@@ -4,6 +4,7 @@
 #include <string>
 #include <list>
 #include <type_traits>
+#include <limits>
 #include <eeros/types.hpp>
 #include <eeros/control/SignalInterface.hpp>
 
@@ -108,11 +109,11 @@ namespace eeros {
 		
 		private:
 			template <typename S> typename std::enable_if<std::is_arithmetic<S>::value>::type _clear() {
-				value = 0;
+				value = std::numeric_limits<double>::quiet_NaN();
 			}
 			
 			template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value>::type _clear() {
-				value.fill(0);
+				value.fill(std::numeric_limits<double>::quiet_NaN());
 			}
 			
 			static std::list<SignalInterface*> signalList;

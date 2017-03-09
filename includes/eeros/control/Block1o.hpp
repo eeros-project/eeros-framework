@@ -11,7 +11,9 @@ namespace eeros {
 		template < typename T = double >
 		class Block1o : public Block {
 		public:
-			Block1o() { }
+			Block1o() {
+				this->out.getSignal().clear();
+			}
 			
 			virtual Output<T>& getOut() {
 				return out;

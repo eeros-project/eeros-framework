@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_MATH_MATRIX_HPP_
 #define ORG_EEROS_MATH_MATRIX_HPP_
 
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 #include "MatrixIndexOutOfBoundException.hpp"
 
 #include <utility>
@@ -82,7 +82,7 @@ namespace eeros {
 					m(2,2) = std::cos(angle);
 				}
 				else {
-					throw EEROSException("rotx(double) is only implemented for 3x3 matrices");
+					throw Fault("rotx(double) is only implemented for 3x3 matrices");
 				}
 			}
 			
@@ -102,7 +102,7 @@ namespace eeros {
 					m(2,2) = std::cos(angle);
 				}
 				else {
-					throw EEROSException("roty(double) is only implemented for 3x3 matrices");
+					throw Fault("roty(double) is only implemented for 3x3 matrices");
 				}
 			}
 			
@@ -122,7 +122,7 @@ namespace eeros {
 					m(2,2) = 1;
 				}
 				else {
-					throw EEROSException("rotz(double) is only implemented for 3x3 matrices");
+					throw Fault("rotz(double) is only implemented for 3x3 matrices");
 				}
 			}
 			
@@ -382,7 +382,7 @@ namespace eeros {
 					}
 				}
 				else {
-					throw EEROSException("Calculating determinant failed: Matrix must be square"); 
+					throw Fault("Calculating determinant failed: Matrix must be square"); 
 				}
 				return 0;
 			}
@@ -589,10 +589,10 @@ namespace eeros {
 			Matrix<M, N, T> operator!() const {
 				T determinant = this->det();
 				if(N != M) {
-					throw EEROSException("Invert failed: matrix not square");
+					throw Fault("Invert failed: matrix not square");
 				}
 				else if(determinant == 0) {
-					throw EEROSException("Invert failed: determinat of matrix is 0");
+					throw Fault("Invert failed: determinat of matrix is 0");
 				}
 				else if(this->isOrthogonal() == true) {
 					return transpose();

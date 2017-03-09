@@ -1,12 +1,12 @@
 #ifndef ORG_EEROS_CORE_MATRIXINDEXOUTOFBOUNDEXCEPTION_HPP
 #define ORG_EEROS_CORE_MATRIXINDEXOUTOFBOUNDEXCEPTION_HPP
 
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 #include <string>
 
 namespace eeros {
 	namespace math {
-		class MatrixIndexOutOfBoundException : public eeros::EEROSException {
+		class MatrixIndexOutOfBoundException : public eeros::Fault {
 
 		public:
 			MatrixIndexOutOfBoundException(unsigned int i, unsigned int I);

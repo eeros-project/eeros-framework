@@ -5,7 +5,6 @@
 #include <string>
 #include <exception>
 #include <eeros/math/Matrix.hpp>
-#include <eeros/core/EEROSException.hpp>
 
 using namespace eeros::math;
 using namespace std;

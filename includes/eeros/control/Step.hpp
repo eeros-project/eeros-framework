@@ -13,7 +13,6 @@ namespace eeros {
 		public:
 			Step(T initValue = 0, T stepHeight = 1, double delayTime = 1) : initValue(initValue), stepHeight(stepHeight), delayTime(delayTime) {
 				first = true;
-				this->out.getSignal().clear();
 			}
 			
 			

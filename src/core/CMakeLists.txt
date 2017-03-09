@@ -10,7 +10,7 @@ add_eeros_sources(
 	Version.cpp
 	Runnable.cpp
 	Thread.cpp
-	EEROSException.cpp
+	Fault.cpp
 	Config.cpp
 	SimpleConfig.cpp
 	PeriodicCounter.cpp

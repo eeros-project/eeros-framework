@@ -1,5 +1,5 @@
 #include <eeros/core/System.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 #include <time.h>
 
 #define NS_PER_SEC 1000000000
@@ -18,7 +18,7 @@ double timespec2sec(struct timespec ts) {
 double System::getClockResolution() {
 	struct timespec ts;
 	if(clock_getres(CLOCK, &ts) != 0) {
-		throw EEROSException("Failed to get clock resolution!");
+		throw Fault("Failed to get clock resolution!");
 	}
 	return timespec2sec(ts);
 }
@@ -31,7 +31,7 @@ uint64_t System::getTimeNs() {
 	uint64_t time;
 	struct timespec ts;
 	if(clock_gettime(CLOCK, &ts) != 0) {
-		throw EEROSException("Failed to get time!");
+		throw Fault("Failed to get time!");
 	}
 	return timespec2nsec(ts);
 }

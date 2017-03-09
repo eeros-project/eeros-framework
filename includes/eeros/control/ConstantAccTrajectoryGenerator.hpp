@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <mutex>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 #include <eeros/control/TrajectoryGenerator.hpp>
 
 
@@ -53,7 +53,7 @@ namespace eeros {
 							y[2][i] = 0.0;
 						}
 						else { // t < 0
-							throw EEROSException("get() failed, t < 0");
+							throw Fault("get() failed, t < 0");
 						}
 					}
 					// set last value

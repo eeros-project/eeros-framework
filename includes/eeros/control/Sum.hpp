@@ -2,7 +2,7 @@
 #define ORG_EEROS_CONTROL_SUM_HPP_
 
 #include <vector>
-#include <eeros/control/Block.hpp>
+#include <eeros/control/Block1o.hpp>
 #include <eeros/control/Input.hpp>
 #include <eeros/control/Output.hpp>
 
@@ -10,14 +10,13 @@ namespace eeros {
 	namespace control {
 
 		template < uint8_t N = 2, typename T = double >
-		class Sum : public Block {
+		class Sum : public Block1o<T> {
 
 		public:
 			Sum() {
 				for(uint8_t i = 0; i < N; i++) {
 					negated[i] = false;
 				}
-				out.getSignal().clear();
 			}
 
 			virtual void run() {

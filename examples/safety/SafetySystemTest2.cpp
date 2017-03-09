@@ -32,6 +32,7 @@ public:
 class ControlSystem {
 public:
 	ControlSystem(SafetySystem& safetySys, SafetyPropertiesTest& ssProperties) : c(0.5), checker(0, 5, safetySys, ssProperties.seReset) {
+		i.getOut().getSignal().setName("integrator output");
 		i.getIn().connect(c.getOut());
 		checker.getIn().connect(i.getOut());
 	}
