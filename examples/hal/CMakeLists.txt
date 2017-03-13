@@ -16,5 +16,5 @@ add_executable(parserTest parserTest.cpp
 			)
 			
 			
-target_link_libraries(parserTest eeros ${CMAKE_DL_LIBS} ucl)
+target_link_libraries(parserTest eeros ${CMAKE_DL_LIBS} ucl )
 

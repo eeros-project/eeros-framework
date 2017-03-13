@@ -5,8 +5,7 @@
 		"subdevice4": {
 			"type": "DigIn",
 			"channel0": {
-				"signalId": "emergency",
-				"inverted": true
+				"signalId": "emergency"
 			}
 		},
 		"subdevice5": {
@@ -15,6 +14,7 @@
 				"signalId": "enable",
 			},
 			"channel1": {
+				"type": "DigIn",
 				"signalId": "readySig1",
 				"inverted": true
 			}

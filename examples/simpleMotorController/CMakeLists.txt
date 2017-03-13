@@ -1,2 +1,2 @@
 add_executable(simpleMotorController SimpleMotorController.cpp MyControlSystem.cpp MySafetyProperties.cpp SequenceA.cpp)
-target_link_libraries(simpleMotorController eeros ucl)
+target_link_libraries(simpleMotorController eeros ucl ${CMAKE_DL_LIBS} )
