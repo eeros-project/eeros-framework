@@ -49,8 +49,9 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	
 	// ############ Define critical inputs ############
 	emergency = hal.getLogicInput("emergency");
+	ready = hal.getLogicInput("readySig1");
 	
-	criticalInputs = { emergency };
+	criticalInputs = { emergency, ready };
 	
 	addLevel(off);
 	addLevel(systemOn);
@@ -75,20 +76,20 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	addEventToLevelAndAbove(startingControl, abort, stoppingControl, kPublicEvent);
 		
 	// ############ Define input states and events for all levels ############
-	off		.setInputActions( { ignore(emergency) });
-	emergencyState	.setInputActions( { ignore(emergency) });
-	systemOn	.setInputActions( { check(emergency, true , doEmergency) });
-	startingControl	.setInputActions( { check(emergency, true , doEmergency) });
-	stoppingControl	.setInputActions( { check(emergency, true , doEmergency) });
-	powerOn		.setInputActions( { check(emergency, true , doEmergency) });
-	moving		.setInputActions( { check(emergency, true , doEmergency) });
+	off		.setInputActions( { ignore(emergency), ignore(ready) });
+	emergencyState	.setInputActions( { ignore(emergency), ignore(ready) });
+	systemOn	.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
+	startingControl	.setInputActions( { check(emergency, true , doEmergency), ignore(ready)});
+	stoppingControl	.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
+	powerOn		.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
+	moving		.setInputActions( { check(emergency, true , doEmergency), check(ready, true, doEmergency) });
 	
 	off		.setOutputActions( { set(enable, false) } );;
 	emergencyState	.setOutputActions( { set(enable, false) } );;
 	systemOn	.setOutputActions( { set(enable, false) } );;
 	startingControl	.setOutputActions( { set(enable, false) } );;
 	stoppingControl	.setOutputActions( { set(enable, false) } );;
-	powerOn		.setOutputActions( { set(enable, false) } );;
+	powerOn		.setOutputActions( { set(enable, true) } );;
 	moving		.setOutputActions( { set(enable, true) } );;
 	
 	// Define and add level functions
@@ -101,7 +102,7 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	});
 	
 	startingControl.setLevelAction([&](SafetyContext* privateContext) {
-		// TODO start controlSys if Executor allows this
+		// TODO start controlSys if Executor allows this, now add some delay
 		static int cnt = 0;
 		cnt++;
 		if(cnt > 500){	// wait 500ms
@@ -115,7 +116,9 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	});
 	
 	powerOn.setLevelAction([&](SafetyContext* privateContext) {
-		privateContext->triggerEvent(startMoving); // TODO read input
+		if(ready->get()){	// check if drive is ready
+			privateContext->triggerEvent(startMoving);
+		}
 	});
 	
 	moving.setLevelAction([&](SafetyContext* privateContext) {

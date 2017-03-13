@@ -13,6 +13,10 @@
 			"type": "DigOut",
 			"channel0": {
 				"signalId": "enable",
+			},
+			"channel1": {
+				"signalId": "readySig1",
+				"inverted": true
 			}
 		},
 		"subdevice2": {
