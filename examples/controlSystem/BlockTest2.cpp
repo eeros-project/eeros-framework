@@ -40,9 +40,9 @@ public:
 		g.getOut().getSignal().setName("gain output");
 		g.getIn().connect(c.getOut());
 		p.getIn().connect(g.getOut());
-		td.addBlock(&c);
-		td.addBlock(&g);
-		td.addBlock(&p);
+		td.addBlock(c);
+		td.addBlock(g);
+		td.addBlock(p);
 	}
 	
 	Constant<> c;

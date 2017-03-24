@@ -53,12 +53,10 @@ namespace eeros {
 		public:
 			Gain() : enabled(true) {
 				gain = 1;
-				this->out.getSignal().clear();
 			}
 			
 			Gain(Tgain c) : enabled(true) {
 				gain = c;
-				this->out.getSignal().clear();
 			}
 			
 			virtual void run() {

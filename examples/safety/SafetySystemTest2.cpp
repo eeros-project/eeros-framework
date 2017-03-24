@@ -94,9 +94,9 @@ int main() {
 		log.info() << controlSystem.i.getOut().getSignal();
 	});
 	
-	td.addBlock(&(controlSystem.c));
-	td.addBlock(&(controlSystem.i));
-	td.addBlock(&(controlSystem.checker));
+	td.addBlock(controlSystem.c);
+	td.addBlock(controlSystem.i);
+	td.addBlock(controlSystem.checker);
 
 	// Create and run executor
 	auto& executor = eeros::Executor::instance();

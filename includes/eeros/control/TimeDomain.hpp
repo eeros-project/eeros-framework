@@ -18,7 +18,9 @@ namespace eeros {
 		public:
 			TimeDomain(std::string name, double period, bool realtime, SafetySystem* ss = nullptr, SafetyEvent* e = nullptr);
 			virtual void addBlock(Runnable* block);
+			virtual void addBlock(Runnable& block);
 			virtual void removeBlock(Runnable* block);
+			virtual void removeBlock(Runnable& block);
 			
 			std::string getName();
 			double getPeriod();

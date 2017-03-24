@@ -48,8 +48,16 @@ void TimeDomain::addBlock(eeros::Runnable* block) {
 	blocks.push_back(block);
 }
 
+void TimeDomain::addBlock(eeros::Runnable& block) {
+	blocks.push_back(&block);
+}
+
 void TimeDomain::removeBlock(eeros::Runnable* block) {
 	blocks.remove(block);
+}
+
+void TimeDomain::removeBlock(eeros::Runnable& block) {
+	blocks.remove(&block);
 }
 
 // void TimeDomain::sortBlocks() {
