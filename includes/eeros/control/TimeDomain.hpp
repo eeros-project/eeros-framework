@@ -16,7 +16,7 @@ namespace eeros {
 
 		class TimeDomain : public virtual Runnable {
 		public:
-			TimeDomain(std::string name, double period, bool realtime, SafetySystem* ss = nullptr, SafetyEvent* e = nullptr);
+			TimeDomain(std::string name, double period, bool realtime);
 			virtual void addBlock(Runnable* block);
 			virtual void addBlock(Runnable& block);
 			virtual void removeBlock(Runnable* block);
@@ -25,6 +25,7 @@ namespace eeros {
 			std::string getName();
 			double getPeriod();
 			bool getRealtime();
+			void registerSafetyEvent(SafetySystem* ss, SafetyEvent* e);
 
 			virtual void run();
 			virtual void start();

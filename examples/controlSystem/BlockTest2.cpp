@@ -19,9 +19,9 @@ using namespace eeros::task;
 class ControlSystem;
 class SafetyPropertiesTest : public SafetyProperties {
 public:
-	SafetyPropertiesTest();
+	SafetyPropertiesTest(ControlSystem& cs);
 	
-	ControlSystem* controlSystem;
+	ControlSystem& controlSystem;
 	double period = 0.01;
 
 	SafetyEvent seStartRunning;
@@ -51,7 +51,8 @@ public:
 	TimeDomain& td;
 };
 
-SafetyPropertiesTest::SafetyPropertiesTest() : 
+SafetyPropertiesTest::SafetyPropertiesTest(ControlSystem& cs) : 
+	controlSystem(cs),
 	seStartRunning("start running"),
 	seDoEmergency("go to emergency"),
 	slEmergency("emergency"),
@@ -70,14 +71,14 @@ SafetyPropertiesTest::SafetyPropertiesTest() :
 
 	// Define and add level functions
 	slEmergency.setLevelAction([&](SafetyContext* privateContext) {
-		if(slEmergency.getNofActivations() == 1) controlSystem->td.stop();
+		if(slEmergency.getNofActivations() == 1) controlSystem.td.stop();
 	});
 	
 	slInitializing.setLevelAction([&](SafetyContext* privateContext) {
-		controlSystem->td.stop();
+		controlSystem.td.stop();
 		if(slInitializing.getNofActivations() * period > 3) {
 			privateContext->triggerEvent(seStartRunning);
-			controlSystem->td.start();
+			controlSystem.td.start();
 		}
 	});
 	
@@ -92,17 +93,18 @@ int main() {
 	
 	log.info() << "Block Test 2 started...";
 	
-	// Create and initialize safety system
-	SafetyPropertiesTest ssProperties;
-	SafetySystem safetySys(ssProperties, ssProperties.period);
-
 	// Get HAL instance and initialize
 	HAL& hal = HAL::instance();
 	hal.addPeripheralOutput(new DummyRealOutput("out"));
 
-	TimeDomain td("td1", 0.01, true, &safetySys, &(ssProperties.seDoEmergency));
+	TimeDomain td("td1", 0.01, true);
 	ControlSystem controlSystem(td);
-	ssProperties.controlSystem = &controlSystem;
+	
+	SafetyPropertiesTest ssProperties(controlSystem);
+	SafetySystem safetySys(ssProperties, ssProperties.period);
+	
+	td.registerSafetyEvent(&safetySys, &ssProperties.seDoEmergency);
+
 	Periodic periodic("per1", 0.01, td);
 	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
 		static int ticks = 0;

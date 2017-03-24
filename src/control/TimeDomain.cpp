@@ -2,8 +2,8 @@
 
 using namespace eeros::control;
 
-TimeDomain::TimeDomain(std::string name, double period, bool realtime, SafetySystem* ss, SafetyEvent* e) :
-	name(name), period(period), realtime(realtime), safetySystem(ss), safetyEvent(e) {
+TimeDomain::TimeDomain(std::string name, double period, bool realtime) :
+	name(name), period(period), realtime(realtime) {
 	// nothing to do
 }
 
@@ -17,6 +17,11 @@ double TimeDomain::getPeriod() {
 
 bool TimeDomain::getRealtime() {
 	return realtime;
+}
+
+void TimeDomain::registerSafetyEvent(SafetySystem* ss, SafetyEvent* e) {
+	safetySystem = ss;
+	safetyEvent = e;
 }
 
 void TimeDomain::run() {
