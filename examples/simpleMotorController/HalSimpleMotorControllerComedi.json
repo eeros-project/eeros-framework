@@ -35,7 +35,7 @@
 								"minIn": 	-10.0, 	"maxIn": 	10.0,
 								"minOut":	-13.5, 	"maxOut": 	13.5 },
 					 ],
-				"unit": "V"
+				"unit": "A"
 			}
 		},
 		"subdevice11": {
@@ -50,7 +50,7 @@
 							"minOut":	0, "maxOut": 2000 }
 					 ],
 				"range": [ { "id" : "enc1",
-								"noLimit": 	true }
+							"noLimit": 	true }
 					 ],
 				"unit": "rad"
 			}
