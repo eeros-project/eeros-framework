@@ -9,3 +9,6 @@ target_link_libraries(blockTest1 eeros pthread)
 
 add_executable(blockTest2 BlockTest2.cpp)
 target_link_libraries(blockTest2 eeros pthread)
+
+add_executable(blockTest3 BlockTest3.cpp)
+target_link_libraries(blockTest3 eeros pthread)

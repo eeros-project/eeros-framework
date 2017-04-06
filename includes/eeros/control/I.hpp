@@ -2,7 +2,6 @@
 #define ORG_EEROS_CONTROL_I_HPP_
 
 #include <eeros/control/Block1i1o.hpp>
-#include <iostream>
 
 namespace eeros {
 	namespace control {
@@ -10,13 +9,13 @@ namespace eeros {
 		template < typename T = double >
 		class I: public Block1i1o<T> {
 		public:
-			I() : first(true), enabled(false) { }
+			I() : first(true), enabled(false) { prev.clear(); }
 			
 			virtual void run() {
-				if(first) {  // first run, no previous value available -> set output to zero
-					this->out.getSignal().clear();
+				if(first) {  // first run, set output to init condition
+ 					this->out.getSignal().setValue(this->prev.getValue());
 					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
-					this->prev = this->out.getSignal();
+					this->prev.setTimestamp(this->out.getSignal().getTimestamp());
 					first = false;
 				}
 				else {
@@ -46,7 +45,6 @@ namespace eeros {
 			}
 			virtual void setInitCondition(T val) {
 				this->prev.setValue(val);
-				this->prev.setTimestamp(this->out.getSignal().getTimestamp());
 			}
 			
 		protected:
