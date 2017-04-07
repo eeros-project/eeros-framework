@@ -1,4 +1,4 @@
-#include "ClientData.hpp"
+#include <eeros/control/ClientData.hpp>
 #include <eeros/core/System.hpp>
 
 #include <iostream>

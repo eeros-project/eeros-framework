@@ -1,17 +1,19 @@
-#ifndef CH_NTB_EEDURO_DELTA_CLIENTDATA_HPP_
-#define CH_NTB_EEDURO_DELTA_CLIENTDATA_HPP_
+#ifndef ORG_EEROS_CONTROL_CLIENTDATA_HPP_
+#define ORG_EEROS_CONTROL_CLIENTDATA_HPP_
 
-#include <eeros/control/Block.hpp>
-#include <eeros/control/Input.hpp>
-#include <eeros/control/Output.hpp>
+#include <eeros/control/Block1i1o.hpp>
+#include <eeros/socket/Client.hpp>
+// #include <eeros/socket/Client.hpp>
+// #include <eeros/control/Input.hpp>
+// #include <eeros/control/Output.hpp>
 #include <array>
 #include <atomic>
-#include "../types.hpp"
-#include "../constants.hpp"
-#include "../../socket/Client.hpp"
+// #include "../types.hpp"
+// #include "../../socket/Client.hpp"
 
-namespace eeduro {
-	namespace delta {
+
+namespace eeros {
+	namespace control {
 	
 		class ClientData: public eeros::control::Block {
 			
@@ -31,4 +33,4 @@ namespace eeduro {
 	};
 }
 
-#endif /* CH_NTB_EEDURO_DELTA_CLIENTDATA_HPP_ */
+#endif /* ORG_EEROS_CONTROL_CLIENTDATA_HPP_ */
