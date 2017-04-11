@@ -27,8 +27,8 @@ void signalHandler(int signum){
 int main(int argc, char **argv){
 	// Create and initialize logger
 	StreamLogWriter w(std::cout);
-	Logger<LogWriter>::setDefaultWriter(&w);
-	Logger<LogWriter> log;
+	Logger::setDefaultWriter(&w);
+	Logger log;
 	
 	w.show();
 	

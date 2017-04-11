@@ -4,4 +4,4 @@ add_executable(safetySystemTest1 SafetySystemTest1.cpp copySafetySystemConfig)
 target_link_libraries(safetySystemTest1 eeros ucl ${CMAKE_DL_LIBS} )
 
 add_executable(safetySystemTest2 SafetySystemTest2.cpp)
-target_link_libraries(safetySystemTest2 eeros pthread)
+target_link_libraries(safetySystemTest2 eeros ucl)

@@ -1,5 +1,5 @@
 #include <eeros/hal/HAL.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 #include <gtest/gtest.h>
 #include <TestVariables.hpp>
 
@@ -26,7 +26,7 @@ TEST(halHalManagerTest, availableDigInOut){
 		hal.releaseOutput("aOut0");
 		hal.releaseInput("aIn0");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(...){
@@ -41,7 +41,7 @@ TEST(halHalManagerTest, notAvailableDigInOut){
 		eeros::hal::Input<bool> &en = *hal.getLogicInput("enable56");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system input 'enable56' not found!"));
 	}
 	catch(...){
@@ -56,7 +56,7 @@ TEST(halHalManagerTest, emptySignalIdLogicIn){
 		eeros::hal::Input<bool> &en = *hal.getLogicInput("");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system input '' not found!"));
 	}
 	catch(...){
@@ -71,7 +71,7 @@ TEST(halHalManagerTest, emptySignalIdLogicOut){
 		eeros::hal::Output<bool> &en = *hal.getLogicOutput("");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system output '' not found!"));
 	}
 	catch(...){
@@ -86,7 +86,7 @@ TEST(halHalManagerTest, emptySignalIdRealIn){
 		eeros::hal::Input<bool> &en = *hal.getLogicInput("");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system input '' not found!"));
 	}
 	catch(...){
@@ -101,7 +101,7 @@ TEST(halHalManagerTest, emptySignalIdRealOut){
 		eeros::hal::Output<double> &en = *hal.getScalableOutput("");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system output '' not found!"));
 	}
 	catch(...){
@@ -116,7 +116,7 @@ TEST(halHalManagerTest, wrongTypeRealIn){
 		eeros::hal::Input<double> &ioIn = *hal.getScalableInput("ioIn");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system input 'ioIn' not found!"));
 	}
 	catch(...){
@@ -131,7 +131,7 @@ TEST(halHalManagerTest, wrongTypeRealOut){
 		eeros::hal::Output<double> &aOut = *hal.getScalableOutput("ioOut");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system output 'ioOut' not found!"));
 	}
 	catch(...){
@@ -146,7 +146,7 @@ TEST(halHalManagerTest, wrongTypeLogicIn){
 		eeros::hal::Input<bool> &dac = *hal.getLogicInput("aIn0");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system input 'aIn0' not found!"));
 	}
 	catch(...){
@@ -161,7 +161,7 @@ TEST(halHalManagerTest, wrongTypeLogicOut){
 		eeros::hal::Output<bool> &ioOut = *hal.getLogicOutput("aOut0");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system output 'aOut0' not found!"));
 	}
 	catch(...){
@@ -176,7 +176,7 @@ TEST(halHalManagerTest, wrongDirectionLogicIn){
 		eeros::hal::Input<bool> &ioIn = *hal.getLogicInput("ioOut");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system input 'ioOut' not found!"));
 	}
 	catch(...){
@@ -191,7 +191,7 @@ TEST(halHalManagerTest, wrongDirectionLogicOut){
 		eeros::hal::Output<bool> &ioOut = *hal.getLogicOutput("ioIn");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system output 'ioIn' not found!"));
 	}
 	catch(...){
@@ -206,7 +206,7 @@ TEST(halHalManagerTest, wrongDirectionRealIn){
 		eeros::hal::Input<double> &aIn0 = *hal.getScalableInput("aOut0");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system input 'aOut0' not found!"));
 	}
 	catch(...){
@@ -221,7 +221,7 @@ TEST(halHalManagerTest, wrongDirectionRealOut){
 		eeros::hal::Output<double> &aOut = *hal.getScalableOutput("aIn0");
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system output 'aIn0' not found!"));
 	}
 	catch(...){
@@ -238,7 +238,7 @@ TEST(halHalManagerTest, claimReservedInput){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system input 'ioIn' is exclusive reserved!"));
 		hal.releaseInput("ioIn");
 	}
@@ -257,7 +257,7 @@ TEST(halHalManagerTest, claimNonExclusiveInput){
 		
 		hal.releaseInput("ioIn");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(...){
@@ -277,7 +277,7 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveInput){
 		
 		hal.releaseInput("ioIn");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(...){
@@ -294,7 +294,7 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveInputFail){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system input 'ioIn' is already claimed as non-exclusive input!"));
 		hal.releaseInput("ioIn");
 	}
@@ -312,7 +312,7 @@ TEST(halHalManagerTest, claimReservedNonExclusiveInput){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system input 'ioIn' is exclusive reserved!"));
 		hal.releaseInput("ioIn");
 	}
@@ -330,7 +330,7 @@ TEST(halHalManagerTest, claimReservedOutput){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system output 'ioOut' is exclusive reserved!"));
 		hal.releaseOutput("ioOut");
 	}
@@ -349,7 +349,7 @@ TEST(halHalManagerTest, claimNonExclusiveOutput){
 		
 		hal.releaseOutput("ioOut");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(...){
@@ -369,7 +369,7 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveOutput){
 		
 		hal.releaseOutput("ioOut");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(...){
@@ -386,7 +386,7 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveOutputFail){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system output 'ioOut' is already claimed as non-exclusive output!"));
 		hal.releaseOutput("ioOut");
 	}
@@ -404,7 +404,7 @@ TEST(halHalManagerTest, claimReservedNonExclusiveOutput){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Logic system output 'ioOut' is exclusive reserved!"));
 		hal.releaseOutput("ioOut");
 	}
@@ -422,7 +422,7 @@ TEST(halHalManagerTest, claimReservedRealInput){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system input 'aIn0' is exclusive reserved!"));
 		hal.releaseInput("aIn0");
 	}
@@ -441,7 +441,7 @@ TEST(halHalManagerTest, claimNonExclusiveRealInput){
 		
 		hal.releaseInput("aIn0");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(...){
@@ -461,7 +461,7 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealInput){
 		
 		hal.releaseInput("aIn0");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(...){
@@ -478,7 +478,7 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealInputFail){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system input 'aIn0' is already claimed as non-exclusive input!"));
 		hal.releaseInput("aIn0");
 	}
@@ -496,7 +496,7 @@ TEST(halHalManagerTest, claimReservedNonExclusiveRealInput){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system input 'aIn0' is exclusive reserved!"));
 		hal.releaseInput("aIn0");
 	}
@@ -514,7 +514,7 @@ TEST(halHalManagerTest, claimReservedRealOutput){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system output 'aOut0' is exclusive reserved!"));
 		hal.releaseOutput("aOut0");
 	}
@@ -533,7 +533,7 @@ TEST(halHalManagerTest, claimNonExclusiveRealOutput){
 		
 		hal.releaseOutput("aOut0");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(...){
@@ -553,7 +553,7 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealOutput){
 		
 		hal.releaseOutput("aOut0");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(...){
@@ -570,7 +570,7 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealOutputFail){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system output 'aOut0' is already claimed as non-exclusive output!"));
 		hal.releaseOutput("aOut0");
 	}
@@ -588,7 +588,7 @@ TEST(halHalManagerTest, claimReservedNonExclusiveRealOutput){
 		
 		FAIL();
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		EXPECT_EQ(err.what(), std::string("Real system output 'aOut0' is exclusive reserved!"));
 		hal.releaseOutput("aOut0");
 	}

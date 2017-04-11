@@ -42,7 +42,7 @@ void ParserTestMainSequence::run() {
 		
 		if(i%50 == 0){
 			log.info() << "reset fqd: ";
-			hal.callInputFeature(&controlSys->encMot1, "resetFqd");
+// 			hal.callInputFeature(&controlSys->encMot1, "resetFqd");
 		}
 		
 		if(i%2 == 0){

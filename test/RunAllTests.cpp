@@ -5,7 +5,7 @@
 #include <TestVariables.hpp>
 #include <EerosEnvironment.hpp>
 #include <EerosEnvironmentInvalidConfig.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 
 /**
  * 
@@ -69,11 +69,11 @@ int main(int argc, char **argv){
 						libsim = true;
 					}
 					else{
-						throw eeros::EEROSException("unknown library given as argument: " + libStr);
+						throw eeros::Fault("unknown library given as argument: " + libStr);
 					}
 				}
 				else{
-					throw eeros::EEROSException("optarg empty!");
+					throw eeros::Fault("optarg empty!");
 				}
 				break;
 			case 'g':

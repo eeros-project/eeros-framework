@@ -2,7 +2,7 @@
 
 # Compile and link test application
 add_executable(demux DeMux.cpp)
-target_link_libraries(demux eeros)
+target_link_libraries(demux eeros ucl)
 
 # Add tests
 add_test(control/demux/matrix/1x1/double/random demux 1 1 "${TEST_DATA_DIR}/control/demux/demux-matrix-1-double-random.csv")

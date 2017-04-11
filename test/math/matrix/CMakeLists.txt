@@ -2,25 +2,25 @@
 
 # Compile and link test applications
 add_executable(elementAccess ElementAccess.cpp)
-target_link_libraries(elementAccess eeros pthread)
+target_link_libraries(elementAccess eeros pthread ucl)
 
 add_executable(initialization Initialization.cpp)
-target_link_libraries(initialization eeros pthread)
+target_link_libraries(initialization eeros pthread ucl)
 
 add_executable(relationalOperators RelationalOperators.cpp)
-target_link_libraries(relationalOperators eeros pthread)
+target_link_libraries(relationalOperators eeros pthread ucl)
 
 add_executable(characteristics Characteristics.cpp)
-target_link_libraries(characteristics eeros pthread)
+target_link_libraries(characteristics eeros pthread ucl)
 
 add_executable(scalarOperations ScalarOperations.cpp)
-target_link_libraries(scalarOperations eeros pthread)
+target_link_libraries(scalarOperations eeros pthread ucl)
 
 add_executable(matrixOperations MatrixOperations.cpp)
-target_link_libraries(matrixOperations eeros pthread)
+target_link_libraries(matrixOperations eeros pthread ucl)
 
 add_executable(matrixOperations2 MatrixOperations2.cpp)
-target_link_libraries(matrixOperations2 eeros pthread)
+target_link_libraries(matrixOperations2 eeros pthread ucl)
 
 # Add tests
 add_test(math/Matrix/elementAccess elementAccess)

@@ -3,7 +3,7 @@
 
 # Compile and link test application
 add_executable(sum Sum.cpp)
-target_link_libraries(sum eeros)
+target_link_libraries(sum eeros ucl)
 
 # Add tests
 add_test(control/sum/double/2inputs/random sum 2 "${TEST_DATA_DIR}/control/sum/sum-double-2inputs-random.csv")

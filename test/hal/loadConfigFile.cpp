@@ -1,5 +1,5 @@
 #include <eeros/hal/HAL.hpp>
-#include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 #include <gtest/gtest.h>
 #include <TestVariables.hpp>
 #include <eeros/hal/ScalableOutput.hpp>
@@ -13,7 +13,7 @@ TEST(halLoadConfigFileTest, noFile){
 	try{
 		hal.readConfigFromFile("");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 	      EXPECT_EQ(err.what(), std::string("cannot open file : No such file or directory: path: "));
 	}
 	catch(const std::exception& e){
@@ -32,7 +32,7 @@ TEST(halConfigFileTest, scaleOffsetAnalogOut0){
 		
 		hal.releaseOutput("aOut0");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(const std::exception& e){
@@ -51,7 +51,7 @@ TEST(halConfigFileTest, scaleOffsetAnalogOut1){
 		
 		hal.releaseOutput("aOut1");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(const std::exception& e){
@@ -70,7 +70,7 @@ TEST(halConfigFileTest, scaleOffsetAnalogOut2){
 		
 		hal.releaseOutput("aOut2");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(const std::exception& e){
@@ -89,7 +89,7 @@ TEST(halConfigFileTest, scaleOffsetAnalogOut3){
 		
 		hal.releaseOutput("aOut3");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(const std::exception& e){
@@ -108,7 +108,7 @@ TEST(halConfigFileTest, rangeAnalogOut0){
 		
 		hal.releaseOutput("aOut0");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(const std::exception& e){
@@ -127,7 +127,7 @@ TEST(halConfigFileTest, rangeAnalogOut1){
 		
 		hal.releaseOutput("aOut1");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(const std::exception& e){
@@ -146,7 +146,7 @@ TEST(halConfigFileTest, rangeAnalogOut2){
 		
 		hal.releaseOutput("aOut2");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(const std::exception& e){
@@ -165,7 +165,7 @@ TEST(halConfigFileTest, rangeAnalogOut3){
 		
 		hal.releaseOutput("aOut3");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(const std::exception& e){
@@ -184,7 +184,7 @@ TEST(halConfigFileTest, scaleAnalogIn0){
 		
 		hal.releaseInput("aIn0");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(const std::exception& e){
@@ -203,7 +203,7 @@ TEST(halConfigFileTest, rangeAnalogIn0){
 		
 		hal.releaseInput("aIn0");
 	}
-	catch(eeros::EEROSException const & err){
+	catch(eeros::Fault const & err){
 		FAIL() << err.what();
 	}
 	catch(const std::exception& e){

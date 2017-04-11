@@ -21,7 +21,7 @@ namespace eeros {
 			
 			virtual void run() {
 				T val = this->in.getSignal().getValue();
-				if(isnan(val)) throw NaNOutputFault("NaN written to output");
+				if(std::isnan(val)) throw NaNOutputFault("NaN written to output");
 				systemOutput->set(this->in.getSignal().getValue());
 			}
 			

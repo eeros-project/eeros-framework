@@ -19,7 +19,7 @@ void EerosEnvironment::SetUp() {
 		hal.readConfigFromFile("loadConfigSim.json");
 	}
 	else {
-		throw eeros::EEROSException("no config loaded");
+		throw eeros::Fault("no config loaded");
 	}
 }
 

@@ -2,7 +2,7 @@
 
 # Compile and link test application
 add_executable(muxTest MuxTest.cpp)
-target_link_libraries(muxTest eeros)
+target_link_libraries(muxTest eeros ucl)
 
 # Add tests
 add_test(control/mux/matrix/1x1/double/random muxTest 1 1 "${TEST_DATA_DIR}/control/mux/mux-matrix-1-double-random.csv")

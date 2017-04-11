@@ -3,8 +3,6 @@
 
 include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR} ${EEROS_SOURCE_DIR}/test)
 
-set(TEST_DATA_DIR ${CMAKE_SOURCE_DIR}/test/data)
-
 ##########################
 # load and add googletest
 ##########################
@@ -57,6 +55,8 @@ macro(add_eeros_test_sources)
         set(EEROS_TEST_SRCS ${EEROS_TEST_SRCS} PARENT_SCOPE)
     endif()
 endmacro()
+
+set(TEST_DATA_DIR ${CMAKE_SOURCE_DIR}/test/data)
 
 add_subdirectory(core)
 add_subdirectory(math)
