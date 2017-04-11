@@ -19,7 +19,7 @@ void signalHandler(int signum) {
 	SafetySystem::exitHandler();
 }
 
-int main() {
+int main(int argc, char **argv) {
 	signal(SIGHUP, signalHandler);
 	signal(SIGINT, signalHandler);
 	signal(SIGQUIT, signalHandler);
@@ -35,8 +35,11 @@ int main() {
 	
 	// Get HAL instance and initialize
 	HAL& hal = HAL::instance();
-	hal.addPeripheralInput(new DummyLogicInput("in1"));
-	hal.addPeripheralOutput(new DummyLogicOutput("out1"));
+	
+	hal.readConfigFromFile(&argc, argv);
+	// uncomment following two lines, if you want to run example without sim-eeros library and config-file
+// 	hal.addInput(new DummyLogicInput("in1"));
+// 	hal.addOutput(new DummyLogicOutput("out1"));
 	
 	// Create and initialize safety system
 	double period = 1;

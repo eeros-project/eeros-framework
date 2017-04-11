@@ -112,30 +112,6 @@ else()
 	message(SEND_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler!")
 endif()
 
-## Check for additional libraries
-message(STATUS "looking for additional libraries")
-find_file(LIBCOMEDI "comedilib.h" ${ADDITIONAL_INCLUDE_DIRS})
-if(LIBCOMEDI)
-	message(STATUS "-> libcomedi available")
-	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} comedi)
-endif()
-
-find_package(flink QUIET)
-if (FLINK_LIB_DIR)
-	message(STATUS "-> libflink package available")
-	include_directories("${FLINK_INCLUDE_DIR}")
-	link_directories("${FLINK_LIB_DIR}")
-	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
-	set(LIBFLINK "${FLINK_INCLUDE_DIR}")
-else()
-	find_file(LIBFLINK "flinklib.h" ${ADDITIONAL_INCLUDE_DIRS})
-	if(LIBFLINK)
-		message(STATUS "-> libflink available")
-		set(EXTERNAL_LIBS ${EXTERNAL_LIBS} flink)
-	endif()
-endif()
-
-
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 if(LIBCURSES)
 	message(STATUS "-> libcurses available")
@@ -145,6 +121,34 @@ endif()
 if(LINUX)
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} -lrt)
 endif()
+
+##########################
+# load and add libucl
+##########################
+# Download and unpack googletest at configure time
+configure_file(CMakeLists.txt.in ${EEROS_BINARY_DIR}/libucl-download/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${EEROS_BINARY_DIR}/libucl-download )
+if(result)
+  message(FATAL_ERROR "CMake step for libucl failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${EEROS_BINARY_DIR}/libucl-download )
+if(result)
+  message(FATAL_ERROR "Build step for libucl failed: ${result}")
+endif()
+
+# Add libucl directly to our build. This defines
+# the libucl target.
+add_subdirectory(${EEROS_BINARY_DIR}/libucl-src
+                 ${EEROS_BINARY_DIR}/libucl-build)
+
+include_directories("${libucl_SOURCE_DIR}/include")
+link_directories(${libucl_BINARY_DIR})
+
+###### libucl ######
 
 ## Config include file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)

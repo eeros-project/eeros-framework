@@ -3,15 +3,11 @@
 #include <fstream>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include <eeros/hal/HAL.hpp>
-#include <eeros/hal/ComediFqd.hpp>
-#include <eeros/hal/ComediDac.hpp>
+#include <eeros/core/Executor.hpp>
 #include <eeros/safety/SafetySystem.hpp>
-#include <eeros/hal/ComediDigIn.hpp>
-#include <eeros/hal/ComediDigOut.hpp>
-#include <eeros/hal/ComediFqd.hpp>
-#include <eeros/hal/ComediDac.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include "MySafetyProperties.hpp"
@@ -25,46 +21,51 @@ using namespace eeros::safety;
 using namespace eeros::logger;
 using namespace eeros::sequencer;
 
-void initHardware() {
-	HAL& hal = HAL::instance();
-
-	std::cout << "  Creating device structure..." << std::endl;
-	ComediDevice* comedi0 = new ComediDevice("/dev/comedi0");
-
-	std::cout << "  Registering I/Os in the HAL..." << std::endl;
-	hal.addPeripheralInput(new ComediFqd("q", comedi0, 11, 8, 10, 9, 6.28318530718 / (4 * 500.0), 0, 0));
-	hal.addPeripheralInput(new ComediDigIn("emergency", comedi0, 2, 1, true));
-	hal.addPeripheralOutput(new ComediDigOut("enable", comedi0, 2, 0));
-	hal.addPeripheralOutput(new ComediDac("dac", comedi0, 1, 0));
+void signalHandler(int signum){
+	SafetySystem::exitHandler();
 }
 
-
-int main() {
-	std::cout << "Simple Motor Controller Demo started..." << std::endl;
-
+int main(int argc, char **argv) {
+	signal(SIGINT, signalHandler);
+	signal(SIGKILL, signalHandler);
+	signal(SIGTERM, signalHandler);
+	
 	StreamLogWriter w(std::cout);
 	Logger<LogWriter>::setDefaultWriter(&w);
+	Logger<LogWriter> log;
+	w.show();
 	
-	std::cout << "Initializing Hardware..." << std::endl;
-	initHardware();
+	log.info() << "Simple Motor Controller Demo started...";
+	
+	log.info() << "Initializing Hardware...";
+	HAL& hal = HAL::instance();
+	hal.readConfigFromFile(&argc, argv);
 	
 	// Create the control system
 	MyControlSystem controlSys(0.001);
 	
 	// Create and initialize a safety system
 	MySafetyProperties properties(controlSys);
-	if(!properties.verify()) throw -1;
-	SafetySystem safetySys(properties, 0.01);
+	SafetySystem safetySys(properties, 0.001);
 	
-	SequenceA mainSequence("Main Sequence", safetySys, controlSys, 3.14/5);
-	Sequencer sequencer(&mainSequence);
+	Sequencer sequencer;
+	SequenceA mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/10);
+	sequencer.start(&mainSequence);
 	
-	sequencer.join();
+	auto &executor = Executor::instance();
+	executor.setMainTask(safetySys);
+	safetySys.triggerEvent(properties.doSystemOn);
 	
-	sleep(100);
+	executor.run();
 	
-	controlSys.stop();
-	safetySys.shutdown();
 	
-	std::cout << "Example finished..." << std::endl;
+	while(sequencer.getState()!=state::terminated) {
+		sequencer.shutdown();
+		sleep(3);
+	}
+	
+	sequencer.abort();
+	
+	log.info() << "Example finished...";
+	return 0;
 }

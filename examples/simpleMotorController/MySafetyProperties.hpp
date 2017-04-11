@@ -5,46 +5,45 @@
 #include <eeros/hal/HAL.hpp>
 #include "MyControlSystem.hpp"
 
-	// Name all levels
-	enum {
-		off = 0,
-		emergencyState = 1,
-		systemOn = 10,
-		startingControl = 11,
-		stoppingControl = 12,
-		powerOn = 20,
-		moving = 30
-	};
-	
-	// Define all possible events
-	enum {
-		doSystemOn = 100,
-		doSystemOff = 101,
-		startControl = 102,
-		stopControl = 103,
-		startControlDone = 104,
-		stopControlDone = 105,
-		startMoving = 106,
-		stopMoving = 107,
-		doEmergency = 108,
-		resetEmergency = 109
-	};
-
 class MySafetyProperties : public eeros::safety::SafetyProperties {
 	
 public:
 	MySafetyProperties(MyControlSystem& controlSys);
 	virtual ~MySafetyProperties();
 	
+	// Define all possible events
+	eeros::safety::SafetyEvent doSystemOn;
+	eeros::safety::SafetyEvent doSystemOff;
+	eeros::safety::SafetyEvent startControl;
+	eeros::safety::SafetyEvent stopControl;
+	eeros::safety::SafetyEvent startControlDone;
+	eeros::safety::SafetyEvent stopControlDone;
+	eeros::safety::SafetyEvent startMoving;
+	eeros::safety::SafetyEvent stopMoving;
+	eeros::safety::SafetyEvent doEmergency;
+	eeros::safety::SafetyEvent resetEmergency;	
+	eeros::safety::SafetyEvent abort;
+	
+	// Name all levels
+	eeros::safety::SafetyLevel off;
+	eeros::safety::SafetyLevel emergencyState;
+	eeros::safety::SafetyLevel systemOn;
+	eeros::safety::SafetyLevel startingControl;
+	eeros::safety::SafetyLevel stoppingControl;
+	eeros::safety::SafetyLevel powerOn;
+	eeros::safety::SafetyLevel moving;
+	
 protected:
 	// critical outputs
-	eeros::hal::PeripheralOutput<bool>* enable;
+	eeros::hal::Output<bool>* enable;
 	
 	// critical inputs
-	eeros::hal::PeripheralInput<bool>* emergency;
-	eeros::hal::PeripheralInput<double>* q;
-	
+	eeros::hal::Input<bool>* emergency;
+	eeros::hal::Input<bool>* ready;
+	eeros::hal::Input<double>* q;
+		
 	MyControlSystem& controlSys;
+	
 };
 
 #endif // MYSAFETYPROPERTIES_HPP_

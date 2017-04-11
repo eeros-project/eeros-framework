@@ -1,0 +1,59 @@
+{
+	"device0": {
+		"library": "libflinkeeros.so",
+		"devHandle": "/dev/flink0",
+		"subdevice4": {
+			"type": "DigIn",
+			"channel0": {
+				"signalId": "emergency"
+			}
+		},
+		"subdevice5": {
+			"type": "DigOut",
+			"channel0": {
+				"signalId": "enable",
+			},
+			"channel1": {
+				"type": "DigIn",
+				"signalId": "readySig1",
+				"inverted": true
+			}
+		},
+		"subdevice2": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "dac",
+				"scale": [ { "id" : "dac",
+								"minIn": 	0, 	"maxIn": 	65535,
+								"minOut": 	-10.0, "maxOut": 	10.0 },
+					   { "id" : "drive",
+								"minIn": 	-10.0, 	"maxIn": 	10.0,
+								"minOut":	-13.5, 	"maxOut": 	13.5 },
+					 ],
+				"range": [ { "id" : "dac",
+								"minIn":	0,  	"maxIn": 	65536,
+								"minOut":	-10.0,	"maxOut": 	10.0 },
+					   { "id" : "drive",
+								"minIn": 	-10.0, 	"maxIn": 	10.0,
+								"minOut":	-13.5, 	"maxOut": 	13.5 },
+					 ],
+				"unit": "A"
+			}
+		},
+		"subdevice1": {
+			"type": "Fqd",
+			"channel0": {
+				"signalId": "q",
+				"scale": [ { "id" : "enc1",
+								"minIn": 	0, "maxIn": 6.28318530718,
+								"minOut":	0, "maxOut": 2000 }
+					 ],
+				"range": [ { "id" : "enc1",
+								"noLimit": 	true }
+					 ],
+				"unit": "rad"
+			}
+		}
+	}
+}
+

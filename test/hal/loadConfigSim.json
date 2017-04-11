@@ -1,0 +1,116 @@
+{
+	"device0": {
+		"library": "libsimeeros.so",
+		"devHandle": "reflect",
+		"subdevice0": {
+			"type": "DigOut",
+			"channel0": {
+				"signalId": "io1"
+			},
+			"channel1": {
+				"signalId": "ioOut"
+			},
+			"channel3": {
+				"signalId": "ioOut4"
+			}
+		},
+		"subdevice1": {
+			"type": "DigIn",
+			"channel2": {
+				"signalId": "ioIn"
+			},
+		},
+		"subdevice4": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "aOut0",
+				"scale": [ { "id" : "dac",
+								"minIn": 	0, 	"maxIn": 	65535,
+								"minOut": 	-10.0, "maxOut": 	10.0 },
+					   { "id" : "test",
+								"minIn": 	-5.0, 	"maxIn": 	5.0,
+								"minOut":	-10.0, 	"maxOut": 	10.0 },
+					   { "id" : "direct",
+								"scale":	0.5,
+								"offset": 	0.0 }
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn": 	0, 	"maxIn": 	65535,
+							"minOut": 	-10.0, 	"maxOut": 	10.0 },
+					   { "id" : "test",
+							"minIn": 	-5.0, 	"maxIn": 	5.0,
+							"minOut": 	-10.0, 	"maxOut": 	10.0 },
+					   { "id" : "direct",
+							"minIn":	-10.0,  "maxIn": 	10.0,
+							"minOut":	-10.0,	"maxOut": 	10.0 }
+					 ],
+				"unit": "V"
+			},
+			"channel1": {
+				"signalId": "aOut1",
+				"scale": [ { "id" : "dac",
+								"minIn": 	0, 	"maxIn": 	65535,
+								"minOut": 	-10.0, "maxOut": 	10.0 }
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn": 	0, 	"maxIn": 	65535,
+							"minOut": 	-10.0, 	"maxOut": 	10.0 }
+					 ],
+				"unit": "V"
+			},
+			"channel2": {
+				"signalId": "aOut2",
+				"scale": [ { "id" : "dac",
+								"minIn": 	0, 	"maxIn": 	65535,
+								"minOut": 	-10.0, "maxOut": 	10.0 },
+					   { "id" : "test",
+								"minIn": 	-5.0, 	"maxIn": 	5.0,
+								"minOut":	-10.0, 	"maxOut": 	10.0 }
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn": 	0, 	"maxIn": 	65535,
+							"minOut": 	-10.0, 	"maxOut": 	10.0 },
+							,
+					   { "id" : "test",
+							"minIn": 	-5.0, 	"maxIn": 	5.0,
+							"minOut": 	-5.0, 	"maxOut": 	5.0 }
+					 ],
+				"unit": "V"
+			},
+			"channel3": {
+				"signalId": "aOut3",
+				"scale": [ { "id" : "dac",
+								"minIn": 	0, 	"maxIn": 	65535,
+								"minOut": 	-10.0, "maxOut": 	10.0 },
+					   { "id" : "direct",
+								"scale":	0.5,
+								"offset": 	1.0 }
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn": 	0, 	"maxIn": 	65535,
+							"minOut": 	-10.0, 	"maxOut": 	10.0 },
+					   { "id" : "direct",
+							"minIn": 	-10.0, 	"maxIn": 	10.0,
+							"minOut": 	-5.0, 	"maxOut": 	5.0 }
+					 ],
+				"unit": "V"
+			}
+		},
+		"subdevice6": {
+			"type": "AnalogIn",
+			"channel0": {
+				"signalId": "aIn0",
+				"scale": [ { "id" : "analogIn",
+							"minIn": 	0.0, 	"maxIn": 	4.90,
+							"minOut": 	32770, 	"maxOut": 	48040 }
+					 ],
+				"range": [ { "id" : "analogIn",
+							"minIn":	-10.0, 	"maxIn": 	10.0,
+							"minOut":	0,	"maxOut": 	65535 }
+					 ],
+				"unit": "V"
+			}
+		}
+	}
+}
+

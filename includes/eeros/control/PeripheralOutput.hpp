@@ -15,7 +15,7 @@ namespace eeros {
 
 		public:
 			PeripheralOutput(std::string id) : hal(hal::HAL::instance()) {
-				systemOutput = dynamic_cast<hal::PeripheralOutput<T>*>(hal.getPeripheralOutput(id));
+				systemOutput = dynamic_cast<hal::Output<T>*>(hal.getOutput(id));
 				if(systemOutput == nullptr) throw Fault("Peripheral output '" + id + "' not found!");
 			}
 			
@@ -27,7 +27,7 @@ namespace eeros {
 			
 		private:
 			hal::HAL& hal;
-			hal::PeripheralOutput<T>* systemOutput;
+			hal::Output<T>* systemOutput;
 		};
 
 	};

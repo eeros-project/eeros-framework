@@ -13,13 +13,10 @@ class MyControlSystem {
 
 public:
 	MyControlSystem(double ts);
-	
-	void start();
-	void stop();
+	~MyControlSystem();
 	
 	eeros::control::Constant<> setpoint;
-	eeros::control::Constant<> setpointV;
-	eeros::control::PeripheralInput<> enc;
+	eeros::control::PeripheralInput<double> enc;
 	eeros::control::D<> diff1;
 	eeros::control::Sum<2> sum1;
 	eeros::control::Gain<> posController;
@@ -28,7 +25,7 @@ public:
 	eeros::control::Gain<> speedController;
 	eeros::control::Gain<> inertia;
 	eeros::control::Gain<> invMotConst;
-	eeros::control::PeripheralOutput<> dac;
+	eeros::control::PeripheralOutput<double> dac;
 	
 private:
 	eeros::control::TimeDomain timedomain;

@@ -1,0 +1,60 @@
+{
+	"device0": {
+		"library": "libcomedieeros.so",
+		"devHandle": "/dev/comedi0",
+		"subdevice2": {
+			"type": "DigIn",
+			"channel1": {
+				"signalId": "emergency",
+				"inverted": true
+			},
+			"channel0": {
+				"type":	    "DigOut",
+				"signalId": "enable",
+			},
+			"channel2": {
+				"signalId": "readySig1",
+				"inverted": true
+			}
+		},
+		"subdevice1": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "dac",
+				"scale": [ { "id" : "dac",
+								"minIn": 	0, 	"maxIn": 	65535,
+								"minOut": 	-10.0, "maxOut": 	10.0 },
+					   { "id" : "drive",
+								"minIn": 	-10.0, 	"maxIn": 	10.0,
+								"minOut":	-13.5, 	"maxOut": 	13.5 },
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn":	0,  	"maxIn": 	65536,
+							"minOut":	-10.0,	"maxOut": 	10.0 },
+					   { "id" : "drive",
+								"minIn": 	-10.0, 	"maxIn": 	10.0,
+								"minOut":	-13.5, 	"maxOut": 	13.5 },
+					 ],
+				"unit": "A"
+			}
+		},
+		"subdevice11": {
+			"type": "Fqd",
+			"channel8": {
+				"signalId": "q",
+				"encChannelA": 8,
+				"encChannelB": 10,
+				"encChannelZ": 9,
+				"scale": [ { "id" : "enc1",
+							"minIn": 	0, "maxIn": 6.28318530718,
+							"minOut":	0, "maxOut": 2000 }
+					 ],
+				"range": [ { "id" : "enc1",
+							"noLimit": 	true }
+					 ],
+				"unit": "rad"
+			}
+		}
+	}
+}
+

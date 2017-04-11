@@ -2,7 +2,7 @@
 
 using namespace eeros::hal;
 
-DummyLogicInput::DummyLogicInput(std::string id) : PeripheralInput<bool>(id) { }
+DummyLogicInput::DummyLogicInput(std::string id, void* libHandle) : Input<bool>(id, libHandle) { }
 
 bool DummyLogicInput::get() {
 	return value;

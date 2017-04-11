@@ -1,0 +1,14 @@
+{
+	"device0": {
+		"library": "libsimeeros.so",
+		"devHandle": "reflect",
+		"subdevice0": {
+			"type": "DInvalidOut",
+			"channel0": {
+				"signalId": "digOutDummy",
+				"inverted": true
+			}
+		}
+	}
+}
+

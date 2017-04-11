@@ -1,0 +1,70 @@
+{
+	"device0": {
+		"library": "libflinkeeros.so",
+		"devHandle": "/dev/flink0",
+		"subdevice4": {
+			"type": "DigOut",
+			"channel0": {
+				"signalId": "io1"
+			},
+			"channel3": {
+				"signalId": "ioOut"
+			},
+			"channel2": {
+				"type": "DigIn",
+				"signalId": "ioIn"
+			},
+			"channel4": {
+				"signalId": "ioOut4"
+			}
+		},
+		"subdevice2": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "dac1",
+				"scale": [ { "id" : "dac",
+								"minIn": 	2000, 	"maxIn": 	64000,
+								"minOut": 	-9.752, "maxOut": 	9.862 },
+					   { "id" : "test",
+								"minIn": 	-5.0, 	"maxIn": 	5.0,
+								"minOut":	-10.0, 	"maxOut": 	10.0 },
+					   { "id" : "direct",
+								"scale":	0.5,
+								"offset": 	0.5 }
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn": 	0, 	"maxIn": 	65535,
+							"minOut": 	-10.0, 	"maxOut": 	10.0 },
+					   { "id" : "test",
+							"minIn": 	-5.0, 	"maxIn": 	5.0,
+							"minOut": 	-10.0, 	"maxOut": 	10.0 },
+					   { "id" : "direct",
+							"minIn":	-10.0,  "maxIn": 	10.0,
+							"minOut":	-4.0,	"maxOut": 	4.0 }
+					 ],
+				"unit": "V"
+			}
+		},
+		"subdevice1": {
+			"type": "Fqd",
+			"channel0": {
+				"signalId": "encMot1",
+				"scale": [ { "id" : "enc1",
+							"minIn": 	0, "maxIn": 6.283185307,
+							"minOut":	0, "maxOut": 25600 }
+					 ],
+				"range": [ { "id" : "enc1",
+								"noLimit": 	true }
+					 ],
+				"unit": "rad"
+			}
+		},
+		"subdevice0": {
+			"type": "Pwm",
+			"channel1": {
+				"signalId": "pwm1"
+			}
+		}
+	}
+}
+

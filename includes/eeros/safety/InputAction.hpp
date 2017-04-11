@@ -2,7 +2,7 @@
 #define ORG_EEROS_SAFETY_INPUTACTION_HPP_
 
 #include <stdint.h>
-#include <eeros/hal/PeripheralInput.hpp>
+#include <eeros/hal/Input.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetyContext.hpp>
 
@@ -13,18 +13,18 @@ namespace eeros {
 		
 		class InputAction {
 		public:
-			InputAction(hal::PeripheralInputInterface& input) : input(&input) { }
+			InputAction(hal::InputInterface& input) : input(&input) { }
 			virtual ~InputAction() { }
 			virtual bool check(SafetyContext* context) { return false; }
-			virtual hal::PeripheralInputInterface* getInput() {return input;}
+			virtual hal::InputInterface* getInput() {return input;}
 		protected:
-			hal::PeripheralInputInterface* input;
+			hal::InputInterface* input;
 		};
 
 		template <typename T>
 		class IgnoreInputAction : public InputAction {
 		public:
-			IgnoreInputAction(hal::PeripheralInput<T>& input) : InputAction(input) { }
+			IgnoreInputAction(hal::Input<T>& input) : InputAction(input) { }
 			virtual ~IgnoreInputAction() { }
 			virtual bool check(SafetyContext* context) { return false; }
 		};
@@ -32,10 +32,10 @@ namespace eeros {
 		template <typename T>
 		class CheckInputAction : public InputAction {
 		public:
-			CheckInputAction(hal::PeripheralInput<T>& input, T value, SafetyEvent& event) : InputAction(input), value(value), event(event) { }
+			CheckInputAction(hal::Input<T>& input, T value, SafetyEvent& event) : InputAction(input), value(value), event(event) { }
 			virtual ~CheckInputAction() { }
 			virtual bool check(SafetyContext* context) {
-				if (dynamic_cast<hal::PeripheralInput<T>*>(input)->get() != value) {
+				if (dynamic_cast<hal::Input<T>*>(input)->get() != value) {
 					context->triggerEvent(event);
 					return true;
 				}
@@ -49,10 +49,10 @@ namespace eeros {
 		template <typename T>
 		class CheckRangeInputAction : public InputAction {
 		public:
-			CheckRangeInputAction(hal::PeripheralInput<T>& input, T min, T max, SafetyEvent& event) : InputAction(input), min(min), max(max), event(event) { }
+			CheckRangeInputAction(hal::Input<T>& input, T min, T max, SafetyEvent& event) : InputAction(input), min(min), max(max), event(event) { }
 			virtual ~CheckRangeInputAction() { }
 			virtual bool check(SafetyContext* context) {
-				T value = dynamic_cast<hal::PeripheralInput<T>*>(input)->get();
+				T value = dynamic_cast<hal::Input<T>*>(input)->get();
 				if (value < min || value > max) {
 					context->triggerEvent(event);
 					return true;
@@ -66,32 +66,32 @@ namespace eeros {
 		};
 
 		template <typename T>
-		IgnoreInputAction<T>* ignore(eeros::hal::PeripheralInput<T>& input) {
+		IgnoreInputAction<T>* ignore(eeros::hal::Input<T>& input) {
 			return new IgnoreInputAction<T>(input);
 		}
 		
 		template <typename T>
-		IgnoreInputAction<T>* ignore(eeros::hal::PeripheralInput<T>* input) {
+		IgnoreInputAction<T>* ignore(eeros::hal::Input<T>* input) {
 			return new IgnoreInputAction<T>(*input);
 		}
 
 		template <typename T>
-		CheckInputAction<T>* check(eeros::hal::PeripheralInput<T>& input, T value, SafetyEvent& event) {
+		CheckInputAction<T>* check(eeros::hal::Input<T>& input, T value, SafetyEvent& event) {
 			return new CheckInputAction<T>(input, value, event);
 		}
 		
 		template <typename T>
-		CheckInputAction<T>* check(eeros::hal::PeripheralInput<T>* input, T value, SafetyEvent& event) {
+		CheckInputAction<T>* check(eeros::hal::Input<T>* input, T value, SafetyEvent& event) {
 			return new CheckInputAction<T>(*input, value, event);
 		}
 
 		template <typename T>
-		CheckRangeInputAction<T>* range(eeros::hal::PeripheralInput<T>& input, T min, T max, SafetyEvent& event) {
+		CheckRangeInputAction<T>* range(eeros::hal::Input<T>& input, T min, T max, SafetyEvent& event) {
 			return new CheckRangeInputAction<T>(input, min, max, event);
 		}
 		
 		template <typename T>
-		CheckRangeInputAction<T>* range(eeros::hal::PeripheralInput<T>* input, T min, T max, SafetyEvent& event) {
+		CheckRangeInputAction<T>* range(eeros::hal::Input<T>* input, T min, T max, SafetyEvent& event) {
 			return new CheckRangeInputAction<T>(*input, min, max, event);
 		}
 

@@ -1,0 +1,29 @@
+{
+	"device0": {
+		"library": "libflinkeeros.so",
+		"devHandle": "/dev/flink0",
+		"subdevice2": {
+			"type": "AnalogOut",
+			"channela0": {
+				"signalId": "aOutDummy",
+				"scale": [ { "id" : "dac",
+								"minIn": 	0, 	"maxIn": 	0,
+								"minOut": 	0, 	"maxOut": 	0 },
+					   { "id" : "direct",
+								"scale":	0,
+								"offset": 	0 }
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn": 	0, 	"maxIn": 	0,
+							"minOut": 	0, 	"maxOut": 	0 },
+							,
+					   { "id" : "direct",
+							"minIn": 	0, 	"maxIn": 	0,
+							"minOut": 	0, 	"maxOut": 	0 }
+					 ],
+				"unit": "V"
+			}
+		}
+	}
+}
+

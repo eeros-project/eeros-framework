@@ -101,7 +101,7 @@ namespace eeros {
 						if(ia->check(&privateContext)) {
 							SafetyLevel* newLevel = nextLevel;
 							using namespace logger;
-							hal::PeripheralInputInterface* input = (hal::PeripheralInputInterface*)(ia->getInput());
+							hal::InputInterface* input = (hal::InputInterface*)(ia->getInput());
 							if(oldLevel != newLevel) {
 								log.info()	<< "level changed due to input action: " << input->getId()
 											<< " from level '" << oldLevel << "'"
