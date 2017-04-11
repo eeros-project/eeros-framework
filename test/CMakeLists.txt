@@ -69,7 +69,7 @@ add_eeros_test_sources(EerosEnvironment.cpp)
 add_eeros_test_sources(EerosEnvironmentInvalidConfig.cpp)
 
 add_executable(unitTests ${EEROS_TEST_SRCS})
-target_link_libraries(unitTests ${EXTERNAL_LIBS} eeros dl ucl gtest_main)
+target_link_libraries(unitTests ${EXTERNAL_LIBS} eeros ${EEROS_LIBS} gtest_main)
 add_test(NAME eeros_unit_tests COMMAND unitTests)
 
 set( HAL_CONFIG_FILES

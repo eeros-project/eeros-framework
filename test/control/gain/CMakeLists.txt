@@ -2,10 +2,10 @@
 
 # Compile and link test applications
 add_executable(gainTestScalar GainTestScalar.cpp)
-target_link_libraries(gainTestScalar eeros ucl)
+target_link_libraries(gainTestScalar eeros ${EEROS_LIBS})
 
 add_executable(gainTestMatrix GainTestMatrix.cpp)
-target_link_libraries(gainTestMatrix eeros ucl)
+target_link_libraries(gainTestMatrix eeros ${EEROS_LIBS})
 
 # Add tests
 add_test(control/gain/scalar-scalar/double/random gainTestScalar d "${TEST_DATA_DIR}/control/gain/gain-scalar-scalar-double-random.csv")

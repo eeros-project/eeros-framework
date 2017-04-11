@@ -8,4 +8,4 @@ add_executable(simExample simExample.cpp
 			  copySimConfig
 			)
 			
-target_link_libraries(simExample eeros ucl ${CMAKE_DL_LIBS})
+target_link_libraries(simExample eeros ${EEROS_LIBS})

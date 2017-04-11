@@ -167,6 +167,7 @@ if(DOXYGEN_FOUND)
 		COMMENT "Generating API documentation with Doxygen" VERBATIM )
 endif(DOXYGEN_FOUND)
 
+set(EEROS_LIBS ${CMAKE_DL_LIBS} ucl)
 
 ## Enable CTest
 enable_testing()

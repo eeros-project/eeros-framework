@@ -2,10 +2,10 @@
 
 # Compile and link test application
 add_executable(saturationTestArithmetic SaturationTestArithmetic.cpp)
-target_link_libraries(saturationTestArithmetic eeros ucl)
+target_link_libraries(saturationTestArithmetic eeros ${EEROS_LIBS})
 
 add_executable(saturationTestContainer SaturationTestContainer.cpp)
-target_link_libraries(saturationTestContainer eeros ucl)
+target_link_libraries(saturationTestContainer eeros ${EEROS_LIBS})
 
 # Add tests
 add_test(control/saturation/int/random    saturationTestArithmetic i)

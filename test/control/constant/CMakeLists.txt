@@ -2,10 +2,10 @@
 
 # Compile and link test application
 add_executable(constantTestArithmetic ConstantTestArithmetic.cpp)
-target_link_libraries(constantTestArithmetic eeros ucl)
+target_link_libraries(constantTestArithmetic eeros ${EEROS_LIBS})
 
 add_executable(constantTestContainer ConstantTestContainer.cpp)
-target_link_libraries(constantTestContainer eeros ucl)
+target_link_libraries(constantTestContainer eeros ${EEROS_LIBS})
 
 # Add tests
 add_test(control/constant/int/random               constantTestArithmetic i)

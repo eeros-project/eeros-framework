@@ -2,7 +2,7 @@
 
 # Compile and link test application
 add_executable(switchTest SwitchTest.cpp)
-target_link_libraries(switchTest eeros ucl)
+target_link_libraries(switchTest eeros ${EEROS_LIBS})
 
 # Add tests
 add_test(control/switch/2input/integer/random switchTest 2)
