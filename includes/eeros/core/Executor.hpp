@@ -2,11 +2,15 @@
 #define ORG_EEROS_CORE_EXECUTOR_HPP_
 
 #include <vector>
+#include <condition_variable>
 
 #include <eeros/core/Runnable.hpp>
 #include <eeros/core/PeriodicCounter.hpp>
 #include <eeros/task/Periodic.hpp>
 #include <eeros/logger/Logger.hpp>
+
+#include <EtherCATMain.hpp>
+
 
 namespace eeros {
 
@@ -17,6 +21,7 @@ namespace eeros {
 	namespace safety {
 		class SafetySystem;
 	};
+	
 
 	class Executor : public Runnable {
 		Executor();
@@ -25,6 +30,7 @@ namespace eeros {
 
 		virtual ~Executor();
 		static Executor& instance();
+		void syncWithEtherCATSTack(ethercat::EtherCATMain* etherCATStack);
 		void setMainTask(task::Periodic &mainTask);
 		void setMainTask(safety::SafetySystem &mainTask);
 		void add(task::Periodic &task);
@@ -41,6 +47,11 @@ namespace eeros {
 	private:
 		void assignPriorities();
 
+		ethercat::EtherCATMain* etherCATStack;
+// 		static bool syncedWithEtherCAT;
+		std::mutex* m;
+		std::condition_variable* cv;
+		
 		logger::Logger log;
 		double period;
 		task::Periodic *mainTask;
