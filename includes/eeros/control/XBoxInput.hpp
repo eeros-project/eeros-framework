@@ -3,26 +3,28 @@
 
 #include <string>
 #include <thread>
-#include <eeros/control/Output.hpp>
 #include <eeros/control/Block1o.hpp>
 #include <eeros/core/System.hpp>
-#include <eeros/hal/Joystick.hpp>
+#include <eeros/hal/XBox.hpp>
 #include <eeros/math/Matrix.hpp>
+
+using namespace eeros::math;
+using namespace eeros::hal;
 
 namespace eeros {
 	namespace control {
 
-		class XBoxInput: public eeros::control::Block1o<eeros::math::Vector4> {
+		class XBoxInput: public Block1o<Matrix<JOYSTICK_AXIS_COUNT>> {
 		public:
 			XBoxInput(std::string dev);
 			virtual ~XBoxInput();
 			
 			virtual void run();
-			virtual void setInitPos(eeros::math::Vector4 initPos);
+			virtual void setInitPos(Matrix<JOYSTICK_AXIS_COUNT> initPos);
 			virtual void setSpeedScaleFactor(double speedScale);
+			Output<Matrix<JOYSTICK_BUTTON_COUNT,1,bool>>& getButtonOut();
 			
-			inline void on_button(std::function<void(int, bool)> &&action)
-			{
+			inline void on_button(std::function<void(int, bool)> &&action) {
 				j.on_button(std::move(action));
 			}
 			
@@ -42,9 +44,9 @@ namespace eeros {
 			double max_r = 2.8;
 
 		protected:
-			eeros::math::Matrix<4,4,double> axisScale;
-			
-			eeros::hal::Joystick j;
+			Output<Matrix<JOYSTICK_BUTTON_COUNT,1,bool>> buttonOut;
+			Matrix<4,4,double> axisScale;
+			XBox j;
 			std::thread* t;
 		};
 

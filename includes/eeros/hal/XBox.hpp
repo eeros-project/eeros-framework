@@ -1,17 +1,16 @@
-#ifndef ORG_EEROS_HAL_JOYSTICK_HPP_
-#define ORG_EEROS_HAL_JOYSTICK_HPP_
+#ifndef ORG_EEROS_HAL_XBOX_HPP_
+#define ORG_EEROS_HAL_XBOX_HPP_
 
 #include <string>
 #include <functional>
 #include <linux/joystick.h>
 
-#define JOYSTICK_BUTTON_COUNT (16)
+#define JOYSTICK_BUTTON_COUNT (8)
 #define JOYSTICK_AXIS_COUNT (8)
 
 namespace eeros {
 	namespace hal {
-		struct JoystickState
-		{
+		struct JoystickState {
 			double axis[JOYSTICK_AXIS_COUNT];
 			bool button_state[JOYSTICK_BUTTON_COUNT];
 			bool button_up[JOYSTICK_BUTTON_COUNT];
@@ -20,11 +19,10 @@ namespace eeros {
 			static const double axis_max;
 		};
 		
-		class Joystick
-		{
+		class XBox {
 		public:
-			explicit Joystick();
-			~Joystick();
+			explicit XBox();
+			~XBox();
 			virtual bool open(const char* device);
 			virtual void close();
 			virtual void loop();
@@ -46,4 +44,4 @@ namespace eeros {
 	}
 }
 
-#endif // ORG_EEROS_HAL_JOYSTICK_HPP_
+#endif // ORG_EEROS_HAL_XBOX_HPP_

@@ -1,5 +1,5 @@
-add_eeros_sources(HAL.cpp DummyLogicInput.cpp DummyLogicOutput.cpp DummyRealInput.cpp DummyRealOutput.cpp JsonParser.cpp)
+add_eeros_sources(HAL.cpp JsonParser.cpp)
 
 if(LINUX)
-	add_eeros_sources(SysFsDigIn.cpp SysFsDigOut.cpp Joystick.cpp Mouse.cpp)
+	add_eeros_sources(SysFsDigIn.cpp SysFsDigOut.cpp XBox.cpp Mouse.cpp)
 endif()

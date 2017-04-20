@@ -1,18 +1,17 @@
 #include <eeros/control/MouseInput.hpp>
-#include <eeros/math/Matrix.hpp>
 
 using namespace eeros::control;
 
 MouseInput::MouseInput(std::string dev) {
-        setInitPos(0, 0, 0, 0);
-        j.open(dev.c_str());
-        t = new std::thread([this](){ this->j.loop(); });
-        first = true;
+	setInitPos(0, 0, 0, 0);
+	j.open(dev.c_str());
+	t = new std::thread([this](){ this->j.loop(); });
+	first = true;
 }
 
 MouseInput::~MouseInput() {
-        delete t;
-        j.close();
+	delete t;
+	j.close();
 }
 
 void MouseInput::run() {
@@ -24,82 +23,52 @@ void MouseInput::run() {
 		first = false;
 	}
 
-	double v;
+	double vx = axisScale_x * j.current.axis.y;
+	if ((x + vx) < min_x)
+		x = (min_x - vx);
+	else if ((x + vx) > max_x)
+		x = (max_x - vx);
+	vx += x;
 
-	v = axisScale_x * j.current.axis.y;
-	if ((x + v) < min_x)
-		x = (min_x - v);
-	else if ((x + v) > max_x)
-		x = (max_x - v);
-	v += x;
-	outX.getSignal().setValue(v);
-	v = axisScale_y * j.current.axis.x;
-	if ((y + v) < min_y)
-		y = (min_y - v);
-	else if ((y + v) > max_y)
-		y = (max_y - v);
-	v += y;
-	outY.getSignal().setValue(v);
+	double vy = axisScale_y * j.current.axis.x;
+	if ((y + vy) < min_y)
+		y = (min_y - vy);
+	else if ((y + vy) > max_y)
+		y = (max_y - vy);
+	vy += y;
 
-	v = axisScale_z * j.current.axis.z;
-	if ((z + v) < min_z)
-		z = (min_z - v);
-	else if ((z + v) > max_z)
-		z = (max_z - v);
-	v += z;
-	outZ.getSignal().setValue(v);
-	v = axisScale_r * j.current.axis.r;
-	if ((r + v) < min_r)
-		r = (min_r - v);
-	else if ((r + v) > max_r)
-		r = (max_r - v);
-	v += r;
-	outR.getSignal().setValue(v);
+	double vz = axisScale_z * j.current.axis.z;
+	if ((z + vz) < min_z)
+		z = (min_z - vz);
+	else if ((z + vz) > max_z)
+		z = (max_z - vz);
+	vz += z;
+	
+	double vr = axisScale_r * j.current.axis.r;
+	if ((r + vr) < min_r)
+		r = (min_r - vr);
+	else if ((r + vr) > max_r)
+		r = (max_r - vr);
+	vr += r;
 
-	uint64_t ts = eeros::System::getTimeNs();
-	outX.getSignal().setTimestamp(ts);
-	outY.getSignal().setTimestamp(ts);
-	outZ.getSignal().setTimestamp(ts);
-	outR.getSignal().setTimestamp(ts);
-
-	out.getSignal().setValue(eeros::math::Matrix<4>{ 
-		outX.getSignal().getValue(),
-		outY.getSignal().getValue(),
-		outZ.getSignal().getValue(),
-		outR.getSignal().getValue(),
-	});
-	out.getSignal().setTimestamp(ts);
+	uint64_t time = eeros::System::getTimeNs();
+	out.getSignal().setValue(Vector4{ vx, vy, vz, vr });
+	out.getSignal().setTimestamp(time);
+	
+	buttonOut.getSignal().setValue(Matrix<3,1,bool>{j.current.button.left, j.current.button.middle, j.current.button.right});
+	buttonOut.getSignal().setTimestamp(time);
 }
 
-Output<double>& MouseInput::getOutX() {
-        return outX;
-}
-Output<double>& MouseInput::getOutY() {
-        return outY;
-}
-
-Output<double>& MouseInput::getOutZ() {
-        return outZ;
-}
-
-Output<double>& MouseInput::getOutR() {
-        return outR;
-}
-
-eeros::control::Output<eeros::math::Matrix<4>>& MouseInput::getOut() {
-	return out;
+Output<Matrix<3,1,bool>>& MouseInput::getButtonOut() {
+	return buttonOut;
 }
 
 void MouseInput::setInitPos(double x, double y, double z, double r) {
 	reset(x, y, z, r);
-	outX.getSignal().setValue(x);
-	outY.getSignal().setValue(y);
-	outZ.getSignal().setValue(z);
-	outR.getSignal().setValue(r);
-	out.getSignal().setValue(eeros::math::Matrix<4>{ x, y, z, r });
+	out.getSignal().setValue(Matrix<4>{ x, y, z, r });
 }
 
-void MouseInput::setInitPos(eeros::math::Matrix<4> pos) {
+void MouseInput::setInitPos(Matrix<4> pos) {
 	setInitPos(pos[0], pos[1], pos[2], pos[3]);
 }
 

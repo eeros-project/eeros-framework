@@ -40,7 +40,6 @@ protected:
 	// critical inputs
 	eeros::hal::Input<bool>* emergency;
 	eeros::hal::Input<bool>* ready;
-	eeros::hal::Input<double>* q;
 		
 	MyControlSystem& controlSys;
 	

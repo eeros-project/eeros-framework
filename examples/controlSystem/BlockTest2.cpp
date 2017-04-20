@@ -6,7 +6,6 @@
 #include <eeros/control/Constant.hpp>
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/PeripheralOutput.hpp>
-#include <eeros/hal/DummyRealOutput.hpp>
 #include <eeros/hal/HAL.hpp>
 
 using namespace eeros;
@@ -95,7 +94,7 @@ int main() {
 	
 	// Get HAL instance and initialize
 	HAL& hal = HAL::instance();
-	hal.addPeripheralOutput(new DummyRealOutput("out"));
+//	hal.addPeripheralOutput(new DummyRealOutput("out"));
 
 	TimeDomain td("td1", 0.01, true);
 	ControlSystem controlSystem(td);

@@ -4,8 +4,6 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/core/Executor.hpp>
 #include <eeros/task/Lambda.hpp>
-#include <eeros/hal/DummyLogicInput.hpp>
-#include <eeros/hal/DummyLogicOutput.hpp>
 #include <signal.h>
 
 #include "SafetyPropertiesTest1.hpp"
@@ -37,9 +35,6 @@ int main(int argc, char **argv) {
 	HAL& hal = HAL::instance();
 	
 	hal.readConfigFromFile(&argc, argv);
-	// uncomment following two lines, if you want to run example without sim-eeros library and config-file
-// 	hal.addInput(new DummyLogicInput("in1"));
-// 	hal.addOutput(new DummyLogicOutput("out1"));
 	
 	// Create and initialize safety system
 	double period = 1;
