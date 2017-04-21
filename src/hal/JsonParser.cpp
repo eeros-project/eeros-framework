@@ -22,6 +22,8 @@ JsonParser::JsonParser() :
 JsonParser::JsonParser(std::string filePath) : log('H') {
 	std::string err;
 	
+	if (filePath == "") throw eeros::Fault("no configuration file given");
+	
 	log.trace() << "parsing config file from path: '" + filePath + "'";
 	
 	halRootObj = ucl::Ucl::parse_from_file_strategy(filePath.c_str(), UCL_DUPLICATE_ERROR, err);

@@ -1,0 +1,13 @@
+{
+	"device0": {
+		"library": "libsimeeros.so",
+		"devHandle": "reflect",
+		"subdevice0": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "out"
+			}
+		}
+	}
+}
+

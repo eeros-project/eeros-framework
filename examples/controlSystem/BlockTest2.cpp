@@ -46,7 +46,7 @@ public:
 	
 	Constant<> c;
 	Gain<> g;
-	control::PeripheralOutput<> p;
+	PeripheralOutput<> p;
 	TimeDomain& td;
 };
 
@@ -85,7 +85,7 @@ SafetyPropertiesTest::SafetyPropertiesTest(ControlSystem& cs) :
 	setEntryLevel(slInitializing);	
 }
 
-int main() {
+int main(int argc, char **argv) {
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;
@@ -94,6 +94,7 @@ int main() {
 	
 	// Get HAL instance and initialize
 	HAL& hal = HAL::instance();
+	hal.readConfigFromFile(&argc, argv);
 //	hal.addPeripheralOutput(new DummyRealOutput("out"));
 
 	TimeDomain td("td1", 0.01, true);

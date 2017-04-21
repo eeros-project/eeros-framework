@@ -33,7 +33,6 @@ int main(int argc, char **argv) {
 	
 	// Get HAL instance and initialize
 	HAL& hal = HAL::instance();
-	
 	hal.readConfigFromFile(&argc, argv);
 	
 	// Create and initialize safety system

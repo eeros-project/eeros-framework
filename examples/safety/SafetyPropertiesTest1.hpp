@@ -74,19 +74,13 @@ public:
 		slOff.setLevelAction([&](SafetyContext* privateContext) {Executor::stop();});
 		slShuttingDown.setLevelAction([&](SafetyContext* privateContext) {privateContext->triggerEvent(seSwitchingOff);});
 		slInitialized.setLevelAction([&](SafetyContext* privateContext) {
-			static int delayTilSwitch = 0;
-			delayTilSwitch++;
-			if(delayTilSwitch > 5){
+			if(slInitialized.getNofActivations() > 5){
 				outTest->set(true);	// switch on in1 via sim-eeros
-				delayTilSwitch = 0;
 			}
 		});
 		slRunning.setLevelAction([&](SafetyContext* privateContext){
-			static int delayTilSwitchBack = 0;
-			delayTilSwitchBack++;
-			if(delayTilSwitchBack > 5){
+			if(slRunning.getNofActivations() > 5){
 				outTest->set(false);	// switch off in1 via sim-eeros
-				delayTilSwitchBack = 0;
 			}
 		});
 		// Define entry level
