@@ -7,6 +7,7 @@
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/hal/HAL.hpp>
+#include <eeros/task/Lambda.hpp>
 
 using namespace eeros;
 using namespace eeros::safety;
@@ -15,13 +16,14 @@ using namespace eeros::control;
 using namespace eeros::hal;
 using namespace eeros::task;
 
+double period = 0.01;
+
 class ControlSystem;
 class SafetyPropertiesTest : public SafetyProperties {
 public:
 	SafetyPropertiesTest(ControlSystem& cs);
 	
 	ControlSystem& controlSystem;
-	double period = 0.01;
 
 	SafetyEvent seStartRunning;
 	SafetyEvent seDoEmergency;
@@ -95,27 +97,25 @@ int main(int argc, char **argv) {
 	// Get HAL instance and initialize
 	HAL& hal = HAL::instance();
 	hal.readConfigFromFile(&argc, argv);
-//	hal.addPeripheralOutput(new DummyRealOutput("out"));
 
-	TimeDomain td("td1", 0.01, true);
+	TimeDomain td("td1", period, true);
 	ControlSystem controlSystem(td);
 	
 	SafetyPropertiesTest ssProperties(controlSystem);
-	SafetySystem safetySys(ssProperties, ssProperties.period);
+	SafetySystem safetySys(ssProperties, period);
 	
 	td.registerSafetyEvent(&safetySys, &ssProperties.seDoEmergency);
 
-	Periodic periodic("per1", 0.01, td);
+	Lambda l1 ([&] () { });
+	Periodic periodic("per1", 1, l1);
 	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
-		static int ticks = 0;
-		if (++ticks < 100) return;
-		ticks = 0;
 		log.info() << controlSystem.g.getOut().getSignal();
 	});
 	
 	// Create and run executor
 	auto& executor = eeros::Executor::instance();
 	executor.setMainTask(safetySys);
+	executor.add(td);
 	executor.add(periodic);
 	executor.run();
 

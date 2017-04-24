@@ -6,6 +6,7 @@
 #include <eeros/control/Constant.hpp>
 #include <eeros/control/I.hpp>
 #include <eeros/control/Switch.hpp>
+#include <eeros/task/Lambda.hpp>
 
 using namespace eeros;
 using namespace eeros::safety;
@@ -83,24 +84,25 @@ int main() {
 	SafetyPropertiesTest ssProperties(controlSystem);
 	SafetySystem safetySys(ssProperties, period);
 	
+	// create time domain and add blocks of control system
 	TimeDomain td("td1", period, true);
-	Periodic periodic("per1", period, td);
-	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
-		static int ticks = 0;
-		if ((++ticks * period) < 0.5) return;
-		ticks = 0;
-		log.info() << controlSystem.sw.getOut().getSignal();
-	});
-	
 	td.addBlock(controlSystem.c1);
 	td.addBlock(controlSystem.c2);
 	td.addBlock(controlSystem.sw);
 	td.addBlock(controlSystem.i);
 	controlSystem.sw.registerSafetyEvent(&safetySys, &ssProperties.seGoto2);
 	
+	// create periodic function for logging
+	Lambda l1 ([&] () { });
+	Periodic periodic("per1", 0.5, l1);
+	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
+		log.info() << controlSystem.sw.getOut().getSignal();
+	});
+	
 	// Create and run executor
 	auto& executor = eeros::Executor::instance();
 	executor.setMainTask(safetySys);
+	executor.add(td);
 	executor.add(periodic);
 	executor.run();
 
