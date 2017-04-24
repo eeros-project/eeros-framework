@@ -19,7 +19,7 @@ struct XBoxController
 		static constexpr int LY = 1;
 		static constexpr int LT = 2;
 		static constexpr int RY = 3;
-		static constexpr int RX = 4;//2;
+		static constexpr int RX = 4;
 		static constexpr int RT = 5;
 		static constexpr int CX = 6;
 		static constexpr int CY = 7;
@@ -94,7 +94,7 @@ void XBoxInput::run() {
 		j.current.axis[XBoxController::Axis::LT],
 		j.current.axis[XBoxController::Axis::RX],
 		j.current.axis[XBoxController::Axis::RY],
-		j.current.axis[XBoxController::Axis::LT],
+		j.current.axis[XBoxController::Axis::RT],
 		j.current.axis[XBoxController::Axis::CX],
 		j.current.axis[XBoxController::Axis::CY]
 	});	
