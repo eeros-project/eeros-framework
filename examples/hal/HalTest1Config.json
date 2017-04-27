@@ -5,25 +5,25 @@
 		"subdevice0": {
 			"type": "DigOut",
 			"channel0": {
-				"signalId": "out0"
+				"signalId": "dOut0"
 			}
 		},
 		"subdevice1": {
 			"type": "DigIn",
 			"channel0": {
-				"signalId": "in0"
+				"signalId": "dIn0"
 			}
 		},
 		"subdevice2": {
 			"type": "DigIn",
 			"channel0":{
-				"signalId": "in1"
+				"signalId": "dIn1"
 			}
 		},
 		"subdevice3": {
 			"type": "DigOut",
 			"channel0":{
-				"signalId": "out1",
+				"signalId": "dOut1",
 				"inverted": true
 			}
 		},
@@ -45,7 +45,7 @@
 		"subdevice5": {
 			"type": "AnalogIn",
 			"channel0": {
-				"signalId": "aInTest0",
+				"signalId": "aIn0",
 				"scale": [ { "id" : "adc",
 								"minIn": 	-10.0, 	"maxIn": 	10.0,
 								"minOut": 	0, 	"maxOut": 	65535 }
@@ -75,7 +75,7 @@
 		"subdevice7": {
 			"type": "AnalogOut",
 			"channel2": {
-				"signalId": "aOutTest2",
+				"signalId": "anOut2",
 				"scale": [ { "id" : "dac",
 								"minIn": 	0, 	"maxIn": 	65535,
 								"minOut": 	-10.0, "maxOut": 	10.0 }

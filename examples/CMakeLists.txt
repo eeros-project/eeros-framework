@@ -7,6 +7,5 @@ add_subdirectory(safety)
 add_subdirectory(logger)
 add_subdirectory(rtTest)
 add_subdirectory(hal)
-add_subdirectory(sim)
 add_subdirectory(simpleMotorController)
 

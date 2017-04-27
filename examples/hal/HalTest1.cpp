@@ -1,62 +1,42 @@
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
-#include <eeros/hal/JsonParser.hpp>
 #include <eeros/hal/HAL.hpp>
-#include <eeros/core/Executor.hpp>
-#include <eeros/sequencer/Sequencer.hpp>
-#include "control/ParserTestControlSystem.hpp"
-#include "safety/ParserTestSafetyProperties.hpp"
-#include "sequences/ParserTestMainSequence.hpp"
-#include <iostream>
-
-#include <signal.h>
-#include <unistd.h>
+#include "HalTest1.hpp"
 
 using namespace eeros;
 using namespace eeros::logger;
+using namespace eeros::task;
 using namespace eeros::hal;
 using namespace eeros::safety;
 using namespace eeros::sequencer;
-
-volatile bool running = true;
-const double dt = 0.001;
-
-void signalHandler(int signum){
-	running = false;
-}
 
 int main(int argc, char **argv){
 	// Create and initialize logger
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;
-	
 	w.show();
 	
-	log.info() << "ParserTest started...";
+	log.info() << "HAL simulator test started...";
   
 	HAL& hal = HAL::instance();
 	hal.readConfigFromFile(&argc, argv);
 	
 // 	hal.callOutputFeature("pwm1", "setPwmFrequency", 100.0);
 	
-	ParserTestControlSystem* parserTestCtrlSys; 
-	parserTestCtrlSys = new ParserTestControlSystem(dt);
-	
-	// Create safety system
-	ParserTestSafetyProperties safetyProperties(parserTestCtrlSys);
+	// Create safety and control system
+	MyControlSystem cs(dt);
+	MySafetyProperties safetyProperties;
 	SafetySystem safetySystem(safetyProperties, dt);
 	
 	// Sequencer
 	Sequencer sequencer;
-	ParserTestMainSequence mainSequence(&sequencer, parserTestCtrlSys, &safetySystem);
+	MyMainSequence mainSequence(&sequencer, cs);
 	sequencer.start(&mainSequence);
 	
-	// Set executor & create safety system
+	// Set executor and run
 	auto &executor = Executor::instance();
 	executor.setMainTask(safetySystem);
-	
-	// Start control system
 	executor.run();
 	
 	sequencer.shutdown();
@@ -69,7 +49,7 @@ int main(int argc, char **argv){
 // 		std::cout << ".";
 // 	}
 	
-	log.info() << "Shuting down...";
+	log.info() << "end...";
 		
 	return 0;
 }
