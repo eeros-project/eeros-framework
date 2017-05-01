@@ -47,19 +47,18 @@ MyControlSystem::MyControlSystem(double ts) :
 	invMotConst.getIn().connect(inertia.getOut());
 	dac.getIn().connect(invMotConst.getOut());
 	
-	timedomain.addBlock(&setpoint);
-	timedomain.addBlock(&diff2);
-	timedomain.addBlock(&diff1);
-	timedomain.addBlock(&enc);
-	timedomain.addBlock(&sum1);
-	timedomain.addBlock(&posController);
-	timedomain.addBlock(&sum2);
-	timedomain.addBlock(&speedController);
-	timedomain.addBlock(&inertia);
-	timedomain.addBlock(&invMotConst);
-	timedomain.addBlock(&dac);
+	timedomain.addBlock(setpoint);
+	timedomain.addBlock(diff2);
+	timedomain.addBlock(diff1);
+	timedomain.addBlock(enc);
+	timedomain.addBlock(sum1);
+	timedomain.addBlock(posController);
+	timedomain.addBlock(sum2);
+	timedomain.addBlock(speedController);
+	timedomain.addBlock(inertia);
+	timedomain.addBlock(invMotConst);
+	timedomain.addBlock(dac);
 
-	eeros::task::Periodic td("control system",ts, timedomain);
 	eeros::Executor::instance().add(timedomain);
 }
 

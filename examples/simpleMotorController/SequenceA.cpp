@@ -16,11 +16,10 @@ SequenceA::SequenceA(std::string name, eeros::sequencer::Sequencer& sequencer, S
 void SequenceA::run() {
 	log.info() << "[" + getName() + " started]";
 	
-	while(safetySys.getCurrentLevel() < safetyProp.moving){
+	while(safetySys.getCurrentLevel() < safetyProp.slMoving){
 		if(isTerminating()) break;
 		usleep(10000);
 	}
-	
 	
 	while(!isTerminating()){
 		double a = 0;

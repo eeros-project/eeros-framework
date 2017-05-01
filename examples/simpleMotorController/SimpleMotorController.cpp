@@ -21,6 +21,8 @@ using namespace eeros::safety;
 using namespace eeros::logger;
 using namespace eeros::sequencer;
 
+const double dt = 0.001;
+
 void signalHandler(int signum){
 	SafetySystem::exitHandler();
 }
@@ -42,11 +44,11 @@ int main(int argc, char **argv) {
 	hal.readConfigFromFile(&argc, argv);
 	
 	// Create the control system
-	MyControlSystem controlSys(0.001);
+	MyControlSystem controlSys(dt);
 	
 	// Create and initialize a safety system
-	MySafetyProperties properties(controlSys);
-	SafetySystem safetySys(properties, 0.001);
+	MySafetyProperties properties(controlSys, dt);
+	SafetySystem safetySys(properties, dt);
 	
 	Sequencer sequencer;
 	SequenceA mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/10);

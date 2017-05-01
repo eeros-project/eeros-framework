@@ -15,16 +15,17 @@ using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;
 
-MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) : 
+MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double ts) : 
 	controlSys(controlSys), 
+	ts(ts),
 	// ############ Define Levels ############
-	off("Software is off"),
-	emergencyState("Emergency state"),
-	systemOn("System is ready, power off"),
-	startingControl("System is starting controller"),
-	stoppingControl("System is stopping controller"),
-	powerOn("Power is on, motors are controlled"),
-	moving("System is moving"),
+	slOff("Software is off"),
+	slEmergency("Emergency state"),
+	slSystemOn("System is ready, power off"),
+	slStartingControl("System is starting control system"),
+	slStoppingControl("System is stopping control system"),
+	slPowerOn("Power is on, motors are controlled"),
+	slMoving("System is moving"),
 	
 	doSystemOn("Switch System on"),
 	doSystemOff("Switch System off"),
@@ -37,7 +38,6 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	doEmergency("Emergency"),
 	resetEmergency("Reset emergency"),
 	abort("abort")
-	
 	{
 	
 	HAL& hal = HAL::instance();
@@ -53,80 +53,75 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys) :
 	
 	criticalInputs = { emergency, ready };
 	
-	addLevel(off);
-	addLevel(systemOn);
-	addLevel(startingControl);
-	addLevel(stoppingControl);
-	addLevel(powerOn);
-	addLevel(moving);
-	addLevel(emergencyState);
+	addLevel(slOff);
+	addLevel(slEmergency);
+	addLevel(slSystemOn);
+	addLevel(slStartingControl);
+	addLevel(slStoppingControl);
+	addLevel(slPowerOn);
+	addLevel(slMoving);
 	
-	off		.addEvent(doSystemOn,                     systemOn,                   kPublicEvent  );
-	systemOn	.addEvent(startControl,                   startingControl,            kPublicEvent  );
-	systemOn	.addEvent(doSystemOff,                    off,                        kPublicEvent  );
-	startingControl	.addEvent(startControlDone,               powerOn,                    kPrivateEvent );
-	stoppingControl	.addEvent(stopControlDone,                off,                   kPrivateEvent );
-	powerOn		.addEvent(startMoving,                    moving,                     kPublicEvent  );
-	powerOn		.addEvent(stopControl,                    powerOn,                    kPublicEvent  );
-	moving		.addEvent(stopMoving,                     powerOn,                    kPublicEvent  );
-	emergencyState	.addEvent(resetEmergency,                 systemOn,                   kPublicEvent  );
+	slOff			.addEvent(doSystemOn,		slSystemOn,		kPublicEvent  );
+	slEmergency		.addEvent(resetEmergency,	slSystemOn,		kPublicEvent  );
+	slSystemOn		.addEvent(startControl,		slStartingControl,	kPublicEvent  );
+	slSystemOn		.addEvent(doSystemOff,		slOff,			kPublicEvent  );
+	slStartingControl	.addEvent(startControlDone,	slPowerOn,		kPrivateEvent );
+	slStoppingControl	.addEvent(stopControlDone,	slOff,			kPrivateEvent );
+	slPowerOn		.addEvent(startMoving,		slMoving,		kPublicEvent  );
+	slMoving		.addEvent(stopMoving,		slPowerOn,		kPublicEvent  );
 	
 	// Add events to multiple levels
-	addEventToLevelAndAbove(systemOn, doEmergency, emergencyState, kPublicEvent);
-	addEventToLevelAndAbove(startingControl, abort, stoppingControl, kPublicEvent);
+	addEventToLevelAndAbove(slSystemOn, doEmergency, slEmergency, kPublicEvent);
+	addEventToLevelAndAbove(slStartingControl, abort, slStoppingControl, kPublicEvent);
 		
 	// ############ Define input states and events for all levels ############
-	off		.setInputActions( { ignore(emergency), ignore(ready) });
-	emergencyState	.setInputActions( { ignore(emergency), ignore(ready) });
-	systemOn	.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
-	startingControl	.setInputActions( { check(emergency, true , doEmergency), ignore(ready)});
-	stoppingControl	.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
-	powerOn		.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
-	moving		.setInputActions( { check(emergency, true , doEmergency), check(ready, true, doEmergency) });
+	slOff			.setInputActions( { ignore(emergency), ignore(ready) });
+	slEmergency		.setInputActions( { ignore(emergency), ignore(ready) });
+	slSystemOn		.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
+	slStartingControl	.setInputActions( { check(emergency, true , doEmergency), ignore(ready)});
+	slStoppingControl	.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
+	slPowerOn		.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
+	slMoving		.setInputActions( { check(emergency, true , doEmergency), check(ready, true, doEmergency) });
 	
-	off		.setOutputActions( { set(enable, false) } );;
-	emergencyState	.setOutputActions( { set(enable, false) } );;
-	systemOn	.setOutputActions( { set(enable, false) } );;
-	startingControl	.setOutputActions( { set(enable, false) } );;
-	stoppingControl	.setOutputActions( { set(enable, false) } );;
-	powerOn		.setOutputActions( { set(enable, true) } );;
-	moving		.setOutputActions( { set(enable, true) } );;
+	slOff			.setOutputActions( { set(enable, false) } );;
+	slEmergency		.setOutputActions( { set(enable, false) } );;
+	slSystemOn		.setOutputActions( { set(enable, false) } );;
+	slStartingControl	.setOutputActions( { set(enable, false) } );;
+	slStoppingControl	.setOutputActions( { set(enable, false) } );;
+	slPowerOn		.setOutputActions( { set(enable, true) } );;
+	slMoving		.setOutputActions( { set(enable, true) } );;
 	
 	// Define and add level functions
-	off.setLevelAction([&](SafetyContext* privateContext) {
+	slOff.setLevelAction([&](SafetyContext* privateContext) {
 		Executor::stop();
 	});
 	
-	systemOn.setLevelAction([&](SafetyContext* privateContext) {
-		privateContext->triggerEvent(startControl); // TODO read input
+	slSystemOn.setLevelAction([&](SafetyContext* privateContext) {
+		controlSys.timedomain.stop();
+		// you may want to check here for a user input
+		privateContext->triggerEvent(startControl); 
 	});
 	
-	startingControl.setLevelAction([&](SafetyContext* privateContext) {
-		// TODO start controlSys if Executor allows this, now add some delay
-		static int cnt = 0;
-		cnt++;
-		if(cnt > 500){	// wait 500ms
+	slStartingControl.setLevelAction([&](SafetyContext* privateContext) {
+		controlSys.timedomain.start();
+		if(slStartingControl.getNofActivations() * ts > 500){	// wait 500ms
 			privateContext->triggerEvent(startControlDone);
 		}
 	});
 	
-	stoppingControl.setLevelAction([&](SafetyContext* privateContext) {
-		// TODO stop controlSys if Executor allows this
+	slStoppingControl.setLevelAction([&](SafetyContext* privateContext) {
+		controlSys.timedomain.stop();
 		privateContext->triggerEvent(stopControlDone);
 	});
 	
-	powerOn.setLevelAction([&](SafetyContext* privateContext) {
+	slPowerOn.setLevelAction([&](SafetyContext* privateContext) {
 		if(ready->get()){	// check if drive is ready
 			privateContext->triggerEvent(startMoving);
 		}
 	});
-	
-	moving.setLevelAction([&](SafetyContext* privateContext) {
-		// moving
-	});
-	
+		
 	// Define entry level
-	setEntryLevel(off);
+	setEntryLevel(slOff);
 	
 	exitFunction = ([&](SafetyContext* privateContext){
 		privateContext->triggerEvent(abort);

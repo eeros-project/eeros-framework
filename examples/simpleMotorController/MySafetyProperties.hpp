@@ -8,7 +8,7 @@
 class MySafetyProperties : public eeros::safety::SafetyProperties {
 	
 public:
-	MySafetyProperties(MyControlSystem& controlSys);
+	MySafetyProperties(MyControlSystem& controlSys, double ts);
 	virtual ~MySafetyProperties();
 	
 	// Define all possible events
@@ -25,13 +25,13 @@ public:
 	eeros::safety::SafetyEvent abort;
 	
 	// Name all levels
-	eeros::safety::SafetyLevel off;
-	eeros::safety::SafetyLevel emergencyState;
-	eeros::safety::SafetyLevel systemOn;
-	eeros::safety::SafetyLevel startingControl;
-	eeros::safety::SafetyLevel stoppingControl;
-	eeros::safety::SafetyLevel powerOn;
-	eeros::safety::SafetyLevel moving;
+	eeros::safety::SafetyLevel slOff;
+	eeros::safety::SafetyLevel slEmergency;
+	eeros::safety::SafetyLevel slSystemOn;
+	eeros::safety::SafetyLevel slStartingControl;
+	eeros::safety::SafetyLevel slStoppingControl;
+	eeros::safety::SafetyLevel slPowerOn;
+	eeros::safety::SafetyLevel slMoving;
 	
 protected:
 	// critical outputs
@@ -42,7 +42,7 @@ protected:
 	eeros::hal::Input<bool>* ready;
 		
 	MyControlSystem& controlSys;
-	
+	double ts;
 };
 
 #endif // MYSAFETYPROPERTIES_HPP_
