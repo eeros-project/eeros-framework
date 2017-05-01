@@ -150,6 +150,18 @@ link_directories(${libucl_BINARY_DIR})
 
 ###### libucl ######
 
+## Find package ecmasterlib
+message(STATUS "looking for package 'ecmasterlib'")
+find_package(ecmasterlib QUIET)
+if (ECMASTERLIB_LIB_DIR)
+	message(STATUS "-> ecmasterlib package available")
+	include_directories("${ECMASTERLIB_INCLUDE_DIR}")
+	link_directories("${ECMASTERLIB_LIB_DIR}")
+	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ecmasterlib)
+	set(LIBECMASTER "${ECMASTERLIB_INCLUDE_DIR}")
+endif()
+
+
 ## Config include file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
