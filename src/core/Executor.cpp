@@ -16,6 +16,7 @@
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 
+#include <EtherCATMain.hpp>
 
 volatile bool running = true;
 
@@ -102,6 +103,12 @@ Executor& Executor::instance() {
 	return executor;
 }
 
+void Executor::syncWithEtherCATSTack(ethercat::EtherCATMain* etherCATStack) {
+	this->etherCATStack = etherCATStack;
+	cv = etherCATStack->getConditionalVariable();
+	m = etherCATStack->getMutex();
+}
+
 void Executor::setMainTask(task::Periodic &mainTask) {
 	if (this->mainTask != nullptr)
 		throw std::runtime_error("you can only define one main task per executor");
@@ -140,6 +147,8 @@ bool Executor::set_priority(int nice) {
 
 void Executor::stop() {
 	running = false;
+	auto &instance = Executor::instance();
+	if(instance.etherCATStack) instance.cv->notify_one();
 }
 
 void Executor::assignPriorities() {
@@ -204,18 +213,33 @@ void Executor::run() {
 	if (!lock_memory())
 		log.error() << "could not lock memory in RAM";
 
-	log.trace() << "starting periodic execution";
+	if (etherCATStack) {
+		log.trace() << "starting execution synced to etcherCAT stack";
+		while (running) {
+			std::unique_lock<std::mutex> lk(*m);
+			cv->wait(lk);
+			lk.unlock();
 
-	auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
-	while (running) {
-		std::this_thread::sleep_until(next_cycle);
+			counter.tick();
+			taskList.run();
+			if (mainTask != nullptr)
+				mainTask->run();
+			counter.tock();
+		}
+	}
+	else {
+		log.trace() << "starting periodic execution";
+		auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
+		while (running) {
+			std::this_thread::sleep_until(next_cycle);
 
-		counter.tick();
-		taskList.run();
-		if (mainTask != nullptr)
-			mainTask->run();
-		counter.tock();
-		next_cycle += seconds(period);
+			counter.tick();
+			taskList.run();
+			if (mainTask != nullptr)
+				mainTask->run();
+			counter.tock();
+			next_cycle += seconds(period);
+		}
 	}
 
 	log.trace() << "stopping all threads";
