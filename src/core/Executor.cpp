@@ -16,7 +16,6 @@
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 
-#include <EtherCATMain.hpp>
 
 volatile bool running = true;
 
@@ -103,11 +102,15 @@ Executor& Executor::instance() {
 	return executor;
 }
 
+
+#ifdef ECMASTERLIB_FOUND
 void Executor::syncWithEtherCATSTack(ethercat::EtherCATMain* etherCATStack) {
 	this->etherCATStack = etherCATStack;
 	cv = etherCATStack->getConditionalVariable();
 	m = etherCATStack->getMutex();
 }
+#endif
+
 
 void Executor::setMainTask(task::Periodic &mainTask) {
 	if (this->mainTask != nullptr)
@@ -148,7 +151,9 @@ bool Executor::set_priority(int nice) {
 void Executor::stop() {
 	running = false;
 	auto &instance = Executor::instance();
+#ifdef ECMASTERLIB_FOUND
 	if(instance.etherCATStack) instance.cv->notify_one();
+#endif
 }
 
 void Executor::assignPriorities() {
@@ -213,6 +218,7 @@ void Executor::run() {
 	if (!lock_memory())
 		log.error() << "could not lock memory in RAM";
 
+#ifdef ECMASTERLIB_FOUND
 	if (etherCATStack) {
 		log.trace() << "starting execution synced to etcherCAT stack";
 		while (running) {
@@ -228,6 +234,7 @@ void Executor::run() {
 		}
 	}
 	else {
+#endif
 		log.trace() << "starting periodic execution";
 		auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
 		while (running) {
@@ -240,7 +247,9 @@ void Executor::run() {
 			counter.tock();
 			next_cycle += seconds(period);
 		}
+#ifdef ECMASTERLIB_FOUND
 	}
+#endif
 
 	log.trace() << "stopping all threads";
 

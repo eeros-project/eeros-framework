@@ -159,6 +159,7 @@ if (ECMASTERLIB_LIB_DIR)
 	link_directories("${ECMASTERLIB_LIB_DIR}")
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ecmasterlib)
 	set(LIBECMASTER "${ECMASTERLIB_INCLUDE_DIR}")
+	add_definitions(-DECMASTERLIB_FOUND)
 endif()
 
 

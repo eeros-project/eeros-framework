@@ -9,7 +9,9 @@
 #include <eeros/task/Periodic.hpp>
 #include <eeros/logger/Logger.hpp>
 
+#ifdef ECMASTERLIB_FOUND
 #include <EtherCATMain.hpp>
+#endif
 
 
 namespace eeros {
@@ -21,7 +23,6 @@ namespace eeros {
 	namespace safety {
 		class SafetySystem;
 	};
-	
 
 	class Executor : public Runnable {
 		Executor();
@@ -30,7 +31,9 @@ namespace eeros {
 
 		virtual ~Executor();
 		static Executor& instance();
+#ifdef ECMASTERLIB_FOUND
 		void syncWithEtherCATSTack(ethercat::EtherCATMain* etherCATStack);
+#endif
 		void setMainTask(task::Periodic &mainTask);
 		void setMainTask(safety::SafetySystem &mainTask);
 		void add(task::Periodic &task);
@@ -46,11 +49,12 @@ namespace eeros {
 
 	private:
 		void assignPriorities();
-
+;
+#ifdef ECMASTERLIB_FOUND
 		ethercat::EtherCATMain* etherCATStack;
-// 		static bool syncedWithEtherCAT;
 		std::mutex* m;
 		std::condition_variable* cv;
+#endif
 		
 		logger::Logger log;
 		double period;
