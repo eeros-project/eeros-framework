@@ -4,6 +4,7 @@
 #include <string>
 #include <functional>
 #include <linux/input.h>
+#include <eeros/hal/Input.hpp>
 
 #define MOUSE_BUTTON_COUNT (16)
 #define MOUSE_AXIS_COUNT (8)
@@ -46,6 +47,9 @@ namespace eeros {
 			std::function<void(struct input_event)> event_action;
 			std::function<void(int, bool)> button_action;
 			std::function<void(int, signed)> axis_action;
+			Input<bool>* left;
+			Input<bool>* middle;
+			Input<bool>* right;
 		};
 	}
 }

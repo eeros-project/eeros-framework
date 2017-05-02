@@ -1,4 +1,6 @@
 #include <eeros/hal/Mouse.hpp>
+#include <eeros/hal/HAL.hpp>
+#include <eeros/hal/MouseDigIn.hpp>
 
 #include <cstdio>
 #include <fcntl.h>
@@ -7,6 +9,14 @@
 using namespace eeros::hal;
 
 Mouse::Mouse() {
+	left = new MouseDigIn("leftMouseButton", this);
+	middle = new MouseDigIn("middleMouseButton", this);
+	right = new MouseDigIn("rightMouseButton", this);
+	HAL& hal = HAL::instance();
+	hal.addInput(left);
+	hal.addInput(middle);
+	hal.addInput(right);
+
 	current.button.left = 0;
 	current.button.middle = 0;
         current.button.right = 0;

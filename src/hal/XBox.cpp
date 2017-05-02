@@ -1,4 +1,6 @@
 #include <eeros/hal/XBox.hpp>
+#include <eeros/hal/HAL.hpp>
+#include <eeros/hal/XBoxDigIn.hpp>
 
 #include <cstdio>
 #include <fcntl.h>
@@ -9,6 +11,10 @@ using namespace eeros::hal;
 const double JoystickState::axis_max = 0x7fff;
 
 XBox::XBox() {
+	button[0] = new XBoxDigIn("XBoxButtonA", this);
+	HAL& hal = HAL::instance();
+	hal.addInput(button[0]);
+
 	for (int i = 0; i < JOYSTICK_AXIS_COUNT; i++) 	{
 		last.axis[i] = 0;
 		current.axis[i] = 0;
