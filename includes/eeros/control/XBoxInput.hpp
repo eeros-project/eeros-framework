@@ -14,15 +14,15 @@ using namespace eeros::hal;
 namespace eeros {
 	namespace control {
 
-		class XBoxInput: public Block1o<Matrix<JOYSTICK_AXIS_COUNT>> {
+		class XBoxInput: public Block1o<Matrix<XBOX_AXIS_COUNT>> {
 		public:
 			XBoxInput(std::string dev);
 			virtual ~XBoxInput();
 			
 			virtual void run();
-			virtual void setInitPos(Matrix<JOYSTICK_AXIS_COUNT> initPos);
+			virtual void setInitPos(Matrix<XBOX_AXIS_COUNT> initPos);
 			virtual void setSpeedScaleFactor(double speedScale);
-			Output<Matrix<JOYSTICK_BUTTON_COUNT,1,bool>>& getButtonOut();
+			Output<Matrix<XBOX_BUTTON_COUNT,1,bool>>& getButtonOut();
 			
 			inline void on_button(std::function<void(int, bool)> &&action) {
 				j.on_button(std::move(action));
@@ -44,7 +44,7 @@ namespace eeros {
 			double max_r = 2.8;
 
 		protected:
-			Output<Matrix<JOYSTICK_BUTTON_COUNT,1,bool>> buttonOut;
+			Output<Matrix<XBOX_BUTTON_COUNT,1,bool>> buttonOut;
 			Matrix<4,4,double> axisScale;
 			XBox j;
 			std::thread* t;

@@ -8,18 +8,25 @@
 
 using namespace eeros::hal;
 
-const double JoystickState::axis_max = 0x7fff;
+const double XBoxState::axis_max = 0x7fff;
 
 XBox::XBox() {
 	button[0] = new XBoxDigIn("XBoxButtonA", this);
+	button[1] = new XBoxDigIn("XBoxButtonB", this);
+	button[2] = new XBoxDigIn("XBoxButtonX", this);
+	button[3] = new XBoxDigIn("XBoxButtonY", this);
+	button[4] = new XBoxDigIn("XBoxButtonLB", this);
+	button[5] = new XBoxDigIn("XBoxButtonRB", this);
+	button[6] = new XBoxDigIn("XBoxButtonBack", this);
+	button[7] = new XBoxDigIn("XBoxButtonStart", this);
 	HAL& hal = HAL::instance();
-	hal.addInput(button[0]);
+	for (int i = 0; i < XBOX_BUTTON_COUNT; i++) hal.addInput(button[i]);
 
-	for (int i = 0; i < JOYSTICK_AXIS_COUNT; i++) 	{
+	for (int i = 0; i < XBOX_AXIS_COUNT; i++) 	{
 		last.axis[i] = 0;
 		current.axis[i] = 0;
 	}
-	for (int i = 0; i < JOYSTICK_BUTTON_COUNT; i++)	{
+	for (int i = 0; i < XBOX_BUTTON_COUNT; i++)	{
 		last.button_state[i] = false;
 		last.button_up[i] = false;
 		last.button_down[i] = false;
@@ -70,7 +77,7 @@ void XBox::loop() {
 		switch (e.type) {
 			case (JS_EVENT_BUTTON | JS_EVENT_INIT):
 			case JS_EVENT_BUTTON:
-				if (e.number < JOYSTICK_BUTTON_COUNT) {
+				if (e.number < XBOX_BUTTON_COUNT) {
 					current.button_state[e.number] = e.value;
 					current.button_up[e.number] = (!current.button_state[e.number] & last.button_state[e.number]);
 					current.button_down[e.number] = (current.button_state[e.number] & !last.button_state[e.number]);
@@ -83,8 +90,8 @@ void XBox::loop() {
 				
 			case (JS_EVENT_AXIS | JS_EVENT_INIT):
 			case JS_EVENT_AXIS:
-				if (e.number < JOYSTICK_AXIS_COUNT) {
-					current.axis[e.number] = (e.value / JoystickState::axis_max);
+				if (e.number < XBOX_AXIS_COUNT) {
+					current.axis[e.number] = (e.value / XBoxState::axis_max);
 					
 					if (e.type != (JS_EVENT_AXIS | JS_EVENT_INIT))
 						if (axis_action != nullptr)

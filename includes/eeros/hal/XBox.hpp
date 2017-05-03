@@ -6,16 +6,16 @@
 #include <linux/joystick.h>
 #include <eeros/hal/Input.hpp>
 
-#define JOYSTICK_BUTTON_COUNT (8)
-#define JOYSTICK_AXIS_COUNT (8)
+#define XBOX_BUTTON_COUNT (8)
+#define XBOX_AXIS_COUNT (8)
 
 namespace eeros {
 	namespace hal {
-		struct JoystickState {
-			double axis[JOYSTICK_AXIS_COUNT];
-			bool button_state[JOYSTICK_BUTTON_COUNT];
-			bool button_up[JOYSTICK_BUTTON_COUNT];
-			bool button_down[JOYSTICK_BUTTON_COUNT];
+		struct XBoxState {
+			double axis[XBOX_AXIS_COUNT];
+			bool button_state[XBOX_BUTTON_COUNT];
+			bool button_up[XBOX_BUTTON_COUNT];
+			bool button_down[XBOX_BUTTON_COUNT];
 			
 			static const double axis_max;
 		};
@@ -56,15 +56,15 @@ namespace eeros {
 			
 			virtual std::string name();
 			
-			JoystickState last;
-			JoystickState current;
+			XBoxState last;
+			XBoxState current;
 			
 		private:
 			int fd;
 			std::function<void(struct js_event)> event_action;
 			std::function<void(int, bool)> button_action;
 			std::function<void(int, double)> axis_action;
-			Input<bool>* button[JOYSTICK_BUTTON_COUNT];
+			Input<bool>* button[XBOX_BUTTON_COUNT];
 		};
 	}
 }

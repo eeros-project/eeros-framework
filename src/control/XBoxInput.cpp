@@ -53,7 +53,7 @@ void XBoxInput::run() {
 // 		v[3] = max_r;
 	
 //	out.getSignal().setValue(v);	
-	out.getSignal().setValue(Matrix<JOYSTICK_AXIS_COUNT>{
+	out.getSignal().setValue(Matrix<XBOX_AXIS_COUNT>{
 		j.current.axis[XBoxController::Axis::LX],
 		j.current.axis[XBoxController::Axis::LY],
 		j.current.axis[XBoxController::Axis::LT],
@@ -65,7 +65,7 @@ void XBoxInput::run() {
 	});	
 	uint64_t ts = eeros::System::getTimeNs();
 	out.getSignal().setTimestamp(ts);
-	buttonOut.getSignal().setValue(Matrix<JOYSTICK_BUTTON_COUNT,1,bool>{
+	buttonOut.getSignal().setValue(Matrix<XBOX_BUTTON_COUNT,1,bool>{
 		j.current.button_state[XBoxController::Button::A],
 		j.current.button_state[XBoxController::Button::B],
 		j.current.button_state[XBoxController::Button::X],
@@ -78,11 +78,11 @@ void XBoxInput::run() {
 	buttonOut.getSignal().setTimestamp(ts);
 }
 
-Output<Matrix<JOYSTICK_BUTTON_COUNT,1,bool>>& XBoxInput::getButtonOut() {
+Output<Matrix<XBOX_BUTTON_COUNT,1,bool>>& XBoxInput::getButtonOut() {
 	return buttonOut;
 }
 
-void XBoxInput::setInitPos(Matrix<JOYSTICK_AXIS_COUNT> initPos) {
+void XBoxInput::setInitPos(Matrix<XBOX_AXIS_COUNT> initPos) {
 	out.getSignal().setValue(initPos);
 }
 
