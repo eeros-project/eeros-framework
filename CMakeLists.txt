@@ -24,8 +24,10 @@ link_directories(${ADDITIONAL_LINK_DIRS})
 INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
 
 ## Install CMake configuration file
-set(INCLUDE_INSTALL_DIR include/)
+set(INCLUDE_INSTALL_DIR "include/")
+set(LIBUCL_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/libucl-src/include")
 set(LIB_INSTALL_DIR lib/)
+set(LIBUCL_LINK_DIR "${CMAKE_CURRENT_BINARY_DIR}/libucl-build/")
 
 include(CMakePackageConfigHelpers)
 
@@ -33,7 +35,7 @@ configure_package_config_file(
 	cmake/EEROSConfig.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake
 	INSTALL_DESTINATION ${LIB_INSTALL_DIR}/EEROS/cmake
-	PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR)
+	PATH_VARS INCLUDE_INSTALL_DIR LIBUCL_INCLUDE_DIR LIB_INSTALL_DIR LIBUCL_LINK_DIR)
 
 write_basic_package_version_file(
 	${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
