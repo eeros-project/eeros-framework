@@ -20,3 +20,6 @@ target_link_libraries(mouseTest eeros ${EEROS_LIBS})
 
 add_executable(xBoxTest XBoxTest.cpp)
 target_link_libraries(xBoxTest eeros ${EEROS_LIBS})
+
+add_executable(keyboardTest KeyboardTest.cpp)
+target_link_libraries(keyboardTest eeros ${EEROS_LIBS})
