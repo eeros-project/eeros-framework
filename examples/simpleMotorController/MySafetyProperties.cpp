@@ -15,9 +15,8 @@ using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;
 
-MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double ts) : 
-	controlSys(controlSys), 
-	ts(ts),
+MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double dt) : 
+	controlSys(controlSys),
 	// ############ Define Levels ############
 	slOff("Software is off"),
 	slEmergency("Emergency state"),
@@ -39,7 +38,7 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double ts) :
 	resetEmergency("Reset emergency"),
 	abort("abort")
 	{
-	
+	this->ts = dt;
 	HAL& hal = HAL::instance();
 
 	// ############ Define critical outputs ############
@@ -72,7 +71,7 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double ts) :
 	
 	// Add events to multiple levels
 	addEventToLevelAndAbove(slSystemOn, doEmergency, slEmergency, kPublicEvent);
-	addEventToLevelAndAbove(slStartingControl, abort, slStoppingControl, kPublicEvent);
+	addEventToLevelAndAbove(slEmergency, abort, slStoppingControl, kPublicEvent);
 		
 	// ############ Define input states and events for all levels ############
 	slOff			.setInputActions( { ignore(emergency), ignore(ready) });
@@ -104,7 +103,7 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double ts) :
 	
 	slStartingControl.setLevelAction([&](SafetyContext* privateContext) {
 		controlSys.timedomain.start();
-		if(slStartingControl.getNofActivations() * ts > 500){	// wait 500ms
+		if(slStartingControl.getNofActivations() * ts > 0.5){	// wait 500ms
 			privateContext->triggerEvent(startControlDone);
 		}
 	});

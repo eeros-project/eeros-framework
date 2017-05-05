@@ -17,7 +17,7 @@ namespace eeros {
 			virtual void run() {
 				if(first) {  // first run, no previous value available -> set output to zero
 					prev = this->in.getSignal();
-					this->out.getSignal().clear();
+					this->out.getSignal().setValue(0.0);
 					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
 					first = false;
 				}

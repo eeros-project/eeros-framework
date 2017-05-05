@@ -48,10 +48,10 @@ MyControlSystem::MyControlSystem(double ts) :
 	dac.getIn().connect(invMotConst.getOut());
 	
 	timedomain.addBlock(setpoint);
-	timedomain.addBlock(diff2);
-	timedomain.addBlock(diff1);
 	timedomain.addBlock(enc);
+	timedomain.addBlock(diff1);
 	timedomain.addBlock(sum1);
+	timedomain.addBlock(diff2);
 	timedomain.addBlock(posController);
 	timedomain.addBlock(sum2);
 	timedomain.addBlock(speedController);
