@@ -38,7 +38,6 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double dt) :
 	resetEmergency("Reset emergency"),
 	abort("abort")
 	{
-	this->ts = dt;
 	HAL& hal = HAL::instance();
 
 	// ############ Define critical outputs ############
@@ -101,9 +100,9 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double dt) :
 		privateContext->triggerEvent(startControl); 
 	});
 	
-	slStartingControl.setLevelAction([&](SafetyContext* privateContext) {
+	slStartingControl.setLevelAction([&,dt](SafetyContext* privateContext) {
 		controlSys.timedomain.start();
-		if(slStartingControl.getNofActivations() * ts > 0.5){	// wait 500ms
+		if(slStartingControl.getNofActivations() * dt > 2){	// wait 2s
 			privateContext->triggerEvent(startControlDone);
 		}
 	});

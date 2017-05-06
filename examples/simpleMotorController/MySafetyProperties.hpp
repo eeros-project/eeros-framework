@@ -42,7 +42,6 @@ protected:
 	eeros::hal::Input<bool>* ready;
 		
 	MyControlSystem& controlSys;
-	double ts;
 };
 
 #endif // MYSAFETYPROPERTIES_HPP_
