@@ -23,3 +23,6 @@ target_link_libraries(xBoxTest eeros ${EEROS_LIBS})
 
 add_executable(keyboardTest KeyboardTest.cpp)
 target_link_libraries(keyboardTest eeros ${EEROS_LIBS})
+
+add_executable(traceTest TraceTest.cpp)
+target_link_libraries(traceTest eeros ${EEROS_LIBS})
