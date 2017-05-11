@@ -26,3 +26,6 @@ target_link_libraries(keyboardTest eeros ${EEROS_LIBS})
 
 add_executable(traceTest TraceTest.cpp)
 target_link_libraries(traceTest eeros ${EEROS_LIBS})
+
+add_executable(spaceNavigatorTest SpaceNavigatorTest.cpp)
+target_link_libraries(spaceNavigatorTest eeros ${EEROS_LIBS})
