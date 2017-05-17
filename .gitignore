@@ -3,3 +3,4 @@ build*/
 .directory
 cmake.sh
 install*/
+*.txt.user
