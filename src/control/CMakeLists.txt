@@ -4,3 +4,7 @@ add_eeros_sources(Block.cpp TimeDomain.cpp TransitionBlock.cpp Vector2Corrector.
 if(LINUX)
 	add_eeros_sources(XBoxInput.cpp MouseInput.cpp KeyboardInput.cpp)
 endif()
+
+if(ROS_FOUND)
+	add_eeros_sources(ReceiveTeleopTurtleKey.cpp)
+endif()
