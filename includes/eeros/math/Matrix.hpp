@@ -8,6 +8,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <cmath>
+#include <vector>
 
 namespace eeros {
 	namespace math {
@@ -179,11 +180,23 @@ namespace eeros {
 					(*this)(m, n) = col(m, 0);
 				}
 			}
+
+			void setCol(unsigned int n, const std::vector<T>& col) {
+				for(unsigned int m = 0; m < M; m++) {
+						(*this)(m, n) = col[m];
+					}
+			}
 			
 			void setRow(unsigned int m, const Matrix<1, N, T>& row) {
 				for(unsigned int n = 0; n < N; n++) {
 					(*this)(m, n) = row(0, n);
 				}
+			}
+
+			void setRow(unsigned int m, const std::vector<T>& col) {
+				for(unsigned int n = 0; n < N; n++) {
+						(*this)(m, n) = col[n];
+					}
 			}
 			
 			T& operator()(unsigned int m, unsigned int n) {
