@@ -22,6 +22,7 @@ namespace eeros{
 			{ "AnalogOut", 	Out },
 			{ "AnalogIn", 	In },
 			{ "Pwm", 	Out },
+			{ "Watchdog", 	Out },
 			{ "Fqd", 	In }
 		};
 		
@@ -31,6 +32,7 @@ namespace eeros{
 			{ "AnalogOut", 	Real },
 			{ "AnalogIn", 	Real },
 			{ "Pwm", 	Real },
+			{ "Watchdog", 	Logic },
 			{ "Fqd", 	Real }
 		};
 	};
