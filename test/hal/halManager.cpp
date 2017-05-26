@@ -102,7 +102,7 @@ TEST(halHalManagerTest, emptySignalIdRealOut){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system output '' not found!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system output '' not found!"));
 	}
 	catch(...){
 		FAIL();
@@ -117,7 +117,7 @@ TEST(halHalManagerTest, wrongTypeRealIn){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system input 'ioIn' not found!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system input 'ioIn' not found!"));
 	}
 	catch(...){
 		FAIL();
@@ -132,7 +132,7 @@ TEST(halHalManagerTest, wrongTypeRealOut){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system output 'ioOut' not found!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system output 'ioOut' not found!"));
 	}
 	catch(...){
 		FAIL();
@@ -207,7 +207,7 @@ TEST(halHalManagerTest, wrongDirectionRealIn){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system input 'aOut0' not found!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system input 'aOut0' not found!"));
 	}
 	catch(...){
 		FAIL();
@@ -222,7 +222,7 @@ TEST(halHalManagerTest, wrongDirectionRealOut){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system output 'aIn0' not found!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system output 'aIn0' not found!"));
 	}
 	catch(...){
 		FAIL();
@@ -423,7 +423,7 @@ TEST(halHalManagerTest, claimReservedRealInput){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system input 'aIn0' is exclusive reserved!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system input 'aIn0' is exclusive reserved!"));
 		hal.releaseInput("aIn0");
 	}
 	catch(...){
@@ -479,7 +479,7 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealInputFail){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system input 'aIn0' is already claimed as non-exclusive input!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system input 'aIn0' is already claimed as non-exclusive input!"));
 		hal.releaseInput("aIn0");
 	}
 	catch(...){
@@ -497,7 +497,7 @@ TEST(halHalManagerTest, claimReservedNonExclusiveRealInput){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system input 'aIn0' is exclusive reserved!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system input 'aIn0' is exclusive reserved!"));
 		hal.releaseInput("aIn0");
 	}
 	catch(...){
@@ -515,7 +515,7 @@ TEST(halHalManagerTest, claimReservedRealOutput){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system output 'aOut0' is exclusive reserved!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system output 'aOut0' is exclusive reserved!"));
 		hal.releaseOutput("aOut0");
 	}
 	catch(...){
@@ -571,7 +571,7 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealOutputFail){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system output 'aOut0' is already claimed as non-exclusive output!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system output 'aOut0' is already claimed as non-exclusive output!"));
 		hal.releaseOutput("aOut0");
 	}
 	catch(...){
@@ -589,7 +589,7 @@ TEST(halHalManagerTest, claimReservedNonExclusiveRealOutput){
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
-		EXPECT_EQ(err.what(), std::string("Real system output 'aOut0' is exclusive reserved!"));
+		EXPECT_EQ(err.what(), std::string("Scalable system output 'aOut0' is exclusive reserved!"));
 		hal.releaseOutput("aOut0");
 	}
 	catch(...){

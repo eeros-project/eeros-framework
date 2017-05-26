@@ -93,12 +93,13 @@ int main(int argc, char **argv){
 	
 	delete [] copyArgv;
 	
-	// environment with invalid config for tests
-	testing::Environment* const eeros_env_invalid = testing::AddGlobalTestEnvironment(new EerosEnvironmentInvalidConfig);
-	
-	// environment with valid config for tests
-	testing::Environment* const eeros_env = testing::AddGlobalTestEnvironment(new EerosEnvironment);
-	
+	if (libflink || libcomedi || libsim) {
+		// environment with invalid config for tests
+		testing::Environment* const eeros_env_invalid = testing::AddGlobalTestEnvironment(new EerosEnvironmentInvalidConfig);
+		
+		// environment with valid config for tests
+		testing::Environment* const eeros_env = testing::AddGlobalTestEnvironment(new EerosEnvironment);
+	}
 	// init googleTest and run
 	::testing::InitGoogleTest(&argc, argv);
 		
