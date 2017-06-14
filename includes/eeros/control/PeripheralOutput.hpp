@@ -14,8 +14,8 @@ namespace eeros {
 		class PeripheralOutput : public Block1i<T> {
 
 		public:
-			PeripheralOutput(std::string id) : hal(hal::HAL::instance()) {
-				systemOutput = dynamic_cast<hal::Output<T>*>(hal.getOutput(id));
+			PeripheralOutput(std::string id, bool exclusive = true) : hal(hal::HAL::instance()) {
+				systemOutput = dynamic_cast<hal::Output<T>*>(hal.getOutput(id, exclusive));
 				if(systemOutput == nullptr) throw Fault("Peripheral output '" + id + "' not found!");
 			}
 			
@@ -23,6 +23,11 @@ namespace eeros {
 				T val = this->in.getSignal().getValue();
 				if(std::isnan(val)) throw NaNOutputFault("NaN written to output");
 				systemOutput->set(this->in.getSignal().getValue());
+			}
+			
+			template<typename ... ArgTypesOut>
+			void callOutputFeature(std::string featureName, ArgTypesOut... args){
+				hal.callOutputFeature(systemOutput, featureName, args...);
 			}
 			
 		private:
