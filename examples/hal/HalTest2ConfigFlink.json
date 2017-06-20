@@ -23,24 +23,12 @@
 			"channel0": {
 				"signalId": "dac1",
 				"scale": [ { "id" : "dac",
-								"minIn": 	2000, 	"maxIn": 	64000,
-								"minOut": 	-9.752, "maxOut": 	9.862 },
-					   { "id" : "test",
-								"minIn": 	-5.0, 	"maxIn": 	5.0,
-								"minOut":	-10.0, 	"maxOut": 	10.0 },
-					   { "id" : "direct",
-								"scale":	0.5,
-								"offset": 	0.5 }
+							"minIn": 	2000, 	"maxIn": 	60000,
+							"minOut": 	-9.88, "maxOut": 	8.42 }
 					 ],
 				"range": [ { "id" : "dac",
 							"minIn": 	0, 	"maxIn": 	65535,
-							"minOut": 	-10.0, 	"maxOut": 	10.0 },
-					   { "id" : "test",
-							"minIn": 	-5.0, 	"maxIn": 	5.0,
-							"minOut": 	-10.0, 	"maxOut": 	10.0 },
-					   { "id" : "direct",
-							"minIn":	-10.0,  "maxIn": 	10.0,
-							"minOut":	-4.0,	"maxOut": 	4.0 }
+							"minOut": 	-10.0, 	"maxOut": 	10.0 }
 					 ],
 				"unit": "V"
 			}

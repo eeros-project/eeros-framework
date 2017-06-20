@@ -19,7 +19,7 @@
 			"channel0":{
 				"signalId": "dIn1"
 			}
-		},
+		}, 
 		"subdevice3": {
 			"type": "DigOut",
 			"channel0":{

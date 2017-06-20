@@ -5,6 +5,7 @@
 #include <eeros/control/PeripheralInput.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/hal/HAL.hpp>
+#include <eeros/control/Constant.hpp>
 #include <eeros/core/Executor.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
@@ -17,11 +18,16 @@ using namespace eeros::hal;
 
 const double dt = 0.001;
 
+
 class MyControlSystem {
 public:
-	MyControlSystem(double ts): io1("io1"),	ioOut("ioOut"),	ioIn("ioIn"), dac1("dac1"),
+	MyControlSystem(double ts): c1(false), c2(1), io1("io1"), ioOut("ioOut"), ioIn("ioIn"), dac1("dac1"),
 					encMot1("encMot1"), timedomain("Main time domain", ts, true) {
 		ioOut.getIn().connect(ioIn.getOut());
+		io1.getIn().connect(c1.getOut());
+		dac1.getIn().connect(c2.getOut());
+		timedomain.addBlock(c1);
+		timedomain.addBlock(c2);
 		timedomain.addBlock(io1);
 		timedomain.addBlock(ioIn);
 		timedomain.addBlock(ioOut);
@@ -31,6 +37,8 @@ public:
 	}
 	virtual ~MyControlSystem() { }
 	
+	Constant<bool> c1;
+	Constant<> c2;
 	PeripheralOutput<double> dac1;		// analog output
 	PeripheralOutput<bool> io1;		// digital output 
 	PeripheralOutput<bool> ioOut;		// digital output
@@ -67,12 +75,12 @@ public:
 				log.info() << "enc: " << controlSys.encMot1.getOut().getSignal().getValue();
 			}
 			if(i%2 == 0){
-				controlSys.dac1.getIn().getSignal().setValue(-1);
-				controlSys.io1.getIn().getSignal().setValue(true);
+				controlSys.c2.setValue(-5);
+				controlSys.c1.setValue(true);
 			}
 			else{
-				controlSys.dac1.getIn().getSignal().setValue(-1);
-				controlSys.io1.getIn().getSignal().setValue(false);
+				controlSys.c2.setValue(5);
+				controlSys.c1.setValue(false);
 			}
 			usleep(100000);
 		}
