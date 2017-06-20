@@ -21,7 +21,10 @@ int main(int argc, char **argv){
 	HAL& hal = HAL::instance();
 	hal.readConfigFromFile(&argc, argv);
 	
-// 	hal.callOutputFeature("pwm1", "setPwmFrequency", 100.0);
+	// set pwm frequency here in main or in sequencer
+	eeros::hal::ScalableOutput<double>* pwmObj = hal.getScalableOutput("pwm2");
+	hal.callOutputFeature(pwmObj, "setPwmFrequency", 1000.0);
+	hal.releaseOutput("pwm2");
 	
 	// Create safety and control system
 	MyControlSystem cs(dt);

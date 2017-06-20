@@ -50,7 +50,7 @@
 		"subdevice0": {
 			"type": "Pwm",
 			"channel1": {
-				"signalId": "pwm1"
+				"signalId": "pwm2"
 			}
 		}
 	}
