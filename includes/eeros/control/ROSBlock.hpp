@@ -17,7 +17,6 @@ namespace eeros {
 			ROSBlock(ros::NodeHandle& rosNodeHandler, const std::string& topic, uint32_t queueSize=1000) :
 				rosNodeHandler(rosNodeHandler),
 				topic (topic)
-//				rosCallbackFctFinished( false )
 			{
 				subscriber = rosNodeHandler.subscribe(topic, queueSize, &ROSBlock::rosCallbackFct, this);
 				ROS_DEBUG_STREAM("ROSBlock, reading from topic: '" << topic << "' created.");
@@ -30,8 +29,22 @@ namespace eeros {
 
 			virtual void rosCallbackFct(const TMsg& msg) = 0;
 
+			//			virtual void rosCallbackFct(const TMsg& msg) {
+
+			//				// USER DEFINED: 1.) Set timestamp for all outputs
+			//				//               2.) Get the data from the message
+			//				//               3.) Cast the data if necessary
+			//				//               4.) Insert the data into output
+
+			//				auto time = eeros::System::getTimeNs();
+			//				this->out.getSignal().setTimestamp( time );
+
+			//				this->out.getSignal().setValue(static_cast< TOutput >( msg.data) );
+			//			}
+
 			virtual void run() {
-	//			ros::getGlobalCallbackQueue()->callAvailable();		// calls callback fct. for all available messages
+	//			ros::getGlobalCallbackQueue()->callAvailable();		// calls callback fct. for all available messages.
+																	//  Only newest message is processed. Older ones are discarded.
 				ros::getGlobalCallbackQueue()->callOne();			// calls callback fct. only for the oldest message
 			}
 
