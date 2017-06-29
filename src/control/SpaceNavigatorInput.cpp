@@ -27,6 +27,7 @@ void SpaceNavigatorInput::run() {
 		sn.current.rotAxis[SpaceNav::RotAxis::RY],
 		sn.current.rotAxis[SpaceNav::RotAxis::RZ],
 	});	
+	rotOut.getSignal().setTimestamp(ts);
 	buttonOut.getSignal().setValue(Matrix<SPACENAVIGATOR_BUTTON_COUNT,1,bool>{
 		sn.current.button[SpaceNav::Button::L],
 		sn.current.button[SpaceNav::Button::R]
