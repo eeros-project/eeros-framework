@@ -7,11 +7,6 @@
 #include <unistd.h>
 #include <netdb.h> 
 
-#include "../control/constants.hpp"
-#include "../control/types.hpp"
-
-using namespace eeduro::delta;
-
 class Client : public eeros::Thread {
 
 public:

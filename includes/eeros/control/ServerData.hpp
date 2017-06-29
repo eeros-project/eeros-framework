@@ -1,32 +1,63 @@
 #ifndef CH_NTB_EEDURO_DELTA_SERVERDATA_HPP_
 #define CH_NTB_EEDURO_DELTA_SERVERDATA_HPP_
 
-#include <eeros/control/Block.hpp>
+#include <eeros/control/Block1i1o.hpp>
 #include <eeros/control/Input.hpp>
 #include <eeros/control/Output.hpp>
 #include <array>
 #include <atomic>
-#include "../types.hpp"
-#include "../constants.hpp"
-#include "../../socket/Server.hpp"
+#include <iostream>
+#include <eeros/core/System.hpp>
+#include <eeros/sockets/SocketServer.hpp>
 
-namespace eeduro {
-	namespace delta {
+namespace eeros {
+	namespace control {
 	
-		class ServerData: public eeros::control::Block {
+		template < uint8_t BufLen = 32, typename T = double, typename SigType = double >
+		class ServerData: public eeros::control::Block1i1o<SigType> {
 			
 		public:
-			ServerData(Server* serverThread);
+			ServerData(eeros::sockets::SocketServer<BufLen, T>* serverThread){
+				server = serverThread;
+			}
 			
-			virtual eeros::control::Input<AxisVector>& getIn();
-			virtual eeros::control::Output<AxisVector>& getOut();
+			virtual eeros::control::Input<SigType>& getIn(){
+				return in;
+			}
 			
-			virtual void run();
+			virtual eeros::control::Output<SigType>& getOut(){
+				return out;
+			}
+			
+			virtual void run() {
+				timestamp_t time = System::getTimeNs();
+				SigType output; 
+				
+				// Get data from other robot
+				
+				std::array<T, BufLen>& getData = server->getBuffer();
+				for(int i = 0; i < (sizeof(SigType))/sizeof(T); i++){
+					output(i) = getData[i];
+				}
+				
+				
+				// Send data to other robot
+				for(int i=0; i < (sizeof(SigType))/sizeof(T);i++){
+					sendData[i] = in.getSignal().getValue()(i);
+				}
+				server->sendBuffer(sendData);
+				
+				out.getSignal().setValue(output);
+				out.getSignal().setTimestamp(time);
+			}
 			
 		protected:
-			eeros::control::Input<AxisVector> in;
-			eeros::control::Output<AxisVector> out;
-			Server* server;
+			eeros::control::Input<SigType> in;
+			eeros::control::Output<SigType> out;
+			eeros::sockets::SocketServer<BufLen, T>* server;
+			
+		private: 
+			std::array<T, BufLen> sendData;
 		};
 	};
 }

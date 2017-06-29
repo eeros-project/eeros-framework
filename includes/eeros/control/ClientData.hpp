@@ -2,7 +2,8 @@
 #define ORG_EEROS_CONTROL_CLIENTDATA_HPP_
 
 #include <eeros/control/Block1i1o.hpp>
-#include <eeros/socket/Client.hpp>
+#include <eeros/sockets/SocketClient.hpp>
+#include <eeros/math/Matrix.hpp>
 // #include <eeros/socket/Client.hpp>
 // #include <eeros/control/Input.hpp>
 // #include <eeros/control/Output.hpp>
@@ -20,14 +21,14 @@ namespace eeros {
 		public:
 			ClientData(Client* clientThread);
 			
-			virtual eeros::control::Input<AxisVector>& getIn();
-			virtual eeros::control::Output<AxisVector>& getOut();
+			virtual eeros::control::Input<Vector4>& getIn();
+			virtual eeros::control::Output<Vector4>& getOut();
 			
 			virtual void run();
 			
 		protected:
-			eeros::control::Input<AxisVector> in;
-			eeros::control::Output<AxisVector> out;
+			eeros::control::Input<Vector4> in;
+			eeros::control::Output<Vector4> out;
 			Client* client;
 		};
 	};

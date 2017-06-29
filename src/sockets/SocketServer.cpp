@@ -6,7 +6,7 @@
 #include <array>
 #include <sys/socket.h>
 #include <fcntl.h>
-// #include <eeros/core/EEROSException.hpp>
+#include <eeros/core/Fault.hpp>
 
 #include <string.h>
 #include <netdb.h>
@@ -18,58 +18,68 @@
 using namespace eeros;
 using namespace eeros::sockets;
 
-SocketServer::SocketServer(uint16_t port, int byteSize, double periodInSec) :
+template < typename T >
+SocketServer<T>::SocketServer(uint16_t port, int byteSize, double periodInSec) :
 port(port), byteSize(byteSize), periodInSec(periodInSec)
 // ,read_ptr(&read1), send_ptr(&send1)
 {
 	running = false;
 }
 
-SocketServer::~SocketServer() {
+template < typename T >
+SocketServer<T>::~SocketServer() {
 	join();
 // 	read1.fill(0.0);
 // 	send1.fill(0.0);
 }
 
-void SocketServer::stop() {
+template < typename T >
+void SocketServer<T>::stop() {
 	running = false;
 }
 
-bool SocketServer::isRunning() {
+template < typename T >
+bool SocketServer<T>::isRunning() {
 	return running;
 }
 
-// const Array& SocketServer::getBuffer() {
-// 	return *read_ptr.load();
-// }
-// 
-// void SocketServer::sendBuffer(Array data) {
-// 	auto p = send_ptr.load();
-// 	if (p == &send1) send1 = data;
-// 	else if (p == &send2) send2 = data;
-// 	else if (p == &send3) send3 = data;
-// }
-// 
-// Array& SocketServer::getWriteBuffer() {
-// 	auto p = read_ptr.load();
-// 	if (p == &read1) return read2;
-// 	else if (p == &read2) return read3;
-// 	else if (p == &read3) return read1;
-// }
-// 
-// Array& SocketServer::getSendBuffer() {
-// 	auto p = send_ptr.load();
-// 	if (p == &send1) return send2;
-// 	else if (p == &send2) return send3;
-// 	else if (p == &send3) return send1;
-// }
-// 
-// void SocketServer::flip() {
-// 	read_ptr.store(&getWriteBuffer());
-// 	send_ptr.store(&getSendBuffer());
-// }
+template < typename T >
+const std::array<T, sizeof(T)>& SocketServer<T>::getBuffer() {
+	return *read_ptr.load();
+}
 
-void SocketServer::run() { 
+template < typename T >
+void SocketServer<T>::sendBuffer(std::array<T, sizeof(T)>& data) {
+	auto p = send_ptr.load();
+	if (p == &send1) send1 = data;
+	else if (p == &send2) send2 = data;
+	else if (p == &send3) send3 = data;
+}
+
+template < typename T >
+std::array<T, sizeof(T)>& SocketServer<T>::getWriteBuffer() {
+	auto p = read_ptr.load();
+	if (p == &read1) return read2;
+	else if (p == &read2) return read3;
+	else if (p == &read3) return read1;
+}
+
+template < typename T >
+std::array<T, sizeof(T)>& SocketServer<T>::getSendBuffer() {
+	auto p = send_ptr.load();
+	if (p == &send1) return send2;
+	else if (p == &send2) return send3;
+	else if (p == &send3) return send1;
+}
+
+template < typename T >
+void SocketServer<T>::flip() {
+	read_ptr.store(&getWriteBuffer());
+	send_ptr.store(&getSendBuffer());
+}
+
+template < typename T >
+void SocketServer<T>::run() { 
 	// Set up socket connection
 	int i = 0; 
 	struct sockaddr_in serv_addr;
@@ -125,7 +135,7 @@ void SocketServer::run() {
 // 			(*readValue)[i] = b_read[i];
 // 		}
 		
-		// read()
+		// 1. read()
 		n = read(newsockfd, &readbuffer, 8);
 // 		if (n < 0) throw EEROSException("ERROR reading from socket");
 		if (n < 0) log.error() << "ERROR reading from socket";
@@ -135,15 +145,15 @@ void SocketServer::run() {
 // 			(*readValue)[i] = b_read[i];
 // 		}
  		
-//  		// write()
+ 		// 2. write()
 //  		auto *sendValue = &getSendBuffer();
 // 		for(int i=0;i<nofAxis;i++){
 // 			b_write[i] = (*sendValue)[i]; 
 // 		}
 // 		n = write(newsockfd,b_write,sizeof(b_write)*8);
-// // 		if (n < 0) throw EEROSException("ERROR writing to socket");
-// 		if (n < 0) log.error() << "ERROR writing to socket";
-
+// 		if (n < 0) throw Fault("ERROR writing to socket");
+// // 		if (n < 0) log.error() << "ERROR writing to socket";
+// 
 // 		flip();
 // 		readValue = &getWriteBuffer();
 // 		sendValue = &getSendBuffer();

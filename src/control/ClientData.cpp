@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-using namespace eeduro::delta;
 using namespace eeros::control;
 using namespace eeros;
 
