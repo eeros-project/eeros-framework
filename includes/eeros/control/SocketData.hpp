@@ -14,11 +14,15 @@ namespace eeros {
 	namespace control {
 	
 		template < uint8_t BufLen = 32, typename T = double, typename SigType = double >
-		class ServerData: public eeros::control::Block1i1o<SigType> {
+		class SocketData: public eeros::control::Block1i1o<SigType> {
 			
 		public:
-			ServerData(eeros::sockets::SocketServer<BufLen, T>* serverThread){
-				server = serverThread;
+			SocketData(uint16_t port, double periodInSec = 0.01){
+				server =  new eeros::sockets::SocketServer<BufLen, T>(9876, 0.01);	//Port;
+			}
+			
+			~SocketData(){
+				server->stop();
 			}
 			
 			virtual eeros::control::Input<SigType>& getIn(){
@@ -35,7 +39,7 @@ namespace eeros {
 				
 				// Get data from other robot
 				
-				std::array<T, BufLen>& getData = server->getBuffer();
+				std::array<T, BufLen>& getData = server->getReceiveBuffer();
 				for(int i = 0; i < (sizeof(SigType))/sizeof(T); i++){
 					output(i) = getData[i];
 				}
@@ -45,7 +49,7 @@ namespace eeros {
 				for(int i=0; i < (sizeof(SigType))/sizeof(T);i++){
 					sendData[i] = in.getSignal().getValue()(i);
 				}
-				server->sendBuffer(sendData);
+				server->setSendBuffer(sendData);
 				
 				out.getSignal().setValue(output);
 				out.getSignal().setTimestamp(time);

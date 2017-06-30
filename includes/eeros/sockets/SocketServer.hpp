@@ -26,16 +26,14 @@ namespace eeros {
 
 		public:
 			
-			SocketServer(uint16_t port, int byteSize = 4, double periodInSec = 0.01) : read1({0.0}), read2({0.0}), read3({0.0}) {
+			SocketServer(uint16_t port, double periodInSec = 0.01) : read1({0.0}), read2({0.0}), read3({0.0}) {
 				this->port = port;
-				this->byteSize = byteSize;
 				this->periodInSec = periodInSec;
 				
 				read_ptr.store(&read1);
 				send_ptr.store(&send1);
 				
 				running = false;
-				
 			}
 			virtual ~SocketServer(){
 				join();
@@ -49,10 +47,10 @@ namespace eeros {
 				return running;
 			}
 			
-			virtual std::array<T, BufLen>& getBuffer(){
+			virtual std::array<T, BufLen>& getReceiveBuffer(){
 				return *read_ptr.load();
 			}
-			virtual void sendBuffer(std::array<T, BufLen>& data){
+			virtual void setSendBuffer(std::array<T, BufLen>& data){
 				auto p = send_ptr.load();
 				if (p == &send1) send1 = data;
 				else if (p == &send2) send2 = data;
@@ -106,7 +104,7 @@ namespace eeros {
 					n = read(newsockfd,b_read,BufLen * sizeof(T)*8);
 					if (n < 0) throw Fault("ERROR reading from socket");
 					
-					std::array<T, BufLen> &readValue = getNextWriteBuffer();
+					std::array<T, BufLen> &readValue = getNextReceiveBuffer();
 					
 					for(int i=0;i < BufLen ;i++){
 						readValue[i] = b_read[i];
@@ -129,7 +127,7 @@ namespace eeros {
 				close(sockfd);
 			}
 			
-			std::array<T, BufLen>& getNextWriteBuffer() {
+			std::array<T, BufLen>& getNextReceiveBuffer() {
 				auto p = read_ptr.load();
 				if (p == &read1) return read2;
 				else if (p == &read2) return read3;
@@ -144,13 +142,12 @@ namespace eeros {
 			}
 			
 			void flip(){
-				read_ptr.store(&getNextWriteBuffer());
+				read_ptr.store(&getNextReceiveBuffer());
 				send_ptr.store(&getNextSendBuffer());
 			}
 			
 			bool running;
 			uint16_t port;
-			int byteSize;
 			double periodInSec;
 			struct hostent *server;
 			int sockfd;
