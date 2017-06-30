@@ -8,4 +8,4 @@ add_subdirectory(logger)
 add_subdirectory(rtTest)
 add_subdirectory(hal)
 add_subdirectory(simpleMotorController)
-
+add_subdirectory(socket)

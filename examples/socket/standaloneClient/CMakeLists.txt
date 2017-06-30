@@ -1,0 +1,1 @@
+add_executable(socketClientExample standaloneClient.cpp)
