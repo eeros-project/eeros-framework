@@ -13,11 +13,6 @@
 #include <eeros/core/Fault.hpp>
 #include <iostream>
 
-// #include "../control/constants.hpp"
-// #include "../control/types.hpp"
-
-// https://vichargrave.github.io/articles/2013-02/tcp-ip-network-programming-design-patterns-in-cpp
-
 namespace eeros {
 	namespace sockets {
 		
@@ -26,9 +21,9 @@ namespace eeros {
 
 		public:
 			
-			SocketServer(uint16_t port, double periodInSec = 0.01) : read1({0.0}), read2({0.0}), read3({0.0}) {
+			SocketServer(uint16_t port, double period = 0.01) : read1({0.0}), read2({0.0}), read3({0.0}) {
 				this->port = port;
-				this->periodInSec = periodInSec;
+				this->period = period;
 				
 				read_ptr.store(&read1);
 				send_ptr.store(&send1);
@@ -89,33 +84,33 @@ namespace eeros {
 				newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,  &clilen);
 				if (newsockfd < 0) throw Fault("ERROR on accept");
 				
+				log.info() << "SocketServer connection accepted";
 				T b_write[BufLen]; T b_read[BufLen];
 				int n;
 				
 				running = true;
 				
 				using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
-				auto next_cycle = std::chrono::steady_clock::now() + seconds(periodInSec);
+				auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
 				
 				while(running){
 					std::this_thread::sleep_until(next_cycle);
 					
-					// read()
-					n = read(newsockfd,b_read,BufLen * sizeof(T)*8);
+					// read
+					n = read(newsockfd,b_read,BufLen * sizeof(T));
 					if (n < 0) throw Fault("ERROR reading from socket");
 					
 					std::array<T, BufLen> &readValue = getNextReceiveBuffer();
-					
 					for(int i=0;i < BufLen ;i++){
 						readValue[i] = b_read[i];
 					}
 					
-					// 2. write()
+					// write
 					std::array<T, BufLen> &sendValue = getNextSendBuffer();
 					for(int i=0;i < BufLen;i++){
 						b_write[i] = sendValue[i]; 
 					}
-					n = write(newsockfd,b_write,BufLen * sizeof(T)*8);
+					n = write(newsockfd,b_write,BufLen * sizeof(T));
 					if (n < 0) throw Fault("ERROR writing to socket");
 			
 					flip();
@@ -148,7 +143,7 @@ namespace eeros {
 			
 			bool running;
 			uint16_t port;
-			double periodInSec;
+			double period;
 			struct hostent *server;
 			int sockfd;
 			int newsockfd;

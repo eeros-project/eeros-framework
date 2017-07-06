@@ -10,13 +10,8 @@
 
 
 int main(int argc, char **argv) {
-	char* server_ip;
-	int port;
-	
-	
-	server_ip = "0.0.0.0";
-	server_ip = "127.0.0.1";
-	port = 9876;
+	char* server_ip = (char*)"127.0.0.1";
+	int port = 9876;
 	
 	struct sockaddr_in serv_addr;
 	
@@ -55,11 +50,11 @@ int main(int argc, char **argv) {
 			std::cout << b_write[i] << "\t";
 		}
 		std::cout << std::endl;
-		n = write(sockfd,b_write,sizeof(b_write)*8);
+		n = write(sockfd,b_write,sizeof(b_write));
 		if (n < 0) std::cout << "ERROR writing to socket" << std::endl;
 		
 		// 2. READ
-		n = read(sockfd,b_read,sizeof(b_read)*8);
+		n = read(sockfd,b_read,sizeof(b_read));
 		if (n < 0) std::cout << "ERROR reading from socket" << std::endl;
 		
 		std::cout << "rec: ";

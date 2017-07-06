@@ -96,7 +96,7 @@ void signalHandler(int signum) {
 int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
 	
-	double dt = 0.001;
+	double dt = 0.01;
 	
 	StreamLogWriter w(std::cout);
 	w.show(LogLevel::TRACE);
