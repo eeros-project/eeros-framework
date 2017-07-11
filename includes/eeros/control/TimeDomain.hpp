@@ -30,6 +30,8 @@ namespace eeros {
 			virtual void run();
 			virtual void start();
 			virtual void stop();
+
+			friend std::ostream& operator<<(std::ostream& os, TimeDomain& td);
 			
 		private:
 			std::string name;
@@ -40,7 +42,6 @@ namespace eeros {
 			SafetySystem* safetySystem;
 			SafetyEvent* safetyEvent;
 		};
-
 	};
 };
 

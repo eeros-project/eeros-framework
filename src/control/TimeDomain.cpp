@@ -68,3 +68,11 @@ void TimeDomain::removeBlock(eeros::Runnable& block) {
 // void TimeDomain::sortBlocks() {
 // 	// TODO
 // }
+
+namespace eeros {
+	namespace control {
+		std::ostream& operator<<(std::ostream& os, TimeDomain& td) {
+			os << "Time domain: '" << td.getName() << "'"; 
+		}
+	}
+}

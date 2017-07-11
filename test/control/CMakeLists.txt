@@ -2,6 +2,7 @@
 ##### UNIT TESTS FOR CONTROL SYSTEM #####
 
 add_eeros_test_sources(DeMux.cpp)
+add_eeros_test_sources(SocketData.cpp)
 
 # Blocks
 add_subdirectory(sum)
@@ -13,4 +14,3 @@ add_subdirectory(saturation)
 add_subdirectory(gain)
 add_subdirectory(constant)
 add_subdirectory(trajectoryGenerator)
-
