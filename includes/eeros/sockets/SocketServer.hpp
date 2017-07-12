@@ -115,7 +115,7 @@ namespace eeros {
 			
 					flip();
 					
-					next_cycle += seconds(periodInSec);
+					next_cycle += seconds(period);
 				}
 					
 				close(newsockfd);
