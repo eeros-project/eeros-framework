@@ -16,7 +16,7 @@
 namespace eeros {
 	namespace sockets {
 		
-		template < uint8_t BufLen = 32, typename T = double >
+		template < uint32_t BufInLen, typename inT, uint32_t BufOutLen, typename outT >
 		class SocketServer : public eeros::Thread {
 
 		public:
@@ -42,17 +42,18 @@ namespace eeros {
 				return running;
 			}
 			
-			virtual std::array<T, BufLen>& getReceiveBuffer(){
+			virtual std::array<outT, BufOutLen>& getReceiveBuffer(){
 				return *read_ptr.load();
 			}
-			virtual void setSendBuffer(std::array<T, BufLen>& data){
+			
+			virtual void setSendBuffer(std::array<inT, BufInLen>& data){
 				auto p = send_ptr.load();
 				if (p == &send1) send1 = data;
 				else if (p == &send2) send2 = data;
 				else if (p == &send3) send3 = data;
 			}
 
-			T readbuffer;
+			outT readbuffer;
 			
 		private:
 			virtual void run(){	
@@ -85,33 +86,34 @@ namespace eeros {
 				if (newsockfd < 0) throw Fault("ERROR on accept");
 				
 				log.info() << "SocketServer connection accepted";
-				T b_write[BufLen]; T b_read[BufLen];
-				int n;
+				inT b_write[BufInLen]; outT b_read[BufOutLen];
 				
 				running = true;
 				
 				using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
 				auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
 				
-				while(running){
+				while(running) {
+					int n;
 					std::this_thread::sleep_until(next_cycle);
 					
-					// read
-					n = read(newsockfd,b_read,BufLen * sizeof(T));
-					if (n < 0) throw Fault("ERROR reading from socket");
-					
-					std::array<T, BufLen> &readValue = getNextReceiveBuffer();
-					for(int i=0;i < BufLen ;i++){
-						readValue[i] = b_read[i];
-					}
-					
 					// write
-					std::array<T, BufLen> &sendValue = getNextSendBuffer();
-					for(int i=0;i < BufLen;i++){
-						b_write[i] = sendValue[i]; 
-					}
-					n = write(newsockfd,b_write,BufLen * sizeof(T));
+					std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
+					for(int i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
+					n = write(newsockfd, b_write, BufInLen * sizeof(inT));
 					if (n < 0) throw Fault("ERROR writing to socket");
+					
+					// read
+					size_t count = BufOutLen * sizeof(outT);
+					outT* ptr = b_read;
+					while (count) {
+						n = read(newsockfd, ptr, count);
+						if (n < 0) throw Fault("ERROR reading from socket");
+						ptr += n;
+						count -= n;
+					}
+					std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
+					for(int i = 0; i < BufOutLen; i++) readValue[i] = b_read[i];
 			
 					flip();
 					
@@ -122,14 +124,14 @@ namespace eeros {
 				close(sockfd);
 			}
 			
-			std::array<T, BufLen>& getNextReceiveBuffer() {
+			std::array<outT, BufOutLen>& getNextReceiveBuffer() {
 				auto p = read_ptr.load();
 				if (p == &read1) return read2;
 				else if (p == &read2) return read3;
 				else if (p == &read3) return read1;
 			}
 			
-			std::array<T, BufLen>& getNextSendBuffer() {
+			std::array<inT, BufInLen>& getNextSendBuffer() {
 				auto p = send_ptr.load();
 				if (p == &send1) return send2;
 				else if (p == &send2) return send3;
@@ -149,11 +151,11 @@ namespace eeros {
 			int newsockfd;
 			
 			
-			std::array<T, BufLen> read1, read2, read3;
-			std::array<T, BufLen> send1, send2, send3;
+			std::array<outT, BufOutLen> read1, read2, read3;
+			std::array<inT, BufInLen> send1, send2, send3;
 
-			std::atomic< std::array<T, BufLen>* > read_ptr;
-			std::atomic< std::array<T, BufLen>* > send_ptr;
+			std::atomic< std::array<outT, BufOutLen>* > read_ptr;
+			std::atomic< std::array<inT, BufInLen>* > send_ptr;
 			
 		};
 	};

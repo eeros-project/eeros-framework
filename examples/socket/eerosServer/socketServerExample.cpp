@@ -8,54 +8,49 @@
 using namespace eeros::control;
 using namespace eeros::sockets;
 using namespace eeros::logger;
+using namespace eeros::math;
+using namespace eeros::task;
+using namespace eeros;
 
-namespace testapptcpip {
-	
-	class TestAppCS {
-	public:
-		TestAppCS(double dt) : 
-			dt(dt),
-			log('C'),
-			socketA(9876, 0.01),
-			c1({1.5, 2.2, 3.3, 4.6}),
-
-			timedomain("Main time domain", dt, true){
-			
-			socketA.getOut().getSignal().setName("socketRead");
-			  
-			// Connect Blocks
-			socketA.getIn().connect(c1.getOut());
-			
-			// Run blocks
-			timedomain.addBlock(c1);
-			timedomain.addBlock(socketA);
-			
-			eeros::Executor::instance().add(timedomain);
-			
-		}
+class TestAppCS {
+public:
+	TestAppCS(double dt) : 
+		dt(dt),
+		log('C'),
+		socketA(9876, 0.01),
+		c1({1.5, 2.2, 3.3, 4.6}),
+		timedomain("Main time domain", dt, true){
 		
-		// Define blocks
-		Constant<eeros::math::Vector4> c1;
-		eeros::control::SocketData<4, double, eeros::math::Vector4> socketA;
-		Logger log;
+		socketA.getOut().getSignal().setName("socketRead");
+		  
+		// Connect Blocks
+		socketA.getIn().connect(c1.getOut());
 		
-	protected:
-		double dt;
-		bool realtime;
-		eeros::control::TimeDomain timedomain;
-	}; // END class
+		// Run blocks
+		timedomain.addBlock(c1);
+		timedomain.addBlock(socketA);
+		
+		Executor::instance().add(timedomain);
+		
+	}
+		
+	// Define blocks
+	Constant<Vector4> c1;
+	SocketData<Vector4, double, Matrix<1000,1,double>, double> socketA;
+	Logger log;
+		
+protected:
+	double dt;
+	bool realtime;
+	TimeDomain timedomain;
+}; // END class
 	
-}; // END namespace
 
 #include <eeros/safety/SafetyProperties.hpp>
  
-namespace testapptcpip {
- 
-    class TestAppSafetyProperties : public eeros::safety::SafetyProperties {
- 
-    public: 
+class TestAppSafetyProperties : public eeros::safety::SafetyProperties {
+public: 
 	TestAppSafetyProperties() : off("System off") {
-		
 		addLevel(off);
 		setEntryLevel(off);
 	}
@@ -64,10 +59,7 @@ namespace testapptcpip {
  
 	eeros::safety::SafetyLevel off;
 	
-    private:
- 
-    }; // end class
-};     // end namespace
+}; // end class
 
 #include <iostream>
 #include <signal.h>
@@ -79,13 +71,8 @@ namespace testapptcpip {
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/sockets/SocketServer.hpp>
 #include <eeros/task/Periodic.hpp>
-
-using namespace eeros;
-using namespace eeros::logger;
-using namespace testapptcpip;
 	
 bool threadFinishd = false;
-
 
 volatile bool running = true;
 void signalHandler(int signum) {
@@ -106,20 +93,20 @@ int main(int argc, char **argv) {
 	log.info() << "EEROS started";
 	
 	// Control System
-	testapptcpip::TestAppCS controlSystem (dt);
+	TestAppCS controlSystem (dt);
 	
 	// Safety System
 	TestAppSafetyProperties safetyProperties;
-	eeros::safety::SafetySystem safetySystem(safetyProperties, dt);
+	SafetySystem safetySystem(safetyProperties, dt);
 
-	eeros::task::Lambda l1;
-	eeros::task::Periodic periodic("per1", 1.0, l1);
+	Lambda l1;
+	Periodic periodic("per1", 1.0, l1);
 	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
 		log.info() << controlSystem.socketA.getOut().getSignal();
 	});
 		
 	// Create and run executor
-	auto& executor = eeros::Executor::instance();
+	auto& executor = Executor::instance();
 	executor.setMainTask(safetySystem);
 	executor.add(periodic);
 	
