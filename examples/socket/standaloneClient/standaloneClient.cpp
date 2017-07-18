@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 	// Start communication
 	std::cout << "Client thread started" << std::endl;
 	
-	double b_write[4]; double b_read[4];
+	double b_write[1000]; double b_read[4];
 	int n;
 	
 	double dataToSend = 0;
