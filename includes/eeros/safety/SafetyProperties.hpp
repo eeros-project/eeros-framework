@@ -26,7 +26,7 @@ namespace eeros {
 			void addEventToAllLevelsBetween(SafetyLevel& lowerLevel, SafetyLevel& upperLevel, SafetyEvent event, SafetyLevel& nextLevel, EventType type);
 			SafetyLevel* getEntryLevel();
 			bool verify();
-			void addLevel(SafetyLevel& level) {levels.push_back(&level);}
+			void addLevel(SafetyLevel& level);
 		protected:
 			void setEntryLevel(SafetyLevel& entryLevel);
 			

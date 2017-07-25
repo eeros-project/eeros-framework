@@ -16,8 +16,7 @@ namespace eeros {
 		}
 
 		SafetyLevel::SafetyLevel(std::string description) : description(description) {
-			static int count = 0;
-			id = count++;
+			// number the levels when adding them to the safety system
 		}
 
 		SafetyLevel::~SafetyLevel() {

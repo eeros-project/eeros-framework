@@ -60,6 +60,12 @@ namespace eeros {
 			return check;
 		}
 		
+		void SafetyProperties::addLevel(SafetyLevel& level) {
+			static int count = 0;
+			level.id = count++;
+			levels.push_back(&level);
+		}
+
 		void SafetyProperties::addEventToLevel(SafetyLevel& level, SafetyEvent event, SafetyLevel& nextLevel, EventType type) {
 			level.addEvent(event, nextLevel, type);
 		}
