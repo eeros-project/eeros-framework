@@ -36,30 +36,31 @@ int main(int argc, char **argv) {
 	// Start communication
 	std::cout << "Client thread started" << std::endl;
 	
-	double b_write[1000]; double b_read[4];
+	double readBuf[4];
+	double writeBuf[6]; 
 	int n;
 	
-	double dataToSend = 0;
+	double dataToSend = 0.1;
 
-	while(1){
+	while(1) {
 		// 1. WRITE
 		std::cout << "w: ";
-		for(int i = 0; i < sizeof(b_write)/sizeof(b_write[0]); i++){
-			b_write[i] = dataToSend;
-			dataToSend++;
-			std::cout << b_write[i] << "\t";
+		for (int i = 0; i < sizeof(writeBuf)/sizeof(writeBuf[0]); i++) {
+			writeBuf[i] = dataToSend;
+			dataToSend += 0.1;
+			std::cout << writeBuf[i] << "\t";
 		}
 		std::cout << std::endl;
-		n = write(sockfd,b_write,sizeof(b_write));
+		n = write(sockfd, writeBuf, sizeof(writeBuf));
 		if (n < 0) std::cout << "ERROR writing to socket" << std::endl;
 		
 		// 2. READ
-		n = read(sockfd,b_read,sizeof(b_read));
+		n = read(sockfd, readBuf, sizeof(readBuf));
 		if (n < 0) std::cout << "ERROR reading from socket" << std::endl;
 		
 		std::cout << "rec: ";
-		for(int i=0;i<4;i++){
-			std::cout << b_read[i] << "\t";
+		for (int i = 0; i < sizeof(readBuf)/sizeof(readBuf[0]); i++) {
+			std::cout << readBuf[i] << "\t";
 		}
 		std::cout << std::endl;
 		

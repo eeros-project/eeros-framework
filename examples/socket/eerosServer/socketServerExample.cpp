@@ -1,9 +1,14 @@
-#include <eeros/logger/Logger.hpp>
 #include <eeros/control/TimeDomain.hpp> 
 #include <eeros/control/Constant.hpp>
 #include <eeros/control/SocketData.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/core/Executor.hpp>
+#include <eeros/task/Lambda.hpp>
+#include <eeros/safety/SafetySystem.hpp>
+#include <eeros/safety/SafetyProperties.hpp>
+#include <eeros/logger/Logger.hpp>
+#include <eeros/logger/StreamLogWriter.hpp>
+#include <eeros/task/Periodic.hpp>
 
 using namespace eeros::control;
 using namespace eeros::sockets;
@@ -19,15 +24,17 @@ public:
 		log('C'),
 		socketA(9876, 0.01),
 		c1({1.5, 2.2, 3.3, 4.6}),
-		timedomain("Main time domain", dt, true){
+		c2(56.5),
+		c3(-28),
+		timedomain("Main time domain", dt, true) {
 		
 		socketA.getOut().getSignal().setName("socketRead");
-		  
-		// Connect Blocks
 		socketA.getIn().connect(c1.getOut());
-		
-		// Run blocks
+// 		socketA.getIn().connect(c2.getOut());
+// 		socketA.getIn().connect(c3.getOut());
 		timedomain.addBlock(c1);
+		timedomain.addBlock(c2);
+		timedomain.addBlock(c3);
 		timedomain.addBlock(socketA);
 		
 		Executor::instance().add(timedomain);
@@ -36,17 +43,22 @@ public:
 		
 	// Define blocks
 	Constant<Vector4> c1;
-	SocketData<Vector4, double, Matrix<1000,1,double>, double> socketA;
+	Constant<double> c2;
+	Constant<int> c3;
+	SocketData<Vector4, Matrix<6,1,double>> socketA;	// send Vector4, receive Matrix<6,1,double>
+// 	SocketData<Vector4, double> socketA;			// send Vector4, receive double
+// 	SocketData<Vector4, int> socketA;			// send Vector4, receive int
+// 	SocketData<Vector4, std::nullptr_t> socketA;		// send Vector4, receive nothing
+// 	SocketData<double, Vector4> socketA;			// send double, receive Vector4
+// 	SocketData<int, Vector4> socketA;			// send int, receive Vector4
+// 	SocketData<std::nullptr_t, Vector4> socketA;		// send nothing, receive Vector4
 	Logger log;
 		
 protected:
 	double dt;
 	bool realtime;
 	TimeDomain timedomain;
-}; // END class
-	
-
-#include <eeros/safety/SafetyProperties.hpp>
+};
  
 class TestAppSafetyProperties : public eeros::safety::SafetyProperties {
 public: 
@@ -54,35 +66,11 @@ public:
 		addLevel(off);
 		setEntryLevel(off);
 	}
-	
 	~TestAppSafetyProperties(){};
- 
 	eeros::safety::SafetyLevel off;
-	
-}; // end class
-
-#include <iostream>
-#include <signal.h>
-
-#include <eeros/core/Executor.hpp>
-#include <eeros/task/Lambda.hpp>
-#include <eeros/safety/SafetySystem.hpp>
-#include <eeros/logger/Logger.hpp>
-#include <eeros/logger/StreamLogWriter.hpp>
-#include <eeros/sockets/SocketServer.hpp>
-#include <eeros/task/Periodic.hpp>
-	
-bool threadFinishd = false;
-
-volatile bool running = true;
-void signalHandler(int signum) {
-	running = false;
-}
-
+}; 
 
 int main(int argc, char **argv) {
-	signal(SIGINT, signalHandler);
-	
 	double dt = 0.01;
 	
 	StreamLogWriter w(std::cout);
@@ -117,8 +105,6 @@ int main(int argc, char **argv) {
 	
 	log.info() << "executor.run()";
 	executor.run();
-
-	threadFinishd = true;
 	
 	return 0;
 }
