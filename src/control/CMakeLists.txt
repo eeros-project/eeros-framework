@@ -4,7 +4,3 @@ add_eeros_sources(Block.cpp TimeDomain.cpp Vector2Corrector.cpp Signal.cpp PathP
 if(LINUX)
 	add_eeros_sources(XBoxInput.cpp MouseInput.cpp KeyboardInput.cpp SpaceNavigatorInput.cpp)
 endif()
-
-if(ROS_FOUND)
-	add_eeros_sources(ReceiveTeleopTurtleKey.cpp)
-endif()
