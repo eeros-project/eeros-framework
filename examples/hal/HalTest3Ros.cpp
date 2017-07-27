@@ -21,6 +21,7 @@ int main(int argc, char **argv) {
 	double dt = 0.2;
 	
 	// Create and initialize logger
+	// ////////////////////////////////////////////////////////////////////////
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;
