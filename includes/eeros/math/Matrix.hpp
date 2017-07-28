@@ -146,10 +146,26 @@ namespace eeros {
 				return col;
 			}
 			
+			std::vector<T> getColVector(unsigned int n) const {
+				std::vector<T> col;
+				for(unsigned int m = 0; m < M; m++) {
+					col.push_back( (*this)(m, n) );
+				}
+				return col;
+			}
+			
 			Matrix<1, N, T> getRow(unsigned int m) const {
 				Matrix<1, N, T> row;
 				for(unsigned int n = 0; n < N; n++) {
 					row(0, n) = (*this)(m, n);
+				}
+				return row;
+			}
+			
+			std::vector<T> getRowVector(unsigned int m) const {
+				std::vector<T> row;
+				for(unsigned int n = 0; n < N; n++) {
+					row.push_back( (*this)(m, n) );
 				}
 				return row;
 			}
