@@ -15,7 +15,7 @@ int main(int argc, char **argv){
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;
-	w.show();
+// 	w.show();
 	
 	log.info() << "HAL simulator test started...";
   

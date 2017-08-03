@@ -10,6 +10,7 @@
 #include <eeros/core/Executor.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
+#include <eeros/sequencer/Step.hpp>
 #include <unistd.h>
 
 using namespace eeros::safety;
@@ -67,46 +68,91 @@ public:
 	SafetyLevel slSingle;
 };
 
-class MyMainSequence : public Sequence {
+class StepDigOut : public Step {
 public:
-	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), controlSys(controlSys) { }
-	
+	StepDigOut(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Step(name, sequencer, caller), cs(cs) { }
+	int operator() (bool val) {state = val; return Step::start();}
+	int action() {cs.c0.setValue(state);}
+	bool state;
+	MyControlSystem& cs;
+};
+
+class StepAnalogOut : public Step {
+public:
+	StepAnalogOut(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Step(name, sequencer, caller), cs(cs) { }
+	int operator() (bool val) {state = val; return Step::start();}
 	int action() {
-		bool toggle = false;
-		bool toggleAnalog = false;
-		log.trace() << "[ Main sequence started ]";
-		sleep(4);
-		
-		log.info() << "Starting...";
-		for(int i = 0; (i < 1000000) /*&& (!isTerminating())*/; i++){	  
-			if(i%20 == 0){
-				log.trace() << controlSys.digIn0.getOut().getSignal();
-				log.trace() << controlSys.digIn1.getOut().getSignal();
-				log.trace() << controlSys.anIn0.getOut().getSignal();
-				log.trace() << controlSys.anIn2.getOut().getSignal();
-			}
-			if(i%50 == 0){
-				toggle = !toggle;
-				log.info() << "toggle digital output of constant block c0";
-				controlSys.c0.setValue(toggle);
-			}
-			if(i%100 == 0){
-				toggleAnalog = !toggleAnalog;
-				log.info() << "change analog output values of constant blocks c1 and c2";
-				if(toggleAnalog){
-					controlSys.c1.setValue(6.0);
-					controlSys.c2.setValue(-3.2);
-				} else {
-					controlSys.c1.setValue(-2.0);
-					controlSys.c2.setValue(7.6);
-				}
-			}
-			usleep(100000);
+		if (state) {
+			cs.c1.setValue(6.0);
+			cs.c2.setValue(-3.2);
+		} else {
+			cs.c1.setValue(-2.0);
+			cs.c2.setValue(7.6);
 		}
-		log.trace() << "[ Main sequence ended ]";
+	}
+	bool state;
+	MyControlSystem& cs;
+};
+
+class SeqDigital : public Sequence {
+public:
+	SeqDigital(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Sequence(name, sequencer, caller), stepDigOut("step dig out", seq, this, cs) {
+		setNonBlocking();
+	}
+	int operator() () {return Sequence::start();}
+	int action() {
+		bool toggle;
+		while (true) {
+			stepDigOut(toggle);
+			sleep(2);
+			toggle = !toggle;
+		}
 	}
 private:
-	MyControlSystem& controlSys;
+	StepDigOut stepDigOut;
+};
+
+class SeqAnalog : public Sequence {
+public:
+	SeqAnalog(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Sequence(name, sequencer, caller), stepAnalogOut("step analog out", seq, this, cs) {
+		setNonBlocking();
+	}
+	int operator() () {return Sequence::start();}
+	int action() {
+		bool toggle;
+		while (true) {
+			stepAnalogOut(toggle);
+			sleep(5);
+			toggle = !toggle;
+		}
+	}
+private:
+	StepAnalogOut stepAnalogOut;
+};
+
+class MyMainSequence : public Sequence {
+public:
+	MyMainSequence(Sequencer& seq, MyControlSystem& cs) : Sequence("main", seq), cs(cs), seqDigital("seq dig out", seq, this, cs), seqAnalog("seq analog out", seq, this, cs) { 
+		setNonBlocking();
+	}
+	
+	int action() {
+		seqDigital();
+		seqAnalog();
+		while (true) {
+			sleep(1);
+			log.info() << cs.digIn0.getOut().getSignal();
+			log.info() << cs.digIn1.getOut().getSignal();
+			log.info() << cs.anIn0.getOut().getSignal();
+			log.info() << cs.anIn2.getOut().getSignal();
+		}
+		seqDigital.join();
+		seqAnalog.join();
+	}
+private:
+	MyControlSystem& cs;
+	SeqDigital seqDigital;
+	SeqAnalog seqAnalog;
 };
 
 #endif // ORG_EEROS_HALTEST1_HPP_

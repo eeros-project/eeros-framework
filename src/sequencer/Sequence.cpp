@@ -34,7 +34,7 @@ void Sequence::run() {	// runs in thread
 	std::unique_lock<std::mutex> lk(m);
 	cv.wait(lk);	// sends sequence to sleep, wait for start()
 	lk.unlock();
-	if (isMainSequence) log.info() << "sequence '" << name << "' started non-blocking";
+	if (isMainSequence) log.info() << "sequence '" << name << "' started (non-blocking)";
 	else log.info() << "sequence '" << name << "' started non-blocking, caller sequence: '" << callerSequence->getName() << "'";
 	BaseSequence::action();
 	log.info() << "sequence '" << name << "' terminated";
@@ -44,7 +44,7 @@ void Sequence::run() {	// runs in thread
 int Sequence::start() {
 	resetTimeout();
 	if (isBlocking()) {	// starts action() blocking
-		if (isMainSequence) log.info() << "sequence '" << name << "' started blocking";
+		if (isMainSequence) log.info() << "sequence '" << name << "' started (blocking)";
 		else log.info() << "sequence '" << name << "' started blocking, caller sequence: '" << callerSequence->getName() << "'";
 		BaseSequence::action();				//action gets overwritten by child class
 		log.info() << "sequence '" << name << "' terminated";

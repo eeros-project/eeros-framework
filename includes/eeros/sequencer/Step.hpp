@@ -11,7 +11,7 @@ namespace eeros {
 			Step(std::string name, Sequencer& seq, BaseSequence* caller) : BaseSequence(seq, caller) {this->name = name;}
 			virtual ~Step() { };
 			
-			virtual int operator() () = 0;	// this operator has to be implemented in the derived sequence
+// 			virtual int operator() () = 0;	// this operator has to be implemented in the derived sequence
 			virtual int action() = 0;	// this function has to be implemented in the derived sequence
 			int start() {
 				resetTimeout();
