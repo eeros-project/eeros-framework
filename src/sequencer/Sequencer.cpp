@@ -7,13 +7,14 @@
 using namespace eeros;
 using namespace eeros::sequencer;
 
-Sequencer::Sequencer() : log('Z') {
-	static int sequencerCounter;
-	sequencerCounter++;
-	if (sequencerCounter > 1) log.error() << "Only one sequencer object is allowed";
-}
+Sequencer::Sequencer() : log('Z') { }
 
 Sequencer::~Sequencer() { }
+
+Sequencer& Sequencer::instance() {
+	static Sequencer seq;
+	return seq;
+}
 
 void Sequencer::addSequence(Sequence* seq) {
 	sequenceList.push_back(seq);

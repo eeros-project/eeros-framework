@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
 	auto& executor = Executor::instance();
 	executor.setMainTask(safetySys);
 
-	Sequencer sequencer;
+	auto& sequencer = Sequencer::instance();
 	MainSequence mainSeq("Main Sequence", sequencer);
 	sequencer.addMainSequence(&mainSeq);
 	

@@ -19,9 +19,10 @@ namespace eeros {
 		class Sequence;
 
 		class Sequencer {
-		public:
 			Sequencer();
+		public:
 			virtual ~Sequencer();
+			static Sequencer& instance();
 			
 			void addSequence(Sequence* seq);
 			void addMainSequence(Sequence* mainSeq);

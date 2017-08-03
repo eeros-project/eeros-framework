@@ -30,7 +30,7 @@ int main(int argc, char **argv){
 	SafetySystem safetySystem(safetyProperties, dt);
 	
 	// Sequencer
-	Sequencer sequencer;
+	auto& sequencer = Sequencer::instance();
 	MyMainSequence mainSequence(sequencer, cs);
 	sequencer.addMainSequence(&mainSequence);
 	
