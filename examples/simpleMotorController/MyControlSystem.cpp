@@ -62,6 +62,4 @@ MyControlSystem::MyControlSystem(double ts) :
 	eeros::Executor::instance().add(timedomain);
 }
 
-MyControlSystem::~MyControlSystem(){
-	
-}
+MyControlSystem::~MyControlSystem() { }

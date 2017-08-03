@@ -12,7 +12,7 @@
 #include <eeros/sequencer/Sequencer.hpp>
 #include "MySafetyProperties.hpp"
 #include "MyControlSystem.hpp"
-#include "SequenceA.hpp"
+#include "MainSequence.hpp"
 
 using namespace eeros;
 using namespace eeros::hal;
@@ -52,22 +52,14 @@ int main(int argc, char **argv) {
 	controlSys.timedomain.registerSafetyEvent(&safetySys, &properties.doEmergency);
 	
 	Sequencer sequencer;
-	SequenceA mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/10);
-	sequencer.start(&mainSequence);
+	MainSequence mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/10);
+	sequencer.addMainSequence(&mainSequence);
 	
 	auto &executor = Executor::instance();
 	executor.setMainTask(safetySys);
 	safetySys.triggerEvent(properties.doSystemOn);
 	
 	executor.run();
-	
-	
-	while(sequencer.getState()!=state::terminated) {
-		sequencer.shutdown();
-		sleep(3);
-	}
-	
-	sequencer.abort();
 	
 	log.info() << "Example finished...";
 	return 0;

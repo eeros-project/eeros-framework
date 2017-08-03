@@ -1,4 +1,6 @@
-if(LIBCURSES)
+# if(LIBCURSES)
 # 	add_executable(simpleSequencerExample simpleExample.cpp)
 # 	target_link_libraries(simpleSequencerExample eeros)
-endif()
+# endif()
+add_executable(sequencerTest1 SequencerTest1.cpp)
+target_link_libraries(sequencerTest1 eeros ${EEROS_LIBS})

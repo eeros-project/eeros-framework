@@ -10,7 +10,6 @@
 namespace eeros {
 	
 	class Thread {
-	
 	public:
 		Thread();
 		virtual ~Thread();

@@ -5,6 +5,7 @@
 #include <eeros/control/PeripheralInput.hpp>
 #include <eeros/control/Constant.hpp>
 #include <eeros/control/TimeDomain.hpp>
+#include <eeros/safety/SafetySystem.hpp>
 #include <eeros/hal/HAL.hpp>
 #include <eeros/core/Executor.hpp>
 #include <eeros/sequencer/Sequence.hpp>
@@ -66,19 +67,18 @@ public:
 	SafetyLevel slSingle;
 };
 
-class MyMainSequence : public Sequence<> {
+class MyMainSequence : public Sequence {
 public:
-	MyMainSequence(Sequencer* sequencer, MyControlSystem& controlSys) : Sequence<void>("main", sequencer), controlSys(controlSys) { }
+	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), controlSys(controlSys) { }
 	
-	virtual bool checkPreCondition() {return true;}
-	virtual void run() {
+	int action() {
 		bool toggle = false;
 		bool toggleAnalog = false;
-		log.trace() << "[ Main Sequence Started ]";
+		log.trace() << "[ Main sequence started ]";
 		sleep(4);
 		
 		log.info() << "Starting...";
-		for(int i = 0; (i < 1000000) && (!isTerminating()); i++){	  
+		for(int i = 0; (i < 1000000) /*&& (!isTerminating())*/; i++){	  
 			if(i%20 == 0){
 				log.trace() << controlSys.digIn0.getOut().getSignal();
 				log.trace() << controlSys.digIn1.getOut().getSignal();
@@ -103,12 +103,9 @@ public:
 			}
 			usleep(100000);
 		}
+		log.trace() << "[ Main sequence ended ]";
 	}
-
-	virtual void exit() {log.info() << "[ Exit Main Sequence ]";}
-	
 private:
-	inline bool isTerminating() {return sequencer->getState() == state::terminating;}
 	MyControlSystem& controlSys;
 };
 

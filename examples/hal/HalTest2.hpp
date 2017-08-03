@@ -62,12 +62,11 @@ public:
 	SafetyLevel slSingle;
 };
 
-class MyMainSequence : public Sequence<> {
+class MyMainSequence : public Sequence {
 public:
-	MyMainSequence(Sequencer* sequencer, MyControlSystem& controlSys) : Sequence<void>("main", sequencer), controlSys(controlSys) { }
+	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), controlSys(controlSys) { }
 	
-	virtual bool checkPreCondition() {return true;}
-	virtual void run() {
+	int action() {
 		log.trace() << "[ Main Sequence Started ]";
 		
 		// set PWM frequency here for example or in main of application
@@ -75,7 +74,7 @@ public:
 		controlSys.pwm2.callOutputFeature("setPwmFrequency", 2000.0);
 		
 		log.info() << "Starting...";
-		for(int i = 0; (i < 1000000) && (!isTerminating()); i++){
+		for(int i = 0; (i < 1000000) /*&& (!isTerminating())*/; i++){
 			if(i%5 == 0){
 				log.info() << "enc: " << controlSys.encMot1.getOut().getSignal().getValue();
 			}
@@ -90,11 +89,8 @@ public:
 			usleep(100000);
 		}
 	}
-
-	virtual void exit() {log.info() << "[ Exit Main Sequence ]";}
 	
 private:
-	inline bool isTerminating() {return sequencer->getState() == state::terminating;}
 	MyControlSystem& controlSys;
 };
 

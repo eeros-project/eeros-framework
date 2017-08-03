@@ -33,23 +33,15 @@ int main(int argc, char **argv){
 	
 	// Sequencer
 	Sequencer sequencer;
-	MyMainSequence mainSequence(&sequencer, cs);
-	sequencer.start(&mainSequence);
+	MyMainSequence mainSequence(sequencer, cs);
+	sequencer.addMainSequence(&mainSequence);
 	
 	// Set executor and run
 	auto &executor = Executor::instance();
 	executor.setMainTask(safetySystem);
 	executor.run();
 	
-	sequencer.shutdown();
-	usleep(3);
-	if(sequencer.getState()!=state::terminated) {
-		sequencer.abort();
-	}
-// 	while(sequencer.getState()!=state::terminated){
-// 		usleep(100000);
-// 		std::cout << ".";
-// 	}
+	mainSequence.join();
 	
 	log.info() << "end...";
 		

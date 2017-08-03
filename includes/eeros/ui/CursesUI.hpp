@@ -36,8 +36,8 @@ namespace eeros {
 			
 		private:
 			eeros::sequencer::Sequencer& sequencer;
-			eeros::sequencer::state::type cachedState;
-			eeros::sequencer::mode::type cachedMode;
+// 			eeros::sequencer::state::type cachedState;
+// 			eeros::sequencer::mode::type cachedMode;
 			std::atomic<bool> messageListUpdated;
 			std::atomic<State> state;
 			unsigned int headerStart;

@@ -127,6 +127,4 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double dt) :
 	
 }
 
-MySafetyProperties::~MySafetyProperties() {
-	// nothing to do
-}
+MySafetyProperties::~MySafetyProperties() { }

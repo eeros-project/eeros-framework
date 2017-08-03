@@ -1,139 +1,33 @@
 #ifndef ORG_EEROS_SEQUENCER_SEQUENCE_HPP_
 #define ORG_EEROS_SEQUENCER_SEQUENCE_HPP_
 
-#include <string>
-#include <map>
-#include <functional>
-#include <vector>
-#include <mutex>
+#include <eeros/sequencer/BaseSequence.hpp>
 #include <condition_variable>
-#include <atomic>
-
-#include <eeros/logger/Logger.hpp>
-#include <eeros/logger/LogWriter.hpp>
-#include <eeros/sequencer/Sequencer.hpp>
-#include <eeros/sequencer/SequenceResult.hpp>
+#include <thread>
 
 namespace eeros {
 	namespace sequencer {
-	
-		// Base class
-		class SequenceBase {
-			
-			friend class eeros::sequencer::Sequencer;
-			
-		public:
-			SequenceBase(std::string name, Sequencer* sequencer);
-			
-			virtual std::string getName() const;
-			virtual bool checkPreCondition();
-			virtual bool checkPostCondition();
-			
-		protected:
-			virtual void yield();
-			
-			virtual void init();
-			virtual void exit();
-			
-			eeros::logger::Logger log;
-			std::string name;
-			Sequencer* sequencer;
-		};
 		
-		// Class template Sequence
-		template<typename Treturn = void, typename ... Targs>
-		class Sequence : public SequenceBase {
-			
-		public:
-			Sequence(std::string name, Sequencer* sequencer) : SequenceBase(name, sequencer) { }
-			
-			SequenceResult<Treturn> operator()(Targs ... args) {
-				init();
-				yield();
-				
-				if(!checkPreCondition())
-					return SequenceResult<Treturn>(result::preConditionFailure);
-				
-				yield();
-				Treturn res = run(args...);
-				yield();
-				
-				if(!checkPostCondition())
-					return SequenceResult<Treturn>(result::postConditionFailure, res);
-				
-				yield();
-				exit();
-				
-				return SequenceResult<Treturn>(result::success, res);
-			}
-			
-		protected:
-			virtual Treturn run(Targs... args) { }
-		};
+		class Sequencer;
 		
-		// Specializations for class template Sequence
-		template<typename ... Targs>
-		class Sequence<void, Targs...> : public SequenceBase {
-			
+		class Sequence : public BaseSequence {
 		public:
-			Sequence(std::string name, Sequencer* sequencer) : SequenceBase(name, sequencer) { }
+			Sequence(std::string name, Sequencer& seq, BaseSequence* caller);
+			Sequence(std::string name, Sequencer& Sseq);		//only for mainSequence
+			virtual ~Sequence();
 			
-			SequenceResult<void> operator()(Targs ... args) {
-				init();
-				yield();
-				
-				if(!checkPreCondition())
-					return SequenceResult<void>(result::preConditionFailure);
-				
-				yield();
-				run(args...);
-				yield();
-				
-				if(!checkPostCondition())
-					return SequenceResult<void>(result::postConditionFailure);
-				
-				yield();
-				exit();
-				
-				return SequenceResult<void>(result::success);
-			}
-			
-		protected:
-			virtual void run(Targs... args) { }
+// 			virtual int operator() () = 0;	// this operator has to be implemented in the derived sequence
+			virtual int action() = 0;	// this function has to be implemented in the derived sequence
+			int start();
+			void join() {thread->join();}
+			bool isStep();
+		private:
+			std::mutex m;
+			std::condition_variable cv;
+			void run();
+			std::thread* thread;
 		};
-		
-		template<>
-		class Sequence<void> : public SequenceBase {
-			
-		public:
-			Sequence(std::string name, Sequencer* sequencer) : SequenceBase(name, sequencer) {
-				sequencer->addCmdSequence(this);
-			}
-			
-			SequenceResult<void> operator()() {
-				init();
-				yield();
-				
-				if(!checkPreCondition())
-					return SequenceResult<void>(result::preConditionFailure);
-				
-				yield();
-				run();
-				yield();
-				
-				if(!checkPostCondition())
-					return SequenceResult<void>(result::postConditionFailure);
-				
-				yield();
-				exit();
-				
-				return SequenceResult<void>(result::success);
-			}
-			
-		protected:
-			virtual void run() { }
-		};
-	}; // namespace sequencer
+	};	//namespace sequencer
 }; // namespace eeros
 
 #endif // ORG_EEROS_SEQUENCER_SEQUENCE_HPP_
