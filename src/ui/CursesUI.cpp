@@ -31,8 +31,8 @@ CursesUI::~CursesUI() {
 }
 
 void CursesUI::dispay() {
-	cachedMode = sequencer.getMode();
-	cachedState = sequencer.getState();
+// 	cachedMode = sequencer.getMode();
+// 	cachedState = sequencer.getState();
 	
 	state = active;
 }
@@ -54,7 +54,7 @@ void CursesUI::printHeader() {
 	}
 //	attron(A_BOLD);
 	std::stringstream title;
-	title << "User interface for sequencer " << sequencer.getName();
+	title << "User interface for sequencer ";
 	mvprintw(headerStart + 1, (COLS - title.str().size()) / 2, "%s", title.str().c_str());
 	color_set(1, nullptr);
 	attrset(A_NORMAL);
@@ -83,7 +83,8 @@ void CursesUI::printTitle(std::string text, unsigned int line) {
 }
 
 void CursesUI::printSequenceList(unsigned int first) {
-	const std::vector<Sequence<void>*>& list = sequencer.getListOfCmdSequences();
+// 	const std::vector<Sequence<void>*>& list = sequencer.getListOfCmdSequences();
+	const std::vector<Sequence*>& list = sequencer.getListOfAllSequences();
 	unsigned int i = 0;
 	printTitle("Command sequences", sequenceListStart);
 	for(auto entry : list) {
@@ -108,22 +109,26 @@ void CursesUI::printMessageList() {
 void CursesUI::printStatus() {
 	printTitle("Status", statusStart);
 	mvprintw(statusStart + 1, 1, "State:");
-	state::type s = sequencer.getState();
+	SequenceState s = sequencer.getMainSequence()->getRunningState();
+// 	state::type s = sequencer.getState();
 	switch(s) {
-		case state::executing:
-			mvprintw(statusStart + 1, 9, "executing  ");
+		case SequenceState::running:
+			mvprintw(statusStart + 1, 9, "running    ");
 			break;
-		case state::waiting:
-			mvprintw(statusStart + 1, 9, "waiting    ");
+		case SequenceState::aborted:
+			mvprintw(statusStart + 1, 9, "aborted    ");
 			break;
-		case state::terminating:
-			mvprintw(statusStart + 1, 9, "terminating");
+		case SequenceState::aborting:
+			mvprintw(statusStart + 1, 9, "aborting   ");
 			break;
-		case state::terminated:
+		case SequenceState::terminated:
 			mvprintw(statusStart + 1, 9, "terminated ");
 			break;
-		case state::idle:
+		case SequenceState::idle:
 			mvprintw(statusStart + 1, 9, "idle       ");
+			break;
+		case SequenceState::restarting:
+			mvprintw(statusStart + 1, 9, "restarting ");
 			break;
 		default:
 			mvprintw(statusStart + 1, 9, "unknown (%u)", static_cast<unsigned int>(s));
@@ -131,18 +136,18 @@ void CursesUI::printStatus() {
 	}
 	
 	mvprintw(statusStart + 1, COLS / 2 + 1, "Mode:");
-	mode::type m = sequencer.getMode();
-	switch(m) {
-		case mode::automatic:
-			mvprintw(statusStart + 1, COLS / 2 + 7, "automatic   ");
-			break;
-		case mode::stepping:
-			mvprintw(statusStart + 1, COLS / 2 + 7, "stepping    ");
-			break;
-		default:
-			mvprintw(statusStart + 1, COLS / 2 + 7, "unknown (%u)", static_cast<unsigned int>(s));
-			break;
-	}
+// 	mode::type m = sequencer.getMode();
+// 	switch(m) {
+// 		case mode::automatic:
+// 			mvprintw(statusStart + 1, COLS / 2 + 7, "automatic   ");
+// 			break;
+// 		case mode::stepping:
+// 			mvprintw(statusStart + 1, COLS / 2 + 7, "stepping    ");
+// 			break;
+// 		default:
+// 			mvprintw(statusStart + 1, COLS / 2 + 7, "unknown (%u)", static_cast<unsigned int>(s));
+// 			break;
+// 	}
 	
 // 	mvprintw(statusStart + 2, 1, "Current Sequence:");
 // 	const Sequence<>* cs = sequencer.getCurrentSequence();
@@ -223,39 +228,39 @@ void CursesUI::run() {
 		int c = getch();
 		char input[10];
 		switch(c) {
-			case KEY_F(2):
-				if(checkCmdToggleIsActive()) sequencer.toggleMode();
-				updateScreen();
-				break;
-			case KEY_F(3):
-				if(checkCmdProceedIsActive()) sequencer.proceed();
-				updateScreen();
-				break;
-			case KEY_F(4):
-				if(checkCmdAbortIsActive()) sequencer.abort();
-				updateScreen();
-				break;
-			case KEY_F(5):
-				if(checkCmdChooseSeqIsActive()){
-					while(!sequencer.start(promptForInt("Enter sequence number:")));
-				}
-				break;
-			case 27: // Esc
-			case KEY_F(10):
-				sequencer.stepMode();
-				sequencer.abort();
-				while(sequencer.getState() != state::idle);
-				sequencer.shutdown();
-				exit();
-				break;
-			default:
-				if(sequencer.getState() != cachedState || sequencer.getMode() != cachedMode || messageListUpdated) {
-					updateScreen();
-					cachedState = sequencer.getState();
-					cachedMode = sequencer.getMode();
-					messageListUpdated = false;
-				}
-				break;
+// 			case KEY_F(2):
+// 				if(checkCmdToggleIsActive()) sequencer.toggleMode();
+// 				updateScreen();
+// 				break;
+// 			case KEY_F(3):
+// 				if(checkCmdProceedIsActive()) sequencer.proceed();
+// 				updateScreen();
+// 				break;
+// 			case KEY_F(4):
+// 				if(checkCmdAbortIsActive()) sequencer.abort();
+// 				updateScreen();
+// 				break;
+// 			case KEY_F(5):
+// 				if(checkCmdChooseSeqIsActive()){
+// 					while(!sequencer.start(promptForInt("Enter sequence number:")));
+// 				}
+// 				break;
+// 			case 27: // Esc
+// 			case KEY_F(10):
+// 				sequencer.stepMode();
+// 				sequencer.abort();
+// 				while(sequencer.getState() != state::idle);
+// 				sequencer.shutdown();
+// 				exit();
+// 				break;
+// 			default:
+// 				if(sequencer.getState() != cachedState || sequencer.getMode() != cachedMode || messageListUpdated) {
+// 					updateScreen();
+// 					cachedState = sequencer.getState();
+// 					cachedMode = sequencer.getMode();
+// 					messageListUpdated = false;
+// 				}
+// 				break;
 		}
 	}
 	
@@ -264,19 +269,19 @@ void CursesUI::run() {
 }
 
 bool CursesUI::checkCmdToggleIsActive() {
-	return sequencer.getState() == state::executing || sequencer.getState() == state::waiting;
+// 	return sequencer.getState() == state::executing || sequencer.getState() == state::waiting;
 }
 
 bool CursesUI::checkCmdAbortIsActive() {
-	return sequencer.getState() == state::executing || sequencer.getState() == state::waiting;
+// 	return sequencer.getState() == state::executing || sequencer.getState() == state::waiting;
 }
 
 bool CursesUI::checkCmdProceedIsActive() {
-	return sequencer.getState() == state::waiting && sequencer.getMode() == mode::stepping;
+// 	return sequencer.getState() == state::waiting && sequencer.getMode() == mode::stepping;
 }
 
 bool CursesUI::checkCmdChooseSeqIsActive() {
-	return sequencer.getState() == state::idle && sequencer.getMode() == mode::stepping;
+// 	return sequencer.getState() == state::idle && sequencer.getMode() == mode::stepping;
 }
 
 void CursesUI::addMessage(std::string message) {

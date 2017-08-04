@@ -183,6 +183,8 @@ void BaseSequence::setName(std::string name) {this->name = name;}
 
 std::string BaseSequence::getName() const {return name;}
 
+SequenceState BaseSequence::getRunningState() const {return runningState;}
+
 void BaseSequence::setId(int id) {this->id = id;}
 
 int BaseSequence::getId() const {return id;}

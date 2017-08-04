@@ -4,3 +4,6 @@
 # endif()
 add_executable(sequencerTest1 SequencerTest1.cpp)
 target_link_libraries(sequencerTest1 eeros ${EEROS_LIBS})
+
+add_executable(sequencerTest2 SequencerTest2.cpp)
+target_link_libraries(sequencerTest2 eeros ${EEROS_LIBS})

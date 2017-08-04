@@ -51,7 +51,7 @@ namespace eeros {
 			std::vector< BaseSequence* > getCallerStack() const;
 			
 // 			void setRunningState(runningStateEnum runningState);
-// 			runningStateEnum getRunningState() const;
+			SequenceState getRunningState() const;
 			void restartSequence();
 			
 			void setPollingTime(int timeInMilliseconds);
