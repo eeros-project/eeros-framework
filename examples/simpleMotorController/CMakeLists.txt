@@ -1,2 +1,2 @@
-add_executable(simpleMotorController SimpleMotorController.cpp MyControlSystem.cpp MySafetyProperties.cpp MainSequence.cpp)
+add_executable(simpleMotorController SimpleMotorController.cpp MyControlSystem.cpp MySafetyProperties.cpp)
 target_link_libraries(simpleMotorController eeros ${EEROS_LIBS})
