@@ -19,7 +19,8 @@ namespace eeros {
 				BaseSequence::action();
 				return 0;
 			}
-			bool isStep() const {return true;};
+			void setBlocking() {blocking = true;}
+			void setNonBlocking() {log.error() << "a step is always blocking";}
 		};
 	};	//namespace sequencer
 }; // namespace eeros

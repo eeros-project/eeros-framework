@@ -56,7 +56,3 @@ int Sequence::start() {
 	return 0;
 }
 
-bool Sequence::isStep() {
-	return false;
-}
-

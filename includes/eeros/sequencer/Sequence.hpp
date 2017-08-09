@@ -20,7 +20,8 @@ namespace eeros {
 			virtual int action() = 0;	// this function has to be implemented in the derived sequence
 			int start();
 			void join() {thread->join();}
-			bool isStep();
+			void setBlocking() {blocking = true;}
+			void setNonBlocking() {blocking = false;}
 		private:
 			std::mutex m;
 			std::condition_variable cv;

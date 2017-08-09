@@ -173,7 +173,7 @@ void BaseSequence::checkActiveException() {
 	}
 }
 
-bool BaseSequence::isStep() const {return false;}
+// bool BaseSequence::isStep() const {return false;}
 
 bool BaseSequence::checkExitCondition() {return true;}
 
@@ -188,10 +188,6 @@ SequenceState BaseSequence::getRunningState() const {return runningState;}
 void BaseSequence::setId(int id) {this->id = id;}
 
 int BaseSequence::getId() const {return id;}
-
-void BaseSequence::setBlocking() {blocking = true;}
-
-void BaseSequence::setNonBlocking() {blocking = false;}
 
 bool BaseSequence::isBlocking() const {return blocking;}
 

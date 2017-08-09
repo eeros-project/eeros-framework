@@ -1,5 +1,6 @@
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
+#include <eeros/core/Fault.hpp>
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -21,13 +22,13 @@ void Sequencer::addSequence(Sequence& seq) {
 }
 
 void Sequencer::addMainSequence(Sequence& mainSeq) { 
-	if (mainSeq.isStep()) log.error() << "Main sequence has to be a sequence, not a step";
+	if (mainSeq.isBlocking()) throw Fault("Main sequence has to be a nonblocking sequence");
 	mainSequence = &mainSeq;
 // 	mainSequence->start();
 }
 
 Sequence* Sequencer::getMainSequence() {
-	if( mainSequence == nullptr ) log.error() << "Main sequence not set in sequencer";
+	if( mainSequence == nullptr ) throw Fault("Main sequence not set in sequencer");
 	return mainSequence;
 }
 
