@@ -20,7 +20,7 @@ Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller) : Bas
 		this->name = name;
 	}
 	
-	seq.addSequence(this);	// register in sequencer
+	seq.addSequence(*this);	// register in sequencer
 	log.trace() << "Sequence '" << name << "' created";
 }
 

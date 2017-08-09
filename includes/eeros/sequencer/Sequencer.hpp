@@ -24,8 +24,8 @@ namespace eeros {
 			virtual ~Sequencer();
 			static Sequencer& instance();
 			
-			void addSequence(Sequence* seq);
-			void addMainSequence(Sequence* mainSeq);
+			void addSequence(Sequence& seq);
+			void addMainSequence(Sequence& mainSeq);
 			Sequence* getMainSequence();
 			Sequence* getSequenceById(int id);
 			Sequence* getSequenceByName(std::string name);

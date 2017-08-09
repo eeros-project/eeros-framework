@@ -32,7 +32,8 @@ int main(int argc, char **argv){
 	// Sequencer
 	auto& sequencer = Sequencer::instance();
 	MyMainSequence mainSequence(sequencer, cs);
-	sequencer.addMainSequence(&mainSequence);
+	sequencer.addMainSequence(mainSequence);
+	mainSequence.start();
 	
 	// Set executor and run
 	auto &executor = Executor::instance();

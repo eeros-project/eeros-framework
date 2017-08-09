@@ -16,14 +16,14 @@ Sequencer& Sequencer::instance() {
 	return seq;
 }
 
-void Sequencer::addSequence(Sequence* seq) {
-	sequenceList.push_back(seq);
+void Sequencer::addSequence(Sequence& seq) {
+	sequenceList.push_back(&seq);
 }
 
-void Sequencer::addMainSequence(Sequence* mainSeq) { 
-	if (mainSeq->isStep()) log.error() << "Main sequence has to be a sequence, not a step";
-	mainSequence = mainSeq;
-	mainSequence->start();
+void Sequencer::addMainSequence(Sequence& mainSeq) { 
+	if (mainSeq.isStep()) log.error() << "Main sequence has to be a sequence, not a step";
+	mainSequence = &mainSeq;
+// 	mainSequence->start();
 }
 
 Sequence* Sequencer::getMainSequence() {

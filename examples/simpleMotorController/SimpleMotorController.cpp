@@ -53,7 +53,8 @@ int main(int argc, char **argv) {
 	
 	auto& sequencer = Sequencer::instance();
 	MainSequence mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/10);
-	sequencer.addMainSequence(&mainSequence);
+	sequencer.addMainSequence(mainSequence);
+	mainSequence.start();
 	
 	auto &executor = Executor::instance();
 	executor.setMainTask(safetySys);
