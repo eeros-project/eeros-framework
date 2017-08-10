@@ -13,6 +13,10 @@
 #include <EtherCATMain.hpp>
 #endif
 
+#ifdef ROS_FOUND
+#include <ros/ros.h>
+#endif
+
 
 namespace eeros {
 
@@ -45,6 +49,8 @@ namespace eeros {
 		static bool set_priority(int nice);
 		static void stop();
 
+		void useRosTimeForExecutor();
+		
 		PeriodicCounter counter;
 
 	private:
@@ -55,7 +61,7 @@ namespace eeros {
 		std::mutex* m;
 		std::condition_variable* cv;
 #endif
-		
+		bool useRosTime;
 		logger::Logger log;
 		double period;
 		task::Periodic *mainTask;

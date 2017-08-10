@@ -91,7 +91,7 @@ namespace {
 }
 
 Executor::Executor() :
-	log('E'), period(0), mainTask(nullptr) { }
+	log('E'), period(0), mainTask(nullptr), useRosTime(false) { }
 
 Executor::~Executor() {
 
@@ -156,6 +156,10 @@ void Executor::stop() {
 #endif
 }
 
+void Executor::useRosTimeForExecutor() {
+	useRosTime = true;
+}
+
 void Executor::assignPriorities() {
 	std::vector<task::Periodic*> priorityAssignments;
 
@@ -218,9 +222,12 @@ void Executor::run() {
 	if (!lock_memory())
 		log.error() << "could not lock memory in RAM";
 
+	bool useDefaultExecutor = true;
 #ifdef ECMASTERLIB_FOUND
 	if (etherCATStack) {
+		if (useRosTime) log.error() << "Can't use both etherCAT and RosTime to sync executor";
 		log.trace() << "starting execution synced to etcherCAT stack";
+		useDefaultExecutor = false;
 		while (running) {
 			std::unique_lock<std::mutex> lk(*m);
 			cv->wait(lk);
@@ -233,8 +240,29 @@ void Executor::run() {
 			counter.tock();
 		}
 	}
-	else {
 #endif
+#ifdef ROS_FOUND
+	if (useRosTime) {
+		log.trace() << "starting execution synced to rosTime";
+		useDefaultExecutor = false;
+		long periodNsec = static_cast<long>(period * 1.0e9);
+		long next_cycle = ros::Time::now().toNSec()+periodNsec;
+		
+// 		auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
+		while (running) { 
+			while (ros::Time::now().toNSec() < next_cycle && running) usleep(10);
+
+			counter.tick();
+			taskList.run();
+			if (mainTask != nullptr)
+				mainTask->run();
+			counter.tock();
+			next_cycle += periodNsec;
+		}
+		
+	}
+#endif
+	if (useDefaultExecutor) {
 		log.trace() << "starting periodic execution";
 		auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
 		while (running) {
@@ -247,9 +275,7 @@ void Executor::run() {
 			counter.tock();
 			next_cycle += seconds(period);
 		}
-#ifdef ECMASTERLIB_FOUND
 	}
-#endif
 
 	log.trace() << "stopping all threads";
 
