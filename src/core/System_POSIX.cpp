@@ -5,6 +5,12 @@
 #define NS_PER_SEC 1000000000
 #define CLOCK CLOCK_MONOTONIC_RAW
 
+
+#define USE_ROS_TIME	//TODO where should this be defined?
+#ifdef USE_ROS_TIME
+#include <ros/ros.h>
+#endif
+
 using namespace eeros;
 
 uint64_t timespec2nsec(struct timespec ts) {
@@ -28,12 +34,18 @@ double System::getTime() {
 }
 
 uint64_t System::getTimeNs() {
+#ifndef USE_ROS_TIME
 	uint64_t time;
 	struct timespec ts;
 	if(clock_gettime(CLOCK, &ts) != 0) {
 		throw Fault("Failed to get time!");
 	}
 	return timespec2nsec(ts);
+#else 
+	auto time = ros::Time::now();
+	return time.toNSec();
+// 	time.
+#endif
 }
 
 
