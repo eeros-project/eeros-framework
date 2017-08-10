@@ -28,8 +28,6 @@ namespace eeros {
 			BaseSequence(Sequencer& seq, BaseSequence* caller);
 			virtual ~BaseSequence();
 			
-		// 	virtual int operator()(std::string args) = 0;	//has to be implemented in derived class
-			
 // 			void pauseSequence();	not yet implemented
 // 			void resumeSequence();	not yet implemented
 			
@@ -46,7 +44,7 @@ namespace eeros {
 			bool isBlocking() const;
 			
 			BaseSequence* getCallerSequence();
-			std::vector< BaseSequence* > getCallerStack() const;
+			std::vector<BaseSequence*> getCallerStack() const;
 			
 // 			void setRunningState(runningStateEnum runningState);
 			SequenceState getRunningState() const;
@@ -68,15 +66,16 @@ namespace eeros {
 			
 		protected:
 			virtual int action();		// handles different checks like preconditions
+			virtual int operator() () = 0;	// has to be implemented in derived class	
 		
-			Sequencer& seq;			//reference to singleton Sequencer
-			bool isMainSequence = false;
-			Logger log;
 			std::string name;			
-			SequenceState runningState;	
-			bool blocking;			//standard run mode
-			BaseSequence* callerSequence;
+			Sequencer& seq;			// reference to sequencer
+			BaseSequence* caller;		// calling sequence
+			bool isMainSequence = false;
+			bool blocking;			// standard run mode
 			bool exceptionIsActive = false;
+			SequenceState state;	
+			Logger log;
 			
 		private:
 			void checkMonitorsOfBlockedCallers();

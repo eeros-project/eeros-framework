@@ -6,10 +6,10 @@ using namespace eeros;
 using namespace eeros::sequencer;
 
 BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller) : 
-	seq(seq), callerSequence(caller), conditionTimeout(), monitorTimeout(this, &conditionTimeout, SequenceProp::abortOwner),
-	runningState(SequenceState::idle), blocking(true), pollingTime(100), log('X')
+	seq(seq), caller(caller), conditionTimeout(), monitorTimeout(this, &conditionTimeout, SequenceProp::abortOwner),
+	state(SequenceState::idle), blocking(true), pollingTime(100), log('X')
 {
-	if (callerSequence == nullptr) {
+	if (caller == nullptr) {
 		static int numberOfMainSequence;
 		numberOfMainSequence++;
 		if (numberOfMainSequence > 1) 
@@ -20,8 +20,8 @@ BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller) :
 	
 	//get and update callerStack
 	if (!isMainSequence) {
-		callerStack = callerSequence->getCallerStack();
-		callerStack.push_back(callerSequence);	// add latest caller
+		callerStack = caller->getCallerStack();
+		callerStack.push_back(caller);	// add latest caller
 	}
 	
 	//callerStackBlocking gets created, when getCallerStackBlocking() is called
@@ -31,16 +31,16 @@ BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller) :
 BaseSequence::~BaseSequence() { }
 
 int BaseSequence::action() {
-	runningState = SequenceState::running;
+	state = SequenceState::running;
 	// check if this sequence or a blocked caller sequence got the order to abort, restart... , if so, set runningState accordingly
 	checkActiveException();
 	
-	if ((callerSequence != NULL) && (runningState == SequenceState::running) && (callerSequence->runningState == SequenceState::restarting)) 
-		runningState = SequenceState::aborting;
+	if ((caller != NULL) && (state == SequenceState::running) && (caller->state == SequenceState::restarting)) 
+		state = SequenceState::aborting;
 	
 	do {	//for restarting
-		if (runningState == SequenceState::restarting) {	// sequence got restarted
-			runningState = SequenceState::running;
+		if (state == SequenceState::restarting) {	// sequence got restarted
+			state = SequenceState::running;
 			sequenceIsRestarting = false;
 			resetTimeout();
 			restartCounter++;
@@ -54,10 +54,10 @@ int BaseSequence::action() {
 		bool firstCheck = true;
 		if (checkPreCondition()) {
 			action();	// call to custom implementation of method
-			while (runningState == SequenceState::running) {
+			while (state == SequenceState::running) {
 				if (!firstCheck) {
-					if (checkExitCondition()) runningState = SequenceState::terminated;	// check exit condition
-					if (runningState != SequenceState::terminated) {
+					if (checkExitCondition()) state = SequenceState::terminated;	// check exit condition
+					if (state != SequenceState::terminated) {
 // 						log.fatal();
 						checkMonitorsOfThisSequence();		//sets activeException if needed
 						checkMonitorsOfBlockedCallers();	//sets activeException if needed
@@ -65,17 +65,17 @@ int BaseSequence::action() {
 				} else firstCheck = false;
 				
 				checkActiveException();					//sets RunningState according to activeException
-				if (runningState == SequenceState::running) usleep(pollingTime*1000);
+				if (state == SequenceState::running) usleep(pollingTime*1000);
 			}
 		}
 		else {	// checkPreCondition() failed
-			runningState = SequenceState::terminated;
+			state = SequenceState::terminated;
 		}
 	
-	} while (runningState == SequenceState::restarting);
+	} while (state == SequenceState::restarting);
 	
-	if (runningState == SequenceState::aborting) runningState = SequenceState::aborted;
-	else runningState = SequenceState::terminated;
+	if (state == SequenceState::aborting) state = SequenceState::aborted;
+	else state = SequenceState::terminated;
 }
 
 void BaseSequence::addMonitor(Monitor* monitor) {monitors.push_back(monitor);}
@@ -151,10 +151,10 @@ void BaseSequence::checkActiveException() {
 	if (exceptionIsActive == true) {	// this sequence got the order to abort, restart ...
 		switch (activeException->getBehavior()) {
 			case SequenceProp::nothing : break;
-			case SequenceProp::abortOwner : runningState = SequenceState::aborting; break;
-			case SequenceProp::restartOwner : runningState = SequenceState::restarting; break;
-			case SequenceProp::abortCallerofOwner : runningState = SequenceState::aborting; break;
-			case SequenceProp::restartCallerOfOwner : runningState = SequenceState::restarting; break;
+			case SequenceProp::abortOwner : state = SequenceState::aborting; break;
+			case SequenceProp::restartOwner : state = SequenceState::restarting; break;
+			case SequenceProp::abortCallerofOwner : state = SequenceState::aborting; break;
+			case SequenceProp::restartCallerOfOwner : state = SequenceState::restarting; break;
 			default : break;
 		}
 		clearActiveException();
@@ -165,7 +165,7 @@ void BaseSequence::checkActiveException() {
 					case SequenceProp::abortOwner :
 					case SequenceProp::restartOwner :
 					case SequenceProp::abortCallerofOwner :
-					case SequenceProp::restartCallerOfOwner : runningState = SequenceState::aborting; break;
+					case SequenceProp::restartCallerOfOwner : state = SequenceState::aborting; break;
 					default : break;
 				}
 			}
@@ -183,7 +183,7 @@ void BaseSequence::setName(std::string name) {this->name = name;}
 
 std::string BaseSequence::getName() const {return name;}
 
-SequenceState BaseSequence::getRunningState() const {return runningState;}
+SequenceState BaseSequence::getRunningState() const {return state;}
 
 void BaseSequence::setId(int id) {this->id = id;}
 
@@ -192,17 +192,17 @@ int BaseSequence::getId() const {return id;}
 bool BaseSequence::isBlocking() const {return blocking;}
 
 BaseSequence* BaseSequence::getCallerSequence() {
-	if (callerSequence == nullptr) {
+	if (caller == nullptr) {
 		log.error() << "This sequence does not have a caller";
 		return nullptr;
 	}
-	else return callerSequence;
+	else return caller;
 }
 
 std::vector<BaseSequence*> BaseSequence::getCallerStack() const {return callerStack;}
 
 void BaseSequence::restartSequence() {
-	runningState = SequenceState::restarting;
+	state = SequenceState::restarting;
 	sequenceIsRestarting = true;
 }
 

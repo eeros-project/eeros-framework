@@ -99,7 +99,6 @@ public:
 	SeqDigital(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Sequence(name, sequencer, caller), stepDigOut("step dig out", seq, this, cs) {
 		setNonBlocking();
 	}
-	int operator() () {return Sequence::start();}
 	int action() {
 		bool toggle;
 		while (true) {
@@ -117,7 +116,6 @@ public:
 	SeqAnalog(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Sequence(name, sequencer, caller), stepAnalogOut("step analog out", seq, this, cs) {
 		setNonBlocking();
 	}
-	int operator() () {return Sequence::start();}
 	int action() {
 		bool toggle;
 		while (true) {

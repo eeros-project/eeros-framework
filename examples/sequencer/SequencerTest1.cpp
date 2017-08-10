@@ -50,7 +50,6 @@ public:
 class StepX : public Step {
 public:
 	StepX(std::string name, Sequencer& sequencer, BaseSequence* caller) : Step(name, sequencer, caller) { }
-	int operator() () {return Step::start();}
 	int action() {r.posX += 1;}
 	bool checkExitCondition() {return r.x >= r.posX;}
 };
@@ -58,7 +57,6 @@ public:
 class StepY : public Step {
 public:
 	StepY(std::string name, Sequencer& sequencer, BaseSequence* caller) : Step(name, sequencer, caller) { }
-	int operator() () {return Step::start();}
 	int action() {r.posY += 1;}
 	bool checkExitCondition() {return r.y >= r.posY;}
 };
@@ -66,7 +64,6 @@ public:
 class SequenceA : public Sequence {
 public:
 	SequenceA(std::string name, Sequencer& sequencer, BaseSequence* caller) : Sequence(name, sequencer, caller), stepX("step X", seq, this) { }
-	int operator() () {return Sequence::start();}
 	int action() {
 		for (int i = 0; i < 5; i++) stepX();
 	}
@@ -79,7 +76,6 @@ public:
 	SequenceB(std::string name, Sequencer& sequencer, BaseSequence* caller) : Sequence(name, sequencer, caller), stepY("step Y", seq, this) { 
 		setNonBlocking();
 	}
-	int operator() () {return Sequence::start();}
 	int action() {
 		for (int i = 0; i < 10; i++) stepY();
 	}

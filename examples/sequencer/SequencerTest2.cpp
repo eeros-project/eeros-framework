@@ -11,14 +11,12 @@ using namespace eeros::logger;
 class StepA : public Step {
 public:
 	StepA(std::string name, Sequencer& sequencer, BaseSequence* caller) : Step(name, sequencer, caller) { }
-	int operator() () {return Step::start();}
 	int action() { }
 };
 
 class StepB : public Step {
 public:
 	StepB(std::string name, Sequencer& sequencer, BaseSequence* caller) : Step(name, sequencer, caller) { }
-	int operator() () {return Step::start();}
 	int action() { }
 };
 
@@ -27,7 +25,6 @@ public:
 	SequenceB(std::string name, Sequencer& sequencer, BaseSequence* caller) : Sequence(name, sequencer, caller), stepB("step B", seq, this) { 
 		setNonBlocking();
 	}
-	int operator() () {return Sequence::start();}
 	int action() {
 		for (int i = 0; i < 5; i++) stepB();
 	}
