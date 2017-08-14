@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_ROSBLOCK_PUBLISHER_DOUBLE_HPP_
 #define ORG_EEROS_CONTROL_ROSBLOCK_PUBLISHER_DOUBLE_HPP_
 
-#include <eeros/control/RosBlockPublisher.hpp>
+#include <eeros/control/ROS/RosBlockPublisher.hpp>
 #include <std_msgs/Float64.h>
 
 using namespace eeros::control;
