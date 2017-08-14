@@ -15,6 +15,8 @@
 #include <eeros/task/HarmonicTaskList.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/safety/SafetySystem.hpp>
+#include <ros/callback_queue_interface.h>
+#include <ros/callback_queue.h>
 
 
 volatile bool running = true;
@@ -91,7 +93,7 @@ namespace {
 }
 
 Executor::Executor() :
-	log('E'), period(0), mainTask(nullptr), useRosTime(false) { }
+	log('E'), period(0), mainTask(nullptr), useRosTime(false), syncWithGazeboIsSet(false) { }
 
 Executor::~Executor() {
 
@@ -160,6 +162,12 @@ void Executor::useRosTimeForExecutor() {
 	useRosTime = true;
 }
 
+void Executor::syncWithGazebo(ros::CallbackQueue* syncRosCallbackQueue)
+{
+	syncWithGazeboIsSet = true;
+	this->syncRosCallbackQueue = syncRosCallbackQueue;
+}
+
 void Executor::assignPriorities() {
 	std::vector<task::Periodic*> priorityAssignments;
 
@@ -225,7 +233,7 @@ void Executor::run() {
 	bool useDefaultExecutor = true;
 #ifdef ECMASTERLIB_FOUND
 	if (etherCATStack) {
-		if (useRosTime) log.error() << "Can't use both etherCAT and RosTime to sync executor";
+		if (useRosTime || syncWithGazeboIsSet) log.error() << "Can't use both etherCAT and RosTime to sync executor";
 		log.trace() << "starting execution synced to etcherCAT stack";
 		useDefaultExecutor = false;
 		while (running) {
@@ -251,13 +259,29 @@ void Executor::run() {
 // 		auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
 		while (running) { 
 			while (ros::Time::now().toNSec() < next_cycle && running) usleep(10);
-
+			
 			counter.tick();
 			taskList.run();
 			if (mainTask != nullptr)
 				mainTask->run();
 			counter.tock();
 			next_cycle += periodNsec;
+		}
+		
+	}
+	else if (syncWithGazeboIsSet) {
+		log.trace() << "starting execution synced to gazebo";
+		useDefaultExecutor = false;
+		
+		while (running) {
+			while (syncRosCallbackQueue->isEmpty() && running) usleep(1);
+			syncRosCallbackQueue->callAvailable();			
+			
+			counter.tick();
+			taskList.run();
+			if (mainTask != nullptr)
+				mainTask->run();
+			counter.tock();
 		}
 		
 	}

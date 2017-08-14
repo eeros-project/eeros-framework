@@ -49,9 +49,18 @@ namespace eeros {
 		static bool set_priority(int nice);
 		static void stop();
 
-		void useRosTimeForExecutor();
 		
 		PeriodicCounter counter;
+		
+		
+#ifdef ROS_FOUND
+		void useRosTimeForExecutor();
+		void syncWithGazebo(ros::CallbackQueue* syncRosCallbackQueue);
+		bool useRosTime;
+		bool syncWithGazeboIsSet;
+		ros::CallbackQueue* syncRosCallbackQueue;
+#endif
+		
 
 	private:
 		void assignPriorities();
@@ -61,7 +70,6 @@ namespace eeros {
 		std::mutex* m;
 		std::condition_variable* cv;
 #endif
-		bool useRosTime;
 		logger::Logger log;
 		double period;
 		task::Periodic *mainTask;

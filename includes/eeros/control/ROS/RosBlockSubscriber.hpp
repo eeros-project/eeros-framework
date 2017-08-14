@@ -21,6 +21,8 @@ namespace eeros {
 			{
 				subscriber = rosNodeHandler.subscribe(topic, queueSize, &RosBlockSubscriber::rosCallbackFct, this);
 				ROS_DEBUG_STREAM("RosBlockSubscriber, reading from topic: '" << topic << "' created.");
+// 				rosNodeHandler.
+// 				subscriber.g
 			}
 
 /*
