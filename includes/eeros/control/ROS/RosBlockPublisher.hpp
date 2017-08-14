@@ -5,8 +5,6 @@
 #include <ros/callback_queue.h>
 #include <eeros/control/Block.hpp>
 #include <eeros/control/Input.hpp>
-// #include <eeros/core/System.hpp>
-// #include <eeros/math/Matrix.hpp>
 
 namespace eeros {
 	namespace control {
