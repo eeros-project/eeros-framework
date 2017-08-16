@@ -274,8 +274,21 @@ void Executor::run() {
 		log.trace() << "starting execution synced to gazebo";
 		useDefaultExecutor = false;
 		
+		auto timeOld = ros::Time::now();
+		auto timeNew = ros::Time::now();
+		static bool first = true;
 		while (running) {
 			while (syncRosCallbackQueue->isEmpty() && running) usleep(1);
+			
+			timeNew = ros::Time::now();
+			if (!first) {
+				while (timeOld == timeNew) {
+					usleep(1);	// waits for new rosTime beeing published
+					timeNew = ros::Time::now();	
+				}
+			}
+			timeOld = timeNew;
+			
 			syncRosCallbackQueue->callAvailable();
 			ros::getGlobalCallbackQueue()->callAvailable();
 			
