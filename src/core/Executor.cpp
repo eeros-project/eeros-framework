@@ -164,6 +164,7 @@ void Executor::useRosTimeForExecutor() {
 
 void Executor::syncWithGazebo(ros::CallbackQueue* syncRosCallbackQueue)
 {
+	std::cout << "sync executor with gazebo" << std::endl;
 	syncWithGazeboIsSet = true;
 	this->syncRosCallbackQueue = syncRosCallbackQueue;
 }
@@ -275,7 +276,8 @@ void Executor::run() {
 		
 		while (running) {
 			while (syncRosCallbackQueue->isEmpty() && running) usleep(1);
-			syncRosCallbackQueue->callAvailable();			
+			syncRosCallbackQueue->callAvailable();
+			ros::getGlobalCallbackQueue()->callAvailable();
 			
 			counter.tick();
 			taskList.run();
