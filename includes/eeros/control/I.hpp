@@ -2,6 +2,9 @@
 #define ORG_EEROS_CONTROL_I_HPP_
 
 #include <eeros/control/Block1i1o.hpp>
+#include <iostream>
+
+#include <eeros/core/System.hpp>
 
 namespace eeros {
 	namespace control {
@@ -31,6 +34,16 @@ namespace eeros {
 					else
 						output = valprev;
 
+					std::cout << "valPrev = " << valprev << std::endl;
+					std::cout << "valAct  = " << valin << std::endl;
+					std::cout << "tprev   = " << tin << std::endl;
+					std::cout << "tin     = " << tprev << std::endl;
+					std::cout << "dt      = " << dt << std::endl;
+					std::cout << "output  = " << output << std::endl;
+					std::cout << "Systime = " << eeros::System::getTimeNs() << std::endl;
+					
+					
+					
 					this->out.getSignal().setValue(output);
 					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
 					this->prev = this->out.getSignal();
