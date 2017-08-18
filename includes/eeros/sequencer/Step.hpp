@@ -12,10 +12,10 @@ namespace eeros {
 			virtual ~Step() { };
 			
 			virtual int operator() () {return start();}	// this operator can be overloaded in the derived sequence
-			virtual int action() = 0;		// this function has to be implemented in the derived sequence
+			virtual int action() = 0;			// this function has to be implemented in the derived sequence
 			int start() {
 				resetTimeout();
-				if (!exceptionIsActive) log.info() << "step '" << name << "' started";
+// 				if (!exceptionIsActive) log.info() << "step '" << name << "' started";
 				BaseSequence::action();
 				return 0;
 			}

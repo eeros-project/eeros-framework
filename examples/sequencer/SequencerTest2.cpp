@@ -10,32 +10,52 @@ using namespace eeros::logger;
 
 class StepA : public Step {
 public:
-	StepA(std::string name, Sequencer& sequencer, BaseSequence* caller) : Step(name, sequencer, caller) { }
-	int action() { }
+	StepA(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
+	int action() {log.info() << "do step A";}
 };
 
 class StepB : public Step {
 public:
-	StepB(std::string name, Sequencer& sequencer, BaseSequence* caller) : Step(name, sequencer, caller) { }
-	int action() { }
+	StepB(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
+	int action() {log.info() << "do step B"; sleep(1);}
+};
+
+class ExceptionSeq : public Sequence {
+public:
+	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller) { }
+	int action() {
+		log.info() << "do exception sequence";
+	}
 };
 
 class SequenceB : public Sequence {
 public:
-	SequenceB(std::string name, Sequencer& sequencer, BaseSequence* caller) : Sequence(name, sequencer, caller), stepB("step B", seq, this) { 
+	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller), stepB("step B", seq, this), eSeq("exception sequence", seq, this) { 
 		setNonBlocking();
+		setTimeoutTime(2.5);
+		setTimeoutExceptionSequence(*(seq.getSequenceByName("exception sequence")));
+// 		setTimeoutBehavior(SequenceProp::nothing);
+		setTimeoutBehavior(SequenceProp::abortOwner);
+// 		setTimeoutBehavior(SequenceProp::restartCallerOfOwner);
 	}
 	int action() {
 		for (int i = 0; i < 5; i++) stepB();
 	}
 private:
 	StepB stepB;
+	ExceptionSeq eSeq;
 };
 
 class MainSequence : public Sequence {
 public:
 	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("seq B", seq, this), stepA("step A", seq, this) { 
 		setNonBlocking();
+// 		setTimeoutTime(3.0);
+// 		setTimeoutBehavior(SequenceProp::abortOwner);
+// 		setTimeoutExceptionSequence(&stepA);
+// 		seqB.setTimeoutTime(3.0);
+// 		seqB.setTimeoutBehavior(SequenceProp::abortOwner);
+// 		seqB.setTimeoutExceptionSequence(&stepA);
 	}
 		
 	int action() {

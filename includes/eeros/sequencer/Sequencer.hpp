@@ -29,10 +29,10 @@ namespace eeros {
 			Sequence* getMainSequence();
 			Sequence* getSequenceById(int id);
 			Sequence* getSequenceByName(std::string name);
-			std::vector< Sequence* > getListOfAllSequences();
+			std::vector<Sequence*> getListOfAllSequences();
 		private:
 			Sequence* mainSequence;
-			std::vector<Sequence*> sequenceList;	//list of all sequences
+			std::vector<Sequence*> sequenceList;	// list of all sequences
 			eeros::logger::Logger log;	
 			unsigned int id;
 		};

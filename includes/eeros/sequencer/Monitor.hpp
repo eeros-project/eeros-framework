@@ -10,35 +10,31 @@ namespace eeros {
 		class Condition;
 		
 		enum class SequenceProp {
-			nothing,			//do nothing. (only exception sequence is called, if available)
-			abortOwner,			//abort the owner sequence or step of this monitor
-			restartOwner,			//restart the owner sequence or step of this monitor
-			abortCallerofOwner,		//abort the caller of the owner of this monitor
-			restartCallerOfOwner,		//restart the caller of the owner of this monitor
-// 			paused,				//pause, till condition==false
+			nothing,			// do nothing. (only exception sequence is called, if available)
+			abortOwner,			// abort the owner sequence or step of this monitor
+			restartOwner,			// restart the owner sequence or step of this monitor
+			abortCallerOfOwner,		// abort the caller of the owner of this monitor
+			restartCallerOfOwner,		// restart the caller of the owner of this monitor
+// 			paused,				// pause, till condition==false
 		};
 
 		class Monitor {
 		public:
-			Monitor(BaseSequence* owner, Condition* condition, SequenceProp behavior);
-			Monitor(BaseSequence* owner, Condition* condition, SequenceProp behavior, BaseSequence* exceptionSequence);
+			Monitor(BaseSequence* owner, Condition& condition, SequenceProp behavior = SequenceProp::nothing, BaseSequence* exceptionSequence = nullptr);
 			virtual ~Monitor();
-			void setExceptionSequence(BaseSequence* exceptionSequence);	
+			void setExceptionSequence(BaseSequence& exceptionSequence);	
 			void setBehavior(SequenceProp behavior);
 			SequenceProp getBehavior() const;
 			BaseSequence* getOwner() const;
-			
 			bool checkCondition();
 			void startExceptionSequence();
 			
 		protected:
 			BaseSequence* owner;
-			Condition* condition;
 			BaseSequence* exceptionSequence;
+			Condition& condition;
 			SequenceProp behavior;
 			std::string exceptionDescription;
-		private:
-			
 		};
 
 	};	//namespace sequencer
