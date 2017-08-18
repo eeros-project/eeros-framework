@@ -278,7 +278,6 @@ void Executor::run() {
 		auto timeNew = ros::Time::now();
 		static bool first = true;
 		while (running) {
-			
 			if (first) {
 				while (timeOld == timeNew  && running) {
 					usleep(10);	// waits for new rosTime beeing published
@@ -288,7 +287,8 @@ void Executor::run() {
 				timeOld = timeNew;
 			}
 			
-			while (syncRosCallbackQueue->isEmpty() && running) usleep(10);	//waits for new message
+			while (syncRosCallbackQueue->isEmpty() && running) usleep(10);	//waits for new message;
+			
 			while (timeOld == timeNew  && running) {
 				usleep(10);	// waits for new rosTime beeing published
 				timeNew = ros::Time::now();	
@@ -296,7 +296,7 @@ void Executor::run() {
 			timeOld = timeNew;
 			
 			syncRosCallbackQueue->callAvailable();
-			ros::getGlobalCallbackQueue()->callAvailable();
+// 			ros::getGlobalCallbackQueue()->callAvailable();
 			
 			counter.tick();
 			taskList.run();
