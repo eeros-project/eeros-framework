@@ -278,19 +278,20 @@ void Executor::run() {
 		auto timeNew = ros::Time::now();
 		static bool first = true;
 		while (running) {
-			while (syncRosCallbackQueue->isEmpty() && running) usleep(1);
 			
-			timeNew = ros::Time::now();
-			
-// 			std::cout << "time now is (executor) = " << timeNew.toNSec() << std::endl; 
-// 			std::cout << "SysT now is (executor) = " << eeros::System::getTimeNs() << std::endl; 
-			if (!first) {
-				while (timeOld == timeNew) {
+			if (first) {
+				while (timeOld == timeNew  && running) {
 					usleep(10);	// waits for new rosTime beeing published
 					timeNew = ros::Time::now();	
 				}
-			} else {
 				first = false;
+				timeOld = timeNew;
+			}
+			
+			while (syncRosCallbackQueue->isEmpty() && running) usleep(10);	//waits for new message
+			while (timeOld == timeNew  && running) {
+				usleep(10);	// waits for new rosTime beeing published
+				timeNew = ros::Time::now();	
 			}
 			timeOld = timeNew;
 			
