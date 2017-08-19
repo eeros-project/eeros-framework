@@ -54,10 +54,8 @@ namespace eeros {
 		
 		
 #ifdef ROS_FOUND
-		void useRosTimeForExecutor();
-		void syncWithGazebo(ros::CallbackQueue* syncRosCallbackQueue);
-		bool useRosTime;
-		bool syncWithGazeboIsSet;
+		void syncWithRosTime();
+		void syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue);
 		ros::CallbackQueue* syncRosCallbackQueue;
 #endif
 		
@@ -70,6 +68,9 @@ namespace eeros {
 		std::mutex* m;
 		std::condition_variable* cv;
 #endif
+		bool syncWithEtherCatStackIsSet;
+		bool syncWithRosTimeIsSet;
+		bool syncWithRosTopicIsSet;
 		logger::Logger log;
 		double period;
 		task::Periodic *mainTask;

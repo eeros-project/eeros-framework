@@ -93,7 +93,7 @@ namespace {
 }
 
 Executor::Executor() :
-	log('E'), period(0), mainTask(nullptr), useRosTime(false), syncWithGazeboIsSet(false) { }
+	log('E'), period(0), mainTask(nullptr), syncWithEtherCatStackIsSet(false), syncWithRosTimeIsSet(false), syncWithRosTopicIsSet(false) { }
 
 Executor::~Executor() {
 
@@ -107,6 +107,7 @@ Executor& Executor::instance() {
 
 #ifdef ECMASTERLIB_FOUND
 void Executor::syncWithEtherCATSTack(ethercat::EtherCATMain* etherCATStack) {
+	syncWithEtherCatStackIsSet = true;
 	this->etherCATStack = etherCATStack;
 	cv = etherCATStack->getConditionalVariable();
 	m = etherCATStack->getMutex();
@@ -158,14 +159,14 @@ void Executor::stop() {
 #endif
 }
 
-void Executor::useRosTimeForExecutor() {
-	useRosTime = true;
+void Executor::syncWithRosTime() {
+	syncWithRosTimeIsSet = true;
 }
 
-void Executor::syncWithGazebo(ros::CallbackQueue* syncRosCallbackQueue)
+void Executor::syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue)
 {
 	std::cout << "sync executor with gazebo" << std::endl;
-	syncWithGazeboIsSet = true;
+	syncWithRosTopicIsSet = true;
 	this->syncRosCallbackQueue = syncRosCallbackQueue;
 }
 
@@ -234,9 +235,11 @@ void Executor::run() {
 	bool useDefaultExecutor = true;
 #ifdef ECMASTERLIB_FOUND
 	if (etherCATStack) {
-		if (useRosTime || syncWithGazeboIsSet) log.error() << "Can't use both etherCAT and RosTime to sync executor";
 		log.trace() << "starting execution synced to etcherCAT stack";
+		if (syncWithRosTimeIsSet)	log.error() << "Can't use both etherCAT and RosTime to sync executor";
+		if (syncWithRosTopicIsSet)	log.error() << "Can't use both etherCAT and RosTopic to sync executor";
 		useDefaultExecutor = false;
+		
 		while (running) {
 			std::unique_lock<std::mutex> lk(*m);
 			cv->wait(lk);
@@ -251,9 +254,12 @@ void Executor::run() {
 	}
 #endif
 #ifdef ROS_FOUND
-	if (useRosTime) {
+	if (syncWithRosTimeIsSet) {
 		log.trace() << "starting execution synced to rosTime";
+		if (syncWithEtherCatStackIsSet)	log.error() << "Can't use both RosTime and etherCAT to sync executor";
+		if (syncWithRosTopicIsSet)		log.error() << "Can't use both RosTime and RosTopic to sync executor";
 		useDefaultExecutor = false;
+		
 		long periodNsec = static_cast<long>(period * 1.0e9);
 		long next_cycle = ros::Time::now().toNSec()+periodNsec;
 		
@@ -270,8 +276,10 @@ void Executor::run() {
 		}
 		
 	}
-	else if (syncWithGazeboIsSet) {
+	else if (syncWithRosTopicIsSet) {
 		log.trace() << "starting execution synced to gazebo";
+		if (syncWithRosTimeIsSet)		log.error() << "Can't use both RosTopic and RosTime to sync executor";
+		if (syncWithEtherCatStackIsSet)	log.error() << "Can't use both RosTopic and etherCAT to sync executor";
 		useDefaultExecutor = false;
 		
 		auto timeOld = ros::Time::now();
@@ -279,8 +287,8 @@ void Executor::run() {
 		static bool first = true;
 		while (running) {
 			if (first) {
-				while (timeOld == timeNew  && running) {
-					usleep(10);	// waits for new rosTime beeing published
+				while (timeOld == timeNew  && running) {	// waits for new rosTime beeing published
+					usleep(10);
 					timeNew = ros::Time::now();	
 				}
 				first = false;
@@ -289,8 +297,8 @@ void Executor::run() {
 			
 			while (syncRosCallbackQueue->isEmpty() && running) usleep(10);	//waits for new message;
 			
-			while (timeOld == timeNew  && running) {
-				usleep(10);	// waits for new rosTime beeing published
+			while (timeOld == timeNew  && running) {		// waits for new rosTime beeing published
+				usleep(10);
 				timeNew = ros::Time::now();	
 			}
 			timeOld = timeNew;
