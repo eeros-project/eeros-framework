@@ -3,7 +3,7 @@
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Step.hpp>
 
-#include <unistd.h>
+#include <chrono>
 
 using namespace eeros::sequencer;
 using namespace eeros::logger;
@@ -11,13 +11,19 @@ using namespace eeros::logger;
 class StepA : public Step {
 public:
 	StepA(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {sleep(1);}
+	int action() {time = std::chrono::steady_clock::now();}
+	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
+private:
+	std::chrono::time_point<std::chrono::steady_clock> time;
 };
 
 class ExceptionSeq : public Sequence {
 public:
 	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller) { }
-	int action() {sleep(1);}
+	int action() {time = std::chrono::steady_clock::now();}
+	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 3.0;}
+private:
+	std::chrono::time_point<std::chrono::steady_clock> time;
 };
 
 class MainSequence : public Sequence {
