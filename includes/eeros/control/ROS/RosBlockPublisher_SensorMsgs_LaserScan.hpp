@@ -26,7 +26,7 @@ namespace eeros {
 				
 			void setRosMsg(TRosMsg& msg) {
 				// B-3 If available, set time in msg header
-				msg.header.stamp = eeros::control::rosTools::convertToRosTime(eeros::System::getTime());
+				msg.header.stamp = eeros::control::rosTools::convertToRosTime(eeros::System::getTimeNs());
 				
 				// B-4 Check if EEROS input is connected. Cast the data. Assign casted data to ROS message field
 				if (angle_minInput.isConnected() )
