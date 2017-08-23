@@ -5,11 +5,17 @@
 
 namespace eeros {
 
+	static bool rosTimeIsUsed = false;
+		
 	class System {
 	public:
 		static double getClockResolution();
 		static double getTime();
 		static uint64_t getTimeNs();
+		
+#ifdef ROS_FOUND
+		static void useRosTime();	
+#endif
 		
 	private:
 		System();

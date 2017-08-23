@@ -41,6 +41,9 @@ int main(int argc, char **argv) {
 	ros::init(dummy_argc, dummy_args, "rosExample");
 	ros::NodeHandle rosNodeHandler;
 	log.trace() << "ROS node initialized.";
+	
+	eeros::System::useRosTime();	// "ros::Time::now()" is used to get system time
+	
 		
 	// Control System
 	// ////////////////////////////////////////////////////////////////////////

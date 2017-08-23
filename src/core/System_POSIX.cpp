@@ -6,8 +6,7 @@
 #define CLOCK CLOCK_MONOTONIC_RAW
 
 
-#define USE_ROS_TIME	//TODO where should this be defined?
-#ifdef USE_ROS_TIME
+#ifdef ROS_FOUND
 #include <ros/ros.h>
 #endif
 
@@ -33,19 +32,26 @@ double System::getTime() {
 	return static_cast<double>(System::getTimeNs()) / NS_PER_SEC;
 }
 
+#ifdef ROS_FOUND
+void System::useRosTime() {
+	rosTimeIsUsed = true;
+}
+#endif
+
 uint64_t System::getTimeNs() {
-#ifndef USE_ROS_TIME
+#ifdef ROS_FOUND
+	if (rosTimeIsUsed) {
+		auto time = ros::Time::now();
+		return time.toNSec();
+	}
+#endif
+
 	uint64_t time;
 	struct timespec ts;
 	if(clock_gettime(CLOCK, &ts) != 0) {
 		throw Fault("Failed to get time!");
 	}
 	return timespec2nsec(ts);
-#else 
-	auto time = ros::Time::now();
-	return time.toNSec();
-// 	time.
-#endif
 }
 
 
