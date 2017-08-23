@@ -1,4 +1,4 @@
-#include "HalTest3Ros.hpp"
+#include "RosExample.hpp"
 
 #include <iostream>
 #include <signal.h>
@@ -33,10 +33,18 @@ int main(int argc, char **argv) {
 	// ////////////////////////////////////////////////////////////////////////
 	HAL& hal = HAL::instance();
 	hal.readConfigFromFile(&argc, argv);
+
+	// ROS
+	// ////////////////////////////////////////////////////////////////////////
+	char* dummy_args[] = {NULL};
+	int dummy_argc = sizeof(dummy_args)/sizeof(dummy_args[0]) - 1;
+	ros::init(dummy_argc, dummy_args, "rosExample");
+	ros::NodeHandle rosNodeHandler;
+	log.trace() << "ROS node initialized.";
 		
 	// Control System
 	// ////////////////////////////////////////////////////////////////////////
-	MyControlSystem controlSystem(dt);
+	MyControlSystem controlSystem(dt, rosNodeHandler);
 	
 	// Safety System
 	// ////////////////////////////////////////////////////////////////////////

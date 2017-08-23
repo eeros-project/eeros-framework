@@ -168,9 +168,7 @@ endif()
 
 ## Find package ROS
 message( STATUS "ROS_ROOT: " $ENV{ROS_ROOT} )
-#find_package( catkin REQUIRED COMPONENTS nodelet)	# /home/mgehrig2/VT2/Software/eeros-framework/buildx86/test/googletest-src/googletest/cmake/internal_utils.cmake:149: error: add_library cannot create target "gtest" because an imported target with the same name already exists. buildx86/test/googletest-src/googletest/cmake/internal_utils.cmake:172 (cxx_library_with_type) buildx86/test/googletest-src/googletest/CMakeLists.txt:90 (cxx_library)
 message(STATUS "looking for package 'ROS'")
-# http://wiki.ros.org/catkin/CMakeLists.txt#Include_Paths_and_Library_Paths
 find_package( roslib QUIET )
 if (roslib_FOUND)
 	message( STATUS "-> ROS found")
