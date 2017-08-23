@@ -3,7 +3,7 @@
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Step.hpp>
 
-#include <unistd.h>
+#include <chrono>
 
 using namespace eeros::sequencer;
 using namespace eeros::logger;
@@ -41,7 +41,7 @@ public:
 		setNonBlocking();
 		setTimeoutTime(2.5);
 		setTimeoutExceptionSequence(*(seq.getSequenceByName("exception sequence")));
-		setTimeoutBehavior(SequenceProp::abortOwner);
+		setTimeoutBehavior(SequenceProp::abort);
 	}
 	int action() {
 		for (int i = 0; i < 5; i++) stepB();

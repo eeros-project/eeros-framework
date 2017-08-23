@@ -8,6 +8,17 @@
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
+int count = 0;
+
+class StepA : public Step {
+public:
+	StepA(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
+	int action() {time = std::chrono::steady_clock::now(); count++;}
+	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
+private:
+	std::chrono::time_point<std::chrono::steady_clock> time;
+};
+
 class StepB : public Step {
 public:
 	StepB(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
@@ -17,9 +28,15 @@ private:
 	std::chrono::time_point<std::chrono::steady_clock> time;
 };
 
+class MyCondition : public Condition {
+	bool validate() {return count > 2;}
+};
+
 class SequenceB : public Sequence {
 public:
-	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller), stepB("step B", seq, this) { }
+	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller), stepB("step B", seq, this) { 
+		setNonBlocking();
+	}
 	int action() {
 		for (int i = 0; i < 5; i++) stepB();
 	}
@@ -27,44 +44,23 @@ private:
 	StepB stepB;
 };
 
-class StepA : public Step {
-public:
-	StepA(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
-private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
-};
-
-class SequenceA : public Sequence {
-public:
-	SequenceA(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller), stepA("step A", seq, this), seqB("sequence B", seq, this) { 
-		setTimeoutTime(3.5);
-		setTimeoutBehavior(SequenceProp::abort);
-	}
-	int action() {
-		stepA();
-		stepA();
-		seqB();
-		stepA();
-		stepA();
-	}
-private:
-	StepA stepA;
-	SequenceB seqB;
-};
-
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqA("sequence A", seq, this) { 
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("sequence B", seq, this), stepA("step A", seq, this), m(this, cond, SequenceProp::abort) { 
 		setNonBlocking();
+		addMonitor(&m);
 	}
 		
 	int action() {
-		seqA();
+		seqB();
+		for (int i = 0; i < 5; i++) stepA();
+		seqB.join();
 	}
 private:
-	SequenceA seqA;
+	SequenceB seqB;
+	StepA stepA;
+	MyCondition cond;
+	Monitor m;
 };
 
 int main(int argc, char **argv) {

@@ -54,9 +54,9 @@ namespace eeros {
 			
 			// Monitors
 			// ////////////////////////////////////////////////////////////////////////
-			std::vector< Monitor* > monitors;
-			void addMonitor( Monitor* monitor);
-			std::vector< Monitor* > getMonitors() const;
+			std::vector<Monitor*> monitors;
+			void addMonitor(Monitor* monitor);
+			std::vector<Monitor*> getMonitors() const;
 			
 			// Timeout
 			// ////////////////////////////////////////////////////////////////////////

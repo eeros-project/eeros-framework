@@ -6,7 +6,7 @@ using namespace eeros;
 using namespace eeros::sequencer;
 
 BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller) : 
-	seq(seq), caller(caller), conditionTimeout(), monitorTimeout(this, conditionTimeout, SequenceProp::abortOwner),
+	seq(seq), caller(caller), conditionTimeout(), monitorTimeout(this, conditionTimeout, SequenceProp::abort),
 	state(SequenceState::idle), blocking(true), pollingTime(100), log('X')
 {
 	if (caller == nullptr) {
@@ -71,7 +71,7 @@ int BaseSequence::action() {
 
 void BaseSequence::addMonitor(Monitor* monitor) {monitors.push_back(monitor);}
 
-std::vector< Monitor* > BaseSequence::getMonitors() const {return monitors;}
+std::vector<Monitor*> BaseSequence::getMonitors() const {return monitors;}
 
 void BaseSequence::checkMonitorsOfThisSequence() {
 	for (Monitor* monitor : getMonitors()) checkMonitor(monitor);
@@ -107,16 +107,16 @@ void BaseSequence::checkMonitor(Monitor* monitor) {
 		if (!monitor->getOwner()->exceptionIsActive) {
 			log.info() << "monitor fired";
 			switch (monitor->getBehavior()) {
-				case SequenceProp::nothing : break;
-				case SequenceProp::abortOwner : 
-				case SequenceProp::restartOwner : monitor->getOwner()->setActiveException(monitor); break;
-				case SequenceProp::abortCallerOfOwner :	
-				case SequenceProp::restartCallerOfOwner : {
-					BaseSequence* seq = monitor->getOwner()->getCallerSequence();
-					if (seq != nullptr) seq->setActiveException(monitor); 
-					else monitor->getOwner()->setActiveException(monitor);	// stop sequence if requested caller not present
-					break;
-				}
+				case SequenceProp::resume : break;
+				case SequenceProp::abort : 
+				case SequenceProp::restart : monitor->getOwner()->setActiveException(monitor); break;
+// 				case SequenceProp::abortCallerOfOwner :	
+// 				case SequenceProp::restartCallerOfOwner : {
+// 					BaseSequence* seq = monitor->getOwner()->getCallerSequence();
+// 					if (seq != nullptr) seq->setActiveException(monitor); 
+// 					else monitor->getOwner()->setActiveException(monitor);	// stop sequence if requested caller not present
+// 					break;
+// 				}
 				default : break;
 			}
 			monitor->startExceptionSequence();	// start only if not yet in exception processing, blocking
@@ -127,24 +127,24 @@ void BaseSequence::checkMonitor(Monitor* monitor) {
 
 void BaseSequence::setActiveException(Monitor* activeMonitor) {
 	switch (activeMonitor->getBehavior()) {
-		case SequenceProp::nothing :
-		case SequenceProp::abortOwner :
-		case SequenceProp::restartOwner :
+		case SequenceProp::resume :
+		case SequenceProp::abort :
+		case SequenceProp::restart :
 			activeMonitor->getOwner()->exceptionIsActive = true;
 			activeMonitor->getOwner()->activeException = activeMonitor;
 			break;
-		case SequenceProp::abortCallerOfOwner :
-		case SequenceProp::restartCallerOfOwner : {
-			BaseSequence* seq = activeMonitor->getOwner()->getCallerSequence();
-			if (seq != nullptr) {
-				activeMonitor->getOwner()->getCallerSequence()->exceptionIsActive = true;
-				activeMonitor->getOwner()->getCallerSequence()->activeException = activeMonitor;
-			} else {
-				activeMonitor->getOwner()->exceptionIsActive = true;
-				activeMonitor->getOwner()->activeException = activeMonitor;
-			}
-			break;
-		}
+// 		case SequenceProp::abortCallerOfOwner :
+// 		case SequenceProp::restartCallerOfOwner : {
+// 			BaseSequence* seq = activeMonitor->getOwner()->getCallerSequence();
+// 			if (seq != nullptr) {
+// 				activeMonitor->getOwner()->getCallerSequence()->exceptionIsActive = true;
+// 				activeMonitor->getOwner()->getCallerSequence()->activeException = activeMonitor;
+// 			} else {
+// 				activeMonitor->getOwner()->exceptionIsActive = true;
+// 				activeMonitor->getOwner()->activeException = activeMonitor;
+// 			}
+// 			break;
+// 		}
 		default : break;
 	}
 }
@@ -158,11 +158,9 @@ void BaseSequence::checkActiveException() {
 	if (exceptionIsActive == true) {	// this sequence got the order to abort, restart ...
 // 		log.warn() << "this";
 		switch (activeException->getBehavior()) {
-			case SequenceProp::nothing : break;
-			case SequenceProp::abortOwner : state = SequenceState::aborting; break;
-			case SequenceProp::restartOwner : state = SequenceState::restarting; break;
-			case SequenceProp::abortCallerOfOwner : state = SequenceState::aborting; break;
-			case SequenceProp::restartCallerOfOwner : state = SequenceState::restarting; break;
+			case SequenceProp::resume : break;
+			case SequenceProp::abort : state = SequenceState::aborting; break;
+			case SequenceProp::restart : state = SequenceState::restarting; break;
 			default : break;
 		}
 		clearActiveException();
@@ -172,11 +170,9 @@ void BaseSequence::checkActiveException() {
 // 				log.warn() << s->exceptionIsActive;
 // 				state = SequenceState::aborting;
 				switch (s->activeException->getBehavior()) {
-					case SequenceProp::nothing : break;
-					case SequenceProp::abortOwner : 
-					case SequenceProp::restartOwner :
-					case SequenceProp::abortCallerOfOwner :
-					case SequenceProp::restartCallerOfOwner : state = SequenceState::aborting; break;
+					case SequenceProp::resume : break;
+					case SequenceProp::abort : 
+					case SequenceProp::restart : state = SequenceState::aborting; break;
 					default : break;
 				}
 			}
