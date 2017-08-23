@@ -3,6 +3,8 @@
 
 #include <ros/ros.h>
 #include <ros/callback_queue.h>
+#include <eeros/core/System.hpp>
+#include <eeros/control/ROS/EerosRosTools.hpp>
 #include <eeros/control/Block.hpp>
 #include <eeros/control/Input.hpp>
 

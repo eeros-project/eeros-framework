@@ -15,6 +15,8 @@
 #include <eeros/task/HarmonicTaskList.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/safety/SafetySystem.hpp>
+#include <ros/callback_queue_interface.h>
+#include <ros/callback_queue.h>
 
 
 volatile bool running = true;
@@ -91,7 +93,7 @@ namespace {
 }
 
 Executor::Executor() :
-	log('E'), period(0), mainTask(nullptr) { }
+	log('E'), period(0), mainTask(nullptr), syncWithEtherCatStackIsSet(false), syncWithRosTimeIsSet(false), syncWithRosTopicIsSet(false) { }
 
 Executor::~Executor() {
 
@@ -105,6 +107,7 @@ Executor& Executor::instance() {
 
 #ifdef ECMASTERLIB_FOUND
 void Executor::syncWithEtherCATSTack(ethercat::EtherCATMain* etherCATStack) {
+	syncWithEtherCatStackIsSet = true;
 	this->etherCATStack = etherCATStack;
 	cv = etherCATStack->getConditionalVariable();
 	m = etherCATStack->getMutex();
@@ -154,6 +157,17 @@ void Executor::stop() {
 #ifdef ECMASTERLIB_FOUND
 	if(instance.etherCATStack) instance.cv->notify_one();
 #endif
+}
+
+void Executor::syncWithRosTime() {
+	syncWithRosTimeIsSet = true;
+}
+
+void Executor::syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue)
+{
+	std::cout << "sync executor with gazebo" << std::endl;
+	syncWithRosTopicIsSet = true;
+	this->syncRosCallbackQueue = syncRosCallbackQueue;
 }
 
 void Executor::assignPriorities() {
@@ -218,9 +232,14 @@ void Executor::run() {
 	if (!lock_memory())
 		log.error() << "could not lock memory in RAM";
 
+	bool useDefaultExecutor = true;
 #ifdef ECMASTERLIB_FOUND
 	if (etherCATStack) {
 		log.trace() << "starting execution synced to etcherCAT stack";
+		if (syncWithRosTimeIsSet)	log.error() << "Can't use both etherCAT and RosTime to sync executor";
+		if (syncWithRosTopicIsSet)	log.error() << "Can't use both etherCAT and RosTopic to sync executor";
+		useDefaultExecutor = false;
+		
 		while (running) {
 			std::unique_lock<std::mutex> lk(*m);
 			cv->wait(lk);
@@ -233,8 +252,70 @@ void Executor::run() {
 			counter.tock();
 		}
 	}
-	else {
 #endif
+#ifdef ROS_FOUND
+	if (syncWithRosTimeIsSet) {
+		log.trace() << "starting execution synced to rosTime";
+		if (syncWithEtherCatStackIsSet)	log.error() << "Can't use both RosTime and etherCAT to sync executor";
+		if (syncWithRosTopicIsSet)		log.error() << "Can't use both RosTime and RosTopic to sync executor";
+		useDefaultExecutor = false;
+		
+		long periodNsec = static_cast<long>(period * 1.0e9);
+		long next_cycle = ros::Time::now().toNSec()+periodNsec;
+		
+// 		auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
+		while (running) { 
+			while (ros::Time::now().toNSec() < next_cycle && running) usleep(10);
+			
+			counter.tick();
+			taskList.run();
+			if (mainTask != nullptr)
+				mainTask->run();
+			counter.tock();
+			next_cycle += periodNsec;
+		}
+		
+	}
+	else if (syncWithRosTopicIsSet) {
+		log.trace() << "starting execution synced to gazebo";
+		if (syncWithRosTimeIsSet)		log.error() << "Can't use both RosTopic and RosTime to sync executor";
+		if (syncWithEtherCatStackIsSet)	log.error() << "Can't use both RosTopic and etherCAT to sync executor";
+		useDefaultExecutor = false;
+		
+		auto timeOld = ros::Time::now();
+		auto timeNew = ros::Time::now();
+		static bool first = true;
+		while (running) {
+			if (first) {
+				while (timeOld == timeNew  && running) {	// waits for new rosTime beeing published
+					usleep(10);
+					timeNew = ros::Time::now();	
+				}
+				first = false;
+				timeOld = timeNew;
+			}
+			
+			while (syncRosCallbackQueue->isEmpty() && running) usleep(10);	//waits for new message;
+			
+			while (timeOld == timeNew  && running) {		// waits for new rosTime beeing published
+				usleep(10);
+				timeNew = ros::Time::now();	
+			}
+			timeOld = timeNew;
+			
+			syncRosCallbackQueue->callAvailable();
+// 			ros::getGlobalCallbackQueue()->callAvailable();
+			
+			counter.tick();
+			taskList.run();
+			if (mainTask != nullptr)
+				mainTask->run();
+			counter.tock();
+		}
+		
+	}
+#endif
+	if (useDefaultExecutor) {
 		log.trace() << "starting periodic execution";
 		auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
 		while (running) {
@@ -247,9 +328,7 @@ void Executor::run() {
 			counter.tock();
 			next_cycle += seconds(period);
 		}
-#ifdef ECMASTERLIB_FOUND
 	}
-#endif
 
 	log.trace() << "stopping all threads";
 

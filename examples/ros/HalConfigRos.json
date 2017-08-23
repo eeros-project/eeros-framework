@@ -1,0 +1,69 @@
+{
+	"device1": {
+		"library": "libroseeros.so",
+		"devHandle": "rosNodeHAL",
+		"subdevice0": {
+			"type": "AnalogIn",
+			"channel0": {
+				"signalId": "simpleRosIn0",
+				"scale": [ { "id" : "dac",
+								"scale":	1,
+								"offset":	0.0	}
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn":	-9e99,  "maxIn": 	9e99,
+							"minOut":	-9e99,	"maxOut": 	9e99 }
+					 ],
+				"unit": "V",
+				"additionalArguments": "topic=/rosNodeTalker/TestTopic1; msgType=std_msgs::Float64"
+			},
+			"channel1": {
+				"signalId": "scanTimeIn0",
+				"scale": [ { "id" : "dac",
+								"scale":	1,
+								"offset":	0.0	}
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn":	-9e99,  "maxIn": 	9e99,
+							"minOut":	-9e99,	"maxOut": 	9e99 }
+					 ],
+				"unit": "V",
+				"additionalArguments": "topic=/rosNodeTalker/TestTopic3; msgType=sensor_msgs::LaserScan; dataField=scan_time; callOne=false; queueSize=100"
+			},
+		},
+		"subdevice1": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "scanTimeEchoOut0",
+				"scale": [ { "id" : "dac",
+								"scale":	1,
+								"offset":	0.0	}
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn":	-9e99,  	"maxIn": 	9e99,
+							"minOut":	-9e99,	"maxOut": 	9e99 }
+					 ],
+				"unit": "V",
+				"additionalArguments": "topic=/rosNodeHAL/TestTopic13; msgType=std_msgs::Float64"
+			}
+		},
+		"subdevice2": {
+			"type": "DigIn",
+			"channel0": {
+				"signalId": "batteryPresent0",
+				"inverted": false,
+				"additionalArguments": "topic=/rosNodeTalker/TestTopic4; msgType=sensor_msgs::BatteryState; dataField=present"
+			}
+		},
+		"subdevice3": {
+			"type": "DigOut",
+			"channel0": {
+				"signalId": "batteryPresentEchoOut0",
+				"inverted": false,
+				"additionalArguments": "topic=/rosNodeHAL/TestTopic14; msgType=sensor_msgs::BatteryState; dataField=present"
+			}
+		}
+		
+	}
+}
+

@@ -1,6 +1,7 @@
 #ifndef ORG_EEROS_HAL_INPUT_HPP_
 #define ORG_EEROS_HAL_INPUT_HPP_
 #include <string>
+#include <eeros/core/System.hpp>
 
 namespace eeros {
 	namespace hal {
@@ -19,6 +20,7 @@ namespace eeros {
 			virtual ~Input() { }
 			virtual inline std::string getId() const { return id; }
 			virtual T get() = 0;
+			virtual uint64_t getTimestamp()	{ return System::getTimeNs(); }
 			virtual void *getLibHandle() { return libHandle; }
 		private:
 			std::string id;
