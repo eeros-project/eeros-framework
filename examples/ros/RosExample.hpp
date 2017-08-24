@@ -87,11 +87,13 @@ public:
 	// Console output
 	Print<double> printDouble0;
 	Print<bool> printBool0;
+	
 	// HAL inputs/outputs
 	PeripheralInput<double>		analogIn0;
 	PeripheralInput<bool>		digitalIn0;
 	PeripheralOutput<double>	analogOut0;
 	PeripheralOutput<bool>		digitalOut0;
+	
 	// ROS blocks
 	typedef eeros::math::Matrix< 5, 1, double >		TRangesOutput;
 	typedef eeros::math::Matrix< 5, 1, double >		TIntensitiesOutput;

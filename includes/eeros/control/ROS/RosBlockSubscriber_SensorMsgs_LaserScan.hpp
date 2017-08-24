@@ -24,10 +24,10 @@ namespace eeros {
 			RosBlockSubscriber< TRosMsg >( rosNodeHandler, topic, queueSize, callNewest )
 			{}
 			
-		void rosCallbackFct(const TRosMsg& msg) {		
-			// TODO timing from header
+		void rosCallbackFct(const TRosMsg& msg) {
 			// B-3 Set the timestamp of all EEROS signals
-			auto time = eeros::System::getTimeNs();
+// 			auto time = eeros::System::getTimeNs();	// use system time for timestamp
+			auto time = msg.header.stamp.toNSec();	// use received timestamp
 			angle_minOutput.getSignal().setTimestamp( time );
 			angle_maxOutput.getSignal().setTimestamp( time );
 			angle_incrementOutput.getSignal().setTimestamp( time );

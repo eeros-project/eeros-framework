@@ -16,6 +16,10 @@ void signalHandler(int signum) {
 	Executor::stop();
 }
 
+// This callback function is only needed, if you want to sync the executor with a gazebo simulation
+// void callback(const sensor_msgs::JointState::Type){
+// 	std::cout << "callback" << std::endl;
+// };
 
 int main(int argc, char **argv) {	
 	double dt = 0.2;
@@ -44,6 +48,12 @@ int main(int argc, char **argv) {
 	
 	eeros::System::useRosTime();	// "ros::Time::now()" is used to get system time
 	
+
+	// This part only needed, if you want to sync the executor with a gazebo simulation
+// 	ros::NodeHandle syncNodeHandler;
+// 	ros::CallbackQueue syncCallbackQueue;
+// 	syncNodeHandler.setCallbackQueue(&syncCallbackQueue);
+// 	auto subscriberSync = syncNodeHandler.subscribe("motor_sim/joint_states", 1, &callback);
 		
 	// Control System
 	// ////////////////////////////////////////////////////////////////////////
@@ -59,6 +69,7 @@ int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);	
 	auto &executor = Executor::instance();
 	executor.setMainTask(safetySystem);
+// 	executor.syncWithRosTopic(&syncCallbackQueue);	// sync with gazebo simulation
 	executor.run();
 	
 	return 0;
