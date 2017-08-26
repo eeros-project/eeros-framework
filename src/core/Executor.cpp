@@ -15,8 +15,10 @@
 #include <eeros/task/HarmonicTaskList.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/safety/SafetySystem.hpp>
+#ifdef ROS_FOUND
 #include <ros/callback_queue_interface.h>
 #include <ros/callback_queue.h>
+#endif
 
 
 volatile bool running = true;
@@ -159,6 +161,7 @@ void Executor::stop() {
 #endif
 }
 
+#ifdef ROS_FOUND
 void Executor::syncWithRosTime() {
 	syncWithRosTimeIsSet = true;
 }
@@ -169,6 +172,7 @@ void Executor::syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue)
 	syncWithRosTopicIsSet = true;
 	this->syncRosCallbackQueue = syncRosCallbackQueue;
 }
+#endif
 
 void Executor::assignPriorities() {
 	std::vector<task::Periodic*> priorityAssignments;
