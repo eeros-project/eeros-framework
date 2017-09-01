@@ -22,12 +22,12 @@ public:
 	TestAppCS(double dt) : 
 		dt(dt),
 		log('C'),
-		socketA("", 9876, 0.01),
-		c1({1.5, 2.2, 3.3, 4.6}),
+		socketA("127.0.0.1", 9876, 0.01),
+		c1({0.2, 0.3, 0.4, 0.5, 0.6, -0.7}),
 		c2(56.5),
 		c3(-28),
 		timedomain("Main time domain", dt, true) {
-	
+		
 		socketA.getOut().getSignal().setName("socketRead");
 		socketA.getIn().connect(c1.getOut());
 // 		socketA.getIn().connect(c2.getOut());
@@ -42,16 +42,16 @@ public:
 	}
 		
 	// Define blocks
-	Constant<Vector4> c1;
+	Constant<Matrix<6,1,double>> c1;
 	Constant<double> c2;
 	Constant<int> c3;
-	SocketData<Vector4, Matrix<6,1,double>> socketA;	// send Vector4, receive Matrix<6,1,double>, connect to c1
-// 	SocketData<Vector4, double> socketA;			// send Vector4, receive double, connect to c1
-// 	SocketData<Vector4, int> socketA;			// send Vector4, receive int, connect to c1
-// 	SocketData<Vector4, std::nullptr_t> socketA;		// send Vector4, receive nothing, connect to c1
-// 	SocketData<double, Matrix<6,1,double>> socketA;		// send double, receive Matrix<6,1,double>, connect to c2
-// 	SocketData<int, Matrix<6,1,double>> socketA;		// send int, receive Matrix<6,1,double>, connect to c3
-// 	SocketData<std::nullptr_t, Matrix<6,1,double>> socketA;	// send nothing, receive Matrix<6,1,double>, no connection
+	SocketData<Matrix<6,1,double>, Vector4, false> socketA;		// send Matrix<6,1,double>, receive Vector4, client, connect to c1
+// 	SocketData<double, Vector4, false> socketA;			// send double, receive Vector4, client, connect to c2
+// 	SocketData<int, Vector4, false> socketA;			// send int, receive Vector4, client, connect to c3
+// 	SocketData<std::nullptr_t, Vector4, false> socketA;		// send nothing, receive Vector4, client, no connection
+// 	SocketData<Matrix<6,1,double>, double, false> socketA;		// send Matrix<6,1,double>, receive double, client, connect to c1
+// 	SocketData<Matrix<6,1,double>, int, false> socketA;		// send Matrix<6,1,double>, receive int, client, connect to c1
+// 	SocketData<Matrix<6,1,double>, std::nullptr_t, false> socketA;	// send Matrix<6,1,double>, receive nothing, client, connect to c1
 	Logger log;
 		
 protected:
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 	Logger::setDefaultWriter(&w);
 	Logger log;
  
-	log.info() << "EEROS started, socket server";
+	log.info() << "EEROS started, socket client";
 	
 	// Control System
 	TestAppCS controlSystem (dt);

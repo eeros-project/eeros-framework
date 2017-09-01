@@ -9,7 +9,7 @@ using namespace eeros::math;
 
 // Test initial values for NaN
 TEST(controlSocketDataTest, name) {
-	SocketData<Vector2,Vector2> s(9876);
+	SocketData<Vector2,Vector2> s("", 9876);
 	EXPECT_EQ(s.getName(), std::string(""));
 	s.setName("socket data block");
 	EXPECT_EQ(s.getName(), std::string("socket data block"));
