@@ -11,17 +11,18 @@
 namespace eeros {
 	namespace control {
 	
-		template < typename SigInType, typename SigOutType, bool isServer = true, typename Enable = void >
+		template < typename SigInType, typename SigOutType, typename Enable = void >
 		class SocketData: public Block1i1o<SigInType, SigOutType> { };
 		
-		template < typename SigInType, typename SigOutType, bool isServer>
-		class SocketData<SigInType, SigOutType, isServer,
+		template < typename SigInType, typename SigOutType>
+		class SocketData<SigInType, SigOutType, 
 			typename std::enable_if<std::is_compound<SigInType>::value && std::is_compound<SigOutType>::value>::type> 
 			: public Block1i1o<SigInType, SigOutType> {			
 		public:
 			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
 				bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
 				bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
+				isServer = serverIP.empty();
 				if (isServer)
 					server = new eeros::sockets::SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period);
 				else 
@@ -62,16 +63,18 @@ namespace eeros {
 			eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>* client;
 			std::array<SigInValueType, sizeof(SigInType) / sizeof(SigInValueType)> sendData;
 			uint32_t bufInLen, bufOutLen;
+			bool isServer;
 		};
 
-		template < typename SigInType, typename SigOutType, bool isServer >
-		class SocketData<SigInType, SigOutType, isServer,
+		template < typename SigInType, typename SigOutType >
+		class SocketData<SigInType, SigOutType,
 			typename std::enable_if<std::is_arithmetic<SigInType>::value && std::is_compound<SigOutType>::value>::type> 
 			: public Block1i1o<SigInType, SigOutType> {			
 		public:
 			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
 				bufInLen = 1;
 				bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
+				isServer = serverIP.empty();
 				if (isServer)
 					server =  new eeros::sockets::SocketServer<1, SigInType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period);
 				else
@@ -112,16 +115,18 @@ namespace eeros {
 			eeros::sockets::SocketClient<1, SigInType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>* client;
 			std::array<SigInType, 1> sendData;;
 			uint32_t bufInLen, bufOutLen;
+			bool isServer;
 		};
 
-		template < typename SigInType, typename SigOutType, bool isServer >
-		class SocketData<SigInType, SigOutType, isServer,
+		template < typename SigInType, typename SigOutType >
+		class SocketData<SigInType, SigOutType,
 			typename std::enable_if<std::is_compound<SigInType>::value && std::is_arithmetic<SigOutType>::value>::type> 
 			: public Block1i1o<SigInType, SigOutType> {			
 		public:
 			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
 				bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
 				bufOutLen = 1;
+				isServer = serverIP.empty();
 				if (isServer)
 					server =  new eeros::sockets::SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 1, SigOutType>(port, period);
 				else
@@ -162,15 +167,17 @@ namespace eeros {
 			eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 1, SigOutType>* client;
 			std::array<SigInValueType, sizeof(SigInType) / sizeof(SigInValueType)> sendData;
 			uint32_t bufInLen, bufOutLen;
+			bool isServer;
 		};
 
-		template < typename SigInType, typename SigOutType, bool isServer >
-		class SocketData<SigInType, SigOutType, isServer,
+		template < typename SigInType, typename SigOutType >
+		class SocketData<SigInType, SigOutType,
 			typename std::enable_if<std::is_compound<SigInType>::value && std::is_same<SigOutType, std::nullptr_t>::value>::type> 
 			: public Block1i1o<SigInType> {			
 		public:
 			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
 				bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
+				isServer = serverIP.empty();
 				if (isServer)
 					server =  new eeros::sockets::SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 0, std::nullptr_t>(port, period);
 				else 
@@ -197,15 +204,17 @@ namespace eeros {
 			eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 0, std::nullptr_t>* client;
 			std::array<SigInValueType, sizeof(SigInType) / sizeof(SigInValueType)> sendData;
 			uint32_t bufInLen;
+			bool isServer;
 		};
 	
-		template < typename SigInType, typename SigOutType, bool isServer >
-		class SocketData<SigInType, SigOutType, isServer,
+		template < typename SigInType, typename SigOutType >
+		class SocketData<SigInType, SigOutType,
 			typename std::enable_if<std::is_same<SigInType, std::nullptr_t>::value && std::is_compound<SigOutType>::value>::type> 
 			: public Block1i1o<SigOutType> {			
 		public:
 			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
 				bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
+				isServer = serverIP.empty();
 				if (isServer) 
 					server =  new eeros::sockets::SocketServer<0, std::nullptr_t, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period);
 				else
@@ -238,6 +247,7 @@ namespace eeros {
 			eeros::sockets::SocketServer<0, std::nullptr_t, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>* server;
 			eeros::sockets::SocketClient<0, std::nullptr_t, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>* client;
 			uint32_t bufOutLen;
+			bool isServer;
 		};
 
 		/********** Print functions **********/

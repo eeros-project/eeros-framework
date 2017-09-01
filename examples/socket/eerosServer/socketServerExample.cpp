@@ -22,7 +22,7 @@ public:
 	TestAppCS(double dt) : 
 		dt(dt),
 		log('C'),
-		socketA("", 9876, 0.01),
+		socketA("", 9876, 0.01),	// server
 		c1({1.5, 2.2, 3.3, 4.6}),
 		c2(56.5),
 		c3(-28),
