@@ -22,6 +22,7 @@ namespace eeros {
 			virtual inline std::string getId() const { return id; }
 			virtual T get() = 0;
 			virtual void set(T value) = 0;
+			virtual void setTimestampSignalIn(uint64_t timestampNs) { return; }
 			virtual void *getLibHandle() { return libHandle; }
 		private:
 			std::string id;

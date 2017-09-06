@@ -27,7 +27,11 @@ namespace eeros {
 					T valin = this->in.getSignal().getValue();
 					T valprev = this->prev.getValue();
 					
-					this->out.getSignal().setValue((valin - valprev) / (tin - tprev));
+					T valOut;
+					if ((tin - tprev) == 0)		valOut = valprev;
+					else 						valOut = (valin - valprev) / (tin - tprev);
+					
+					this->out.getSignal().setValue(valOut);
 					this->out.getSignal().setTimestamp((this->in.getSignal().getTimestamp() + this->prev.getTimestamp()) / 2);
 					
 					prev = this->in.getSignal();

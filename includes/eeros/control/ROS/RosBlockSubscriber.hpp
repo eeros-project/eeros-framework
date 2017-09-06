@@ -23,11 +23,6 @@ namespace eeros {
 				ROS_DEBUG_STREAM("RosBlockSubscriber, reading from topic: '" << topic << "' created.");
 			}
 
-/*
-			void rosCallbackFctBase(const TRosMsg& msg) {
-				rosCallbackFct(msg);
-			}*/
-
 			virtual void rosCallbackFct(const TRosMsg& msg) = 0;
 
 // 			void rosCallbackFct(const TRosMsg& msg) {

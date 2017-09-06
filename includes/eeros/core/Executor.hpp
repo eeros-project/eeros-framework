@@ -13,6 +13,10 @@
 #include <EtherCATMain.hpp>
 #endif
 
+#ifdef ROS_FOUND
+#include <ros/ros.h>
+#endif
+
 
 namespace eeros {
 
@@ -45,7 +49,16 @@ namespace eeros {
 		static bool set_priority(int nice);
 		static void stop();
 
+		
 		PeriodicCounter counter;
+		
+		
+#ifdef ROS_FOUND
+		void syncWithRosTime();
+		void syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue);
+		ros::CallbackQueue* syncRosCallbackQueue;
+#endif
+		
 
 	private:
 		void assignPriorities();
@@ -55,7 +68,9 @@ namespace eeros {
 		std::mutex* m;
 		std::condition_variable* cv;
 #endif
-		
+		bool syncWithEtherCatStackIsSet;
+		bool syncWithRosTimeIsSet;
+		bool syncWithRosTopicIsSet;
 		logger::Logger log;
 		double period;
 		task::Periodic *mainTask;

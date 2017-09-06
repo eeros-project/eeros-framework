@@ -19,7 +19,8 @@ namespace eeros {
 			
 			virtual void run() {
 				this->out.getSignal().setValue(systemInput->get());
-				this->out.getSignal().setTimestamp(System::getTimeNs());
+// 				this->out.getSignal().setTimestamp(System::getTimeNs());
+				this->out.getSignal().setTimestamp(systemInput->getTimestamp());
 			}
 			
 			template<typename ... ArgTypesIn>
