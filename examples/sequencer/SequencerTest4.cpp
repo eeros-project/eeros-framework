@@ -8,11 +8,13 @@
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
+int count = 0;
+
 class StepA : public Step {
 public:
 	StepA(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
+	int action() {time = std::chrono::steady_clock::now(); count++;}
+	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 2.0;}
 private:
 	std::chrono::time_point<std::chrono::steady_clock> time;
 };
@@ -20,21 +22,23 @@ private:
 class ExceptionSeq : public Sequence {
 public:
 	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 3.0;}
+	int action() {time = std::chrono::steady_clock::now(); count = 0;}
+	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 0.5;}
 private:
 	std::chrono::time_point<std::chrono::steady_clock> time;
 };
 
+class MyCondition : public Condition {
+	bool validate() {return count > 2;}
+};
+
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", seq, this), eSeq("exception sequence", seq, this) { 
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", seq, this), eSeq("exception sequence", seq, this), m(this, cond, SequenceProp::resume, &eSeq) { 
 		setNonBlocking();
-		setTimeoutTime(2.5);
-		setTimeoutExceptionSequence(eSeq);
-// 		setTimeoutBehavior(SequenceProp::resume);
-// 		setTimeoutBehavior(SequenceProp::abortOwner);
-		setTimeoutBehavior(SequenceProp::restart);
+		setTimeoutTime(7.0);
+		setTimeoutBehavior(SequenceProp::abort);
+		addMonitor(&m);
 	}
 		
 	int action() {
@@ -43,6 +47,8 @@ public:
 private:
 	StepA stepA;
 	ExceptionSeq eSeq;
+	MyCondition cond;
+	Monitor m;
 };
 
 int main(int argc, char **argv) {

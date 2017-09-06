@@ -26,4 +26,5 @@ void Thread::join() {
 	if(t.joinable()) t.join();
 }
 
-void Thread::run() { }
+void Thread::run() {	log.warn() << "base class";
+ }

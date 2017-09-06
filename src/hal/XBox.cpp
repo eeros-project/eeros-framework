@@ -72,7 +72,7 @@ void XBox::on_axis(std::function<void(int, double)> action) {
 void XBox::loop() {
 	struct js_event e;
 	while (true) 	{
-		read(fd, &e, sizeof(struct js_event));
+		ssize_t n = read(fd, &e, sizeof(struct js_event));
 		
 		switch (e.type) {
 			case (JS_EVENT_BUTTON | JS_EVENT_INIT):

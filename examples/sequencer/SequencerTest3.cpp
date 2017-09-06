@@ -8,6 +8,25 @@
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
+class StepB : public Step {
+public:
+	StepB(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
+	int action() {time = std::chrono::steady_clock::now();}
+	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
+private:
+	std::chrono::time_point<std::chrono::steady_clock> time;
+};
+
+class SequenceB : public Sequence {
+public:
+	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller), stepB("step B", seq, this) { }
+	int action() {
+		for (int i = 0; i < 5; i++) stepB();
+	}
+private:
+	StepB stepB;
+};
+
 class StepA : public Step {
 public:
 	StepA(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
@@ -17,32 +36,35 @@ private:
 	std::chrono::time_point<std::chrono::steady_clock> time;
 };
 
-class ExceptionSeq : public Sequence {
+class SequenceA : public Sequence {
 public:
-	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 3.0;}
+	SequenceA(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller), stepA("step A", seq, this), seqB("sequence B", seq, this) { 
+		setTimeoutTime(3.5);
+		setTimeoutBehavior(SequenceProp::abort);
+	}
+	int action() {
+		stepA();
+		stepA();
+		seqB();
+		stepA();
+		stepA();
+	}
 private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
+	StepA stepA;
+	SequenceB seqB;
 };
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", seq, this), eSeq("exception sequence", seq, this) { 
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqA("sequence A", seq, this) { 
 		setNonBlocking();
-		setTimeoutTime(2.5);
-		setTimeoutExceptionSequence(eSeq);
-// 		setTimeoutBehavior(SequenceProp::resume);
-// 		setTimeoutBehavior(SequenceProp::abortOwner);
-		setTimeoutBehavior(SequenceProp::restart);
 	}
 		
 	int action() {
-		for (int i = 0; i < 5; i++) stepA();
+		seqA();
 	}
 private:
-	StepA stepA;
-	ExceptionSeq eSeq;
+	SequenceA seqA;
 };
 
 int main(int argc, char **argv) {

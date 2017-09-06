@@ -21,6 +21,7 @@ void closeUI() {
 }
 
 CursesUI::CursesUI(Sequencer& sequencer) : sequencer(sequencer), state(idle) {
+	log.warn() << "ahsdkhak";
 	if(++instanceCounter > 1) {
 		throw Fault("Only a single user interface can exist at the same time!");
 	}
@@ -215,6 +216,7 @@ void CursesUI::initScreen() {
 }
 
 void CursesUI::run() {
+		log.trace() << "UI '" << "' bbbbbbbbbbbbbbbbbbbbbbbbbbbb.";
 	
 	// idle state
 	std::chrono::milliseconds sleepDuration(100);
@@ -224,7 +226,8 @@ void CursesUI::run() {
 	
 	// active state
 	initScreen();
-	while(state == active) {
+
+	while(state != active) {
 		int c = getch();
 		char input[10];
 		switch(c) {

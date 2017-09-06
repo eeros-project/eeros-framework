@@ -23,7 +23,8 @@ namespace eeros {
 			restarting,	// repeat 
 		};
 
-		class BaseSequence {			
+		class BaseSequence {	
+			friend class Monitor;
 		public:
 			BaseSequence(Sequencer& seq, BaseSequence* caller);
 			virtual ~BaseSequence();
@@ -48,21 +49,21 @@ namespace eeros {
 			
 // 			void setRunningState(runningStateEnum runningState);
 			SequenceState getRunningState() const;
-			void restartSequence();
+// 			void restartSequence();
 			void setPollingTime(int timeInMilliseconds);
 			
 			// Monitors
 			// ////////////////////////////////////////////////////////////////////////
-			std::vector< Monitor* > monitors;
-			void addMonitor( Monitor* monitor);
-			std::vector< Monitor* > getMonitors() const;
+			std::vector<Monitor*> monitors;
+			void addMonitor(Monitor* monitor);
+			std::vector<Monitor*> getMonitors() const;
 			
 			// Timeout
 			// ////////////////////////////////////////////////////////////////////////
 			void setTimeoutTime(double timeoutInSec);		//in seconds. For this sequence
 			void resetTimeout();
 			void setTimeoutBehavior(SequenceProp behavior);	
-			void setTimeoutExceptionSequence(BaseSequence* sequence);
+			void setTimeoutExceptionSequence(BaseSequence& sequence);
 			
 		protected:
 			virtual int action();		// handles different checks like preconditions
@@ -73,7 +74,8 @@ namespace eeros {
 			BaseSequence* caller;		// calling sequence
 			bool isMainSequence = false;
 			bool blocking;			// standard run mode
-			bool exceptionIsActive = false;
+			bool exceptionIsActive = false;	// one of its monitors fired
+			bool inExcProcessing = false;	// this sequence already started an exception sequence of one of its monitors
 			SequenceState state;	
 			Logger log;
 			
@@ -86,13 +88,13 @@ namespace eeros {
 			void checkActiveException();
 			
 			int id;
-			bool sequenceIsRestarting = false;
-			std::vector< BaseSequence* > callerStack;		//vector with all caller sequences. Top element is latest caller
-			std::vector< BaseSequence* > callerStackBlocking;	//vector with all sequences, which are blocked by this sequence. Element[0] is the oldest blocked caller
-			bool callerStackBlockingCreated = false;
+// 			bool sequenceIsRestarting = false;
+			std::vector<BaseSequence*> callerStack;		// vector with all caller sequences. Latest element is latest caller
+			std::vector<BaseSequence*> callerStackBlocking;	// vector with all sequences, which are blocked by this sequence. Element[0] is the oldest blocked caller
+			bool callerStackCreated = false;
 			Monitor monitorTimeout;
 			ConditionTimeout conditionTimeout;
-			int restartCounter = 0;
+// 			int restartCounter = 0;
 			int pollingTime;		//in milliseconds for checkExitCondition monitors)
 			Monitor* activeException;
 		};

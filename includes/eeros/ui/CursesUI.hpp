@@ -32,9 +32,9 @@ namespace eeros {
 			virtual void addMessage(std::string message);
 			
 		protected:
-			virtual void run();
 			
 		private:
+			virtual void run();
 			eeros::sequencer::Sequencer& sequencer;
 // 			eeros::sequencer::state::type cachedState;
 // 			eeros::sequencer::mode::type cachedMode;

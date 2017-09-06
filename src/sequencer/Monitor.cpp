@@ -4,19 +4,17 @@
 using namespace eeros;
 using namespace eeros::sequencer;
 
-
-Monitor::Monitor(BaseSequence* owner, Condition* condition, SequenceProp behavior)
-: Monitor(owner, condition, behavior, nullptr)
-{ }
-
-Monitor::Monitor(BaseSequence* owner, Condition* condition, SequenceProp behavior, BaseSequence* exceptionSequence)
+Monitor::Monitor(BaseSequence* owner, Condition& condition, SequenceProp behavior, BaseSequence* exceptionSequence)
 : owner(owner), condition(condition), behavior(behavior), exceptionSequence(exceptionSequence)
 { }
 
 Monitor::~Monitor() { }
 
 void Monitor::startExceptionSequence() {
-	if (exceptionSequence != nullptr) exceptionSequence->start();
+	if (exceptionSequence != nullptr) {
+		exceptionSequence->caller->inExcProcessing = true;
+		exceptionSequence->start();
+	}
 }
 
 void Monitor::setBehavior(SequenceProp behavior) {
@@ -31,10 +29,10 @@ BaseSequence* Monitor::getOwner() const {
 	return owner;
 }
 
-void Monitor::setExceptionSequence(BaseSequence* exceptionSequence) {
-	this->exceptionSequence = exceptionSequence;
+void Monitor::setExceptionSequence(BaseSequence& exceptionSequence) {
+	this->exceptionSequence = &exceptionSequence;
 }
 
 bool Monitor::checkCondition() {
-	return condition->isTrue();
+	return condition.isTrue();
 }

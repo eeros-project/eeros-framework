@@ -1,5 +1,5 @@
-#ifndef ORG_EEROS_SOCKET_SERVER_HPP_
-#define ORG_EEROS_SOCKET_SERVER_HPP_
+#ifndef ORG_EEROS_SOCKET_CLIENT_HPP_
+#define ORG_EEROS_SOCKET_CLIENT_HPP_
 
 #include <eeros/core/Thread.hpp>
 #include <atomic>
@@ -18,12 +18,13 @@ namespace eeros {
 	namespace sockets {
 				
 		template < uint32_t BufInLen, typename inT, uint32_t BufOutLen, typename outT >
-		class SocketServer : public eeros::Thread {
+		class SocketClient : public eeros::Thread {
 		public:
 			
-			SocketServer(uint16_t port, double period = 0.01) : read1({0}), read2({0}), read3({0}) {
+			SocketClient(std::string serverIP, uint16_t port, double period = 0.01) : read1({0}), read2({0}), read3({0}) {
 				this->port = port;
 				this->period = period;
+				this->serverIP = serverIP;
 				
 				read_ptr.store(&read1);
 				send_ptr.store(&send1);
@@ -31,7 +32,7 @@ namespace eeros {
 				running = false;
 			}
 			
-			virtual ~SocketServer(){
+			virtual ~SocketClient(){
 				join();
 			}
 			
@@ -58,35 +59,28 @@ namespace eeros {
 			
 		private:
 			virtual void run(){	
-				// Set up socket connection
-				int i = 0; 
 				struct sockaddr_in serv_addr;
-				
-				sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	
+				int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 				if (sockfd < 0) throw Fault("ERROR opening socket");
-				
+	
+				auto server = gethostbyname(serverIP.c_str()); 
+	
+				if (server == NULL) {
+					throw Fault("server ip not found");
+				}
 				bzero((char *) &serv_addr, sizeof(serv_addr));
-				
-				serv_addr.sin_port = htons(port); 
+	
 				serv_addr.sin_family = AF_INET;
-				serv_addr.sin_addr.s_addr = htonl(INADDR_ANY) ;
+				bcopy((char *)server->h_addr,(char *)&serv_addr.sin_addr.s_addr, server->h_length);
+				serv_addr.sin_port = htons(port);
+	
+				log.info() << "- Connected to server IP --> " << serverIP;
+				log.info() << "SocketClient thread started";
+				if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
+					throw Fault("ERROR connecting");	
+				log.info() << "SocketClient connected";
 				
-				// bind()
-				if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
-					throw Fault("ERROR on binding");
-				log.info() << "- Connected to client IP --> " << inet_ntoa(serv_addr.sin_addr);
-				log.info() << "SocketServer thread started";
-				
-				// listen()
-				socklen_t clilen;
-				listen(sockfd,1);
-				struct sockaddr_in cli_addr;
-				clilen = sizeof(cli_addr);
-				// accept()
-				newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,  &clilen);
-				if (newsockfd < 0) throw Fault("ERROR on accept");
-				
-				log.info() << "SocketServer connection accepted";
 				inT b_write[BufInLen]; outT b_read[BufOutLen];
 				
 				running = true;
@@ -101,7 +95,7 @@ namespace eeros {
 					// write
 					std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
 					for(int i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
-					n = write(newsockfd, b_write, BufInLen * sizeof(inT));
+					n = write(sockfd, b_write, BufInLen * sizeof(inT));
 					if (n < 0) throw Fault("ERROR writing to socket");
 					
 					// read
@@ -109,7 +103,7 @@ namespace eeros {
 					uint8_t* ptr = (uint8_t *)b_read;
 					while (count) {
 // 						log.trace() << "try to read " << count << " Bytes";
-						n = read(newsockfd, ptr, count);
+						n = read(sockfd, ptr, count);
 // 						log.trace() << "could read " << n << " Bytes";
 						if (n < 0) {
 							log.trace() << "error = " << std::strerror(errno);
@@ -124,7 +118,6 @@ namespace eeros {
 					flip();
 					next_cycle += seconds(period);
 				}
-				close(newsockfd);
 				close(sockfd);
 			}
 			
@@ -148,11 +141,11 @@ namespace eeros {
 			}
 			
 			bool running;
+			std::string serverIP;
 			uint16_t port;
 			double period;
 			struct hostent *server;
 			int sockfd;
-			int newsockfd;
 			
 			std::array<outT, BufOutLen> read1, read2, read3;
 			std::array<inT, BufInLen> send1, send2, send3;
@@ -161,19 +154,20 @@ namespace eeros {
 		};
 
 		template < uint32_t BufInLen, typename inT >
-		class SocketServer<BufInLen, inT, 0, std::nullptr_t> : public eeros::Thread {
+		class SocketClient<BufInLen, inT, 0, std::nullptr_t> : public eeros::Thread {
 		public:
 			
-			SocketServer(uint16_t port, double period = 0.01) {
+			SocketClient(std::string serverIP, uint16_t port, double period = 0.01) {
 				this->port = port;
 				this->period = period;
+				this->serverIP = serverIP;
 				
 				send_ptr.store(&send1);
 				
 				running = false;
 			}
 			
-			virtual ~SocketServer(){
+			virtual ~SocketClient(){
 				join();
 			}
 			
@@ -194,35 +188,28 @@ namespace eeros {
 
 		private:
 			virtual void run(){	
-				// Set up socket connection
-				int i = 0; 
 				struct sockaddr_in serv_addr;
-				
-				sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	
+				int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 				if (sockfd < 0) throw Fault("ERROR opening socket");
-				
+	
+				auto server = gethostbyname(serverIP.c_str()); 
+	
+				if (server == NULL) {
+					throw Fault("server ip not found");
+				}
 				bzero((char *) &serv_addr, sizeof(serv_addr));
-				
-				serv_addr.sin_port = htons(port); 
+	
 				serv_addr.sin_family = AF_INET;
-				serv_addr.sin_addr.s_addr = htonl(INADDR_ANY) ;
-				
-				// bind()
-				if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
-					throw Fault("ERROR on binding");
-				log.info() << "- Connected to client IP --> " << inet_ntoa(serv_addr.sin_addr);
-				log.info() << "SocketServer thread started";
-				
-				// listen()
-				socklen_t clilen;
-				listen(sockfd,1);
-				struct sockaddr_in cli_addr;
-				clilen = sizeof(cli_addr);
-				// accept()
-				newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,  &clilen);
-				if (newsockfd < 0) throw Fault("ERROR on accept");
-				
-				log.info() << "SocketServer connection accepted";
+				bcopy((char *)server->h_addr,(char *)&serv_addr.sin_addr.s_addr, server->h_length);
+				serv_addr.sin_port = htons(port);
+	
+				log.info() << "- Connected to server IP --> " << serverIP;
+				log.info() << "SocketClient thread started";
+				if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
+					throw Fault("ERROR connecting");
+				log.info() << "SocketClient connected";
+
 				inT b_write[BufInLen]; 
 				
 				running = true;
@@ -237,13 +224,12 @@ namespace eeros {
 					// write
 					std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
 					for(int i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
-					n = write(newsockfd, b_write, BufInLen * sizeof(inT));
+					n = write(sockfd, b_write, BufInLen * sizeof(inT));
 					if (n < 0) throw Fault("ERROR writing to socket");
 				
 					flip();
 					next_cycle += seconds(period);
 				}
-				close(newsockfd);
 				close(sockfd);
 			}
 			
@@ -259,11 +245,11 @@ namespace eeros {
 			}
 			
 			bool running;
+			std::string serverIP;
 			uint16_t port;
 			double period;
 			struct hostent *server;
 			int sockfd;
-			int newsockfd;
 			
 			std::array<inT, BufInLen> send1, send2, send3;
 			std::atomic< std::array<inT, BufInLen>* > send_ptr;
@@ -272,4 +258,4 @@ namespace eeros {
 	};
 };
 
-#endif // ORG_EEROS_SOCKET_SERVER_HPP_
+#endif // ORG_EEROS_SOCKET_CLIENT_HPP_

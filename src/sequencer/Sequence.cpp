@@ -31,11 +31,11 @@ void Sequence::run() {	// runs in thread
 	s << thread->get_id();
 	std::string id = s.str();
 	log.trace() << "Thread '" << id << "' for sequence '" << name << "' started";
-	std::unique_lock<std::mutex> lk(m);
-	cv.wait(lk);	// sends sequence to sleep, wait for start()
-	lk.unlock();
-	if (isMainSequence) log.info() << "sequence '" << name << "' started (non-blocking)";
-	else log.info() << "sequence '" << name << "' started non-blocking, caller sequence: '" << caller->getName() << "'";
+// 	std::unique_lock<std::mutex> lk(m);
+// 	cv.wait(lk);	// sends sequence to sleep, wait for start()
+// 	lk.unlock();
+	if (isMainSequence) log.info() << "sequence '" << name << "' (non-blocking)";
+	else log.info() << "sequence '" << name << "' (non-blocking), caller sequence: '" << caller->getName() << "'";
 	BaseSequence::action();
 	log.info() << "sequence '" << name << "' terminated";
 	log.trace() << "Thread '" << id << "' finished.";
@@ -44,14 +44,14 @@ void Sequence::run() {	// runs in thread
 int Sequence::start() {
 	resetTimeout();
 	if (isBlocking()) {	// starts action() blocking
-		if (isMainSequence) log.info() << "sequence '" << name << "' started (blocking)";
-		else log.info() << "sequence '" << name << "' started blocking, caller sequence: '" << caller->getName() << "'";
+		if (isMainSequence) log.info() << "sequence '" << name << "' (blocking)";
+		else log.info() << "sequence '" << name << "' (blocking), caller sequence: '" << caller->getName() << "'";
 		BaseSequence::action();				//action gets overwritten by child class
 		log.info() << "sequence '" << name << "' terminated";
 	} else {
 		thread = new std::thread([this]() {this->run();});
-		sleep(1);	// TODO muss weg
-		cv.notify_one();	// starts actionFramework() in thread
+// 		usleep(200);	// TODO muss weg
+// 		cv.notify_one();	// starts actionFramework() in thread
 	}
 	return 0;
 }

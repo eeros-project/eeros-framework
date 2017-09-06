@@ -12,16 +12,14 @@ namespace eeros {
 			ConditionTimeout() : timeout(0) { }
 			
 			bool validate() {
-				if ( timeout == 0 ) return false;	// timeout not activated
-				if ( started == false ) {		// first call
+				if (timeout == 0) return false;	// timeout not activated
+				if (started == false) {		// first call
 					resetTimeout();
 					return false;
 				}
-	
 				auto now = std::chrono::steady_clock::now();
 				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime);
-				if (duration.count() > timeout*1000) return true;
-				else return false;
+				return (duration.count() > timeout * 1000);
 			};
 			
 			void setTimeoutTime(double timeInSec) {timeout = timeInSec;}	// 0 = not set or infinite
@@ -32,7 +30,7 @@ namespace eeros {
 		private:
 			bool started = false;			
 			std::chrono::steady_clock::time_point startTime;
-			double timeout;				//0 = not set or infinite; in Seconds
+			double timeout;	// 0 = not set or infinite, in seconds
 		};
 		
 	};	//namespace sequencer
