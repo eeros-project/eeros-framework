@@ -18,7 +18,7 @@ namespace eeros {
 		class Monitor {
 			friend class BaseSequence;
 		public:
-			Monitor(BaseSequence* owner, Condition& condition, SequenceProp behavior = SequenceProp::resume, BaseSequence* exceptionSequence = nullptr);
+			Monitor(std::string name, BaseSequence* owner, Condition& condition, SequenceProp behavior = SequenceProp::resume, BaseSequence* exceptionSequence = nullptr);
 			virtual ~Monitor();
 			void setExceptionSequence(BaseSequence& exceptionSequence);	
 			void setBehavior(SequenceProp behavior);
@@ -31,7 +31,7 @@ namespace eeros {
 			BaseSequence* exceptionSequence;
 			Condition& condition;
 			SequenceProp behavior;
-			std::string exceptionDescription;
+			std::string name;
 		};
 
 	};	//namespace sequencer

@@ -6,7 +6,7 @@ using namespace eeros;
 using namespace eeros::sequencer;
 
 BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller) : 
-	seq(seq), caller(caller), conditionTimeout(), monitorTimeout(this, conditionTimeout, SequenceProp::abort),
+	seq(seq), caller(caller), monitorTimeout("timeout", this, conditionTimeout, SequenceProp::abort), monitorAbort("abort", this, conditionAbort, SequenceProp::abort),
 	state(SequenceState::idle), blocking(true), pollingTime(100), log('X')
 {
 	if (caller == nullptr) {
@@ -22,6 +22,7 @@ BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller) :
 		callerStack.push_back(caller);	// add latest caller
 	}
 	addMonitor(&monitorTimeout);	// default monitor
+	addMonitor(&monitorAbort);	// default monitor
 }
 
 BaseSequence::~BaseSequence() { }
@@ -105,18 +106,11 @@ void BaseSequence::checkMonitorsOfBlockedCallers() {
 void BaseSequence::checkMonitor(Monitor* monitor) {
 	if (monitor->checkCondition() == true) {
 		if (!monitor->getOwner()->exceptionIsActive) {
-			log.info() << "monitor fired";
+			log.info() << "monitor '" << monitor->name << "' fired";
 			switch (monitor->getBehavior()) {
 				case SequenceProp::resume : break;
 				case SequenceProp::abort : 
 				case SequenceProp::restart : monitor->getOwner()->setActiveException(monitor); break;
-// 				case SequenceProp::abortCallerOfOwner :	
-// 				case SequenceProp::restartCallerOfOwner : {
-// 					BaseSequence* seq = monitor->getOwner()->getCallerSequence();
-// 					if (seq != nullptr) seq->setActiveException(monitor); 
-// 					else monitor->getOwner()->setActiveException(monitor);	// stop sequence if requested caller not present
-// 					break;
-// 				}
 				default : break;
 			}
 			monitor->startExceptionSequence();	// start only if not yet in exception processing, blocking
@@ -133,18 +127,6 @@ void BaseSequence::setActiveException(Monitor* activeMonitor) {
 			activeMonitor->getOwner()->exceptionIsActive = true;
 			activeMonitor->getOwner()->activeException = activeMonitor;
 			break;
-// 		case SequenceProp::abortCallerOfOwner :
-// 		case SequenceProp::restartCallerOfOwner : {
-// 			BaseSequence* seq = activeMonitor->getOwner()->getCallerSequence();
-// 			if (seq != nullptr) {
-// 				activeMonitor->getOwner()->getCallerSequence()->exceptionIsActive = true;
-// 				activeMonitor->getOwner()->getCallerSequence()->activeException = activeMonitor;
-// 			} else {
-// 				activeMonitor->getOwner()->exceptionIsActive = true;
-// 				activeMonitor->getOwner()->activeException = activeMonitor;
-// 			}
-// 			break;
-// 		}
 		default : break;
 	}
 }
@@ -156,7 +138,6 @@ void BaseSequence::clearActiveException() {
 
 void BaseSequence::checkActiveException() {
 	if (exceptionIsActive == true) {	// this sequence got the order to abort, restart ...
-// 		log.warn() << "this";
 		switch (activeException->getBehavior()) {
 			case SequenceProp::resume : break;
 			case SequenceProp::abort : state = SequenceState::aborting; break;
@@ -179,8 +160,6 @@ void BaseSequence::checkActiveException() {
 		}
 	}
 }
-
-// bool BaseSequence::isStep() const {return false;}
 
 bool BaseSequence::checkExitCondition() {return true;}
 
@@ -208,11 +187,6 @@ BaseSequence* BaseSequence::getCallerSequence() {
 
 std::vector<BaseSequence*> BaseSequence::getCallerStack() const {return callerStack;}
 
-// void BaseSequence::restartSequence() {
-// 	state = SequenceState::restarting;
-// 	sequenceIsRestarting = true;
-// }
-
 void BaseSequence::setPollingTime(int timeInMilliseconds) {
 	pollingTime = timeInMilliseconds;
 }
@@ -232,3 +206,4 @@ void BaseSequence::setTimeoutBehavior(SequenceProp behavior) {
 void BaseSequence::setTimeoutExceptionSequence(BaseSequence& sequence) {
 	monitorTimeout.setExceptionSequence(sequence);
 }
+

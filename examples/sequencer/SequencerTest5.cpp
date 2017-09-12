@@ -46,7 +46,7 @@ private:
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("sequence B", seq, this), stepA("step A", seq, this), m(this, cond, SequenceProp::abort) { 
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("sequence B", seq, this), stepA("step A", seq, this), m("myMonitor", this, cond, SequenceProp::abort) { 
 		setNonBlocking();
 		addMonitor(&m);
 	}

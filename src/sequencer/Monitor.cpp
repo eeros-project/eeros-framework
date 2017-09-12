@@ -4,8 +4,8 @@
 using namespace eeros;
 using namespace eeros::sequencer;
 
-Monitor::Monitor(BaseSequence* owner, Condition& condition, SequenceProp behavior, BaseSequence* exceptionSequence)
-: owner(owner), condition(condition), behavior(behavior), exceptionSequence(exceptionSequence)
+Monitor::Monitor(std::string name, BaseSequence* owner, Condition& condition, SequenceProp behavior, BaseSequence* exceptionSequence)
+: name(name), owner(owner), condition(condition), behavior(behavior), exceptionSequence(exceptionSequence)
 { }
 
 Monitor::~Monitor() { }

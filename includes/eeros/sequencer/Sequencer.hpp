@@ -8,14 +8,6 @@
 namespace eeros {
 	namespace sequencer {
 		
-// 		namespace state {
-// 			enum type { executing, waiting, terminating, terminated, idle };
-// 		}
-// 		
-// 		namespace mode {
-// 			enum type { automatic, stepping };
-// 		}
-	
 		class Sequence;
 
 		class Sequencer {
@@ -30,6 +22,7 @@ namespace eeros {
 			Sequence* getSequenceById(int id);
 			Sequence* getSequenceByName(std::string name);
 			std::vector<Sequence*> getListOfAllSequences();
+			void abort();
 		private:
 			Sequence* mainSequence;
 			std::vector<Sequence*> sequenceList;	// list of all sequences

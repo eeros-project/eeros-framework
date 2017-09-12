@@ -2,7 +2,7 @@
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Step.hpp>
-
+#include <signal.h>
 #include <chrono>
 
 using namespace eeros::sequencer;
@@ -68,7 +68,13 @@ private:
 	SequenceB seqB;
 };
 
+void signalHandler(int signum) {
+	Sequencer::instance().abort();
+}
+
 int main(int argc, char **argv) {
+	signal(SIGINT, signalHandler);
+
 	StreamLogWriter w(std::cout);
 // 	w.show(LogLevel::TRACE);
 	Logger::setDefaultWriter(&w);

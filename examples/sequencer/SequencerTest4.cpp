@@ -34,7 +34,7 @@ class MyCondition : public Condition {
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", seq, this), eSeq("exception sequence", seq, this), m(this, cond, SequenceProp::resume, &eSeq) { 
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", seq, this), eSeq("exception sequence", seq, this), m("myMonitor", this, cond, SequenceProp::resume, &eSeq) { 
 		setNonBlocking();
 		setTimeoutTime(7.0);
 		setTimeoutBehavior(SequenceProp::abort);

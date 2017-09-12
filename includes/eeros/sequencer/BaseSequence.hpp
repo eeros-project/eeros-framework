@@ -3,6 +3,7 @@
 
 #include <eeros/logger/Logger.hpp>
 #include <eeros/sequencer/ConditionTimeout.hpp>
+#include <eeros/sequencer/ConditionAbort.hpp>
 #include <eeros/sequencer/Monitor.hpp>
 #include <vector>
 
@@ -25,12 +26,10 @@ namespace eeros {
 
 		class BaseSequence {	
 			friend class Monitor;
+			friend class Sequencer;
 		public:
 			BaseSequence(Sequencer& seq, BaseSequence* caller);
 			virtual ~BaseSequence();
-			
-// 			void pauseSequence();	not yet implemented
-// 			void resumeSequence();	not yet implemented
 			
 			virtual int start() = 0;
 			virtual bool checkPreCondition();
@@ -47,9 +46,7 @@ namespace eeros {
 			BaseSequence* getCallerSequence();
 			std::vector<BaseSequence*> getCallerStack() const;
 			
-// 			void setRunningState(runningStateEnum runningState);
 			SequenceState getRunningState() const;
-// 			void restartSequence();
 			void setPollingTime(int timeInMilliseconds);
 			
 			// Monitors
@@ -60,7 +57,7 @@ namespace eeros {
 			
 			// Timeout
 			// ////////////////////////////////////////////////////////////////////////
-			void setTimeoutTime(double timeoutInSec);		//in seconds. For this sequence
+			void setTimeoutTime(double timeoutInSec);		// in seconds. For this sequence
 			void resetTimeout();
 			void setTimeoutBehavior(SequenceProp behavior);	
 			void setTimeoutExceptionSequence(BaseSequence& sequence);
@@ -88,13 +85,13 @@ namespace eeros {
 			void checkActiveException();
 			
 			int id;
-// 			bool sequenceIsRestarting = false;
 			std::vector<BaseSequence*> callerStack;		// vector with all caller sequences. Latest element is latest caller
 			std::vector<BaseSequence*> callerStackBlocking;	// vector with all sequences, which are blocked by this sequence. Element[0] is the oldest blocked caller
 			bool callerStackCreated = false;
 			Monitor monitorTimeout;
 			ConditionTimeout conditionTimeout;
-// 			int restartCounter = 0;
+			Monitor monitorAbort;
+			ConditionAbort conditionAbort;
 			int pollingTime;		//in milliseconds for checkExitCondition monitors)
 			Monitor* activeException;
 		};

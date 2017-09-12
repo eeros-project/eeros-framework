@@ -28,7 +28,7 @@ void Sequencer::addMainSequence(Sequence& mainSeq) {
 }
 
 Sequence* Sequencer::getMainSequence() {
-	if( mainSequence == nullptr ) throw Fault("Main sequence not set in sequencer");
+	if (mainSequence == nullptr) throw Fault("Main sequence not set in sequencer");
 	return mainSequence;
 }
 
@@ -52,7 +52,9 @@ std::vector< Sequence* > Sequencer::getListOfAllSequences() {
 	return sequenceList;
 }
 
-
+void Sequencer::abort() {
+	getMainSequence()->conditionAbort.set();
+}
 
 
 
