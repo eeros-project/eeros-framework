@@ -13,41 +13,42 @@
 #include <eeros/core/Fault.hpp>
 #include <iostream>
 #include <cstring>
+#include <signal.h>
 
 namespace eeros {
 	namespace sockets {
 				
+		void signalHandler(int signum) { }
+
 		template < uint32_t BufInLen, typename inT, uint32_t BufOutLen, typename outT >
 		class SocketServer : public eeros::Thread {
 		public:
-			
 			SocketServer(uint16_t port, double period = 0.01) : read1({0}), read2({0}), read3({0}) {
 				this->port = port;
 				this->period = period;
-				
+				signal(SIGPIPE, signalHandler);	// make sure, that a broken pipe does not stop application
 				read_ptr.store(&read1);
 				send_ptr.store(&send1);
-				
 				running = false;
 			}
 			
-			virtual ~SocketServer(){
+			virtual ~SocketServer() {
 				join();
 			}
 			
-			virtual void stop(){
+			virtual void stop() {
 				running = false;
 			}
 			
-			virtual bool isRunning(){
+			virtual bool isRunning() {
 				return running;
 			}
 			
-			virtual std::array<outT, BufOutLen>& getReceiveBuffer(){
+			virtual std::array<outT, BufOutLen>& getReceiveBuffer() {
 				return *read_ptr.load();
 			}
 			
-			virtual void setSendBuffer(std::array<inT, BufInLen>& data){
+			virtual void setSendBuffer(std::array<inT, BufInLen>& data) {
 				auto p = send_ptr.load();
 				if (p == &send1) send1 = data;
 				else if (p == &send2) send2 = data;
@@ -57,74 +58,74 @@ namespace eeros {
 			outT readbuffer;
 			
 		private:
-			virtual void run(){	
-				// Set up socket connection
-				int i = 0; 
-				struct sockaddr_in serv_addr;
-				
+			virtual void run() {	
+				log.info() << "SocketServer thread started";
+				struct sockaddr_in servAddr;
 				sockfd = socket(AF_INET, SOCK_STREAM, 0);
 				if (sockfd < 0) throw Fault("ERROR opening socket");
 				
-				bzero((char *) &serv_addr, sizeof(serv_addr));
-				
-				serv_addr.sin_port = htons(port); 
-				serv_addr.sin_family = AF_INET;
-				serv_addr.sin_addr.s_addr = htonl(INADDR_ANY) ;
-				
-				// bind()
-				if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
+				bzero((char *) &servAddr, sizeof(servAddr));	
+				servAddr.sin_port = htons(port); 
+				servAddr.sin_family = AF_INET;
+				servAddr.sin_addr.s_addr = htonl(INADDR_ANY) ;
+				if (bind(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0) 
 					throw Fault("ERROR on binding");
-				log.info() << "- Connected to client IP --> " << inet_ntoa(serv_addr.sin_addr);
-				log.info() << "SocketServer thread started";
 				
-				// listen()
 				socklen_t clilen;
 				listen(sockfd,1);
-				struct sockaddr_in cli_addr;
-				clilen = sizeof(cli_addr);
-				// accept()
-				newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,  &clilen);
-				if (newsockfd < 0) throw Fault("ERROR on accept");
-				
-				log.info() << "SocketServer connection accepted";
-				inT b_write[BufInLen]; outT b_read[BufOutLen];
+				struct sockaddr_in cliAddr;
+				clilen = sizeof(cliAddr);
 				
 				running = true;
+				while (running) {
+					newsockfd = accept(sockfd, (struct sockaddr *) &cliAddr,  &clilen);
+					if (newsockfd < 0) throw Fault("ERROR on accept");
+					bool connected = true;
+					char cliName[INET6_ADDRSTRLEN];
+					getnameinfo((struct sockaddr*)&cliAddr, sizeof cliAddr, cliName, sizeof(cliName), NULL, 0, NI_NUMERICHOST|NI_NUMERICSERV);
+					log.info() << "Client connection from ip=" << cliName << " accepted";
+					inT b_write[BufInLen]; outT b_read[BufOutLen];
+					using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
+					auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
 				
-				using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
-				auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
-				
-				while(running) {
-					int n;
-					std::this_thread::sleep_until(next_cycle);
-					
-					// write
-					std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
-					for(int i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
-					n = write(newsockfd, b_write, BufInLen * sizeof(inT));
-					if (n < 0) throw Fault("ERROR writing to socket");
-					
-					// read
-					size_t count = BufOutLen * sizeof(outT);
-					uint8_t* ptr = (uint8_t *)b_read;
-					while (count) {
-// 						log.trace() << "try to read " << count << " Bytes";
-						n = read(newsockfd, ptr, count);
-// 						log.trace() << "could read " << n << " Bytes";
+					while (connected) {
+						std::this_thread::sleep_until(next_cycle);
+			
+						// write
+						std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
+						for(int i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
+// 						log.trace() << "try to write " << b_write[0];
+						int n = write(newsockfd, b_write, BufInLen * sizeof(inT));
 						if (n < 0) {
 							log.trace() << "error = " << std::strerror(errno);
-							throw Fault("ERROR reading from socket");
+							connected = false;
+						}	
+						
+						// read
+						size_t count = BufOutLen * sizeof(outT);
+						uint8_t* ptr = (uint8_t *)b_read;
+						auto endTime = std::chrono::steady_clock::now() + seconds(period * 100);
+						while (connected && count) {
+							if (std::chrono::steady_clock::now() > endTime) {
+								log.trace() << "error = socket read timed out";
+								connected = false;
+							}
+	// 						log.trace() << "try to read " << count << " Bytes";
+							n = read(newsockfd, ptr, count);
+							if (n < 0) {
+								log.trace() << "error = " << std::strerror(errno);
+								connected = false;
+							}
+							ptr += n;
+							count -= n;
 						}
-						ptr += n;
-						count -= n;
+						std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
+						for(int i = 0; i < BufOutLen; i++) readValue[i] = b_read[i];
+						flip();
+						next_cycle += seconds(period);
 					}
-					std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
-					for(int i = 0; i < BufOutLen; i++) readValue[i] = b_read[i];
-			
-					flip();
-					next_cycle += seconds(period);
+					close(newsockfd);
 				}
-				close(newsockfd);
 				close(sockfd);
 			}
 			
@@ -160,20 +161,19 @@ namespace eeros {
 			std::atomic< std::array<inT, BufInLen>* > send_ptr;
 		};
 
+		// specialization used when server doesn't receive data from its client
 		template < uint32_t BufInLen, typename inT >
 		class SocketServer<BufInLen, inT, 0, std::nullptr_t> : public eeros::Thread {
 		public:
-			
 			SocketServer(uint16_t port, double period = 0.01) {
 				this->port = port;
 				this->period = period;
-				
+				signal(SIGPIPE, signalHandler);	// make sure, that a broken pipe does not stop application
 				send_ptr.store(&send1);
-				
 				running = false;
 			}
 			
-			virtual ~SocketServer(){
+			virtual ~SocketServer() {
 				join();
 			}
 			
@@ -181,11 +181,11 @@ namespace eeros {
 				running = false;
 			}
 			
-			virtual bool isRunning(){
+			virtual bool isRunning() {
 				return running;
 			}
 			
-			virtual void setSendBuffer(std::array<inT, BufInLen>& data){
+			virtual void setSendBuffer(std::array<inT, BufInLen>& data) {
 				auto p = send_ptr.load();
 				if (p == &send1) send1 = data;
 				else if (p == &send2) send2 = data;
@@ -193,57 +193,54 @@ namespace eeros {
 			}
 
 		private:
-			virtual void run(){	
-				// Set up socket connection
-				int i = 0; 
-				struct sockaddr_in serv_addr;
-				
+			virtual void run() {	
+				log.info() << "SocketServer thread started";
+				struct sockaddr_in servAddr;
 				sockfd = socket(AF_INET, SOCK_STREAM, 0);
 				if (sockfd < 0) throw Fault("ERROR opening socket");
 				
-				bzero((char *) &serv_addr, sizeof(serv_addr));
-				
-				serv_addr.sin_port = htons(port); 
-				serv_addr.sin_family = AF_INET;
-				serv_addr.sin_addr.s_addr = htonl(INADDR_ANY) ;
-				
-				// bind()
-				if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
+				bzero((char *) &servAddr, sizeof(servAddr));	
+				servAddr.sin_port = htons(port); 
+				servAddr.sin_family = AF_INET;
+				servAddr.sin_addr.s_addr = htonl(INADDR_ANY) ;
+				if (bind(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0) 
 					throw Fault("ERROR on binding");
-				log.info() << "- Connected to client IP --> " << inet_ntoa(serv_addr.sin_addr);
-				log.info() << "SocketServer thread started";
 				
-				// listen()
 				socklen_t clilen;
 				listen(sockfd,1);
-				struct sockaddr_in cli_addr;
-				clilen = sizeof(cli_addr);
-				// accept()
-				newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,  &clilen);
-				if (newsockfd < 0) throw Fault("ERROR on accept");
-				
-				log.info() << "SocketServer connection accepted";
-				inT b_write[BufInLen]; 
+				struct sockaddr_in cliAddr;
+				clilen = sizeof(cliAddr);
 				
 				running = true;
+				while (running) {
+					newsockfd = accept(sockfd, (struct sockaddr *) &cliAddr,  &clilen);
+					if (newsockfd < 0) throw Fault("ERROR on accept");
+					bool connected = true;
+					char cliName[INET6_ADDRSTRLEN];
+					getnameinfo((struct sockaddr*)&cliAddr, sizeof cliAddr, cliName, sizeof(cliName), NULL, 0, NI_NUMERICHOST|NI_NUMERICSERV);
+					log.info() << "Client connection from ip=" << cliName << " accepted";
+					inT b_write[BufInLen];
+					using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
+					auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
 				
-				using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
-				auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
-				
-				while(running) {
-					int n;
-					std::this_thread::sleep_until(next_cycle);
+					while (connected) {
+						std::this_thread::sleep_until(next_cycle);
 					
-					// write
-					std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
-					for(int i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
-					n = write(newsockfd, b_write, BufInLen * sizeof(inT));
-					if (n < 0) throw Fault("ERROR writing to socket");
+						// write
+						std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
+						for(int i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
+// 						log.trace() << "try to write " << b_write[0];
+						int n = write(newsockfd, b_write, BufInLen * sizeof(inT));
+						if (n < 0) {
+							log.trace() << "error = " << std::strerror(errno);
+							connected = false;
+						}	
 				
-					flip();
-					next_cycle += seconds(period);
+						flip();
+						next_cycle += seconds(period);
+					}
+					close(newsockfd);
 				}
-				close(newsockfd);
 				close(sockfd);
 			}
 			

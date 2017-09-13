@@ -91,6 +91,7 @@ int main(int argc, char **argv) {
 	Periodic periodic("per1", 1.0, l1);
 	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
 		log.info() << controlSystem.socketA.getOut().getSignal();
+		controlSystem.c1.setValue(controlSystem.c1.getOut().getSignal().getValue() + (0.1));
 	});
 		
 	// Create and run executor
