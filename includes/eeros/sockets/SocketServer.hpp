@@ -18,7 +18,7 @@
 namespace eeros {
 	namespace sockets {
 				
-		void signalHandler(int signum) { }
+		void sigPipeHandler(int signum);
 
 		template < uint32_t BufInLen, typename inT, uint32_t BufOutLen, typename outT >
 		class SocketServer : public eeros::Thread {
@@ -26,7 +26,7 @@ namespace eeros {
 			SocketServer(uint16_t port, double period = 0.01) : read1({0}), read2({0}), read3({0}) {
 				this->port = port;
 				this->period = period;
-				signal(SIGPIPE, signalHandler);	// make sure, that a broken pipe does not stop application
+				signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application
 				read_ptr.store(&read1);
 				send_ptr.store(&send1);
 				running = false;
@@ -168,7 +168,7 @@ namespace eeros {
 			SocketServer(uint16_t port, double period = 0.01) {
 				this->port = port;
 				this->period = period;
-				signal(SIGPIPE, signalHandler);	// make sure, that a broken pipe does not stop application
+				signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application
 				send_ptr.store(&send1);
 				running = false;
 			}

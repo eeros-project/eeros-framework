@@ -25,7 +25,7 @@ namespace eeros {
 				this->port = port;
 				this->period = period;
 				this->serverIP = serverIP;
-				signal(SIGPIPE, signalHandler);	// make sure, that a broken pipe does not stop application
+				signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application
 				read_ptr.store(&read1);
 				send_ptr.store(&send1);		
 				running = false;
@@ -161,7 +161,7 @@ namespace eeros {
 				this->port = port;
 				this->period = period;
 				this->serverIP = serverIP;
-				signal(SIGPIPE, signalHandler);	// make sure, that a broken pipe does not stop application
+				signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application
 				send_ptr.store(&send1);
 				running = false;
 			}
