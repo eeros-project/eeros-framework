@@ -41,6 +41,7 @@ namespace eeros {
 			
 			MouseState current;
 			MouseState last;
+			bool running;
 
 		private:
 			int fd;

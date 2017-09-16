@@ -1,6 +1,7 @@
 #ifndef ORG_EEROS_EXAMPLES_SEQUENCER_MAINSEQUENCE_HPP_
 #define ORG_EEROS_EXAMPLES_SEQUENCER_MAINSEQUENCE_HPP_
 
+#include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Step.hpp>
 #include <eeros/safety/SafetySystem.hpp>
@@ -34,7 +35,7 @@ public:
 		while(safetySys.getCurrentLevel() < safetyProp.slMoving);
 	
 		angle = 0;
-		while (true) {
+		while (Sequencer::running) {
 			angle += 6.28 / 10;
 			move(angle);
 			sleep(1);

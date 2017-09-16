@@ -34,6 +34,7 @@ namespace eeros {
 			virtual int start() = 0;
 			virtual bool checkPreCondition();
 			virtual bool checkExitCondition();
+			virtual void terminate() = 0;	// cancels the associated thread
 			
 			void setName(std::string name);
 			std::string getName() const;
@@ -95,7 +96,11 @@ namespace eeros {
 			int pollingTime;		//in milliseconds for checkExitCondition monitors)
 			Monitor* activeException;
 		};
-	};	//namespace sequencer
+		
+		/********** Print functions **********/
+		std::ostream& operator<<(std::ostream& os, SequenceState state);
+
+	};	// namespace sequencer
 }; // namespace eeros
 
 #endif // ORG_EEROS_SEQUENCER_BASESEQUENCE_HPP_

@@ -22,6 +22,10 @@ namespace eeros {
 			void join() {thread->join();}
 			void setBlocking() {blocking = true;}
 			void setNonBlocking() {blocking = false;}
+			void terminate() { 
+				log.fatal() << "cancel thread of '" << this->name << "'";
+				thread->~thread();
+			}
 		private:
 			std::mutex m;
 			std::condition_variable cv;

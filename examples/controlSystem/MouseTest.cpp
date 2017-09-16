@@ -6,6 +6,7 @@
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/core/Executor.hpp>
 #include <eeros/control/MouseInput.hpp>
+#include <signal.h>
 
 using namespace eeros;
 using namespace eeros::logger;
@@ -17,7 +18,7 @@ double period = 0.01;
 
 class ControlSystem {
 public:
-	ControlSystem() : mouse("/dev/input/event4"), td("td1", period, true) {
+	ControlSystem() : mouse("/dev/input/event5"), td("td1", period, true) {
 		mouse.setName("mouse");
 		mouse.getOut().getSignal().setName("position");
 		mouse.getButtonOut().getSignal().setName("events");
@@ -56,7 +57,12 @@ public:
 	SafetyEvent seGoDown;
 };
 
-int main() {
+void signalHandler(int signum) {
+	Executor::instance().stop();
+}
+
+int main(int argc, char **argv) {
+	signal(SIGINT, signalHandler);
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;

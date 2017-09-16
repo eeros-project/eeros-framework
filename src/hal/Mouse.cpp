@@ -64,7 +64,7 @@ void Mouse::on_axis(std::function<void(int, signed)> action) {
 
 void Mouse::loop() {
 	struct input_event e;
-	while (true) {
+	while (running) {
 		ssize_t n = read(fd, &e, sizeof(struct input_event));
 
 		if (e.type == EV_KEY) {

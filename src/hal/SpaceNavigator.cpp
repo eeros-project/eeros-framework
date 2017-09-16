@@ -79,7 +79,7 @@ std::string SpaceNavigator::name() {
 
 void SpaceNavigator::loop() {
 	uint8_t readbuff[14];
-	while (true) {
+	while (running) {
 		*readbuff = fgetc(file);
 		ssize_t n;
 		switch(*readbuff) {

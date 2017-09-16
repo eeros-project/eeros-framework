@@ -44,6 +44,7 @@ namespace eeros {
 			virtual std::string name();
 			
 			SpaceState current;
+			bool running;
 			
 		private:
 			FILE* file;

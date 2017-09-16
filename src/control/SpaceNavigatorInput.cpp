@@ -6,10 +6,13 @@ using namespace eeros::math;
 SpaceNavigatorInput::SpaceNavigatorInput(std::string dev) {
 	setInitPos({0,0,0});
 	sn.open(dev.c_str());
+	sn.running = true;
 	t = new std::thread([this](){ this->sn.loop(); });
 }
 
 SpaceNavigatorInput::~SpaceNavigatorInput() {
+	sn.running = false;
+	t->join();
 	delete t;
 	sn.close();
 }

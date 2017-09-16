@@ -33,6 +33,10 @@ namespace eeros {
 			SequenceProp behavior;
 			std::string name;
 		};
+		
+		/********** Print functions **********/
+		std::ostream& operator<<(std::ostream& os, SequenceProp prop);
+
 
 	};	//namespace sequencer
 }; // namespace eeros

@@ -25,12 +25,11 @@ const double dt = 0.001;
 
 void signalHandler(int signum){
 	SafetySystem::exitHandler();
+	Sequencer::instance().abort();
 }
 
 int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
-	signal(SIGKILL, signalHandler);
-	signal(SIGTERM, signalHandler);
 	
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
@@ -62,6 +61,7 @@ int main(int argc, char **argv) {
 	
 	executor.run();
 	
+	mainSequence.join();
 	log.info() << "Example finished...";
 	return 0;
 }

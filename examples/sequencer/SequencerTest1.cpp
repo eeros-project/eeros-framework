@@ -38,7 +38,8 @@ public:
 	}
 		
 	int action() {
-		for (int i = 0; i < 5; i++) stepA();
+		while (Sequencer::running) stepA();
+// 		for (int i = 0; i < 5; i++) stepA();
 	}
 private:
 	StepA stepA;
@@ -63,8 +64,7 @@ int main(int argc, char **argv) {
 	sequencer.addMainSequence(mainSeq);
 	mainSeq.start();
 	
-	// Wait until sequencer terminates
-	mainSeq.join();
+	mainSeq.join();	// wait until sequencer terminates
 	
 	log.info() << "Simple Sequencer Example finished...";
 }

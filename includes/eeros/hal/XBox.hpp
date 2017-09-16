@@ -58,6 +58,7 @@ namespace eeros {
 			
 			XBoxState last;
 			XBoxState current;
+			bool running;
 			
 		private:
 			int fd;

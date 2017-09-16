@@ -25,7 +25,7 @@ namespace eeros {
 			Output<Matrix<XBOX_BUTTON_COUNT,1,bool>>& getButtonOut();
 			
 			inline void on_button(std::function<void(int, bool)> &&action) {
-				j.on_button(std::move(action));
+				x.on_button(std::move(action));
 			}
 			
 			double speedScaleFactor = 1.0;
@@ -46,7 +46,7 @@ namespace eeros {
 		protected:
 			Output<Matrix<XBOX_BUTTON_COUNT,1,bool>> buttonOut;
 			Matrix<4,4,double> axisScale;
-			XBox j;
+			XBox x;
 			std::thread* t;
 		};
 

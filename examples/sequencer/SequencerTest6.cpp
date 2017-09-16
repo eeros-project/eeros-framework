@@ -6,7 +6,6 @@
 #include <eeros/core/Executor.hpp>
 #include <eeros/task/Periodic.hpp>
 #include <eeros/task/Lambda.hpp>
-#include <eeros/ui/CursesUI.hpp>
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -16,9 +15,8 @@ using namespace eeros::task;
 using namespace eeros::sequencer;
 using namespace eeros::safety;
 using namespace eeros::logger;
-using namespace eeros::ui;
 
-bool running = true;
+// bool running = true;
 
 class Robot {
 public:
@@ -42,11 +40,6 @@ public:
 	SafetyLevel slSingle;
 };
 
-class AbortCondition : public Condition {
-public:
-	bool validate() {return !running;}
-};
-
 class StepX : public Step {
 public:
 	StepX(std::string name, Sequencer& sequencer, BaseSequence* caller) : Step(name, sequencer, caller) { }
@@ -66,6 +59,7 @@ public:
 	SequenceA(std::string name, Sequencer& sequencer, BaseSequence* caller) : Sequence(name, sequencer, caller), stepX("step X", seq, this) { }
 	int action() {
 		for (int i = 0; i < 5; i++) stepX();
+// 		while (true) stepX();
 	}
 private:
 	StepX stepX;
@@ -85,10 +79,8 @@ private:
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqA("seq A", seq, this), seqB("seq B", seq, this), abortMonitor(this, abortCondition, SequenceProp::abort) { 
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqA("seq A", seq, this), seqB("seq B", seq, this) { 
 		setNonBlocking();
-		seqA.addMonitor(&abortMonitor);
-// 		seqB.addMonitor(&abortMonitor);
 	}
 		
 	int action() {
@@ -100,12 +92,10 @@ public:
 private:
 	SequenceA seqA;
 	SequenceB seqB;
-	AbortCondition abortCondition;
-	Monitor abortMonitor;
 };
 
 void signalHandler(int signum) {
-	running = false;
+	Sequencer::instance().abort();;
 	Executor::instance().stop();
 }
 
@@ -117,7 +107,7 @@ int main(int argc, char **argv) {
 	Logger::setDefaultWriter(&w);
 	Logger log;
 	
-	log.info() << "Sequencer example started...";
+	log.info() << "Mock robot example started...";
 	
 	double period = 0.01;
 	MySafetyProperties ssProperties;
@@ -137,8 +127,9 @@ int main(int argc, char **argv) {
 	
 	executor.run();
 	
-	// Wait until sequencer terminates
+	// terminate sequencer 
+// 	mainSeq.terminate();
 	mainSeq.join();
 	
-	log.info() << "Simple Sequencer Example finished...";
+	log.info() << "Mock robot example finished...";
 }
