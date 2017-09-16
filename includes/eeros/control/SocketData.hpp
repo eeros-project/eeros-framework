@@ -29,7 +29,7 @@ namespace eeros {
 					client = new eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(serverIP, port, period);;
 			}
 			
-			~SocketData() {server->stop();}
+			~SocketData() {if (isServer) server->stop(); else client->stop();}
 						
 			virtual void run() {
 				// receive
@@ -81,7 +81,7 @@ namespace eeros {
 					client =  new eeros::sockets::SocketClient<1, SigInType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(serverIP, port, period);
 			}
 			
-			~SocketData() {server->stop();}
+			~SocketData() {if (isServer) server->stop(); else client->stop();}
 						
 			virtual void run() {
 				// receive
@@ -133,7 +133,7 @@ namespace eeros {
 					client =  new eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 1, SigOutType>(serverIP, port, period);
 			}
 			
-			~SocketData() {server->stop();}
+			~SocketData() {if (isServer) server->stop(); else client->stop();}
 						
 			virtual void run() {
 				// receive
@@ -184,7 +184,7 @@ namespace eeros {
 					client =  new eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 0, std::nullptr_t>(serverIP, port, period);
 			}
 			
-			~SocketData() {server->stop();}
+			~SocketData() {if (isServer) server->stop(); else client->stop();}
 						
 			virtual void run() {
 				// send
@@ -221,7 +221,7 @@ namespace eeros {
 					client =  new eeros::sockets::SocketClient<0, std::nullptr_t, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(serverIP, port, period);
 			}
 			
-			~SocketData() {server->stop();}
+			~SocketData() {if (isServer) server->stop(); else client->stop();}
 						
 			virtual void run() {
 				// receive

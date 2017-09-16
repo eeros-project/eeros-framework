@@ -9,6 +9,7 @@
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/task/Periodic.hpp>
+#include <signal.h>
 
 using namespace eeros::control;
 using namespace eeros::sockets;
@@ -70,7 +71,12 @@ public:
 	eeros::safety::SafetyLevel off;
 }; 
 
+void signalHandler(int signum) {
+	Executor::instance().stop();
+}
+
 int main(int argc, char **argv) {
+	signal(SIGINT, signalHandler);
 	double dt = 0.01;
 	
 	StreamLogWriter w(std::cout);
@@ -98,9 +104,9 @@ int main(int argc, char **argv) {
 	auto& executor = Executor::instance();
 	executor.setMainTask(safetySystem);
 	executor.add(periodic);
-		
 	executor.run();
 	
+	log.info() << "Client program end";	
 	return 0;
 }
 
