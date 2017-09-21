@@ -4,6 +4,7 @@
 #include <eeros/sequencer/Step.hpp>
 
 #include <chrono>
+#include <signal.h>
 
 using namespace eeros::sequencer;
 using namespace eeros::logger;
@@ -51,7 +52,12 @@ private:
 	Monitor m;
 };
 
+void signalHandler(int signum) {
+	Sequencer::instance().abort();
+}
+
 int main(int argc, char **argv) {
+	signal(SIGINT, signalHandler);
 	StreamLogWriter w(std::cout);
 // 	w.show(LogLevel::TRACE);
 	Logger::setDefaultWriter(&w);
@@ -61,7 +67,7 @@ int main(int argc, char **argv) {
 	
 	auto& sequencer = Sequencer::instance();
 	MainSequence mainSeq("Main Sequence", sequencer);
-	sequencer.addMainSequence(mainSeq);
+	sequencer.addSequence(mainSeq);
 	mainSeq.start();
 	
 	// Wait until sequencer terminates

@@ -22,17 +22,6 @@ namespace eeros {
 			sequenceList.push_back(&seq);
 		}
 
-		void Sequencer::addMainSequence(Sequence& mainSeq) { 
-			if (mainSeq.isBlocking()) throw Fault("Main sequence has to be a nonblocking sequence");
-			mainSequence = &mainSeq;
-		// 	mainSequence->start();
-		}
-
-		Sequence* Sequencer::getMainSequence() {
-			if (mainSequence == nullptr) throw Fault("Main sequence not set in sequencer");
-			return mainSequence;
-		}
-
 		Sequence* Sequencer::getSequenceById(int id) {
 			for (Sequence *seq : getListOfAllSequences()) {
 				if (id == seq->getId()) return seq;
@@ -49,13 +38,14 @@ namespace eeros {
 			return nullptr;
 		}
 
-		std::vector< Sequence* > Sequencer::getListOfAllSequences() {
+		std::vector<Sequence*> Sequencer::getListOfAllSequences() {
 			return sequenceList;
 		}
 
-		// can be used to terminate the thread of the main sequence, will destroy all threads of subsequences
+		// can be used to terminate the threads of all sequences
 		void Sequencer::abort() {
-			getMainSequence()->conditionAbort.set();
+			std::vector<Sequence*> list = getListOfAllSequences();
+			for (Sequence* s : list) s->conditionAbort.set();
 			running = false;
 		}
 	};	//namespace sequencer

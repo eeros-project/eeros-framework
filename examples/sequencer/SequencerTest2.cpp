@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
 	
 	auto& sequencer = Sequencer::instance();
 	MainSequence mainSeq("Main Sequence", sequencer);
-	sequencer.addMainSequence(mainSeq);
+	sequencer.addSequence(mainSeq);
 	mainSeq.start();
 	
 	mainSeq.join();	// wait until sequencer terminates

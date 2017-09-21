@@ -21,7 +21,6 @@ namespace eeros {
 			}
 			void setBlocking() {blocking = true;}
 			void setNonBlocking() {log.error() << "a step is always blocking";}
-			void terminate() { } // a step has no associated thread
 		};
 	};	//namespace sequencer
 }; // namespace eeros

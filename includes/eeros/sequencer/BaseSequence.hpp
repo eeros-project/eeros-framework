@@ -34,7 +34,6 @@ namespace eeros {
 			virtual int start() = 0;
 			virtual bool checkPreCondition();
 			virtual bool checkExitCondition();
-			virtual void terminate() = 0;	// cancels the associated thread
 			
 			void setName(std::string name);
 			std::string getName() const;
@@ -70,7 +69,6 @@ namespace eeros {
 			std::string name;			
 			Sequencer& seq;			// reference to sequencer
 			BaseSequence* caller;		// calling sequence
-			bool isMainSequence = false;
 			bool blocking;			// standard run mode
 			bool exceptionIsActive = false;	// one of its monitors fired
 			bool inExcProcessing = false;	// this sequence already started an exception sequence of one of its monitors

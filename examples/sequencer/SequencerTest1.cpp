@@ -33,13 +33,12 @@ public:
 		setTimeoutTime(2.5);
 		setTimeoutExceptionSequence(eSeq);
 // 		setTimeoutBehavior(SequenceProp::resume);
-// 		setTimeoutBehavior(SequenceProp::abortOwner);
+// 		setTimeoutBehavior(SequenceProp::abort);
 		setTimeoutBehavior(SequenceProp::restart);
 	}
 		
 	int action() {
-		while (Sequencer::running) stepA();
-// 		for (int i = 0; i < 5; i++) stepA();
+		for (int i = 0; i < 5; i++) stepA();
 	}
 private:
 	StepA stepA;
@@ -61,8 +60,8 @@ int main(int argc, char **argv) {
 	
 	auto& sequencer = Sequencer::instance();
 	MainSequence mainSeq("Main Sequence", sequencer);
-	sequencer.addMainSequence(mainSeq);
-	mainSeq.start();
+ 	sequencer.addSequence(mainSeq);
+ 	mainSeq.start();
 	
 	mainSeq.join();	// wait until sequencer terminates
 	

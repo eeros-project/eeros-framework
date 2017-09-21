@@ -9,15 +9,7 @@ namespace eeros {
 			seq(seq), caller(caller), monitorTimeout("timeout", this, conditionTimeout, SequenceProp::abort), monitorAbort("abort", this, conditionAbort, SequenceProp::abort),
 			state(SequenceState::idle), blocking(true), pollingTime(100), log('X')
 		{
-			if (caller == nullptr) {
-				static int numberOfMainSequence;
-				numberOfMainSequence++;
-				if (numberOfMainSequence > 1) 
-					throw Fault("Only one main sequence is possible. Use 'Sequence(S, caller, name)' to construct a normal sequence");
-				else 
-					isMainSequence = true;
-			}
-			if (!isMainSequence) {	// get and update callerStack
+			if (caller != nullptr) {
 				callerStack = caller->getCallerStack();
 				callerStack.push_back(caller);	// add latest caller
 			}
@@ -28,6 +20,7 @@ namespace eeros {
 		BaseSequence::~BaseSequence() { }
 
 		int BaseSequence::action() {
+			usleep(100000);
 			state = SequenceState::running;
 			checkActiveException();	// check if this or a caller sequence is 'exceptionIsActive', set state accordingly
 
