@@ -61,7 +61,7 @@ int main() {
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;
-	
+
 	log.info() << "Space Navigator Test started...";
 	
 	ControlSystem controlSystem;

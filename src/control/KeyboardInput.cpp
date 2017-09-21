@@ -2,13 +2,9 @@
 
 using namespace eeros::control;
 
-KeyboardInput::KeyboardInput() {
-	t = new std::thread([this](){ this->k.loop(); });
-}
+KeyboardInput::KeyboardInput() { }
 
-KeyboardInput::~KeyboardInput() {
-	delete t;
-}
+KeyboardInput::~KeyboardInput() { }
 
 void KeyboardInput::run() {
 	uint64_t time = eeros::System::getTimeNs();

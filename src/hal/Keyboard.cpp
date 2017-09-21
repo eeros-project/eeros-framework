@@ -32,12 +32,15 @@ Keyboard::Keyboard() {
 }
 
 Keyboard::~Keyboard() {     
+	running = false; 
+	join(); 
 	tio.c_lflag |=(ICANON | ECHO);
 	tcsetattr(STDIN_FILENO, TCSANOW, &tio);
 }
 
-void Keyboard::loop() {
-	while (std::cin.good()) {
+void Keyboard::run() {
+	running = true;
+	while (running && std::cin.good()) {
 		char c;
 		std::cin.get(c);
 

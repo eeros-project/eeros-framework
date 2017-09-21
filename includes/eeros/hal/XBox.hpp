@@ -5,6 +5,7 @@
 #include <functional>
 #include <linux/joystick.h>
 #include <eeros/hal/Input.hpp>
+#include <eeros/core/Thread.hpp>
 
 #define XBOX_BUTTON_COUNT (8)
 #define XBOX_AXIS_COUNT (8)
@@ -43,25 +44,24 @@ namespace eeros {
 			};
 		};
 		
-		class XBox {
+		class XBox : public eeros::Thread{
 		public:
-			explicit XBox();
+			explicit XBox(std::string dev);
 			~XBox();
-			virtual bool open(const char* device);
-			virtual void close();
-			virtual void loop();
 			virtual void on_event(std::function<void(struct js_event)> action);
 			virtual void on_button(std::function<void(int, bool)> action);
 			virtual void on_axis(std::function<void(int, double)> action);
-			
 			virtual std::string name();
 			
 			XBoxState last;
 			XBoxState current;
-			bool running;
 			
 		private:
+			virtual void run();
+			virtual bool open(const char* device);
+			virtual void close();
 			int fd;
+			bool running;
 			std::function<void(struct js_event)> event_action;
 			std::function<void(int, bool)> button_action;
 			std::function<void(int, double)> axis_action;

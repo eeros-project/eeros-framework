@@ -6,6 +6,7 @@
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/core/Executor.hpp>
 #include <eeros/control/KeyboardInput.hpp>
+#include <signal.h>
 
 using namespace eeros;
 using namespace eeros::logger;
@@ -56,11 +57,15 @@ public:
 	SafetyEvent seGoDown;
 };
 
+void signalHandler(int signum) {
+	Executor::instance().stop();
+}
+
 int main() {
+	signal(SIGINT, signalHandler);
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;
-	
 	log.info() << "Keyboard Test started ...";
 	
 	ControlSystem controlSystem;

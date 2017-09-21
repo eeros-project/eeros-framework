@@ -12,9 +12,7 @@ Thread::Thread() : t([&]() {
 
 Thread::Thread(std::function<void ()> t) : t(t) { }
 
-Thread::~Thread() {
-	join();
-}
+Thread::~Thread() {join();}
 
 std::string Thread::getId() const {
 	std::ostringstream s;
@@ -26,5 +24,4 @@ void Thread::join() {
 	if(t.joinable()) t.join();
 }
 
-void Thread::run() {	log.warn() << "base class";
- }
+void Thread::run() {log.warn() << "base class";}

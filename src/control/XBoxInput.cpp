@@ -3,23 +3,15 @@
 using namespace eeros::control;
 using namespace eeros::math;
 
-XBoxInput::XBoxInput(std::string dev) {
+XBoxInput::XBoxInput(std::string dev) : x(dev) {
 	setInitPos({0,0,0,0,0,0,0,0});
-	x.open(dev.c_str());
-	x.running = true;
-	t = new std::thread([this](){ this->x.loop(); });
 	axisScale << xScale,      0,      0,      0,
 	                  0, yScale,      0,      0,
 	                  0,      0, zScale,      0,
 	                  0,      0,      0, rScale;
 }
 
-XBoxInput::~XBoxInput() {
-	x.running = false;
-	t->join();
-	delete t;
-	x.close();
-}
+XBoxInput::~XBoxInput() { }
 
 void XBoxInput::run() {
 	out.getSignal().setValue(Matrix<XBOX_AXIS_COUNT>{

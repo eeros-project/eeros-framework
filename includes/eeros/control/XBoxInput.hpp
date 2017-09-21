@@ -47,7 +47,6 @@ namespace eeros {
 			Output<Matrix<XBOX_BUTTON_COUNT,1,bool>> buttonOut;
 			Matrix<4,4,double> axisScale;
 			XBox x;
-			std::thread* t;
 		};
 
 	};

@@ -25,7 +25,6 @@ namespace eeros {
 			virtual void setInitPos(Vector4 pos);
 			virtual void reset(double x, double y, double z, double r);
 
-			Mouse mouse;
 			double axisScale_x = 0.0001;
 			double axisScale_y = 0.0001;
 			double axisScale_z = 0.001;
@@ -43,7 +42,7 @@ namespace eeros {
 			Output<Matrix<3,1,bool>> buttonOut;
 			double x, y, z, r;
 			bool first;
-			std::thread* t;
+			Mouse mouse;
 		};
 	};
 };

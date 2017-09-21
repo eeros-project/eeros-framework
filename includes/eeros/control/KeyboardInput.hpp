@@ -27,8 +27,6 @@ namespace eeros {
 			Output<bool>& getStop();
 			virtual void run();
 			
-			Keyboard k;
-
 		protected:
 			Output<Vector<5,bool>> isHomed;
 			Output<bool> esc;
@@ -36,7 +34,7 @@ namespace eeros {
 			Output<bool> reset;
 			Output<bool> start;
 			Output<bool> stop;
-			std::thread* t;
+			Keyboard k;
 		};
 	};
 };

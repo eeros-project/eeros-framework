@@ -1,6 +1,7 @@
 #include <eeros/hal/Mouse.hpp>
 #include <eeros/hal/HAL.hpp>
 #include <eeros/hal/MouseDigIn.hpp>
+#include <eeros/core/Fault.hpp>
 
 #include <cstdio>
 #include <fcntl.h>
@@ -8,7 +9,8 @@
 
 using namespace eeros::hal;
 
-Mouse::Mouse() {
+Mouse::Mouse(std::string dev) {
+	open(dev.c_str());
 	left = new MouseDigIn("leftMouseButton", this);
 	middle = new MouseDigIn("middleMouseButton", this);
 	right = new MouseDigIn("rightMouseButton", this);
@@ -29,10 +31,15 @@ Mouse::Mouse() {
         last = current;
 }
 
-Mouse::~Mouse() { close(); }
+Mouse::~Mouse() {
+	running = false; 
+	join(); 
+	close(); 
+}
 
 bool Mouse::open(const char* device) {
 	fd = ::open(device, O_RDONLY);
+	if (fd < 0) throw eeros::Fault("Mouse: could not open input device ");
 	return fd;
 }
 
@@ -62,7 +69,8 @@ void Mouse::on_axis(std::function<void(int, signed)> action) {
 }
 
 
-void Mouse::loop() {
+void Mouse::run() {
+	running = true;
 	struct input_event e;
 	while (running) {
 		ssize_t n = read(fd, &e, sizeof(struct input_event));

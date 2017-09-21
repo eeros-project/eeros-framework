@@ -2,20 +2,12 @@
 
 using namespace eeros::control;
 
-MouseInput::MouseInput(std::string dev) {
+MouseInput::MouseInput(std::string dev) : mouse(dev) {
 	setInitPos(0, 0, 0, 0);
-	mouse.open(dev.c_str());
-	mouse.running = true;
-	t = new std::thread([this](){ this->mouse.loop(); });
 	first = true;
 }
 
-MouseInput::~MouseInput() {
-	mouse.running = false;
-	t->join();
- 	delete t;
-	mouse.close();
-}
+MouseInput::~MouseInput() { }
 
 void MouseInput::run() {
 	if (first) {

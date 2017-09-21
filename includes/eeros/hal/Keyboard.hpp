@@ -6,7 +6,7 @@
 #include <termios.h>
 #include <linux/input.h>
 #include <eeros/hal/Input.hpp>
-
+#include <eeros/core/Thread.hpp>
 
 namespace eeros {
 	namespace hal {
@@ -19,17 +19,17 @@ namespace eeros {
 			bool stop;
 		};
 
-		class Keyboard {
+		class Keyboard : public eeros::Thread {
 		public:
 			explicit Keyboard();
 			~Keyboard();
-			virtual void loop();
 			Events events;
 			bool homed[5];
 			double speed[4];
 		private:
+			virtual void run();
+			bool running;
 			struct termios tio;
-			
 			Input<bool>* esc;
 			Input<bool>* emergency;
 			Input<bool>* reset;

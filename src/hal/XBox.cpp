@@ -10,7 +10,8 @@ using namespace eeros::hal;
 
 const double XBoxState::axis_max = 0x7fff;
 
-XBox::XBox() {
+XBox::XBox(std::string dev) {
+	open(dev.c_str());
 	button[0] = new XBoxDigIn("XBoxButtonA", this);
 	button[1] = new XBoxDigIn("XBoxButtonB", this);
 	button[2] = new XBoxDigIn("XBoxButtonX", this);
@@ -37,10 +38,15 @@ XBox::XBox() {
 }
 
 
-XBox::~XBox() { close(); }
+XBox::~XBox() {
+	running = false; 
+	join(); 
+	close(); 
+}
 
 bool XBox::open(const char* device) {
 	fd = ::open(device, O_RDONLY);
+	if (fd < 0) throw eeros::Fault("XBox: could not open input device ");
 	return fd;
 }
 
@@ -69,7 +75,8 @@ void XBox::on_axis(std::function<void(int, double)> action) {
 }
 
 
-void XBox::loop() {
+void XBox::run() {
+	running = true;
 	struct js_event e;
 	while (running) 	{
 		ssize_t n = read(fd, &e, sizeof(struct js_event));

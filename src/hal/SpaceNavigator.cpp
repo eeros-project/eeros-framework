@@ -8,7 +8,8 @@
 
 using namespace eeros::hal;
 
-SpaceNavigator::SpaceNavigator() {
+SpaceNavigator::SpaceNavigator(std::string dev) {
+	open(dev.c_str());
 	button[0] = new SpaceNavigatorDigIn("SpaceNavButtonL", this);
 	button[1] = new SpaceNavigatorDigIn("SpaceNavButtonR", this);
 	HAL& hal = HAL::instance();
@@ -18,10 +19,15 @@ SpaceNavigator::SpaceNavigator() {
 }
 
 
-SpaceNavigator::~SpaceNavigator() { close(); }
+SpaceNavigator::~SpaceNavigator() { 
+	running = false; 
+	join(); 
+	close(); 
+}
 
 bool SpaceNavigator::open(const char* device) {
 	file = ::fopen(device, "rb");
+	if (file == NULL) throw eeros::Fault("Space Navigator: could not open input device ");
 	return true;
 }
 
@@ -77,7 +83,8 @@ std::string SpaceNavigator::name() {
      * As such, byte 1 can take values 0x00, 0x01, 0x02, or 0x03.
      */
 
-void SpaceNavigator::loop() {
+void SpaceNavigator::run() {
+	running = true;
 	uint8_t readbuff[14];
 	while (running) {
 		*readbuff = fgetc(file);

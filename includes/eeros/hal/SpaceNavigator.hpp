@@ -4,6 +4,7 @@
 #include <string>
 #include <functional>
 #include <eeros/hal/Input.hpp>
+#include <eeros/core/Thread.hpp>
 
 #define SPACENAVIGATOR_AXIS_COUNT (3)
 #define SPACENAVIGATOR_ROT_AXIS_COUNT (3)
@@ -34,20 +35,20 @@ namespace eeros {
 			};
 		};
 		
-		class SpaceNavigator {
+		class SpaceNavigator : public eeros::Thread {
 		public:
-			explicit SpaceNavigator();
+			explicit SpaceNavigator(std::string dev);
 			~SpaceNavigator();
-			virtual bool open(const char* device);
-			virtual void close();
-			virtual void loop();			
 			virtual std::string name();
 			
 			SpaceState current;
-			bool running;
 			
 		private:
+			virtual void run();			
+			virtual bool open(const char* device);
+			virtual void close();
 			FILE* file;
+			bool running;
 			Input<bool>* button[SPACENAVIGATOR_BUTTON_COUNT];
 		};
 	}
