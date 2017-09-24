@@ -31,10 +31,8 @@ namespace eeros {
 				if (state == SequenceState::restarting) {	// sequence got restarted
 					log.info() << "restart sequence '" << name << "'";
 					state = SequenceState::running;
-		// 			sequenceIsRestarting = false;
 					resetTimeout();
-		// 			restartCounter++;
-				} //else restartCounter = 0;
+				} 
 				bool firstCheck = true;
 				if (checkPreCondition()) {
 					checkMonitorsOfBlockedCallers();	// check for monitors of all callers, start exception sequence, mark owner of fired monitor with 'exceptionIsActive'

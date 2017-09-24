@@ -53,8 +53,7 @@ int main(int argc, char **argv) {
 	executor.run();
 	
 	// terminate sequencer 
-	homingSeq.join();
-	upDownSeq.join();
+	sequencer.join();
 	
 	log.info() << "Mock robot example finished...";
 }

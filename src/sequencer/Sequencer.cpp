@@ -41,6 +41,11 @@ namespace eeros {
 		std::vector<Sequence*> Sequencer::getListOfAllSequences() {
 			return sequenceList;
 		}
+		
+		void Sequencer::join() {
+			std::vector<Sequence*> list = getListOfAllSequences();
+			for (Sequence* s : list) s->join();
+		}
 
 		// can be used to terminate the threads of all sequences
 		void Sequencer::abort() {

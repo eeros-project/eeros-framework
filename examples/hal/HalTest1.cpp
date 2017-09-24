@@ -40,7 +40,7 @@ int main(int argc, char **argv){
 	executor.setMainTask(safetySystem);
 	executor.run();
 	
-	mainSequence.join();
+	sequencer.join();
 	log.info() << "end...";
 		
 	return 0;

@@ -24,7 +24,7 @@ Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller) : Bas
 	log.trace() << "Sequence '" << name << "' created";
 }
 
-Sequence::~Sequence() {delete thread;}
+Sequence::~Sequence() { }
 
 void Sequence::run() {	// runs in thread
 	std::ostringstream s;
@@ -44,7 +44,7 @@ int Sequence::start() {
 		BaseSequence::action();				//action gets overwritten by child class
 		log.info() << "sequence '" << name << "' terminated";
 	} else {
-		thread = new std::thread([this]() {this->run();});
+		thread.reset(new std::thread([this]() {this->run();}));
 	}
 	return 0;
 }

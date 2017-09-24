@@ -11,6 +11,7 @@ namespace eeros {
 		class Sequencer;
 		
 		class Sequence : public BaseSequence {
+			friend class Sequencer;
 		public:
 			Sequence(std::string name, Sequencer& seq, BaseSequence* caller);
 			Sequence(std::string name, Sequencer& seq);	// only for mainSequence
@@ -26,7 +27,7 @@ namespace eeros {
 		private:
 			std::mutex m;
 			std::condition_variable cv;
-			std::thread* thread = nullptr;
+			std::unique_ptr<std::thread> thread;
 			void run();
 		};
 	};	//namespace sequencer

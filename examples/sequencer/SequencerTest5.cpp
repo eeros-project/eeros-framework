@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
 	mainSeq.start();
 	
 	// Wait until sequencer terminates
-	mainSeq.join();
+	sequencer.join();
 	
 	log.info() << "Simple Sequencer Example finished...";
 }

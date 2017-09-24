@@ -21,6 +21,7 @@ namespace eeros {
 			Sequence* getSequenceByName(std::string name);
 			std::vector<Sequence*> getListOfAllSequences();
 			void abort();
+			void join();
 			static bool running;
 		private:
 			Sequence* mainSequence;
