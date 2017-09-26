@@ -17,10 +17,9 @@ using namespace eeros::task;
 class ControlSystem;
 class SafetyPropertiesTest : public SafetyProperties {
 public:
-	SafetyPropertiesTest();
+	SafetyPropertiesTest(double ts);
 	
 	ControlSystem* controlSystem;
-	double period = 0.01;
 
 	SafetyEvent seStartRampingUp;
 	SafetyEvent seReset;
@@ -42,7 +41,7 @@ public:
 	SignalChecker<> checker;
 };
 
-SafetyPropertiesTest::SafetyPropertiesTest() : 
+SafetyPropertiesTest::SafetyPropertiesTest(double ts) : 
 	seStartRampingUp("start ramping up"),
 	seReset("reset"),
 	slStart("start"),
@@ -58,10 +57,10 @@ SafetyPropertiesTest::SafetyPropertiesTest() :
 	slRampingUp.addEvent(seReset, slStart, kPublicEvent);
 
 	// Define and add level functions
-	slStart.setLevelAction([&](SafetyContext* privateContext) {
+	slStart.setLevelAction([this,ts](SafetyContext* privateContext) {
 		controlSystem->i.disable();
 		controlSystem->i.setInitCondition(0);
-		if(slStart.getNofActivations() * period > 3) {
+		if(slStart.getNofActivations() * ts > 3) {
 			privateContext->triggerEvent(seStartRampingUp);
 			controlSystem->checker.reset();
 			controlSystem->i.enable();
@@ -80,17 +79,15 @@ int main() {
 	log.info() << "Safety System Example 2 started...";
 	
 	// Create and initialize safety system
-	SafetyPropertiesTest ssProperties;
-	SafetySystem safetySys(ssProperties, ssProperties.period);
+	double period = 0.01;
+	SafetyPropertiesTest ssProperties(period);
+	SafetySystem safetySys(ssProperties, period);
 	ControlSystem controlSystem(safetySys, ssProperties);
 	ssProperties.controlSystem = &controlSystem;
 
-	TimeDomain td("td1", 0.01, true);
-	Periodic periodic("per1", 0.01, td);
+	TimeDomain td("td1", 0.5, true);
+	Periodic periodic("per1", 0.5, td);
 	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
-		static int ticks = 0;
-		if (++ticks < 100) return;
-		ticks = 0;
 		log.info() << controlSystem.i.getOut().getSignal();
 	});
 	
