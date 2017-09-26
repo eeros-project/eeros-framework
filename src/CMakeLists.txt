@@ -25,7 +25,7 @@ add_subdirectory(sequencer)
 add_subdirectory(socket)
 add_subdirectory(safety)
 add_subdirectory(logger)
-add_subdirectory(ui)
+# add_subdirectory(ui)
 
 link_directories(${EEROS_BINARY_DIR}/src/core)
 link_directories(${EEROS_BINARY_DIR}/src/math)
@@ -35,7 +35,7 @@ link_directories(${EEROS_BINARY_DIR}/src/sequencer)
 link_directories(${EEROS_BINARY_DIR}/src/socket)
 link_directories(${EEROS_BINARY_DIR}/src/safety)
 link_directories(${EEROS_BINARY_DIR}/src/logger)
-link_directories(${EEROS_BINARY_DIR}/src/ui)
+# link_directories(${EEROS_BINARY_DIR}/src/ui)
 
 add_library(eeros SHARED ${EEROS_SRCS})
 
