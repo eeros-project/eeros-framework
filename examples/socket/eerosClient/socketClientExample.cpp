@@ -23,19 +23,22 @@ public:
 	TestAppCS(double dt) : 
 		dt(dt),
 		log('C'),
-		socketA("127.0.0.1", 9876, 0.01),	// client
+		socketA("127.0.0.1", 9876, 0.1),	// client
 		c1({0.2, 0.3, 0.4, 0.5, 0.6, -0.7}),
 		c2(56.5),
 		c3(-28),
+		c4({-5,8,-321}),
 		timedomain("Main time domain", dt, true) {
 		
 		socketA.getOut().getSignal().setName("socketRead");
-		socketA.getIn().connect(c1.getOut());
+// 		socketA.getIn().connect(c1.getOut());
 // 		socketA.getIn().connect(c2.getOut());
-// 		socketA.getIn().connect(c3.getOut());
+		socketA.getIn().connect(c3.getOut());
+// 		socketA.getIn().connect(c4.getOut());
 		timedomain.addBlock(c1);
 		timedomain.addBlock(c2);
 		timedomain.addBlock(c3);
+		timedomain.addBlock(c4);
 		timedomain.addBlock(socketA);
 		
 		Executor::instance().add(timedomain);
@@ -46,13 +49,16 @@ public:
 	Constant<Matrix<6,1,double>> c1;
 	Constant<double> c2;
 	Constant<int> c3;
-	SocketData<Matrix<6,1,double>, Vector4> socketA;		// send Matrix<6,1,double>, receive Vector4, connect to c1
+	Constant<Matrix<3,1,int>> c4;
+// 	SocketData<Matrix<6,1,double>, Vector4> socketA;	// send Matrix<6,1,double>, receive Vector4, connect to c1
+// 	SocketData<Matrix<3,1,int>, Vector4> socketA;		// send Matrix<3,1,double>, receive Vector4, connect to c4
 // 	SocketData<double, Vector4> socketA;			// send double, receive Vector4, connect to c2
 // 	SocketData<int, Vector4> socketA;			// send int, receive Vector4, connect to c3
 // 	SocketData<std::nullptr_t, Vector4> socketA;		// send nothing, receive Vector4, no connection
-// 	SocketData<Matrix<6,1,double>, double> socketA;		// send Matrix<6,1,double>, receive double, connect to c1
+//	SocketData<Matrix<6,1,double>, double> socketA;		// send Matrix<6,1,double>, receive double, connect to c1
 // 	SocketData<Matrix<6,1,double>, int> socketA;		// send Matrix<6,1,double>, receive int, connect to c1
 // 	SocketData<Matrix<6,1,double>, std::nullptr_t> socketA;	// send Matrix<6,1,double>, receive nothing, connect to c1
+	SocketData<int, std::nullptr_t> socketA;		// send int, receive nothing, connect to c3
 	Logger log;
 		
 protected:

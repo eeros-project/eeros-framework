@@ -110,7 +110,7 @@ namespace eeros {
 								log.trace() << "error = socket read timed out";
 								connected = false;
 							}
-	// 						log.trace() << "try to read " << count << " Bytes";
+// 							log.trace() << "try to read " << count << " Bytes";
 							n = read(newsockfd, ptr, count);
 							if (n < 0) {
 								log.trace() << "error = " << std::strerror(errno);
@@ -125,6 +125,10 @@ namespace eeros {
 						next_cycle += seconds(period);
 					}
 					close(newsockfd);
+					// if disconnected clear receive buffer
+					std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
+					for(int i = 0; i < BufOutLen; i++) readValue[i] = 0;
+					flip();
 				}
 				close(sockfd);
 			}
@@ -154,6 +158,7 @@ namespace eeros {
 			struct hostent *server;
 			int sockfd;
 			int newsockfd;
+			char* p;
 			
 			std::array<outT, BufOutLen> read1, read2, read3;
 			std::array<inT, BufInLen> send1, send2, send3;
