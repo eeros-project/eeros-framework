@@ -1,4 +1,5 @@
 #include <eeros/sequencer/BaseSequence.hpp>
+#include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/core/Fault.hpp>
 #include <unistd.h>
 
@@ -20,7 +21,12 @@ namespace eeros {
 		BaseSequence::~BaseSequence() { }
 
 		int BaseSequence::action() {
-			usleep(100000);
+			auto& seq = Sequencer::instance();
+			if (seq.stepping) {
+				log.warn() << "wait for next step command";
+				while (Sequencer::running && !seq.nextStep);
+				seq.nextStep = false;
+			}
 			state = SequenceState::running;
 			checkActiveException();	// check if this or a caller sequence is 'exceptionIsActive', set state accordingly
 
@@ -58,6 +64,7 @@ namespace eeros {
 			
 			if (state == SequenceState::aborting) state = SequenceState::aborted;
 			else state = SequenceState::terminated;
+			if (Sequencer::instance().stepping) log.warn() << "'" << name << "' done";
 		}
 
 		void BaseSequence::addMonitor(Monitor* monitor) {monitors.push_back(monitor);}

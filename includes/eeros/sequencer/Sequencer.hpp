@@ -4,13 +4,18 @@
 #include <eeros/logger/Logger.hpp>
 #include <vector>
 #include <atomic>
+#include <memory>
 
 namespace eeros {
 	namespace sequencer {
 		
 		class Sequence;
+		class SequencerUI;
 
 		class Sequencer {
+			friend class BaseSequence;
+			friend class SequencerUI;
+			
 			Sequencer();
 		public:
 			virtual ~Sequencer();
@@ -22,12 +27,18 @@ namespace eeros {
 			std::vector<Sequence*> getListOfAllSequences();
 			void abort();
 			void join();
+			void singleStepping();
 			static bool running;
 		private:
+			void step();
+			void restart();
 			Sequence* mainSequence;
 			std::vector<Sequence*> sequenceList;	// list of all sequences
 			eeros::logger::Logger log;	
 			unsigned int id;
+			bool stepping;
+			bool nextStep;
+			SequencerUI* ui;
 		};
 	};	//namespace sequencer
 }; // namespace eeros

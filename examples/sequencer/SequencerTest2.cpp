@@ -4,6 +4,7 @@
 #include <eeros/sequencer/Step.hpp>
 #include <signal.h>
 #include <chrono>
+#include <unistd.h>
 
 using namespace eeros::sequencer;
 using namespace eeros::logger;
