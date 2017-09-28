@@ -158,7 +158,6 @@ namespace eeros {
 			struct hostent *server;
 			int sockfd;
 			int newsockfd;
-			char* p;
 			
 			std::array<outT, BufOutLen> read1, read2, read3;
 			std::array<inT, BufInLen> send1, send2, send3;
