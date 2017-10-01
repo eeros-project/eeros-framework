@@ -1,10 +1,8 @@
 #ifndef ORG_EEROS_CONTROL_SUM_HPP_
 #define ORG_EEROS_CONTROL_SUM_HPP_
 
-#include <vector>
 #include <eeros/control/Block1o.hpp>
 #include <eeros/control/Input.hpp>
-#include <eeros/control/Output.hpp>
 
 namespace eeros {
 	namespace control {
@@ -25,18 +23,13 @@ namespace eeros {
 					if(negated[i]) sum -= in[i].getSignal().getValue();
 					else sum += in[i].getSignal().getValue();
 				}
-				out.getSignal().setValue(sum);
-				out.getSignal().setTimestamp(in[0].getSignal().getTimestamp());
+				this->out.getSignal().setValue(sum);
+				this->out.getSignal().setTimestamp(in[0].getSignal().getTimestamp());
 			}
 			
 			virtual Input<T>& getIn(uint8_t index) {
 				return in[index];
 			}
-			
-			virtual Output<T>& getOut() {
-				return out;
-			}
-			
 			
 			virtual void negateInput(uint8_t index) {
 				negated[index] = true;
@@ -44,7 +37,6 @@ namespace eeros {
 
 		protected:
 			Input<T> in[N];
-			Output<T> out;
 			bool negated[N];
 		};
 		

@@ -3,10 +3,11 @@
 
 add_eeros_test_sources(Constant.cpp)
 add_eeros_test_sources(DeMux.cpp)
+add_eeros_test_sources(Mul.cpp)
 add_eeros_test_sources(SocketData.cpp)
+add_eeros_test_sources(Sum.cpp)
 
 # Blocks
-add_subdirectory(sum)
 add_subdirectory(d)
 add_subdirectory(mux)
 # add_subdirectory(demux)
