@@ -90,3 +90,11 @@ set( HAL_CONFIG_FILES
 foreach( halConfig_i ${HAL_CONFIG_FILES})
           add_custom_command(TARGET unitTests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${halConfig_i} "${EEROS_BINARY_DIR}/test/")
 endforeach( halConfig_i )
+
+set( PATH_PLANNER_FILES
+      ${EEROS_SOURCE_DIR}/test/control/path1.txt
+)
+      
+foreach( ppFiles_i ${PATH_PLANNER_FILES})
+          add_custom_command(TARGET unitTests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${ppFiles_i} "${EEROS_BINARY_DIR}/test/")
+endforeach( ppFiles_i )
