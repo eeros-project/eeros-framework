@@ -172,6 +172,57 @@ namespace eeros {
 
 		template < typename SigInType, typename SigOutType >
 		class SocketData<SigInType, SigOutType,
+			typename std::enable_if<std::is_arithmetic<SigInType>::value && std::is_arithmetic<SigOutType>::value>::type> 
+			: public Block1i1o<SigInType, SigOutType> {			
+		public:
+			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
+				bufInLen = 1;
+				bufOutLen = 1;
+				isServer = serverIP.empty();
+				if (isServer)
+					server =  new eeros::sockets::SocketServer<1, SigInType, 1, SigOutType>(port, period);
+				else
+					client =  new eeros::sockets::SocketClient<1, SigInType, 1, SigOutType>(serverIP, port, period);
+			}
+			
+			~SocketData() {if (isServer) server->stop(); else client->stop();}
+						
+			virtual void run() {
+				// receive
+				SigOutType output; 
+				if (isServer) {
+					std::array<SigOutType, 1>& getData = server->getReceiveBuffer();
+					output = getData[0];
+				} else {
+					std::array<SigOutType, 1>& getData = client->getReceiveBuffer();
+					output = getData[0];
+				}
+				
+				// send
+				if (this->in.isConnected()) {
+					sendData[0] = this->in.getSignal().getValue();
+					if (isServer) server->setSendBuffer(sendData);
+					else client->setSendBuffer(sendData);
+				}
+				
+				this->out.getSignal().setValue(output);
+				timestamp_t time = System::getTimeNs();
+				this->out.getSignal().setTimestamp(time);
+			}
+			
+			template <typename X, typename Y>
+			friend std::ostream& operator<<(std::ostream& os, SocketData<X,Y>& s);
+
+		protected:
+			eeros::sockets::SocketServer<1, SigInType, 1, SigOutType>* server;
+			eeros::sockets::SocketClient<1, SigInType, 1, SigOutType>* client;
+			std::array<SigInType, 1> sendData;
+			uint32_t bufInLen, bufOutLen;
+			bool isServer;
+		};
+
+		template < typename SigInType, typename SigOutType >
+		class SocketData<SigInType, SigOutType,
 			typename std::enable_if<std::is_compound<SigInType>::value && std::is_same<SigOutType, std::nullptr_t>::value>::type> 
 			: public Block1i1o<SigInType> {			
 		public:
