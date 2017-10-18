@@ -41,9 +41,9 @@ namespace eeros {
 				container->mtx.lock();
 				Signal<T> sig;
 				for (typename std::vector<Signal<T>>::iterator it = container->buf.begin(); it != container->buf.end(); ++it) {
-//					this->container->log.error() << (*it).getTimestamp();
+// 					this->container->log.error() << time << "   " << (*it).getTimestamp();
 					sig = *it;
-					if (time >= sig.getTimestamp()) break;
+					if (time <= sig.getTimestamp()) break;
 // 						container->log.warn() << *it;
 				}
 				container->buf.clear();
