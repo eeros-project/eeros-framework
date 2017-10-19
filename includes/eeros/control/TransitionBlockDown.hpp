@@ -4,6 +4,7 @@
 #include <mutex>
 #include <eeros/control/Block1i.hpp>
 #include <eeros/control/Block1o.hpp>
+#include <eeros/control/Block1i1o.hpp>
 #include <eeros/control/Signal.hpp>
 #include <eeros/logger/Logger.hpp>
 

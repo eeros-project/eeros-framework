@@ -46,7 +46,7 @@ namespace eeros {
 					dVal = (in.getValue() - prevIn.getValue()) / container->ratio;
 					dTime= (in.getTimestamp() - prevIn.getTimestamp()) / container->ratio;
 				}
-				T val = prevIn.getValue() + count * dVal;
+				T val = prevIn.getValue() + dVal * count;
 				this->getOut().getSignal().setValue(val);
 				timestamp_t time = prevIn.getTimestamp() + count * dTime;
 				this->getOut().getSignal().setTimestamp(time);
@@ -56,7 +56,8 @@ namespace eeros {
 		protected:
 			TransitionBlockUp<T>* container;
 			Signal<T> prevIn, in;
-			double dVal, dTime;
+			T dVal;
+			double dTime;
 			uint32_t count;
 		};
 
