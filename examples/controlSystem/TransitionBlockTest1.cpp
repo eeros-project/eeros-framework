@@ -5,10 +5,11 @@
 #include <eeros/core/Executor.hpp>
 #include <eeros/control/Constant.hpp>
 #include <eeros/control/I.hpp>
-#include <eeros/control/TransitionBlockUp.hpp>
-#include <eeros/control/TransitionBlockDown.hpp>
+#include <eeros/control/Transition.hpp>
 #include <eeros/task/Lambda.hpp>
+#include <eeros/math/Matrix.hpp>
 
+using namespace eeros::math;
 using namespace eeros;
 using namespace eeros::safety;
 using namespace eeros::logger;
@@ -41,8 +42,8 @@ public:
 	TimeDomain tdFast, tdSlow;
 	Constant<> c1;
 	I<> i1;
-	TransitionBlockUp<> t1;
-	TransitionBlockDown<> t2;
+	Transition<> t1;
+	Transition<> t2;
 };
 
 class SafetyPropertiesTest : public SafetyProperties {
@@ -72,10 +73,10 @@ int main() {
 	Periodic periodic("per1", 0.5, l1);
 	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
 //		log.warn() << controlSystem.i1.getOut().getSignal();
-// 		log.info() << controlSystem.t1.outBlock.getOut().getSignal() << "   " << controlSystem.t2.outBlock.getOut().getSignal();
- 		log.info() << controlSystem.i1.getOut().getSignal() << "   " << controlSystem.t1.outBlock.getOut().getSignal() << "   " << controlSystem.t2.outBlock.getOut().getSignal();
+		log.info() << controlSystem.t1.outBlock.getOut().getSignal() << "   " << controlSystem.t2.outBlock.getOut().getSignal();
+//  		log.info() << controlSystem.i1.getOut().getSignal() << "   " << controlSystem.t1.outBlock.getOut().getSignal() << "   " << controlSystem.t2.outBlock.getOut().getSignal();
 	});
-	
+
 	// Create and run executor
 	auto& executor = eeros::Executor::instance();
 	executor.setMainTask(safetySys);

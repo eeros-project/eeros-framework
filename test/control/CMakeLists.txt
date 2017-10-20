@@ -7,6 +7,7 @@ add_eeros_test_sources(Mul.cpp)
 add_eeros_test_sources(PathPlannerCubic.cpp)
 add_eeros_test_sources(SocketData.cpp)
 add_eeros_test_sources(Sum.cpp)
+add_eeros_test_sources(Transition.cpp)
 
 # Blocks, old, delete when replaced by new tests
 add_subdirectory(d)
