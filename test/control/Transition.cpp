@@ -65,12 +65,12 @@ TEST(controlTransitionSimpleTest, simple) {
 		t2.inBlock.run();
 	}
 	t2.outBlock.run();
-	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue(), 0.6, 1e-10));
+	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue(), 0.4, 1e-10));
 }
 
 TEST(controlTransitionSimpleTest, vector) {
 	Transition<Vector2> t1(5);
-	Transition<Vector2> t2(5);
+	Transition<Vector2> t2(1/5);
 	Constant<Vector2> c1({0,0}), c2({0,0});
 	t1.inBlock.getIn().connect(c1.getOut());
 	t2.inBlock.getIn().connect(t1.outBlock.getOut());
@@ -95,6 +95,6 @@ TEST(controlTransitionSimpleTest, vector) {
 		t2.inBlock.run();
 	}
 	t2.outBlock.run();
-	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue()[0], 0.8, 1e-10));
-	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue()[1], 1.6, 1e-10));
+	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue()[0], 0.4, 1e-10));
+	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue()[1], 0.8, 1e-10));
 }

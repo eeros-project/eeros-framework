@@ -64,13 +64,10 @@ namespace eeros {
 				} else {	//down
 					auto time = this->getIn().getSignal().getTimestamp();
 					container->mtx.lock();
-					Signal<T> sig;
-					for (typename std::vector<Signal<T>>::iterator it = container->buf.begin(); it != container->buf.end(); ++it) {
-	// 					this->container->log.error() << time << "   " << (*it).getTimestamp();
-						sig = *it;
-						if (time <= sig.getTimestamp()) break;
-	// 						container->log.warn() << *it;
-					}
+					int i = 0;
+					while (i < container->buf.size() && time > container->buf[i].getTimestamp()) i++;
+					if (i > 0) i--;
+					Signal<T> sig = container->buf[i];
 					container->buf.clear();
 					container->mtx.unlock();
 					this->getOut().getSignal().setValue(sig.getValue());
@@ -106,6 +103,7 @@ namespace eeros {
 					bufSize = 1 / ratio;
 				}
 			}
+			virtual ~Transition() { }
 			
 			TransitionInBlock<T> inBlock;
 			TransitionOutBlock<T> outBlock;
@@ -117,7 +115,6 @@ namespace eeros {
 			double ratio;
 			uint32_t bufSize;
 			std::mutex mtx;
-// 			eeros::logger::Logger log;
 		};
 
 		/********** Print functions **********/
