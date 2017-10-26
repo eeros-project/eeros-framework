@@ -23,20 +23,22 @@ TEST(controlTransitionNameTest, naming) {
 
 TEST(controlTransitionNanTest, nan) {
 	Transition<> t1(1);
+	t1.inBlock.setName("t1");
 	EXPECT_TRUE(std::isnan(t1.outBlock.getOut().getSignal().getValue()));
 	Transition<> t2(1);
+	t2.inBlock.setName("t2");
 	EXPECT_TRUE(std::isnan(t2.outBlock.getOut().getSignal().getValue()));
 	try {
 		t1.inBlock.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 't1'"));
 	}
 	try {
 		t2.inBlock.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 't2'"));
 	}
 }
 

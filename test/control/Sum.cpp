@@ -14,6 +14,10 @@ TEST(controlSumTest, initialValue) {
 	Sum<2, int> s2;
 	Sum<2, Matrix<2,1,double>> s3;
 	Sum<2, Matrix<2,1,int>> s4;
+	s1.setName("s1");
+	s2.setName("s2");
+	s3.setName("s3");
+	s4.setName("s4");
 		
 	EXPECT_TRUE(std::isnan(s1.getOut().getSignal().getValue()));
 	EXPECT_EQ(s2.getOut().getSignal().getValue(), std::numeric_limits<int32_t>::min());
@@ -25,25 +29,25 @@ TEST(controlSumTest, initialValue) {
 		s1.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 's1'"));
 	}
 	try {
 		s2.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 's2'"));
 	}
 	try {
 		s3.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 's3'"));
 	}
 	try {
 		s4.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 's4'"));
 	}
 }
 

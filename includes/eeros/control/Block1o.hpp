@@ -11,7 +11,7 @@ namespace eeros {
 		template < typename T = double >
 		class Block1o : public Block {
 		public:
-			Block1o() {
+			Block1o() : out(this) {
 				this->out.getSignal().clear();
 			}
 			

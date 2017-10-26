@@ -14,6 +14,10 @@ TEST(controlMulTest, initialValue) {
 	Mul<int,int,int> m2;
 	Mul<Matrix<2,2,double>,Matrix<2,1,double>,Matrix<2,1,double>> m3;
 	Mul<Matrix<2,2,int>,Matrix<2,1,int>,Matrix<2,1,int>> m4;
+	m1.setName("m1");
+	m2.setName("m2");
+	m3.setName("m3");
+	m4.setName("m4");
 		
 	EXPECT_TRUE(std::isnan(m1.getOut().getSignal().getValue()));
 	EXPECT_EQ(m2.getOut().getSignal().getValue(), std::numeric_limits<int32_t>::min());
@@ -25,25 +29,25 @@ TEST(controlMulTest, initialValue) {
 		m1.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 'm1'"));
 	}
 	try {
 		m2.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 'm2'"));
 	}
 	try {
 		m3.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 'm3'"));
 	}
 	try {
 		m4.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 'm4'"));
 	}
 }
 

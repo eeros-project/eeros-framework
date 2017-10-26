@@ -11,7 +11,7 @@ namespace eeros {
 		class Mul : public Block1o<OutT> {
 
 		public:
-			Mul() { }
+			Mul() : in1(this), in2(this) { }
 
 			virtual void run() {
 				OutT prod;

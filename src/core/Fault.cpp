@@ -4,9 +4,7 @@ using namespace eeros;
 
 Fault::Fault() { }
 
-Fault::Fault(std::string m) : message(m) {
-	
-}
+Fault::Fault(std::string m) : message(m) { }
 
 Fault::~Fault() throw() { }
 

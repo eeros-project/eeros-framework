@@ -16,6 +16,7 @@ namespace eeros {
                 class Switch : public Block1o<T> {
                 public:
                         Switch(uint8_t initInputIndex) : currentInput(initInputIndex) {
+				for(uint8_t i = 0; i < N; i++) in[i].setOwner(this);
                         }
                        
                         virtual void run() {

@@ -13,7 +13,9 @@ namespace eeros {
 		class Mux: public Block {
 			
 		public:
-			Mux() { }
+			Mux() { 
+				for(uint8_t i = 0; i < N; i++) in[i].setOwner(this);
+			}
 			
 			virtual void run() {
 				C newValue;

@@ -3,7 +3,7 @@
 using namespace eeros::control;
 
 TimeDomain::TimeDomain(std::string name, double period, bool realtime) :
-	name(name), period(period), realtime(realtime) {
+	name(name), period(period), realtime(realtime), safetySystem(nullptr), safetyEvent(nullptr) {
 	// nothing to do
 }
 
@@ -28,16 +28,16 @@ void TimeDomain::run() {
 	if(!running) return;
 	try {
 		for(auto block : blocks) block->run();
-	} catch (NotConnectedFault& e) {
+	} catch (NotConnectedFault const& e) {
 		if(safetySystem != nullptr && safetyEvent != nullptr) {
 			safetySystem->triggerEvent(*safetyEvent);
-			safetySystem->log.error() << "Input of block not connected";
-		} else throw eeros::Fault("Time domain cannot trigger safety event");
-	} catch (NaNOutputFault& e) {
+			safetySystem->log.error() << e.what();
+		} else throw eeros::Fault(std::string(e.what()) + ", time domain cannot trigger safety event");
+	} catch (NaNOutputFault const& e) {
 		if(safetySystem != nullptr && safetyEvent != nullptr) {
 			safetySystem->triggerEvent(*safetyEvent);
-			safetySystem->log.error() << "Try to write NaN to peripheral output";
-		} else throw eeros::Fault("Time domain cannot trigger safety event");
+			safetySystem->log.error() << e.what();
+		} else throw eeros::Fault(std::string(e.what()) + ", time domain cannot trigger safety event");
 	}
 }
 

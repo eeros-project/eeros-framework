@@ -2,7 +2,7 @@
 
 using namespace eeros::control;
 
-KeyboardInput::KeyboardInput() { }
+KeyboardInput::KeyboardInput() : isHomed(this), esc(this), emergency(this), reset(this), start(this), stop(this) { }
 
 KeyboardInput::~KeyboardInput() { }
 

@@ -11,7 +11,7 @@ namespace eeros {
 		template < typename T = double >
 		class Block1i : public Block {
 		public:
-			Block1i() { }
+			Block1i() : in(this) { }
 			
 			virtual Input<T>& getIn() {
 				return in;
