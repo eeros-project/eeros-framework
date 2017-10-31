@@ -2,7 +2,7 @@
 
 using namespace eeros::control;
 
-MouseInput::MouseInput(std::string dev) : mouse(dev) {
+MouseInput::MouseInput(std::string dev) : mouse(dev), buttonOut(this) {
 	setInitPos(0, 0, 0, 0);
 	first = true;
 }

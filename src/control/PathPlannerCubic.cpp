@@ -7,7 +7,7 @@
 using namespace eeros;
 using namespace eeros::control;
 
-PathPlannerCubic::PathPlannerCubic(double dt) : dt(dt), log('P') {
+PathPlannerCubic::PathPlannerCubic(double dt) : dt(dt), log('P'), posOut(this), velOut(this), accOut(this), jerkOut(this) {
 	finished = true;
 	prevPos = 0.0;
 	prevVel = 0.0;

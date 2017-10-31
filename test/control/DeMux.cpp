@@ -8,6 +8,7 @@ using namespace eeros::control;
 // Test initial values for NaN
 TEST(controlDeMuxTest, initialValue) {
 	DeMux<2> dm;
+	dm.setName("dm");
 	
 	EXPECT_TRUE(std::isnan(dm.getOut(0).getSignal().getValue()));
 	EXPECT_TRUE(std::isnan(dm.getOut(1).getSignal().getValue()));
@@ -15,7 +16,7 @@ TEST(controlDeMuxTest, initialValue) {
 		dm.run();
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("Read from an unconnected input"));
+		EXPECT_EQ(err.what(), std::string("Read from an unconnected input in block 'dm'"));
 	}
 }
 

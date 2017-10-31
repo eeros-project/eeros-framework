@@ -14,6 +14,7 @@ namespace eeros {
 			Sum() {
 				for(uint8_t i = 0; i < N; i++) {
 					negated[i] = false;
+					in[i].setOwner(this);
 				}
 			}
 

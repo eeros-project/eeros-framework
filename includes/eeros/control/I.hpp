@@ -13,7 +13,7 @@ namespace eeros {
 			
 			virtual void run() {
 				if(first) {  // first run, set output to init condition
- 					this->out.getSignal().setValue(this->prev.getValue());
+					this->out.getSignal().setValue(this->prev.getValue());
 					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
 					this->prev.setTimestamp(this->out.getSignal().getTimestamp());
 					first = false;

@@ -3,7 +3,7 @@
 using namespace eeros::control;
 using namespace eeros::math;
 
-XBoxInput::XBoxInput(std::string dev) : x(dev) {
+XBoxInput::XBoxInput(std::string dev) : x(dev), buttonOut(this) {
 	setInitPos({0,0,0,0,0,0,0,0});
 	axisScale << xScale,      0,      0,      0,
 	                  0, yScale,      0,      0,

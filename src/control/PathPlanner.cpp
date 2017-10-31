@@ -7,7 +7,7 @@ using namespace eeros;
 using namespace eeros::control;
 
 PathPlanner::PathPlanner(AxisVector velMax, AxisVector accMax, AxisVector decMax, double dt) : 
-                         velMax(velMax), accMax(accMax), decMax(decMax), dt(dt) {
+                         velMax(velMax), accMax(accMax), decMax(decMax), dt(dt), posOut(this), velOut(this), accOut(this), jerkOut(this) {
 	coefficients.zero();
 	coefficients.transpose();
 	finish = true;
