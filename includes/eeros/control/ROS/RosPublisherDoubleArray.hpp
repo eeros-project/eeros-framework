@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_ROSPUBLISHER_DOUBLEARRAY_HPP
 #define ORG_EEROS_CONTROL_ROSPUBLISHER_DOUBLEARRAY_HPP
 
-#include <eeros/control/ROS/RosBlockPublisher.hpp>
+#include <eeros/control/ROS/RosPublisher.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <std_msgs/Float64MultiArray.h>
 
@@ -9,11 +9,11 @@ namespace eeros {
 	namespace control {
 
 		template < typename SigInType >
-		class RosPublisherDoubleArray : public RosBlockPublisher<std_msgs::Float64MultiArray::Type> {
+		class RosPublisherDoubleArray : public RosPublisher<std_msgs::Float64MultiArray::Type, SigInType> {
 			typedef std_msgs::Float64MultiArray::Type TRosMsg;
 		public:
 			RosPublisherDoubleArray(ros::NodeHandle& rosNodeHandler, const std::string& topic, const uint32_t queueSize=1000) :
-				RosBlockPublisher<TRosMsg>(rosNodeHandler, topic, queueSize) { }
+				RosPublisher<TRosMsg, SigInType>(rosNodeHandler, topic, queueSize) { }
 				
 			void setRosMsg(TRosMsg& msg) {
 				if (this->in.isConnected()) {
@@ -22,13 +22,7 @@ namespace eeros {
 					msg.data = valTmpDouble;
 				}
 			}
-			
-			Input<SigInType>& getIn() {return in;}
-				
-		protected:
-			Input<SigInType> in;
 		};
-
 	};
 };
 

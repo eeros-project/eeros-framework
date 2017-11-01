@@ -1,25 +1,25 @@
-#ifndef ORG_EEROS_CONTROL_ROSBLOCK_HPP_
-#define ORG_EEROS_CONTROL_ROSBLOCK_HPP_
+#ifndef ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_
+#define ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_
 
 #include <ros/ros.h>
 #include <ros/callback_queue.h>
-#include <eeros/control/Block.hpp>
+#include <eeros/control/Block1o.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
 #include <eeros/math/Matrix.hpp>
 
 namespace eeros {
 	namespace control {
-		template < typename TRosMsg >
-		class RosBlockSubscriber : public Block {
+		template < typename TRosMsg, typename SigOutType >
+		class RosSubscriber : public Block1o<SigOutType> {
 
 		public:
-			RosBlockSubscriber(ros::NodeHandle& rosNodeHandler, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false) :
+			RosSubscriber(ros::NodeHandle& rosNodeHandler, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false) :
 				rosNodeHandler(rosNodeHandler),
 				topic (topic),
 				callNewest(callNewest)
 			{
-				subscriber = rosNodeHandler.subscribe(topic, queueSize, &RosBlockSubscriber::rosCallbackFct, this);
+				subscriber = rosNodeHandler.subscribe(topic, queueSize, &RosSubscriber::rosCallbackFct, this);
 				ROS_DEBUG_STREAM("RosBlockSubscriber, reading from topic: '" << topic << "' created.");
 			}
 
@@ -58,4 +58,4 @@ namespace eeros {
 	}
 }
 
-#endif /* ORG_EEROS_CONTROL_ROSBLOCK__HPP_ */
+#endif /* ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_ */

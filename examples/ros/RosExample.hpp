@@ -4,12 +4,13 @@
 #include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/PeripheralInput.hpp>
 #include <eeros/control/TimeDomain.hpp>
+#include <eeros/control/Constant.hpp>
 #include <eeros/safety/InputAction.hpp>
 #include <eeros/safety/OutputAction.hpp>
 #include <eeros/hal/HAL.hpp>
-#include <eeros/control/ROS/RosBlockPublisherDouble.hpp>
-#include <eeros/control/ROS/RosBlockSubscriber_SensorMsgs_LaserScan.hpp>
-#include <eeros/control/ROS/RosBlockPublisher_SensorMsgs_LaserScan.hpp>
+#include <eeros/control/ROS/RosPublisherDouble.hpp>
+#include <eeros/control/ROS/RosSubscriberLaserScan.hpp>
+#include <eeros/control/ROS/RosPublisherLaserScan.hpp>
 #include <eeros/core/Executor.hpp>
 #include <unistd.h>
 
@@ -19,7 +20,7 @@ using namespace eeros::hal;
 
 
 // thsi block prints value of signal
-template < typename T = double >
+template < typename T = double > 
 class Print : public eeros::control::Block1i<T> {
 	public:
 		Print(int modulo=1) : modulo(modulo), counter(0) { }
@@ -44,6 +45,7 @@ public:
 		printBool0(1),
 		
 		analogIn0("scanTimeIn0"),		// argument has to match signalId of json
+// 		analogIn0(34.65423),
 		digitalIn0("batteryPresent0"),
 		analogOut0("scanTimeEchoOut0"),
 		digitalOut0("batteryPresentEchoOut0"),
@@ -90,6 +92,7 @@ public:
 	
 	// HAL inputs/outputs
 	PeripheralInput<double>		analogIn0;
+// 	Constant<>			analogIn0;
 	PeripheralInput<bool>		digitalIn0;
 	PeripheralOutput<double>	analogOut0;
 	PeripheralOutput<bool>		digitalOut0;
@@ -97,13 +100,13 @@ public:
 	// ROS blocks
 	typedef eeros::math::Matrix< 5, 1, double >		TRangesOutput;
 	typedef eeros::math::Matrix< 5, 1, double >		TIntensitiesOutput;
-	RosBlockSubscriber_SensorMsgs_LaserScan<TRangesOutput, TIntensitiesOutput>	laserScanIn;
+	RosSubscriberLaserScan<TRangesOutput, TIntensitiesOutput>	laserScanIn;
 	typedef eeros::math::Matrix< 5, 1, double >		TRangesInput;
 	typedef eeros::math::Matrix< 5, 1, double >		TIntensitiesInput;
-	RosBlockPublisher_SensorMsgs_LaserScan<TRangesInput, TIntensitiesInput>		laserScanOut;
+	RosPublisherLaserScan<TRangesInput, TIntensitiesInput>		laserScanOut;
 	
 	// Simple ROS block for easy debugging
-	RosBlockPublisherDouble		debugOut0;
+	RosPublisherDouble		debugOut0;
 	
 	double dt;
 	ros::NodeHandle& rosNodeHandler;
@@ -113,12 +116,17 @@ public:
 
 class MySafetyProperties : public SafetyProperties {
 public:
-	MySafetyProperties() : slOff("off") {	
+	MySafetyProperties(MyControlSystem& cs) : slOff("off"), cs(cs) {	
 		addLevel(slOff);
 		setEntryLevel(slOff);
+// 		slOff.setLevelAction([&](SafetyContext* privateContext){
+// 			if (slOff.getNofActivations() > 3)
+// 				cs.analogIn0.setValue(cs.analogIn0.getOut().getSignal().getValue() + 0.1);
+// 		});
 	}
 	
 	SafetyLevel slOff;
+	MyControlSystem cs;
 };
 
 

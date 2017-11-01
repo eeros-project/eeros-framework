@@ -17,7 +17,6 @@ using namespace eeros::hal;
 class MyControlSystem {
 public:
 	MyControlSystem(double dt, ros::NodeHandle& rosNodeHandler):
-		rosNodeHandler(rosNodeHandler),
 		c1({2.4, 0, 4.443, 23.6, -11.2, 1.3, 0.003}),
 		vectorOut(rosNodeHandler, "/rosTest2/Vector", 100),
 		timedomain("Main time domain", dt, true) 
@@ -32,7 +31,6 @@ public:
 	typedef eeros::math::Matrix<7, 1, double> Vector7;
 	Constant<Vector7> c1;
 	RosPublisherDoubleArray<Vector7> vectorOut;	
-	ros::NodeHandle& rosNodeHandler;
 	TimeDomain timedomain;
 };
 
@@ -43,7 +41,7 @@ public:
 		setEntryLevel(slOff);
 		
 		slOff.setLevelAction([&](SafetyContext* privateContext) {
-			if(slOff.getNofActivations() > 3) {
+			if(slOff.getNofActivations() > 1) {
 				cs.c1.setValue(cs.c1.getOut().getSignal().getValue() + 0.1);
 			}
 		});
@@ -68,7 +66,7 @@ int main(int argc, char **argv) {
 
 	char* dummy_args[] = {NULL};
 	int dummy_argc = sizeof(dummy_args)/sizeof(dummy_args[0]) - 1;
-	ros::init(dummy_argc, dummy_args, "rosExample");
+	ros::init(dummy_argc, dummy_args, "rosTest2");
 	ros::NodeHandle rosNodeHandler;
 	log.trace() << "ROS node initialized.";
 	

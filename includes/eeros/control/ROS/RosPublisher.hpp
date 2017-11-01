@@ -1,20 +1,19 @@
-#ifndef ORG_EEROS_CONTROL_ROSBLOCK_PUBLISHER_HPP_
-#define ORG_EEROS_CONTROL_ROSBLOCK_PUBLISHER_HPP_
+#ifndef ORG_EEROS_CONTROL_ROSPUBLISHER_HPP_
+#define ORG_EEROS_CONTROL_ROSPUBLISHER_HPP_
 
 #include <ros/ros.h>
 #include <ros/callback_queue.h>
-#include <eeros/core/System.hpp>
+// #include <eeros/core/System.hpp>
 #include <eeros/control/ROS/EerosRosTools.hpp>
-#include <eeros/control/Block.hpp>
-#include <eeros/control/Input.hpp>
+#include <eeros/control/Block1i.hpp>
 
 namespace eeros {
 	namespace control {
-		template < typename TRosMsg >
-		class RosBlockPublisher : public Block {
+		template < typename TRosMsg, typename SigInType >
+		class RosPublisher : public Block1i<SigInType> {
 
 		public:
-			RosBlockPublisher(ros::NodeHandle& rosNodeHandler, const std::string& topic, uint32_t queueSize=1000, bool callNewest=false) :
+			RosPublisher(ros::NodeHandle& rosNodeHandler, const std::string& topic, uint32_t queueSize=1000, bool callNewest=false) :
 				rosNodeHandler(rosNodeHandler),
 				topic (topic)
 // 				callNewest(callNewest)
@@ -44,4 +43,4 @@ namespace eeros {
 	}
 }
 
-#endif /* ORG_EEROS_CONTROL_ROSBLOCK_PUBLISHER_HPP_ */
+#endif /* ORG_EEROS_CONTROL_ROSPUBLISHER_HPP_ */

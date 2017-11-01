@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 	// HAL
 	// ////////////////////////////////////////////////////////////////////////
 	HAL& hal = HAL::instance();
-	hal.readConfigFromFile(&argc, argv);
+// 	hal.readConfigFromFile(&argc, argv);
 
 	// ROS
 	// ////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
 	
 	// Safety System
 	// ////////////////////////////////////////////////////////////////////////
-	MySafetyProperties safetyProperties;
+	MySafetyProperties safetyProperties(controlSystem);
 	eeros::safety::SafetySystem safetySystem(safetyProperties, dt);
 	
 	// Executor
