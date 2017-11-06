@@ -24,22 +24,16 @@ void signalHandler(int signum) {
 int main(int argc, char **argv) {	
 	double dt = 0.2;
 	
-	// Create and initialize logger
-	// ////////////////////////////////////////////////////////////////////////
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;
 	w.show();
  
-	log.info() << "HAL ROS tester started";
+	log.info() << "ROS Test 2 started";
 
-	// HAL
-	// ////////////////////////////////////////////////////////////////////////
 	HAL& hal = HAL::instance();
-// 	hal.readConfigFromFile(&argc, argv);
+	hal.readConfigFromFile(&argc, argv);
 
-	// ROS
-	// ////////////////////////////////////////////////////////////////////////
 	char* dummy_args[] = {NULL};
 	int dummy_argc = sizeof(dummy_args)/sizeof(dummy_args[0]) - 1;
 	ros::init(dummy_argc, dummy_args, "rosExample");
@@ -55,22 +49,16 @@ int main(int argc, char **argv) {
 // 	syncNodeHandler.setCallbackQueue(&syncCallbackQueue);
 // 	auto subscriberSync = syncNodeHandler.subscribe("motor_sim/joint_states", 1, &callback);
 		
-	// Control System
-	// ////////////////////////////////////////////////////////////////////////
-	MyControlSystem controlSystem(dt, rosNodeHandler);
-	
-	// Safety System
-	// ////////////////////////////////////////////////////////////////////////
+	MyControlSystem controlSystem(dt);
 	MySafetyProperties safetyProperties(controlSystem);
 	eeros::safety::SafetySystem safetySystem(safetyProperties, dt);
 	
-	// Executor
-	// ////////////////////////////////////////////////////////////////////////
 	signal(SIGINT, signalHandler);	
-	auto &executor = Executor::instance();
+	auto& executor = Executor::instance();
 	executor.setMainTask(safetySystem);
 // 	executor.syncWithRosTopic(&syncCallbackQueue);	// sync with gazebo simulation
 	executor.run();
-	
+
+	log.info() << "ROS Test2 end";	
 	return 0;
 }

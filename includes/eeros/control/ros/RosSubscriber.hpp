@@ -14,12 +14,12 @@ namespace eeros {
 		class RosSubscriber : public Block1o<SigOutType> {
 
 		public:
-			RosSubscriber(ros::NodeHandle& rosNodeHandler, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false) :
-				rosNodeHandler(rosNodeHandler),
+			RosSubscriber(const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false) :
 				topic (topic),
 				callNewest(callNewest)
 			{
-				subscriber = rosNodeHandler.subscribe(topic, queueSize, &RosSubscriber::rosCallbackFct, this);
+				ros::NodeHandle handle;
+				subscriber = handle.subscribe(topic, queueSize, &RosSubscriber::rosCallbackFct, this);
 				ROS_DEBUG_STREAM("RosBlockSubscriber, reading from topic: '" << topic << "' created.");
 			}
 
@@ -47,8 +47,6 @@ namespace eeros {
 
 
 		protected:
-			//ROS variables
-			ros::NodeHandle& rosNodeHandler;
 			ros::Subscriber subscriber;
 			const std::string& topic;
 			bool callNewest;

@@ -1,53 +1,68 @@
-#include <signal.h>
-#include <eeros/core/Executor.hpp>
-#include <eeros/control/Constant.hpp>
-#include <eeros/control/TimeDomain.hpp>
-#include <eeros/safety/SafetySystem.hpp>
+#include <eeros/hal/HAL.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
-#include <eeros/control/ROS/RosPublisherDoubleArray.hpp>
+#include <eeros/control/PeripheralOutput.hpp>
+#include <eeros/control/PeripheralInput.hpp>
+#include <eeros/control/TimeDomain.hpp>
+#include <eeros/control/Constant.hpp>
+#include <eeros/core/Executor.hpp>
+#include <eeros/control/ros/EerosRosTools.hpp>
+#include <ros/ros.h>
+#include <signal.h>
 
 using namespace eeros;
-using namespace eeros::control;
-using namespace eeros::safety;
-using namespace eeros::math;
 using namespace eeros::logger;
 using namespace eeros::hal;
+using namespace eeros::safety;
+using namespace eeros::control;
 
 class MyControlSystem {
 public:
-	MyControlSystem(double dt, ros::NodeHandle& rosNodeHandler):
-		c1({2.4, 0, 4.443, 23.6, -11.2, 1.3, 0.003}),
-		vectorOut(rosNodeHandler, "/rosTest2/Vector", 100),
-		timedomain("Main time domain", dt, true) 
+	MyControlSystem(double ts):
+		c1(0.5),
+		doubleOut("doubleOut"),
+		doubleIn("doubleIn"),
+		boolIn("batteryPresent"),
+		boolOut("batteryPresentEcho"),
+		timedomain("Main time domain", ts, true) 
 	{
- 		vectorOut.getIn().connect(c1.getOut());	
+		doubleOut.getIn().connect(c1.getOut());
+		boolOut.getIn().connect(boolIn.getOut());
 		timedomain.addBlock(c1);
-		timedomain.addBlock(vectorOut);
+		timedomain.addBlock(doubleOut);
+		timedomain.addBlock(doubleIn);
+		timedomain.addBlock(boolIn);
+		timedomain.addBlock(boolOut);
+		
 		eeros::Executor::instance().add(timedomain);
 	}
 	virtual ~MyControlSystem() { }
-	
-	typedef eeros::math::Matrix<7, 1, double> Vector7;
-	Constant<Vector7> c1;
-	RosPublisherDoubleArray<Vector7> vectorOut;	
+
+	Constant<> c1;
+	PeripheralInput<double> doubleIn;
+	PeripheralInput<bool> boolIn;
+	PeripheralOutput<double> doubleOut;
+	PeripheralOutput<bool> boolOut;
 	TimeDomain timedomain;
 };
 
 class MySafetyProperties : public SafetyProperties {
 public:
-	MySafetyProperties(MyControlSystem& cs) : slOff("off") {	
+	MySafetyProperties(MyControlSystem& cs) : slOff("off"), cs(cs) {	
 		addLevel(slOff);
 		setEntryLevel(slOff);
-		
 		slOff.setLevelAction([&](SafetyContext* privateContext) {
-			if(slOff.getNofActivations() > 1) {
-				cs.c1.setValue(cs.c1.getOut().getSignal().getValue() + 0.1);
+			if ((slOff.getNofActivations() % 5) == 0) {
+				cs.c1.setValue(cs.c1.getOut().getSignal().getValue() + 0.01);
+				log.info() << cs.doubleIn.getOut().getSignal();
+				log.info() << cs.boolIn.getOut().getSignal();
 			}
 		});
 	}
-
+	
 	SafetyLevel slOff;
+	MyControlSystem cs;
+	Logger log;
 };
 
 void signalHandler(int signum) {
@@ -56,31 +71,31 @@ void signalHandler(int signum) {
 
 int main(int argc, char **argv) {	
 	double dt = 0.2;
-
+	
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;
 	w.show();
  
-	log.info() << "ROS Test2 started";
+	log.info() << "ROS Test 2 started";
 
-	char* dummy_args[] = {NULL};
-	int dummy_argc = sizeof(dummy_args)/sizeof(dummy_args[0]) - 1;
-	ros::init(dummy_argc, dummy_args, "rosTest2");
-	ros::NodeHandle rosNodeHandler;
+	HAL& hal = HAL::instance();
+	hal.readConfigFromFile(&argc, argv);
+
+	rosTools::initNode("rosTest1");
 	log.trace() << "ROS node initialized.";
 	
 	eeros::System::useRosTime();	// "ros::Time::now()" is used to get system time
-	
-	MyControlSystem controlSystem(dt, rosNodeHandler);
+			
+	MyControlSystem controlSystem(dt);
 	MySafetyProperties safetyProperties(controlSystem);
 	eeros::safety::SafetySystem safetySystem(safetyProperties, dt);
 	
 	signal(SIGINT, signalHandler);	
-	auto &executor = Executor::instance();
+	auto& executor = Executor::instance();
 	executor.setMainTask(safetySystem);
 	executor.run();
-	
-	log.info() << "ROS Test2 end";
+
+	log.info() << "ROS Test2 end";	
 	return 0;
 }

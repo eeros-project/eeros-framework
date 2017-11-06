@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_ROSSUBSCRIBER_LASERSCAN_HPP
 #define ORG_EEROS_CONTROL_ROSSUBSCRIBER_LASERSCAN_HPP
 
-#include <eeros/control/ROS/RosSubscriber.hpp>
+#include <eeros/control/ros/RosSubscriber.hpp>
 #include <eeros/core/System.hpp>
 
 // A-1 Include the header file of the ROS message
@@ -17,8 +17,8 @@ namespace eeros {
 			// A-2 Define the type of the ROS message
 			typedef sensor_msgs::LaserScan::Type	TRosMsg;
 		public:
-			RosSubscriberLaserScan(ros::NodeHandle& rosNodeHandler, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false ) :
-				RosSubscriber<TRosMsg, double>(rosNodeHandler, topic, queueSize, callNewest){ }
+			RosSubscriberLaserScan(const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false ) :
+				RosSubscriber<TRosMsg, double>(topic, queueSize, callNewest){ }
 				
 			void rosCallbackFct(const TRosMsg& msg) {
 				// B-3 Set the timestamp of all EEROS signals

@@ -8,59 +8,35 @@
 #include <eeros/safety/InputAction.hpp>
 #include <eeros/safety/OutputAction.hpp>
 #include <eeros/hal/HAL.hpp>
-#include <eeros/control/ROS/RosPublisherDouble.hpp>
-#include <eeros/control/ROS/RosSubscriberLaserScan.hpp>
-#include <eeros/control/ROS/RosPublisherLaserScan.hpp>
+#include <eeros/control/ros/RosPublisherDouble.hpp>
+#include <eeros/control/ros/RosSubscriberLaserScan.hpp>
+#include <eeros/control/ros/RosPublisherLaserScan.hpp>
 #include <eeros/core/Executor.hpp>
 #include <unistd.h>
+#include <eeros/logger/Logger.hpp>
 
 using namespace eeros::safety;
 using namespace eeros::control;
 using namespace eeros::hal;
-
-
-// thsi block prints value of signal
-template < typename T = double > 
-class Print : public eeros::control::Block1i<T> {
-	public:
-		Print(int modulo=1) : modulo(modulo), counter(0) { }
-		virtual void run() {
-			if ( (counter % modulo) == 0 ) {
-				std::cout << this->in.getSignal().getValue() << std::endl;
-			}
-			counter++;
-		}
-		int modulo;
-		uint64_t counter;
-};
-
+using namespace eeros::logger;
 
 class MyControlSystem {
 public:
-	MyControlSystem(double ts, ros::NodeHandle& rosNodeHandler):
+	MyControlSystem(double ts):
 		dt(ts),
-		rosNodeHandler(rosNodeHandler),
-		
-		printDouble0(1),
-		printBool0(1),
-		
+
 		analogIn0("scanTimeIn0"),		// argument has to match signalId of json
-// 		analogIn0(34.65423),
 		digitalIn0("batteryPresent0"),
 		analogOut0("scanTimeEchoOut0"),
 		digitalOut0("batteryPresentEchoOut0"),
 		
-		laserScanIn (rosNodeHandler, "/rosNodeTalker/TestTopic3", 100, false),
-		laserScanOut(rosNodeHandler, "/rosExample/TestTopic23", 100),
+		laserScanIn ("/rosNodeTalker/TestTopic4", 100, false),
+		laserScanOut("/rosExample/TestTopic23", 100),
 
-		debugOut0(rosNodeHandler, "debugNode/debugOut0"),
+		debugOut0("debugNode/debugOut0"),
 		
 		timedomain("Main time domain", dt, true) 
 		{
-		
-		// Connect HAL blocks
-		printDouble0.getIn().connect(analogIn0.getOut());
-		printBool0.getIn().connect(digitalIn0.getOut());
 		analogOut0.getIn().connect(analogIn0.getOut());
 		digitalOut0.getIn().connect(digitalIn0.getOut());
 		
@@ -75,8 +51,6 @@ public:
 		timedomain.addBlock(analogIn0);
 		timedomain.addBlock(digitalIn0);
 		timedomain.addBlock(laserScanIn);
-		timedomain.addBlock(printBool0);
-		timedomain.addBlock(printDouble0);
 		timedomain.addBlock(analogOut0);
 		timedomain.addBlock(digitalOut0);
 		timedomain.addBlock(laserScanOut);
@@ -85,14 +59,9 @@ public:
 		eeros::Executor::instance().add(timedomain);
 	}
 	virtual ~MyControlSystem() { }
-	
-	// Console output
-	Print<double> printDouble0;
-	Print<bool> printBool0;
-	
+
 	// HAL inputs/outputs
 	PeripheralInput<double>		analogIn0;
-// 	Constant<>			analogIn0;
 	PeripheralInput<bool>		digitalIn0;
 	PeripheralOutput<double>	analogOut0;
 	PeripheralOutput<bool>		digitalOut0;
@@ -109,7 +78,6 @@ public:
 	RosPublisherDouble		debugOut0;
 	
 	double dt;
-	ros::NodeHandle& rosNodeHandler;
 	bool realtime;
 	eeros::control::TimeDomain timedomain;
 };
@@ -119,14 +87,17 @@ public:
 	MySafetyProperties(MyControlSystem& cs) : slOff("off"), cs(cs) {	
 		addLevel(slOff);
 		setEntryLevel(slOff);
-// 		slOff.setLevelAction([&](SafetyContext* privateContext){
-// 			if (slOff.getNofActivations() > 3)
-// 				cs.analogIn0.setValue(cs.analogIn0.getOut().getSignal().getValue() + 0.1);
-// 		});
+		slOff.setLevelAction([&](SafetyContext* privateContext) {
+			if ((slOff.getNofActivations() % 5) == 0) {
+				log.info() << cs.analogIn0.getOut().getSignal();
+				log.info() << cs.digitalIn0.getOut().getSignal();
+			}
+		});
 	}
 	
 	SafetyLevel slOff;
 	MyControlSystem cs;
+	Logger log;
 };
 
 

@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include <ros/callback_queue.h>
 // #include <eeros/core/System.hpp>
-#include <eeros/control/ROS/EerosRosTools.hpp>
+#include <eeros/control/ros/EerosRosTools.hpp>
 #include <eeros/control/Block1i.hpp>
 
 namespace eeros {
@@ -13,12 +13,12 @@ namespace eeros {
 		class RosPublisher : public Block1i<SigInType> {
 
 		public:
-			RosPublisher(ros::NodeHandle& rosNodeHandler, const std::string& topic, uint32_t queueSize=1000, bool callNewest=false) :
-				rosNodeHandler(rosNodeHandler),
+			RosPublisher(const std::string& topic, uint32_t queueSize=1000, bool callNewest=false) :
 				topic (topic)
 // 				callNewest(callNewest)
 			{
-				publisher = rosNodeHandler.advertise<TRosMsg>(topic, queueSize);
+				ros::NodeHandle handle;
+				publisher = handle.advertise<TRosMsg>(topic, queueSize);
 				ROS_DEBUG_STREAM("RosBlockPublisher, reading from topic: '" << topic << "' created.");
 			}
 
@@ -31,8 +31,6 @@ namespace eeros {
 
 
 		protected:
-			//ROS variables
-			ros::NodeHandle& rosNodeHandler;
 			ros::Publisher publisher;
 			const std::string& topic;
 // 			bool callNewest;

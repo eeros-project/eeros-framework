@@ -2,7 +2,7 @@
 #define ORG_EEROS_CONTROL_ROSPUBLISHER_DOUBLE_HPP_
 
 #include <eeros/core/System.hpp>
-#include <eeros/control/ROS/RosPublisher.hpp>
+#include <eeros/control/ros/RosPublisher.hpp>
 #include <sensor_msgs/FluidPressure.h>
 
 namespace eeros {
@@ -11,8 +11,8 @@ namespace eeros {
 		class RosPublisherDouble : public RosPublisher<sensor_msgs::FluidPressure::Type, double> {
 			typedef sensor_msgs::FluidPressure::Type TRosMsg;
 		public:
-			RosPublisherDouble (ros::NodeHandle& rosNodeHandler, const std::string& topic, const uint32_t queueSize=1000) :
-				RosPublisher<TRosMsg, double>(rosNodeHandler, topic, queueSize) { }
+			RosPublisherDouble (const std::string& topic, const uint32_t queueSize=1000) :
+				RosPublisher<TRosMsg, double>(topic, queueSize) { }
 			
 			void setRosMsg(TRosMsg& msg) {
 				msg.fluid_pressure = in.getSignal().getValue();

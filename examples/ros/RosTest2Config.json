@@ -1,0 +1,55 @@
+{
+	"device0": {
+		"library": "libroseeros.so",
+		"devHandle": "eerosNode",
+		"subdevice0": {
+			"type": "AnalogOut",
+			"channel0": {
+				"signalId": "doubleOut",
+				"scale": [ { "id" : "dac",
+								"scale":	1,
+								"offset":	0.0	}
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn":	-9e99,  	"maxIn": 	9e99,
+							"minOut":	-9e99,	"maxOut": 	9e99 }
+					 ],
+				"unit": "V",
+				"additionalArguments": "topic=/test1/val; msgType=std_msgs::Float64"
+			}
+		},		
+		"subdevice1": {
+			"type": "AnalogIn",
+			"channel0": {
+				"signalId": "doubleIn",
+				"scale": [ { "id" : "adc",
+								"scale":	1,
+								"offset":	0.0	}
+					 ],
+				"range": [ { "id" : "adc",
+							"minIn":	-9e99,  "maxIn": 	9e99,
+							"minOut":	-9e99,	"maxOut": 	9e99 }
+					 ],
+				"unit": "V",
+				"additionalArguments": "topic=/rosNodeTalker/val; msgType=std_msgs::Float64"
+			}
+		},
+		"subdevice2": {
+			"type": "DigIn",
+			"channel0": {
+				"signalId": "batteryPresent",
+				"inverted": false,
+				"additionalArguments": "topic=/rosNodeTalker/batteryState; msgType=sensor_msgs::BatteryState; dataField=present"
+			}
+		},
+		"subdevice3": {
+			"type": "DigOut",
+			"channel0": {
+				"signalId": "batteryPresentEcho",
+				"inverted": false,
+				"additionalArguments": "topic=/test2/batteryPresentEcho; msgType=sensor_msgs::BatteryState; dataField=present"
+			}
+		}
+	}
+}
+

@@ -15,7 +15,7 @@
 							"minOut":	-9e99,	"maxOut": 	9e99 }
 					 ],
 				"unit": "V",
-				"additionalArguments": "topic=/rosNodeTalker/TestTopic1; msgType=std_msgs::Float64"
+				"additionalArguments": "topic=/rosNodeTalker/val; msgType=std_msgs::Float64"
 			},
 			"channel1": {
 				"signalId": "scanTimeIn0",
@@ -28,7 +28,7 @@
 							"minOut":	-9e99,	"maxOut": 	9e99 }
 					 ],
 				"unit": "V",
-				"additionalArguments": "topic=/rosNodeTalker/TestTopic3; msgType=sensor_msgs::LaserScan; dataField=scan_time; callOne=false; queueSize=100"
+				"additionalArguments": "topic=/rosNodeTalker/TestTopic4; msgType=sensor_msgs::LaserScan; dataField=scan_time; callOne=false; queueSize=100"
 			},
 		},
 		"subdevice1": {
@@ -52,7 +52,7 @@
 			"channel0": {
 				"signalId": "batteryPresent0",
 				"inverted": false,
-				"additionalArguments": "topic=/rosNodeTalker/TestTopic4; msgType=sensor_msgs::BatteryState; dataField=present"
+				"additionalArguments": "topic=/rosNodeTalker/TestTopic5; msgType=sensor_msgs::BatteryState; dataField=present"
 			}
 		},
 		"subdevice3": {
