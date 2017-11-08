@@ -26,7 +26,7 @@ TEST(controlPathPlannerCubicTest, nan) {
 }
 
 // Test initial positions
-TEST(controlPathPlannerCubicTest, init) {
+TEST(controlPathPlannerCubicTest, init1) {
 	PathPlannerCubic planner(0.1);
 	planner.init("path1.txt");
 	planner.setInitPos(200);
@@ -41,4 +41,37 @@ TEST(controlPathPlannerCubicTest, init) {
 	EXPECT_TRUE(Utils::compareApprox(planner.getAccOut().getSignal().getValue(), 0, 1e-10));
 	EXPECT_TRUE(Utils::compareApprox(planner.getVelOut().getSignal().getValue(), 0, 1e-10));
 	EXPECT_TRUE(Utils::compareApprox(planner.getPosOut().getSignal().getValue(), 1200, 1e-10));
+}
+
+// Test initial positions
+TEST(controlPathPlannerCubicTest, init2) {
+	PathPlannerCubic planner(0.08);
+	planner.init("path1.txt");
+	planner.setInitPos(200);
+	planner.move(200);
+	planner.run();
+	EXPECT_EQ(planner.getJerkOut().getSignal().getValue(), 0);
+	EXPECT_EQ(planner.getAccOut().getSignal().getValue(), 0);
+	EXPECT_EQ(planner.getVelOut().getSignal().getValue(), 0);
+	EXPECT_EQ(planner.getPosOut().getSignal().getValue(), 200);
+	planner.run();
+	EXPECT_EQ(planner.getJerkOut().getSignal().getValue(), 10000);
+	EXPECT_EQ(planner.getAccOut().getSignal().getValue(), 0);
+	EXPECT_EQ(planner.getVelOut().getSignal().getValue(), 0);
+	EXPECT_EQ(planner.getPosOut().getSignal().getValue(), 200);
+	planner.run();
+	EXPECT_EQ(planner.getJerkOut().getSignal().getValue(), 10000);
+	EXPECT_EQ(planner.getAccOut().getSignal().getValue(), 800);
+	EXPECT_EQ(planner.getVelOut().getSignal().getValue(), 32);
+	EXPECT_TRUE(Utils::compareApprox(planner.getPosOut().getSignal().getValue(), 200.853, 1e-3));
+	planner.run();
+	EXPECT_EQ(planner.getJerkOut().getSignal().getValue(), 10000);
+	EXPECT_EQ(planner.getAccOut().getSignal().getValue(), 1600);
+	EXPECT_EQ(planner.getVelOut().getSignal().getValue(), 128);
+	EXPECT_TRUE(Utils::compareApprox(planner.getPosOut().getSignal().getValue(), 206.827, 1e-3));
+	for (int i = 0; i < 100; i++) planner.run();
+	EXPECT_TRUE(Utils::compareApprox(planner.getJerkOut().getSignal().getValue(), 0, 1e-10));
+	EXPECT_TRUE(Utils::compareApprox(planner.getAccOut().getSignal().getValue(), 0, 1e-10));
+	EXPECT_TRUE(Utils::compareApprox(planner.getVelOut().getSignal().getValue(), 0, 1e-10));
+	EXPECT_TRUE(Utils::compareApprox(planner.getPosOut().getSignal().getValue(), 1183.04, 1e-3));
 }

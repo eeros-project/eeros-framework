@@ -160,11 +160,23 @@ void PathPlannerCubic::scalePath(double time, double deltaPos) {
 	posCoeff  = pos_rounded;
 }
 
-bool PathPlannerCubic::move(double init_pos){
+bool PathPlannerCubic::move(double initPos){
 	if (!finished) return false;
 	if (timeCoeffRaw.size() <= 0) throw Fault("Time coeff array empty!"); 
-	posCoeffShifted.resize(posCoeff.size());
-	for (int i = 0; i < posCoeff.size(); i++) posCoeffShifted[i] = posCoeff[i] + init_pos;	// set start position
+	timeCoeff.resize(timeCoeffRaw.size());
+	jerkCoeff.resize(timeCoeffRaw.size());
+	accCoeff.resize(timeCoeffRaw.size());
+	velCoeff.resize(timeCoeffRaw.size());
+	posCoeff.resize(timeCoeffRaw.size());
+	posCoeffShifted.resize(timeCoeffRaw.size());
+	for (int i = 0; i < timeCoeffRaw.size(); i++) {
+		timeCoeff[i] = timeCoeffRaw[i];
+		jerkCoeff[i] = jerkCoeffRaw[i];
+		accCoeff[i] = accCoeffRaw[i];
+		velCoeff[i] = velCoeffRaw[i];
+		posCoeff[i] = posCoeffRaw[i];
+		posCoeffShifted[i] = posCoeffRaw[i] + initPos;	// set start position
+	}
 	finished = false;
 	return true;
 }
@@ -195,7 +207,7 @@ void PathPlannerCubic::setInitPos(double initPos) {
 
 void PathPlannerCubic::run() {
 	double pos, vel, acc, jerk;
-	static int index;
+	static int index = 0;
 	static bool first = true;
 	static double timeInterval = -dt;
 	static double t = 0;
