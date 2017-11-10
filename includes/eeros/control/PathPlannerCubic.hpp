@@ -36,8 +36,12 @@ namespace eeros {
 			eeros::control::Output<double> accOut;
 			eeros::control::Output<double> jerkOut;
 			
-			bool finished;
+			bool finished = true;
 			double dt;
+			int index = 0;
+			bool first = true;
+			double timeInterval;
+			double t = 0;
 			double prevJerk, prevAcc, prevVel, prevPos;
 			std::vector<double> timeCoeffRaw, jerkCoeffRaw, accCoeffRaw, velCoeffRaw, posCoeffRaw;
 			std::vector<double> timeCoeff, jerkCoeff, accCoeff, velCoeff, posCoeff, posCoeffShifted;

@@ -7,8 +7,7 @@
 using namespace eeros;
 using namespace eeros::control;
 
-PathPlannerCubic::PathPlannerCubic(double dt) : dt(dt), log('P'), posOut(this), velOut(this), accOut(this), jerkOut(this) {
-	finished = true;
+PathPlannerCubic::PathPlannerCubic(double dt) : dt(dt), timeInterval(-dt), log('P'), posOut(this), velOut(this), accOut(this), jerkOut(this) {
 	prevPos = 0.0;
 	prevVel = 0.0;
 	prevAcc = 0.0;
@@ -207,10 +206,10 @@ void PathPlannerCubic::setInitPos(double initPos) {
 
 void PathPlannerCubic::run() {
 	double pos, vel, acc, jerk;
-	static int index = 0;
-	static bool first = true;
-	static double timeInterval = -dt;
-	static double t = 0;
+// 	static int index = 0;
+// 	static bool first = true;
+// 	static double timeInterval = -dt;
+// 	static double t = 0;
 	
 	std::lock_guard<std::mutex> guard(m);
 	
