@@ -100,3 +100,31 @@ TEST(controlTransitionSimpleTest, vector) {
 	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue()[0], 0.4, 1e-10));
 	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue()[1], 0.8, 1e-10));
 }
+
+TEST(controlTransitionSimpleTest, steady) {
+	Transition<> t1(5, true);
+	Transition<> t2(1/5, true);
+	Constant<> c1(0), c2(0);
+	t1.inBlock.getIn().connect(c1.getOut());
+	t2.inBlock.getIn().connect(t1.outBlock.getOut());
+	t2.outBlock.getIn().connect(c2.getOut());
+	c1.run();
+	timestamp_t start = c1.getOut().getSignal().getTimestamp();
+	t1.inBlock.run();
+	usleep(5000);
+	c1.setValue(1.0);
+	c1.run();
+	timestamp_t end = c1.getOut().getSignal().getTimestamp();
+	t1.inBlock.run();
+	t1.outBlock.run();
+	for (int i = 0; i < 5; i++) {
+		EXPECT_EQ(t1.outBlock.getOut().getSignal().getTimestamp(), end);
+		EXPECT_TRUE(Utils::compareApprox(t1.outBlock.getOut().getSignal().getValue(), 1.0, 1e-10));
+		t1.outBlock.run();
+		t2.inBlock.run();
+	}
+	t2.outBlock.run();
+	EXPECT_EQ(t2.outBlock.getOut().getSignal().getTimestamp(), end);
+	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue(), 1.0, 1e-10));
+}
+
