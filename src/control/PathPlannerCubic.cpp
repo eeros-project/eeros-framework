@@ -33,7 +33,7 @@ Output<double>& PathPlannerCubic::getJerkOut() {
 	return jerkOut;
 }
 
-void PathPlannerCubic::clear() {
+void PathPlannerCubic::stop() {
 	timeCoeffRaw.clear();
 	jerkCoeffRaw.clear();
 	accCoeffRaw.clear();
@@ -49,7 +49,7 @@ void PathPlannerCubic::clear() {
 
 void PathPlannerCubic::reset() {
 	this->finished = true;
-	clear();
+	stop();
 }
 
 void PathPlannerCubic::init(std::string filename) {
@@ -58,7 +58,7 @@ void PathPlannerCubic::init(std::string filename) {
 	log.info() << "filename " << filename; 
 	file.open(filename.c_str());   
 	if (!file.is_open()) throw Fault("File for loading trajectory is not open!");
-	clear();
+	stop();
 	while(!file.eof()) {
 		std::string tmp_string;
 		double tmp_double;
@@ -192,7 +192,7 @@ bool PathPlannerCubic::move(double time, double startPos, double deltaPos){
 	return true;
 }
 
-bool PathPlannerCubic::posReached() {
+bool PathPlannerCubic::endReached() {
 	return finished;
 }
 

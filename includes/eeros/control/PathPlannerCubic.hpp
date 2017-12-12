@@ -24,12 +24,12 @@ namespace eeros {
 			virtual void setInitPos(double initPos);
 			virtual bool move(double init_pos);
 			virtual bool move(double time, double init_pos, double end_pos); 
-			virtual bool posReached();				
+			virtual bool endReached();				
 			virtual void reset();
 			virtual void run();
 				
 		private:
-			void clear();
+			void stop();
 			void scalePath(double time, double end_pos);
 			eeros::control::Output<double> posOut;
 			eeros::control::Output<double> velOut;
