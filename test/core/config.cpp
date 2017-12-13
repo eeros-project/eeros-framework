@@ -1,5 +1,5 @@
 #include <iostream>
-#include <eeros/core/SimpleConfig.hpp>
+#include <eeros/config/SimpleConfig.hpp>
 
 #include <sys/types.h>
 #include <sys/stat.h>

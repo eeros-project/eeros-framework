@@ -11,8 +11,6 @@ add_eeros_sources(
 	Runnable.cpp
 	Thread.cpp
 	Fault.cpp
-	Config.cpp
-	SimpleConfig.cpp
 	PeriodicCounter.cpp
 	Statistics.cpp
 	Semaphore.cpp

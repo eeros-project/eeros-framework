@@ -1,21 +1,21 @@
 #include <iostream>
 #include <array>
 
-#include <eeros/core/SimpleConfig.hpp>
+#include <eeros/config/SimpleConfig.hpp>
 
 
 namespace {
 
-	class MyConfig : public eeros::SimpleConfig {
+	class TestConfig : public eeros::SimpleConfig {
 	public:
-		MyConfig(const char *name) :
+		TestConfig(const char *name) :
 			SimpleConfig(name),
 			// default values
 			value1(1),
 			value2(2.2),
-			value3(-3.3)
-// 			value4{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }
-// 			value5{ 0.1, 0.2, 0.3 }
+			value3(-3.3),
+			value4{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+			value5{ 0.1, 0.2, 0.3 }
 		{
 			add("value1", value1);
 			add("value2", value2);
@@ -35,7 +35,7 @@ namespace {
 int main(int argc, char **argv) {
     std::cout << "Config demo started!" << std::endl;
 
-	MyConfig configFile("config.txt");	// choose an appropriate path
+	TestConfig configFile("config.txt");	// choose an appropriate path
 	configFile.load();
 
 	std::cout << "Config read from file: value1 = " << configFile.value1 << std::endl;

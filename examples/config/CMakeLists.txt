@@ -1,3 +1,3 @@
 add_executable(configExample configExample.cpp)
-target_link_libraries(configExample eeros pthread)
+target_link_libraries(configExample eeros ${EEROS_LIBS})
 
