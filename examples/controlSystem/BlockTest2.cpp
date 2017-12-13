@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
 	SafetyPropertiesTest ssProperties(controlSystem);
 	SafetySystem safetySys(ssProperties, period);
 	
-	td.registerSafetyEvent(&safetySys, &ssProperties.seDoEmergency);
+	td.registerSafetyEvent(safetySys, ssProperties.seDoEmergency);
 
 	Lambda l1 ([&] () { });
 	Periodic periodic("per1", 1, l1);

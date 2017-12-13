@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 	// Create and initialize a safety system
 	MySafetyProperties properties(controlSys, dt);
 	SafetySystem safetySys(properties, dt);
-	controlSys.timedomain.registerSafetyEvent(&safetySys, &properties.doEmergency);
+	controlSys.timedomain.registerSafetyEvent(safetySys, properties.doEmergency);
 	
 	auto& sequencer = Sequencer::instance();
 	MainSequence mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/10);

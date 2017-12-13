@@ -25,7 +25,7 @@ namespace eeros {
 			std::string getName();
 			double getPeriod();
 			bool getRealtime();
-			void registerSafetyEvent(SafetySystem* ss, SafetyEvent* e);
+			void registerSafetyEvent(SafetySystem& ss, SafetyEvent& e);
 
 			virtual void run();
 			virtual void start();

@@ -19,9 +19,9 @@ bool TimeDomain::getRealtime() {
 	return realtime;
 }
 
-void TimeDomain::registerSafetyEvent(SafetySystem* ss, SafetyEvent* e) {
-	safetySystem = ss;
-	safetyEvent = e;
+void TimeDomain::registerSafetyEvent(SafetySystem& ss, SafetyEvent& e) {
+	safetySystem = &ss;
+	safetyEvent = &e;
 }
 
 void TimeDomain::run() {
