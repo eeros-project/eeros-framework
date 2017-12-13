@@ -90,7 +90,7 @@ int main() {
 	td.addBlock(controlSystem.c2);
 	td.addBlock(controlSystem.sw);
 	td.addBlock(controlSystem.i);
-	controlSystem.sw.registerSafetyEvent(&safetySys, &ssProperties.seGoto2);
+	controlSystem.sw.registerSafetyEvent(safetySys, ssProperties.seGoto2);
 	
 	// create periodic function for logging
 	Lambda l1 ([&] () { });

@@ -30,7 +30,7 @@ public:
 
 class ControlSystem {
 public:
-	ControlSystem(SafetySystem& safetySys, SafetyPropertiesTest& ssProperties) : c(0.5), checker(0, 5, safetySys, ssProperties.seReset) {
+	ControlSystem(SafetySystem& safetySys, SafetyPropertiesTest& ssProperties) : c(0.5), checker(0, 5) {
 		i.getOut().getSignal().setName("integrator output");
 		i.getIn().connect(c.getOut());
 		checker.getIn().connect(i.getOut());
@@ -84,6 +84,7 @@ int main() {
 	SafetySystem safetySys(ssProperties, period);
 	ControlSystem controlSystem(safetySys, ssProperties);
 	ssProperties.controlSystem = &controlSystem;
+	controlSystem.checker.registerSafetyEvent(safetySys, ssProperties.seReset);
 
 	TimeDomain td("td1", 0.5, true);
 	Periodic periodic("per1", 0.5, td);

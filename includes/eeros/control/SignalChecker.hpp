@@ -12,11 +12,9 @@ namespace eeros {
 		template <typename T = double>
 		class SignalChecker : public Block1i<T> {
 		public:
-			SignalChecker(T lowerLimit, T upperLimit, SafetySystem& ss, SafetyEvent& event) : 
+			SignalChecker(T lowerLimit, T upperLimit) : 
 				lowerLimit(lowerLimit), 
 				upperLimit(upperLimit),
-				ss(ss), 
-				e(event), 
 				fired(false) 
 			{ }
 			
@@ -24,8 +22,10 @@ namespace eeros {
 				auto val = this->in.getSignal().getValue();
 				if (!fired) {
 					if (val < lowerLimit || val > upperLimit) {
-						ss.triggerEvent(e);
-						fired = true;
+						if(safetySystem != nullptr && safetyEvent != nullptr) {
+							safetySystem->triggerEvent(*safetyEvent);
+							fired = true;
+						}
 					}
 				}
 			}
@@ -34,11 +34,16 @@ namespace eeros {
 				fired = false;
 			}
 			
+			virtual void registerSafetyEvent(SafetySystem& ss, SafetyEvent& e) {
+				safetySystem = &ss;
+				safetyEvent = &e;
+			}
+
 		protected:
 			T lowerLimit, upperLimit;
 			bool fired;
-			SafetySystem& ss;
-			SafetyEvent& e;
+			SafetySystem* safetySystem;
+			SafetyEvent* safetyEvent;
 		};
 		
 	};

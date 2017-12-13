@@ -52,9 +52,9 @@ namespace eeros {
                                 return currentInput;
                         }
                        
-			virtual void registerSafetyEvent(SafetySystem* ss, SafetyEvent* e) {
-				safetySystem = ss;
-				safetyEvent = e;
+			virtual void registerSafetyEvent(SafetySystem& ss, SafetyEvent& e) {
+				safetySystem = &ss;
+				safetyEvent = &e;
 			}
 
                         virtual void setCondition(T switchLevel, T delta, uint8_t index) {
