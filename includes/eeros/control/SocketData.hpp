@@ -19,14 +19,14 @@ namespace eeros {
 			typename std::enable_if<std::is_compound<SigInType>::value && std::is_compound<SigOutType>::value>::type> 
 			: public Block1i1o<SigInType, SigOutType> {			
 		public:
-			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
+			SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
 				bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
 				bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
 				isServer = serverIP.empty();
 				if (isServer)
-					server = new eeros::sockets::SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period);
+					server = new eeros::sockets::SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period, timeout);
 				else 
-					client = new eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(serverIP, port, period);;
+					client = new eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(serverIP, port, period, timeout);;
 			}
 			
 			~SocketData() {if (isServer) server->stop(); else client->stop();}
@@ -71,14 +71,14 @@ namespace eeros {
 			typename std::enable_if<std::is_arithmetic<SigInType>::value && std::is_compound<SigOutType>::value>::type> 
 			: public Block1i1o<SigInType, SigOutType> {			
 		public:
-			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
+			SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
 				bufInLen = 1;
 				bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
 				isServer = serverIP.empty();
 				if (isServer)
-					server =  new eeros::sockets::SocketServer<1, SigInType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period);
+					server =  new eeros::sockets::SocketServer<1, SigInType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period, timeout);
 				else
-					client =  new eeros::sockets::SocketClient<1, SigInType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(serverIP, port, period);
+					client =  new eeros::sockets::SocketClient<1, SigInType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(serverIP, port, period, timeout);
 			}
 			
 			~SocketData() {if (isServer) server->stop(); else client->stop();}
@@ -123,14 +123,14 @@ namespace eeros {
 			typename std::enable_if<std::is_compound<SigInType>::value && std::is_arithmetic<SigOutType>::value>::type> 
 			: public Block1i1o<SigInType, SigOutType> {			
 		public:
-			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
+			SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
 				bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
 				bufOutLen = 1;
 				isServer = serverIP.empty();
 				if (isServer)
-					server =  new eeros::sockets::SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 1, SigOutType>(port, period);
+					server =  new eeros::sockets::SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 1, SigOutType>(port, period, timeout);
 				else
-					client =  new eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 1, SigOutType>(serverIP, port, period);
+					client =  new eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 1, SigOutType>(serverIP, port, period, timeout);
 			}
 			
 			~SocketData() {if (isServer) server->stop(); else client->stop();}
@@ -175,14 +175,14 @@ namespace eeros {
 			typename std::enable_if<std::is_arithmetic<SigInType>::value && std::is_arithmetic<SigOutType>::value>::type> 
 			: public Block1i1o<SigInType, SigOutType> {			
 		public:
-			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
+			SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
 				bufInLen = 1;
 				bufOutLen = 1;
 				isServer = serverIP.empty();
 				if (isServer)
-					server =  new eeros::sockets::SocketServer<1, SigInType, 1, SigOutType>(port, period);
+					server =  new eeros::sockets::SocketServer<1, SigInType, 1, SigOutType>(port, period, timeout);
 				else
-					client =  new eeros::sockets::SocketClient<1, SigInType, 1, SigOutType>(serverIP, port, period);
+					client =  new eeros::sockets::SocketClient<1, SigInType, 1, SigOutType>(serverIP, port, period, timeout);
 			}
 			
 			~SocketData() {if (isServer) server->stop(); else client->stop();}
@@ -226,13 +226,13 @@ namespace eeros {
 			typename std::enable_if<std::is_compound<SigInType>::value && std::is_same<SigOutType, std::nullptr_t>::value>::type> 
 			: public Block1i1o<SigInType> {			
 		public:
-			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
+			SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
 				bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
 				isServer = serverIP.empty();
 				if (isServer)
-					server =  new eeros::sockets::SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 0, std::nullptr_t>(port, period);
+					server =  new eeros::sockets::SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 0, std::nullptr_t>(port, period, timeout);
 				else 
-					client =  new eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 0, std::nullptr_t>(serverIP, port, period);
+					client =  new eeros::sockets::SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 0, std::nullptr_t>(serverIP, port, period, timeout);
 			}
 			
 			~SocketData() {if (isServer) server->stop(); else client->stop();}
@@ -263,13 +263,13 @@ namespace eeros {
 			typename std::enable_if<std::is_same<SigInType, std::nullptr_t>::value && std::is_compound<SigOutType>::value>::type> 
 			: public Block1i1o<SigOutType> {			
 		public:
-			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
+			SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
 				bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
 				isServer = serverIP.empty();
 				if (isServer) 
-					server =  new eeros::sockets::SocketServer<0, std::nullptr_t, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period);
+					server =  new eeros::sockets::SocketServer<0, std::nullptr_t, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period, timeout);
 				else
-					client =  new eeros::sockets::SocketClient<0, std::nullptr_t, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(serverIP, port, period);
+					client =  new eeros::sockets::SocketClient<0, std::nullptr_t, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(serverIP, port, period, timeout);
 			}
 			
 			~SocketData() {if (isServer) server->stop(); else client->stop();}
@@ -306,13 +306,13 @@ namespace eeros {
 			typename std::enable_if<std::is_arithmetic<SigInType>::value && std::is_same<SigOutType, std::nullptr_t>::value>::type> 
 			: public Block1i1o<SigInType> {			
 		public:
-			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
+			SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
 				bufInLen = 1;
 				isServer = serverIP.empty();
 				if (isServer)
-					server =  new eeros::sockets::SocketServer<1, SigInType, 0, std::nullptr_t>(port, period);
+					server =  new eeros::sockets::SocketServer<1, SigInType, 0, std::nullptr_t>(port, period, timeout);
 				else 
-					client =  new eeros::sockets::SocketClient<1, SigInType, 0, std::nullptr_t>(serverIP, port, period);
+					client =  new eeros::sockets::SocketClient<1, SigInType, 0, std::nullptr_t>(serverIP, port, period, timeout);
 			}
 			
 			~SocketData() {if (isServer) server->stop(); else client->stop();}
@@ -342,13 +342,13 @@ namespace eeros {
 			typename std::enable_if<std::is_same<SigInType, std::nullptr_t>::value && std::is_arithmetic<SigOutType>::value>::type> 
 			: public Block1i1o<SigOutType> {			
 		public:
-			SocketData(std::string serverIP, uint16_t port, double period = 0.01) {
+			SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
 				bufOutLen = 1;
 				isServer = serverIP.empty();
 				if (isServer) 
-					server =  new eeros::sockets::SocketServer<0, std::nullptr_t, 1, SigOutType>(port, period);
+					server =  new eeros::sockets::SocketServer<0, std::nullptr_t, 1, SigOutType>(port, period, timeout);
 				else
-					client =  new eeros::sockets::SocketClient<0, std::nullptr_t, 1, SigOutType>(serverIP, port, period);
+					client =  new eeros::sockets::SocketClient<0, std::nullptr_t, 1, SigOutType>(serverIP, port, period, timeout);
 			}
 			
 			~SocketData() {if (isServer) server->stop(); else client->stop();}

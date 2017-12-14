@@ -23,9 +23,10 @@ namespace eeros {
 		template < uint32_t BufInLen, typename inT, uint32_t BufOutLen, typename outT >
 		class SocketServer : public eeros::Thread {
 		public:
-			SocketServer(uint16_t port, double period = 0.01) : read1({0}), read2({0}), read3({0}) {
+			SocketServer(uint16_t port, double period = 0.01, double timeout = 1.0) : read1({0}), read2({0}), read3({0}) {
 				this->port = port;
 				this->period = period;
+				this->timeout = timeout;
 				signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application
 				read_ptr.store(&read1);
 				send_ptr.store(&send1);
@@ -104,7 +105,7 @@ namespace eeros {
 						// read
 						size_t count = BufOutLen * sizeof(outT);
 						uint8_t* ptr = (uint8_t *)b_read;
-						auto endTime = std::chrono::steady_clock::now() + seconds(period * 100);
+						auto endTime = std::chrono::steady_clock::now() + seconds(timeout);
 						while (connected && count) {
 							if (std::chrono::steady_clock::now() > endTime) {
 								log.trace() << "error = socket read timed out";
@@ -155,6 +156,7 @@ namespace eeros {
 			bool running;
 			uint16_t port;
 			double period;
+			double timeout;	// time which thread tries to read until socket read timed out
 			struct hostent *server;
 			int sockfd;
 			int newsockfd;
