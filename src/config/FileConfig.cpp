@@ -1,9 +1,9 @@
-#include <eeros/config/SimpleConfig.hpp>
+#include <eeros/config/FileConfig.hpp>
 #include <eeros/core/Fault.hpp>
 
 #include <fstream>
 
-using namespace eeros;
+using namespace eeros::config;
 
 namespace {
 	bool is_whitespace(char c) {
@@ -16,11 +16,11 @@ namespace {
 };
 
 
-SimpleConfig::SimpleConfig(const char *path) : Config(path) { }
+FileConfig::FileConfig(const char *path) : Config(path) { }
 
-SimpleConfig::~SimpleConfig() { }
+FileConfig::~FileConfig() { }
 
-bool SimpleConfig::save(const char *path) {
+bool FileConfig::save(const char *path) {
 	if (path == nullptr) path = this->path;
 	if (path == nullptr) throw Fault("path is null");
 	char buffer[buffer_size + 1];
@@ -41,7 +41,7 @@ bool SimpleConfig::save(const char *path) {
 	return true;
 }
 
-bool SimpleConfig::load(const char *path) {
+bool FileConfig::load(const char *path) {
 	if (path == nullptr) path = this->path;
 	if (path == nullptr) throw Fault("path is null");
 	char buffer[buffer_size + 1];

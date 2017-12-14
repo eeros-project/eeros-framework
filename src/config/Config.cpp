@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 
-using namespace eeros;
+using namespace eeros::config;
 
 
 Config::Config(const char *path) : path(path) { }
@@ -152,6 +152,26 @@ void Config::add(const char *name, std::size_t length, double *start, double *en
 		}
 
 		return 0;
+		}
+	};
+}
+
+void Config::add(const char *name, std::string &value) {
+	auto k = properties.find(name);
+	if (k != properties.end()) {
+		throw eeros::Fault(std::string("Property '") + name + "' already added.");
+	}
+	properties[name] = ConfigPropertyAccessor{
+		[&value] (const char *name, char *buffer, int size) -> int {
+			const char *v = value.c_str();
+			int n = strlen(v);
+			if (n > size) n = size;
+			strncpy(buffer, v, n);
+			return n;
+		},
+		[&value] (const char *name, const char *buffer, int size) -> int {
+			value = std::string(buffer+1);
+			return 0;
 		}
 	};
 }
