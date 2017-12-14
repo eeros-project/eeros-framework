@@ -63,6 +63,7 @@ add_subdirectory(math)
 add_subdirectory(control)
 add_subdirectory(safety)
 add_subdirectory(hal)
+add_subdirectory(config)
 
 add_eeros_test_sources(RunAllTests.cpp)
 add_eeros_test_sources(EerosEnvironment.cpp)
