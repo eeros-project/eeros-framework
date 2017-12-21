@@ -7,10 +7,6 @@ namespace eeros {
 		uint8_t SafetySystem::instCount = 0;
 		SafetySystem* SafetySystem::instance = nullptr;
 		
-		/** \brief Creates a safety system with given properties 
-		 *  \param safetyProperties a set of safety properties
-		 *  \param period period with which the safety system will be run by the executor
-		 */
 		SafetySystem::SafetySystem(SafetyProperties& safetyProperties, double period) :
 		log('S'),
 		currentLevel(nullptr),
