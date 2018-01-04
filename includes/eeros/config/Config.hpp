@@ -27,13 +27,38 @@ namespace eeros {
 			}
 		};
 
+		/** \brief Configuration.
+		*
+		* This is the base class for a configuration to be saved to or loaded from disk.
+		* A configuration might be useful to keep calibration values or setup data.
+		*/
 		class Config {
 		public:
+			/**
+			* Creates a configuration
+			* @param path Name of the configuration.
+			*/
 			Config(const char *path = nullptr);
+			/**
+			* Destructor, do not call manually.
+			*/
 			virtual ~Config();
 			
+			/**
+			* Loads a default configuration, must be overwritten by a derived class.
+			*/
 			virtual void loadDefaults();
+			/**
+			* Saves a configuration, must be overwritten by a derived clas
+			* @param path Name of the configuration.
+			* @return true if successful
+			*/
 			virtual bool save(const char *path = nullptr) = 0;
+			/**
+			* Loads a configuration, must be overwritten by a derived clas
+			* @param path Name of the configuration.
+			* @return true if successful
+			*/
 			virtual bool load(const char *path = nullptr) = 0;
 			
 		protected:
