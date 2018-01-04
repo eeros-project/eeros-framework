@@ -3,31 +3,35 @@
 #include <eeros/hal/SpaceNavigatorDigIn.hpp>
 
 #include <cstdio>
+#include <fstream>
 #include <fcntl.h>
 #include <unistd.h>
 
 using namespace eeros::hal;
 
 SpaceNavigator::SpaceNavigator(std::string dev) {
-	open(dev.c_str());
-	button[0] = new SpaceNavigatorDigIn("SpaceNavButtonL", this);
-	button[1] = new SpaceNavigatorDigIn("SpaceNavButtonR", this);
-	HAL& hal = HAL::instance();
-	for (int i = 0; i < SPACENAVIGATOR_BUTTON_COUNT; i++) hal.addInput(button[i]);
-	for (int i = 0; i < SPACENAVIGATOR_AXIS_COUNT; i++) current.axis[i] = 0;
-	for (int i = 0; i < SPACENAVIGATOR_BUTTON_COUNT; i++) current.button[i] = false;
+		this->open(dev.c_str());
+		this->useRaw = (dev.find("raw") != std::string::npos);
+		button[0] = new SpaceNavigatorDigIn("SpaceNavButtonL", this);
+		button[1] = new SpaceNavigatorDigIn("SpaceNavButtonR", this);
+		HAL& hal = HAL::instance();
+		for (int i = 0; i < SPACENAVIGATOR_BUTTON_COUNT; i++) hal.addInput(button[i]);
+		for (int i = 0; i < SPACENAVIGATOR_AXIS_COUNT; i++) current.axis[i] = 0;
+		for (int i = 0; i < SPACENAVIGATOR_BUTTON_COUNT; i++) current.button[i] = false;
 }
 
 
 SpaceNavigator::~SpaceNavigator() { 
 	running = false; 
 	join(); 
-	close(); 
+	this->close(); 
 }
 
 bool SpaceNavigator::open(const char* device) {
 	file = ::fopen(device, "rb");
-	if (file == NULL) throw eeros::Fault("Space Navigator: could not open input device ");
+	if (file == NULL) {
+		throw eeros::Fault("Space Navigator: could not open input device ");
+	}
 	return true;
 }
 
@@ -85,45 +89,119 @@ std::string SpaceNavigator::name() {
 
 void SpaceNavigator::run() {
 	running = true;
-	uint8_t readbuff[14];
-	while (running) {
-		*readbuff = fgetc(file);
-		ssize_t n;
-		switch(*readbuff) {
-		case 0x01: // position/rotation packet 
-			n = fread(readbuff+1, 1, 13, file);
-			current.axis[0] = (int16_t)(((int16_t)readbuff[2]<<8)&0xff00) | ((int16_t)readbuff[1]&0xff);
-			current.axis[1] = (int16_t)(((int16_t)readbuff[4]<<8)&0xff00) | ((int16_t)readbuff[3]&0xff);
-			current.axis[2] = (int16_t)(((int16_t)readbuff[6]<<8)&0xff00) | ((int16_t)readbuff[5]&0xff);
-			current.rotAxis[0] = (int16_t)(((int16_t)readbuff[9]<<8)&0xff00) | ((int16_t)readbuff[8]&0xff);
-			current.rotAxis[1] = (int16_t)(((int16_t)readbuff[11]<<8)&0xff00) | ((int16_t)readbuff[10]&0xff);
-			current.rotAxis[2] = (int16_t)(((int16_t)readbuff[13]<<8)&0xff00) | ((int16_t)readbuff[12]&0xff);
-			break;
-		case 0x03: // button event
-			n = fread(readbuff+1, 1, 2, file); 
-			switch(readbuff[1]) {
-			case 0x00:
-				current.button[0] = false;
-				current.button[1] = false;
+	std::cout  << "use raw: " << useRaw << std::endl;
+	if (useRaw) {	// read from raw hid stream
+		uint8_t readbuff[14];
+		while (running) {
+			*readbuff = fgetc(file);
+			ssize_t n;
+			switch(*readbuff) {
+			case 0x01: // position/rotation packet 
+				n = fread(readbuff+1, 1, 13, file);
+				current.axis[0] = (int16_t)(((int16_t)readbuff[2]<<8)&0xff00) | ((int16_t)readbuff[1]&0xff);
+				current.axis[1] = (int16_t)(((int16_t)readbuff[4]<<8)&0xff00) | ((int16_t)readbuff[3]&0xff);
+				current.axis[2] = (int16_t)(((int16_t)readbuff[6]<<8)&0xff00) | ((int16_t)readbuff[5]&0xff);
+				current.rotAxis[0] = (int16_t)(((int16_t)readbuff[9]<<8)&0xff00) | ((int16_t)readbuff[8]&0xff);
+				current.rotAxis[1] = (int16_t)(((int16_t)readbuff[11]<<8)&0xff00) | ((int16_t)readbuff[10]&0xff);
+				current.rotAxis[2] = (int16_t)(((int16_t)readbuff[13]<<8)&0xff00) | ((int16_t)readbuff[12]&0xff);
 				break;
-			case 0x01:
-				current.button[0] = true;
-				current.button[1] = false;
+			case 0x03: // button event
+				n = fread(readbuff+1, 1, 2, file); 
+				switch(readbuff[1]) {
+				case 0x00:
+					current.button[0] = false;
+					current.button[1] = false;
+					break;
+				case 0x01:
+					current.button[0] = true;
+					current.button[1] = false;
+					break;
+				case 0x02:
+					current.button[0] = false;
+					current.button[1] = true;
+					break;
+				case 0x03:
+					current.button[0] = true;
+					current.button[1] = true;
+					break;
+				default: 
+					break;
+				}
 				break;
-			case 0x02:
-				current.button[0] = false;
-				current.button[1] = true;
-				break;
-			case 0x03:
-				current.button[0] = true;
-				current.button[1] = true;
-				break;
-			default: 
+			default: // bad header
 				break;
 			}
-			break;
-		default: // bad header
-			break;
+		}
+	} else {	// read events
+		struct input_event ev;
+		while (running) {
+			int rd = fread(&ev, sizeof(struct input_event), 1, file);
+			switch(ev.type) {
+			case 1: // button event
+				switch(ev.code) {
+				case 256:	// button 0
+					if (ev.value) current.button[0] = true;
+					else current.button[0] = false;
+					break;
+				case 257:	// button 1
+					if (ev.value) current.button[1] = true;
+					else current.button[1] = false;
+					break;
+				default: 
+					break;
+				}
+				break;
+			case 2: // position/rotation packet (rel), sent by: 3Dconnexion SpaceNavigator for Notebooks, vendor 0x46d product 0xc628 version 0x111
+				switch(ev.code) {
+				case 0:	// X
+					current.axis[0] = ev.value;
+					break;
+				case 1:	// Y
+					current.axis[1] = ev.value;
+					break;
+				case 2:	// Z
+					current.axis[2] = ev.value;
+					break;
+				case 3:	// RY
+					current.rotAxis[0] = ev.value;
+					break;
+				case 4:	// RY
+					current.rotAxis[1] = ev.value;
+					break;
+				case 5:	// RZ
+					current.rotAxis[2] = ev.value;
+					break;
+				default: 
+					break;
+				}
+				break;
+			case 3: // position/rotation packet (abs), sent by: 3Dc̘3Dconne SpaceMouse Wireless Receiver, vendor 0x256f product 0xc62f version 0x111
+				switch(ev.code) {
+				case 0:	// X
+					current.axis[0] = ev.value;
+					break;
+				case 1:	// Y
+					current.axis[1] = ev.value;
+					break;
+				case 2:	// Z
+					current.axis[2] = ev.value;
+					break;
+				case 3:	// RY
+					current.rotAxis[0] = ev.value;
+					break;
+				case 4:	// RY
+					current.rotAxis[1] = ev.value;
+					break;
+				case 5:	// RZ
+					current.rotAxis[2] = ev.value;
+					break;
+				default: 
+					break;
+				}
+				break;
+			default: // other
+				break;
+			}
 		}
 	}
 }

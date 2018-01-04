@@ -17,7 +17,7 @@ double period = 0.01;
 
 class ControlSystem {
 public:
-	ControlSystem() : sn("/dev/hidraw1"), td("td1", period, true) {
+	ControlSystem() : sn("/dev/input/event18"), td("td1", period, true) {
 		sn.setName("space navigator");
 		sn.getOut().getSignal().setName("space nav position signal");
 		sn.getRotOut().getSignal().setName("space nav rotation signal");

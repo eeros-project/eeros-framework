@@ -48,7 +48,7 @@ namespace eeros {
 			virtual bool open(const char* device);
 			virtual void close();
 			FILE* file;
-			bool running;
+			bool running, useRaw;
 			Input<bool>* button[SPACENAVIGATOR_BUTTON_COUNT];
 		};
 	}
