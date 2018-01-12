@@ -19,7 +19,7 @@ using namespace eeros::control;
 using namespace eeros::task;
 using namespace eeros::math;
 
-double period = 0.01;
+double period = 0.1;
 double traceLen = 64;
 
 class ControlSystem {
@@ -48,6 +48,11 @@ public:
 		slRunning.addEvent(seShutDown, slOff, kPrivateEvent);
 		// Define and add level functions
 		slOff.setLevelAction([&](SafetyContext* privateContext) {Executor::stop();});
+		slRunning.setLevelAction([&](SafetyContext* privateContext) {
+			if (slRunning.getNofActivations() == 30) // start after 3s
+				cs.trace1.enable();
+				cs.trace2.enable();
+			});
 		// Define action when exiting application with Ctrl-C 
 		exitFunction = [&](SafetyContext* privateContext) {privateContext->triggerEvent(seShutDown);};
 		// Define entry level
@@ -62,12 +67,7 @@ void signalHandler(int signum) {
 }
 
 int main() {
-	signal(SIGHUP, signalHandler);
 	signal(SIGINT, signalHandler);
-	signal(SIGQUIT, signalHandler);
-	signal(SIGKILL, signalHandler);
-	signal(SIGTERM, signalHandler);
-	signal(SIGPWR, signalHandler);
 
 	StreamLogWriter w(std::cout);
 	w.show(LogLevel::TRACE);
@@ -109,7 +109,7 @@ int main() {
 	timestamp_t* timeStampBuf = controlSystem.trace1.getTimestampTrace();
 	Vector3* buf1 = controlSystem.trace1.getTrace();
 	Vector3* buf2 = controlSystem.trace2.getTrace();
-	for (int i = 0; i < traceLen; i++) file << timeStampBuf[i] << " " << buf1[i] << " " << buf2[i] << std::endl;
+	for (int i = 0; i < controlSystem.trace1.getSize(); i++) file << timeStampBuf[i] << " " << buf1[i] << " " << buf2[i] << std::endl;
 	file.close();
 	log.info() << "file written";
 
