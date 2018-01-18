@@ -38,12 +38,12 @@ public:
 				Sequencer::instance().getSequenceByName("Homing Sequence")->start();
 			if (cs.iX.getOut().getSignal().getValue() >= 1.0) cs.setpointX.setValue(0);
 			if (cs.iY.getOut().getSignal().getValue() >= 1.0) cs.setpointY.setValue(0);
-			if (cs.iX.getOut().getSignal().getValue() >= 1.0 && cs.iY.getOut().getSignal().getValue() >= 1.0)
+			if (Sequencer::instance().getSequenceByName("Homing Sequence")->getRunningState() == SequenceState::terminated)
 				privateContext->triggerEvent(homingDone);
 		});
 		
-		slReady.setLevelAction([&](SafetyContext* privateContext) {
-			if (slReady.getNofActivations() * 0.01 >= 2)
+		slReady.setLevelAction([=](SafetyContext* privateContext) {
+			if (slReady.getNofActivations() * ts >= 2)
 				privateContext->triggerEvent(startMoving);
 		});
 		

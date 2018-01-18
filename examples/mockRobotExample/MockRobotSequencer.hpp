@@ -4,7 +4,6 @@
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Step.hpp>
-#include "MockRobotSafetyProperties.hpp"
 #include "MockRobotControlSystem.hpp"
 
 using namespace eeros;

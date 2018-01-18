@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 	executor.add(periodic);
 	executor.run();
 	
-	// terminate sequencer 
+	// wait for sequencer thread 
 	sequencer.join();
 	
 	log.info() << "Mock robot example finished...";
