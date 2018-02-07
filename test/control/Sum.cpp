@@ -51,6 +51,29 @@ TEST(controlSumTest, initialValue) {
 	}
 }
 
+TEST(controlSumTest, index) {
+	Sum<2, int> s1;
+	s1.setName("s1");
+	Constant<int> c1(10);
+	s1.getIn(0).connect(c1.getOut());
+	s1.getIn(1).connect(c1.getOut());
+	try {
+		s1.getIn(2).connect(c1.getOut());
+		FAIL();
+	} catch(eeros::Fault const & err) {
+		EXPECT_EQ(err.what(), std::string("index too big in sum block 's1'"));
+	}
+	
+	s1.negateInput(0);
+	s1.negateInput(1);
+	try {
+		s1.negateInput(2);
+		FAIL();
+	} catch(eeros::Fault const & err) {
+		EXPECT_EQ(err.what(), std::string("index too big in sum block 's1'"));
+	}
+}
+
 TEST(controlSumTest, int) {
 	Sum<2, int> s1;
 	Constant<int> c1(10), c2(-325);

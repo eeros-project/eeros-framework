@@ -29,10 +29,12 @@ namespace eeros {
 			}
 			
 			virtual Input<T>& getIn(uint8_t index) {
+				if (index >= N) throw eeros::Fault("index too big in sum block '" + this->getName() + "'");
 				return in[index];
 			}
 			
 			virtual void negateInput(uint8_t index) {
+				if (index >= N) throw eeros::Fault("index too big in sum block '" + this->getName() + "'");
 				negated[index] = true;
 			}
 
