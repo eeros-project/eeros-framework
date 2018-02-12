@@ -9,6 +9,11 @@
 #include <eeros/task/Periodic.hpp>
 #include <eeros/logger/Logger.hpp>
 
+//uncomment if etherCAT is needed
+//#ifndef ECMASTERLIB_FOUND
+//#define ECMASTERLIB_FOUND
+//#endif
+
 #ifdef ECMASTERLIB_FOUND
 #include <EtherCATMain.hpp>
 #endif
