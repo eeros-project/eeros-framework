@@ -53,6 +53,14 @@ namespace eeros {
 				this->out.getSignal().setTimestamp(time);
 			}
 			
+			virtual bool isNew() {
+				if (isServer) return server->newData; else return client->newData;
+			}
+
+			virtual void resetNew() {
+				if (isServer) server->newData = false; else client->newData = false;
+			}
+			
 			template <typename X, typename Y>
 			friend std::ostream& operator<<(std::ostream& os, SocketData<X,Y>& s);
 
@@ -104,6 +112,14 @@ namespace eeros {
 				this->out.getSignal().setValue(output);
 				timestamp_t time = System::getTimeNs();
 				this->out.getSignal().setTimestamp(time);
+			}
+			
+			virtual bool isNew() {
+				if (isServer) return server->newData; else return client->newData;
+			}
+
+			virtual void resetNew() {
+				if (isServer) server->newData = false; else client->newData = false;
 			}
 			
 			template <typename X, typename Y>
@@ -158,6 +174,14 @@ namespace eeros {
 				this->out.getSignal().setTimestamp(time);
 			}
 			
+			virtual bool isNew() {
+				if (isServer) return server->newData; else return client->newData;
+			}
+
+			virtual void resetNew() {
+				if (isServer) server->newData = false; else client->newData = false;
+			}
+			
 			template <typename X, typename Y>
 			friend std::ostream& operator<<(std::ostream& os, SocketData<X,Y>& s);
 
@@ -208,6 +232,14 @@ namespace eeros {
 				this->out.getSignal().setValue(output);
 				timestamp_t time = System::getTimeNs();
 				this->out.getSignal().setTimestamp(time);
+			}
+			
+			virtual bool isNew() {
+				if (isServer) return server->newData; else return client->newData;
+			}
+
+			virtual void resetNew() {
+				if (isServer) server->newData = false; else client->newData = false;
 			}
 			
 			template <typename X, typename Y>
@@ -290,6 +322,14 @@ namespace eeros {
 				this->out.getSignal().setTimestamp(time);
 			}
 			
+			virtual bool isNew() {
+				if (isServer) return server->newData; else return client->newData;
+			}
+
+			virtual void resetNew() {
+				if (isServer) server->newData = false; else client->newData = false;
+			}
+			
 			template <typename X, typename Y>
 			friend std::ostream& operator<<(std::ostream& os, SocketData<X,Y>& s);
 
@@ -367,6 +407,14 @@ namespace eeros {
 				this->out.getSignal().setValue(output);
 				timestamp_t time = System::getTimeNs();
 				this->out.getSignal().setTimestamp(time);
+			}
+			
+			virtual bool isNew() {
+				if (isServer) return server->newData; else return client->newData;
+			}
+
+			virtual void resetNew() {
+				if (isServer) server->newData = false; else client->newData = false;
 			}
 			
 			template <typename X, typename Y>

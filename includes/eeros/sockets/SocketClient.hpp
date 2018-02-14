@@ -56,6 +56,7 @@ namespace eeros {
 			}
 
 			outT readbuffer;
+			bool newData = false;
 			
 		private:
 			virtual void run() {	
@@ -115,6 +116,7 @@ namespace eeros {
 						}
 						std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
 						for(int i = 0; i < BufOutLen; i++) readValue[i] = b_read[i];
+						newData = true;
 						flip();
 						next_cycle += seconds(period);
 					}
