@@ -32,3 +32,6 @@ target_link_libraries(spaceNavigatorTest eeros ${EEROS_LIBS})
 
 add_executable(transitionBlockTest1 TransitionBlockTest1.cpp)
 target_link_libraries(transitionBlockTest1 eeros ${EEROS_LIBS})
+
+add_executable(pathPlannerTest1 PathPlannerTest1.cpp)
+target_link_libraries(pathPlannerTest1 eeros ${EEROS_LIBS})
