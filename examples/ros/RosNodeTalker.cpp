@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 	ros::Rate loop_rate(5);	// 5Hz
 
 	cout << "'rosNodeTalker' initialized" << endl;
-	double count = 0;
+	int count = 0;
 	while (ros::ok())
 	{
 		std_msgs::Float64 msg1;
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 		msg2.data = {static_cast<double>(static_cast<int>(count) % 37), static_cast<double>( static_cast<int>(count) % 73 )};
 
 		msg3.header.stamp = ros::Time::now();
-		sensor_msgs::Joy::_axes_type axes {count/10, (count+1)/10, (count+2)/10};
+		sensor_msgs::Joy::_axes_type axes {(float)(count/10), (float)((count+1)/10), (float)((count+2)/10)};
 		msg3.axes = axes;
 		sensor_msgs::Joy::_buttons_type buttons {count, count+1, count+2, count+3, count+4};
 		msg3.buttons = buttons;
