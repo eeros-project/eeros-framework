@@ -228,17 +228,12 @@ namespace eeros {
 				coefficients.zero();
 				segment_set = false;
 			}
-			
+
 			virtual void run() {
-				std::vector<T> y = std::vector<T>(4);
-				y = this->last;
-				timestamp_t time = System::getTimeNs();	
+			  	std::vector<T> y = this->last;
 				t += dt;
 				
 				if (!finished) {
-					T a_prev, v_prev, p_prev, j_prev;
-					double dT;
-					double j0, s0; 
 					if (k < segments_nr) {
 						// define coefficients
 						if (segment_set == false) {
@@ -292,6 +287,7 @@ namespace eeros {
 				accOut.getSignal().setValue( y[2]);
 				jerkOut.getSignal().setValue(y[3]);
 
+				timestamp_t time = System::getTimeNs();	
 				posOut.getSignal().setTimestamp( time);
 				velOut.getSignal().setTimestamp( time);
 				accOut.getSignal().setTimestamp( time);
@@ -429,6 +425,9 @@ namespace eeros {
 			bool jerkLimit = false;
 			
 			T velMax, accMax, decMax; 
+			T a_prev, v_prev, p_prev, j_prev;
+			double dT, j0, s0; 
+
 			std::vector<T> last = std::vector<T>(4);
 			std::vector<T> positions = std::vector<T>(100);
 			eeros::math::Matrix<100,5,T> coefficients;
