@@ -98,4 +98,31 @@ TEST(controlITest, running) {
 	EXPECT_TRUE(Utils::compareApprox(i1.getOut().getSignal().getValue(), 2.502, 1e-3));
 }
 
+// test limit
+TEST(controlITest, limit) {
+	Constant<> c1(100.0);
+	I<> i1;
+	i1.getIn().connect(c1.getOut());
+	i1.enable();
+	i1.setInitCondition(-0.2);
+ 	i1.setLimit(5.6, -3.2);
+	for (int i = 0; i < 100; i++) {c1.run(); i1.run(); usleep(1000);}
+	EXPECT_TRUE(Utils::compareApprox(i1.getOut().getSignal().getValue(), 5.6, 1e-10));
+	c1.setValue(-100.0);
+	for (int i = 0; i < 100; i++) {c1.run(); i1.run(); usleep(1000);}
+	EXPECT_TRUE(Utils::compareApprox(i1.getOut().getSignal().getValue(), -3.2, 1e-10));
 
+	Constant<Matrix<2,1,double>> c2(100.0);
+	I<Matrix<2,1,double>> i2;
+	i2.getIn().connect(c2.getOut());
+	i2.enable();
+	i2.setInitCondition({-0.2, 0.4});
+ 	i2.setLimit({5.6, 5.3}, -3.2);
+	for (int i = 0; i < 100; i++) {c2.run(); i2.run(); usleep(1000);}
+	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[0], 5.6, 1e-10));
+	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[1], 5.3, 1e-10));
+	c2.setValue(-100.0);
+	for (int i = 0; i < 100; i++) {c2.run(); i2.run(); usleep(1000);}
+	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[0], -3.2, 1e-10));
+	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[1], -3.2, 1e-10));
+}
