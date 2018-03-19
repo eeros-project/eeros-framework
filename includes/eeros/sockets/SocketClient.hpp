@@ -124,6 +124,7 @@ namespace eeros {
 					// if disconnected clear receive buffer
 					std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
 					for(int i = 0; i < BufOutLen; i++) readValue[i] = 0;
+					newData = true;
 					flip();
 				}
 			}
