@@ -9,7 +9,7 @@ namespace eeros {
 		template < typename T = double >
 		class I: public Block1i1o<T> {
 		public:
-			I() : first(true), enabled(false) { prev.clear(); }
+			I() : first(true), enabled(false) { prev.clear(); clearLimits(); }
 			
 			virtual void run() {
 				if(first) {  // first run, set output to init condition
@@ -30,7 +30,8 @@ namespace eeros {
 						output = valprev + valin * dt;
 					else
 						output = valprev;
-
+					if (output > upperLimit) output = upperLimit;
+					if (output < lowerLimit) output = lowerLimit;
 					this->out.getSignal().setValue(output);
 					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
 					this->prev = this->out.getSignal();
@@ -46,11 +47,40 @@ namespace eeros {
 			virtual void setInitCondition(T val) {
 				this->prev.setValue(val);
 			}
+			virtual void setLimit(T upper, T lower) {
+				this->upperLimit = upper;
+				this->lowerLimit = lower;
+				T val = prev.getValue();
+				if (val > upper) prev.setValue(upper);
+				if (val < lower) prev.setValue(lower);
+			}
 			
 		protected:
 			bool first;
 			bool enabled;
 			Signal<T> prev;
+			T upperLimit, lowerLimit;
+		private:
+			virtual void clearLimits() {
+				_clear<T>();
+			}
+			template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _clear() {
+				upperLimit = std::numeric_limits<int32_t>::max();
+				lowerLimit = std::numeric_limits<int32_t>::min();
+			}
+			template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type _clear() {
+				upperLimit = std::numeric_limits<double>::max();
+				lowerLimit = std::numeric_limits<double>::min();
+			}
+			template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type _clear() {
+				upperLimit.fill(std::numeric_limits<int32_t>::max());
+				lowerLimit.fill(std::numeric_limits<int32_t>::min());
+			}
+			template <typename S> typename std::enable_if<   !std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
+				upperLimit.fill(std::numeric_limits<double>::max());
+				lowerLimit.fill(std::numeric_limits<double>::min());
+			}
+
 		};
 		
 		/********** Print functions **********/

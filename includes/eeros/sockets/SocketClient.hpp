@@ -76,11 +76,14 @@ namespace eeros {
 					bcopy((char *)server->h_addr,(char *)&servAddr.sin_addr.s_addr, server->h_length);
 					servAddr.sin_port = htons(port);
 				
-					while (connect(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0) ;
-					log.info() << "Client connected to ip=" << serverIP;
-					inT b_write[BufInLen]; outT b_read[BufOutLen];							
 					using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
 					auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
+					while (connect(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0) {
+						std::this_thread::sleep_until(next_cycle);
+						next_cycle += seconds(period);
+					}
+					log.info() << "Client connected to ip=" << serverIP;
+					inT b_write[BufInLen]; outT b_read[BufOutLen];							
 					bool connected = true;
 				
 					while (connected) {
@@ -124,6 +127,7 @@ namespace eeros {
 					// if disconnected clear receive buffer
 					std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
 					for(int i = 0; i < BufOutLen; i++) readValue[i] = 0;
+					newData = true;
 					flip();
 				}
 			}
