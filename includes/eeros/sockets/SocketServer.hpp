@@ -70,8 +70,11 @@ namespace eeros {
 				servAddr.sin_port = htons(port); 
 				servAddr.sin_family = AF_INET;
 				servAddr.sin_addr.s_addr = htonl(INADDR_ANY) ;
+				int yes = 1;
+				if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1)
+					throw Fault("ERROR on set socket option");
 				if (bind(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0) 
-					throw Fault("ERROR on binding");
+					throw Fault("ERROR on socket binding");
 				
 				socklen_t clilen;
 				listen(sockfd,1);
@@ -81,7 +84,7 @@ namespace eeros {
 				running = true;
 				while (running) {
 					newsockfd = accept(sockfd, (struct sockaddr *) &cliAddr,  &clilen);
-					if (newsockfd < 0) throw Fault("ERROR on accept");
+					if (newsockfd < 0) throw Fault("ERROR on socket accept");
 					bool connected = true;
 					char cliName[INET6_ADDRSTRLEN];
 					getnameinfo((struct sockaddr*)&cliAddr, sizeof cliAddr, cliName, sizeof(cliName), NULL, 0, NI_NUMERICHOST|NI_NUMERICSERV);
