@@ -30,8 +30,8 @@ namespace eeros {
 						output = valprev + valin * dt;
 					else
 						output = valprev;
-					if (output > upperLimit) output = upperLimit;
-					if (output < lowerLimit) output = lowerLimit;
+// 					if (output > upperLimit) output = upperLimit;
+// 					if (output < lowerLimit) output = lowerLimit;
 					this->out.getSignal().setValue(output);
 					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
 					this->prev = this->out.getSignal();
