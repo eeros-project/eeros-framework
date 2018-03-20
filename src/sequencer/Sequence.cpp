@@ -27,10 +27,14 @@ Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller) : Bas
 Sequence::~Sequence() { }
 
 void Sequence::run() {	// runs in thread
+	struct sched_param schedulingParam;
+	schedulingParam.sched_priority = 0;
+	if (sched_setscheduler(0, SCHED_OTHER, &schedulingParam) != 0) log.error() << "could not set scheduling parameter for sequence thread";
+	sched_getparam(0, &schedulingParam);
 	std::ostringstream s;
 	s << thread->get_id();
 	std::string id = s.str();
-	log.trace() << "Thread '" << id << "' for sequence '" << name << "' started";
+	log.trace() << "Thread '" << id << "' for sequence '" << name << "' and with prio=" << schedulingParam.sched_priority << " started";
 	log.info() << "sequence '" << name << "' (non-blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
 	BaseSequence::action();
 	log.info() << "sequence '" << name << "' terminated";
