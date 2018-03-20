@@ -17,7 +17,7 @@ namespace eeros {
 
 			void addDefaultMonitor(double tolerance = 0.05);
 
-			const char * getName();
+			std::string getName();
 			double getPeriod();
 			Runnable& getTask();
 			bool getRealtime();
@@ -30,7 +30,7 @@ namespace eeros {
 			std::vector<PeriodicCounter::MonitorFunc> monitors;
 
 		private:
-			const char *name;
+			std::string name;
 			double period;
 			Runnable *task;
 			bool realtime;

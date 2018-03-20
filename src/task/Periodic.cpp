@@ -15,7 +15,7 @@ void Periodic::addDefaultMonitor(double tolerance) {
 	PeriodicCounter::addDefaultMonitor(monitors, period, tolerance);
 }
 
-const char * Periodic::getName() {
+std::string Periodic::getName() {
 	return name;
 }
 
