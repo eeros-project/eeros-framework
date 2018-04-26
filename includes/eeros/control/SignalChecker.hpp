@@ -25,9 +25,8 @@ namespace eeros {
 			virtual void run() override {
 				auto val = this->in.getSignal().getValue();
 				if (!fired) {
-					if (val < lowerLimit || val > upperLimit) {
+					if (!((val > lowerLimit) && (val < upperLimit))) {
 						if (safetySystem != nullptr && safetyEvent != nullptr) {
-//							if (activeLevel != nullptr) std::cout << " ungleich nullptr" << std::endl;
 							if (activeLevel == nullptr || (activeLevel != nullptr && safetySystem->getCurrentLevel() >= *activeLevel)) {
 								safetySystem->triggerEvent(*safetyEvent);
 								fired = true;
