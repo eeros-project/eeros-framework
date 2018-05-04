@@ -113,6 +113,11 @@ elseif(COMPILER_SUPPORTS_CXX0X)
 else()
 	message(SEND_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler!")
 endif()
+ 
+ 
+## Compile with debug symbols
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
 
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 if(LIBCURSES)
