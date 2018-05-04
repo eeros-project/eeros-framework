@@ -3,6 +3,7 @@
 
 #include <eeros/control/Block1i.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
+#include <eeros/safety/SafetySystem.hpp>
 
 namespace eeros {
 	namespace control {
@@ -15,16 +16,21 @@ namespace eeros {
 			SignalChecker(T lowerLimit, T upperLimit) : 
 				lowerLimit(lowerLimit), 
 				upperLimit(upperLimit),
-				fired(false) 
+				fired(false),
+				safetySystem(nullptr),
+				safetyEvent(nullptr),
+				activeLevel(nullptr)
 			{ }
 			
 			virtual void run() override {
 				auto val = this->in.getSignal().getValue();
 				if (!fired) {
-					if (val < lowerLimit || val > upperLimit) {
-						if(safetySystem != nullptr && safetyEvent != nullptr) {
-							safetySystem->triggerEvent(*safetyEvent);
-							fired = true;
+					if (!((val > lowerLimit) && (val < upperLimit))) {
+						if (safetySystem != nullptr && safetyEvent != nullptr) {
+							if (activeLevel == nullptr || (activeLevel != nullptr && safetySystem->getCurrentLevel() >= *activeLevel)) {
+								safetySystem->triggerEvent(*safetyEvent);
+								fired = true;
+							}
 						}
 					}
 				}
@@ -39,11 +45,16 @@ namespace eeros {
 				safetyEvent = &e;
 			}
 
+			virtual void setActiveLevel(SafetyLevel& level) {
+				activeLevel = &level;
+			}
+
 		protected:
 			T lowerLimit, upperLimit;
 			bool fired;
 			SafetySystem* safetySystem;
 			SafetyEvent* safetyEvent;
+			SafetyLevel* activeLevel;
 		};
 		
 	};
