@@ -5,6 +5,7 @@
 #include <functional>
 #include <eeros/hal/Input.hpp>
 #include <eeros/core/Thread.hpp>
+#include <eeros/logger/Logger.hpp>
 
 #define SPACENAVIGATOR_AXIS_COUNT (3)
 #define SPACENAVIGATOR_ROT_AXIS_COUNT (3)
@@ -50,6 +51,7 @@ namespace eeros {
 			FILE* file;
 			bool running, useRaw;
 			Input<bool>* button[SPACENAVIGATOR_BUTTON_COUNT];
+			eeros::logger::Logger log;
 		};
 	}
 }

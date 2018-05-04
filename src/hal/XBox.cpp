@@ -46,7 +46,7 @@ XBox::~XBox() {
 
 bool XBox::open(const char* device) {
 	fd = ::open(device, O_RDONLY);
-	if (fd < 0) throw eeros::Fault("XBox: could not open input device ");
+	if (fd < 0) throw eeros::Fault("XBox: could not open input device on " + std::string(device));
 	return fd;
 }
 
@@ -77,6 +77,7 @@ void XBox::on_axis(std::function<void(int, double)> action) {
 
 void XBox::run() {
 	running = true;
+	if (fd < 0) return;
 	struct js_event e;
 	while (running) 	{
 		ssize_t n = read(fd, &e, sizeof(struct js_event));

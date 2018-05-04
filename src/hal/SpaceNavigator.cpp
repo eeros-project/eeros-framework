@@ -30,7 +30,7 @@ SpaceNavigator::~SpaceNavigator() {
 bool SpaceNavigator::open(const char* device) {
 	file = ::fopen(device, "rb");
 	if (file == NULL) {
-		throw eeros::Fault("Space Navigator: could not open input device ");
+		throw eeros::Fault("Space Navigator: could not open input device on " + std::string(device));
 	}
 	return true;
 }
@@ -89,7 +89,8 @@ std::string SpaceNavigator::name() {
 
 void SpaceNavigator::run() {
 	running = true;
-	std::cout  << "use raw: " << useRaw << std::endl;
+	log.info() << "use raw: " << useRaw;
+	if (!file) return;
 	if (useRaw) {	// read from raw hid stream
 		uint8_t readbuff[14];
 		while (running) {
