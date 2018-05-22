@@ -1,5 +1,6 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <iomanip>
+#include <time.h>
 
 #define COLOR_RESET		"\033[0m"
 #define COLOR_BLACK		"\033[22;30m"
@@ -27,6 +28,24 @@ StreamLogWriter::StreamLogWriter(std::ostream& out) :
 	enabled(false),
 	colored(true)
 { }	// nothing to do
+
+StreamLogWriter::StreamLogWriter(std::ostream& out, std::string logFile) :
+	out(out),
+	visible_level(LogLevel::INFO),
+	enabled(false),
+	colored(true)
+{
+	time_t now = time(0);
+	struct tm  tstruct;
+	char       buf[80];
+	tstruct = *localtime(&now);
+	strftime(buf, sizeof(buf), ".%Y-%m-%d.%X", &tstruct);
+	fileOut.open(logFile + buf, std::ios::trunc);
+}
+
+StreamLogWriter::~StreamLogWriter() {
+	fileOut.close();
+}
 
 void StreamLogWriter::show(LogLevel level) { visible_level = level; }
 
@@ -83,6 +102,7 @@ void StreamLogWriter::end(std::ostringstream& os) {
 	if (colored) os << COLOR_RESET;
 	os << std::endl;
 	out << os.str();
+	fileOut << os.str();
 }
 
 

@@ -12,7 +12,7 @@ using namespace eeros::safety;
 
 int main() {
 	// Create and initialize logger
-	StreamLogWriter w(std::cout);
+	StreamLogWriter w(std::cout, "/tmp/log");
 // 	SysLogWriter w("LoggerTest1");
 	Logger::setDefaultWriter(&w);
 	Logger log;
