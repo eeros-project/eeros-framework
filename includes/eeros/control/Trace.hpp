@@ -2,7 +2,11 @@
 #define ORG_EEROS_CONTROL_TRACE_HPP_
 
 #include <vector>
+#include <iostream>
+#include <fstream>
 #include <eeros/control/Block1i.hpp>
+#include <eeros/core/Thread.hpp>
+#include <eeros/logger/Logger.hpp>
 
 namespace eeros {
 	namespace control {
@@ -75,6 +79,29 @@ namespace eeros {
 		std::ostream& operator<<(std::ostream& os, Trace<T>& trace) {
 			os << "Block trace: '" << trace.getName() << "'"; 
 		}
+
+
+		template < typename T = double >
+	class TraceWriter : public eeros::Thread {
+		public:
+			explicit TraceWriter(Trace<T>& trace, std::string fileName) : trace(trace), name(fileName) { }
+			~TraceWriter() { }
+			
+		private:
+			virtual void run() {
+				log.info() << "start writing trace file " + name;
+				std::ofstream file;
+				file.open(name, std::ios::trunc);
+				timestamp_t* timeStampBuf = trace.getTimestampTrace();
+				T* buf = trace.getTrace();
+				for (int i = 0; i < trace.getSize(); i++) file << timeStampBuf[i] << " " << buf[i] << std::endl;
+				file.close();
+				log.info() << "trace file written";
+			}
+			std::string name;
+			Trace<T> trace;
+			eeros::logger::Logger log;
+		};
 
 	};
 };

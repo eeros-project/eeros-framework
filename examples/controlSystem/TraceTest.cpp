@@ -8,6 +8,7 @@
 #include <eeros/control/Trace.hpp>
 #include <eeros/task/Lambda.hpp>
 #include <eeros/math/Matrix.hpp>
+#include <eeros/core/System.hpp>
 #include <signal.h>
 #include <iostream>
 #include <fstream>
@@ -49,10 +50,14 @@ public:
 		// Define and add level functions
 		slOff.setLevelAction([&](SafetyContext* privateContext) {Executor::stop();});
 		slRunning.setLevelAction([&](SafetyContext* privateContext) {
-			if (slRunning.getNofActivations() == 30) // start after 3s
+			if (slRunning.getNofActivations() == 30) {// start after 3s
 				cs.trace1.enable();
 				cs.trace2.enable();
-			});
+			}
+			if (slRunning.getNofActivations() == 300) {// write to log file after 30s
+				new TraceWriter<Vector3>(cs.trace2, "/tmp/ctrlData.txt");
+			}
+		});
 		// Define action when exiting application with Ctrl-C 
 		exitFunction = [&](SafetyContext* privateContext) {privateContext->triggerEvent(seShutDown);};
 		// Define entry level
@@ -104,13 +109,17 @@ int main() {
 	executor.run();
 	
 	log.info() << "start writing file";
+	uint64_t start = eeros::System::getTimeNs();
 	std::ofstream file;
-	file.open("/tmp/ctrlData.txt", std::ios::trunc);
+	file.open("/mnt/ramdisk/ctrlData.txt", std::ios::trunc);
 	timestamp_t* timeStampBuf = controlSystem.trace1.getTimestampTrace();
 	Vector3* buf1 = controlSystem.trace1.getTrace();
 	Vector3* buf2 = controlSystem.trace2.getTrace();
-	for (int i = 0; i < controlSystem.trace1.getSize(); i++) file << timeStampBuf[i] << " " << buf1[i] << " " << buf2[i] << std::endl;
+	for (int i = 0; i < controlSystem.trace1.getSize(); i++) file << timeStampBuf[i] << " " << buf1[i] << " " << buf2[i].getRow(0) << std::endl;
 	file.close();
+	uint64_t stop = eeros::System::getTimeNs();
+	log.error() << stop - start;
+
 	log.info() << "file written";
 
 	log.info() << "Test finished...";
