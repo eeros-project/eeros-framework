@@ -41,7 +41,7 @@ public:
 class SafetyPropertiesTest : public SafetyProperties {
 public:
 	SafetyPropertiesTest(ControlSystem& cs) : 
-		slOff("off"), slRunning("running"), seShutDown("switching off") {
+		slOff("off"), slRunning("running"), seShutDown("switching off"), tw(cs.trace2, "/mnt/ramdisk/ctrlData1.txt") {
 		// Add levels 
 		addLevel(slOff);
 		addLevel(slRunning);
@@ -55,7 +55,7 @@ public:
 				cs.trace2.enable();
 			}
 			if (slRunning.getNofActivations() % (int)(30 / period) == 0) {// write to log file every 30s
-				new TraceWriter<Vector3>(cs.trace2, "/tmp/ctrlData.txt");
+				tw.write();
 			}
 		});
 		// Define action when exiting application with Ctrl-C 
@@ -65,6 +65,7 @@ public:
 	};
 	SafetyLevel slOff, slRunning;
 	SafetyEvent seShutDown;
+	TraceWriter<Vector3> tw;
 };
 
 void signalHandler(int signum) {
@@ -111,7 +112,7 @@ int main() {
 	log.info() << "start writing file";
 	uint64_t start = eeros::System::getTimeNs();
 	std::ofstream file;
-	file.open("/mnt/ramdisk/ctrlData.txt", std::ios::trunc);
+	file.open("/mnt/ramdisk/ctrlData2.txt", std::ios::trunc);
 	timestamp_t* timeStampBuf = controlSystem.trace1.getTimestampTrace();
 	Vector3* buf1 = controlSystem.trace1.getTrace();
 	Vector3* buf2 = controlSystem.trace2.getTrace();
