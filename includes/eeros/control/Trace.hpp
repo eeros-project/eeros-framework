@@ -9,6 +9,8 @@
 #include <eeros/core/Thread.hpp>
 #include <eeros/logger/Logger.hpp>
 
+#include <time.h>
+
 namespace eeros {
 	namespace control {
 
@@ -35,12 +37,14 @@ namespace eeros {
 				if (cycle) {
 					T* tmp = new T[maxBufLen];
 					size = maxBufLen;
+					std::cout  << "getTrace cycle: size = " << size << std::endl;
 					for (int i = 0; i < maxBufLen; i++)
 						tmp[i] = buf[(i + index) % maxBufLen];
 					return tmp;
 				} else {
 					T* tmp = new T[index];
 					size = index;
+					std::cout  << "getTrace no cycle: size = " << size << std::endl;
 					for (int i = 0; i < index; i++)
 						tmp[i] = buf[i];
 					return tmp;
@@ -65,8 +69,9 @@ namespace eeros {
 			virtual void enable() {running = true;}
 			virtual void disable() {running = false;}
 			
-		protected:
 			uint32_t maxBufLen;	// total size of buffer
+			
+		protected:
 			uint32_t size;		// size to which the buffer is filled
 			uint32_t index = 0;	// current index
 			bool cycle = false;	// indicates whether wrap around occured
@@ -99,16 +104,24 @@ namespace eeros {
 					go = false;
 					log.info() << "start writing trace file " + name;
 					std::ofstream file;
-					file.open(name, std::ios::trunc);
+					
+					time_t now = time(0);
+					struct tm  tstruct;
+					char       chbuf[80];
+					tstruct = *localtime(&now);
+					strftime(chbuf, sizeof(chbuf), "_%Y-%m-%d_%X", &tstruct);
+					
+					file.open(name + chbuf, std::ios::trunc);
 					timestamp_t* timeStampBuf = trace.getTimestampTrace();
 					T* buf = trace.getTrace();
+					file << "name = " << trace.getName() << ", size = " << trace.getSize() << ", maxBufLen = " << trace.maxBufLen << "\n";
 					for (int i = 0; i < trace.getSize(); i++) file << timeStampBuf[i] << " " << buf[i] << std::endl;
 					file.close();
 					log.info() << "trace file written";
 				}
 			}
 			std::string name;
-			Trace<T> trace;
+			Trace<T>& trace;
 			eeros::logger::Logger log;
 		};
 
