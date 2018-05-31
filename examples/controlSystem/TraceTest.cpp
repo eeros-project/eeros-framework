@@ -29,6 +29,10 @@ public:
 		i.getIn().connect(c.getOut());
 		i.setInitCondition(Vector3{0, 1.0, 2.0});
 		i.enable();
+		c.setName("const block");
+		i.setName("integrator");
+		trace1.setName("trace constant output");
+		trace2.setName("trace integrator output");
 		trace1.getIn().connect(c.getOut());
 		trace2.getIn().connect(i.getOut());
 	}
@@ -50,11 +54,12 @@ public:
 		// Define and add level functions
 		slOff.setLevelAction([&](SafetyContext* privateContext) {Executor::stop();});
 		slRunning.setLevelAction([&](SafetyContext* privateContext) {
-			if (slRunning.getNofActivations() == (int)(3 / period)) {// start after 3s
+			if (slRunning.getNofActivations() == (int)(3 / period)) {	// start after 3s
+				log.info() << "start tracing";
 				cs.trace1.enable();
 				cs.trace2.enable();
 			}
-			if (slRunning.getNofActivations() % (int)(30 / period) == 0) {// write to log file every 30s
+			if (slRunning.getNofActivations() % (int)(30 / period) == 0) {	// write to log file every 30s
 				tw.write();
 			}
 		});
@@ -66,6 +71,7 @@ public:
 	SafetyLevel slOff, slRunning;
 	SafetyEvent seShutDown;
 	TraceWriter<Vector3> tw;
+	Logger log;
 };
 
 void signalHandler(int signum) {
@@ -75,7 +81,7 @@ void signalHandler(int signum) {
 int main() {
 	signal(SIGINT, signalHandler);
 
-	StreamLogWriter w(std::cout);
+	StreamLogWriter w(std::cout, "/tmp/hgkljklkjl");
 	w.show(LogLevel::TRACE);
 	Logger::setDefaultWriter(&w);
 	Logger log;
@@ -109,19 +115,18 @@ int main() {
 	executor.add(periodic);
 	executor.run();
 	
-	log.info() << "start writing file";
+	std::string fileName = "/mnt/ramdisk/ctrlData2.txt";
+	log.info() << "start writing file " << fileName;
 	uint64_t start = eeros::System::getTimeNs();
 	std::ofstream file;
-	file.open("/mnt/ramdisk/ctrlData2.txt", std::ios::trunc);
+	file.open(fileName, std::ios::trunc);
 	timestamp_t* timeStampBuf = controlSystem.trace1.getTimestampTrace();
 	Vector3* buf1 = controlSystem.trace1.getTrace();
 	Vector3* buf2 = controlSystem.trace2.getTrace();
 	for (int i = 0; i < controlSystem.trace1.getSize(); i++) file << timeStampBuf[i] << " " << buf1[i] << " " << buf2[i] << std::endl;
 	file.close();
 	uint64_t stop = eeros::System::getTimeNs();
-	log.error() << stop - start;
-
-	log.info() << "file written";
+	log.info() << "file written in " << (stop - start) << "ns";
 
 	log.info() << "Test finished...";
 }

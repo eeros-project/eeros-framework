@@ -35,16 +35,14 @@ namespace eeros {
 			}
 			virtual T* getTrace() {
 				if (cycle) {
-					T* tmp = new T[maxBufLen];
 					size = maxBufLen;
-					std::cout  << "getTrace cycle: size = " << size << std::endl;
+					T* tmp = new T[maxBufLen];
 					for (int i = 0; i < maxBufLen; i++)
 						tmp[i] = buf[(i + index) % maxBufLen];
 					return tmp;
 				} else {
 					T* tmp = new T[index];
 					size = index;
-					std::cout  << "getTrace no cycle: size = " << size << std::endl;
 					for (int i = 0; i < index; i++)
 						tmp[i] = buf[i];
 					return tmp;
@@ -58,8 +56,8 @@ namespace eeros {
 						tmp[i] = timeBuf[(i + index) % maxBufLen];
 					return tmp;
 				} else {
-					timestamp_t* tmp = new timestamp_t[index];
 					size = index;
+					timestamp_t* tmp = new timestamp_t[index];
 					for (int i = 0; i < index; i++)
 						tmp[i] = timeBuf[i];
 					return tmp;
