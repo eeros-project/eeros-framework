@@ -45,6 +45,7 @@ namespace eeros {
 #endif
 		void setMainTask(task::Periodic &mainTask);
 		void setMainTask(safety::SafetySystem &mainTask);
+		task::Periodic* getMainTask();
 		void add(task::Periodic &task);
 		void add(control::TimeDomain &timedomain);
 		virtual void run();
@@ -78,7 +79,7 @@ namespace eeros {
 		bool syncWithRosTopicIsSet;
 		logger::Logger log;
 		double period;
-		task::Periodic *mainTask;
+		task::Periodic* mainTask;
 		std::vector<task::Periodic> tasks;
 	};
 

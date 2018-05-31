@@ -130,6 +130,10 @@ void Executor::setMainTask(safety::SafetySystem &ss) {
 	setMainTask(*task);
 }
 
+task::Periodic* Executor::getMainTask() {
+	return mainTask;
+}
+
 void Executor::add(task::Periodic &task) {
 	tasks.push_back(task);
 }
