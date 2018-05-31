@@ -18,12 +18,7 @@ void signalHandler(int signum) {
 }
 
 int main(int argc, char **argv) {
-	signal(SIGHUP, signalHandler);
 	signal(SIGINT, signalHandler);
-	signal(SIGQUIT, signalHandler);
-	signal(SIGKILL, signalHandler);
-	signal(SIGTERM, signalHandler);
-	signal(SIGPWR, signalHandler);
 	
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);

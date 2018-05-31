@@ -85,6 +85,7 @@ int main() {
 	ControlSystem controlSystem(safetySys, ssProperties);
 	ssProperties.controlSystem = &controlSystem;
 	controlSystem.checker.registerSafetyEvent(safetySys, ssProperties.seReset);
+	controlSystem.checker.setActiveLevel(ssProperties.slRampingUp);
 
 	TimeDomain td("td1", 0.5, true);
 	Periodic periodic("per1", 0.5, td);
