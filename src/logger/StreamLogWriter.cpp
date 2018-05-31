@@ -103,6 +103,7 @@ void StreamLogWriter::end(std::ostringstream& os) {
 	os << std::endl;
 	out << os.str();
 	fileOut << os.str();
+	fileOut.flush();
 }
 
 
