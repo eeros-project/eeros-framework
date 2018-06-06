@@ -215,8 +215,11 @@ namespace eeros {
 				servAddr.sin_port = htons(port); 
 				servAddr.sin_family = AF_INET;
 				servAddr.sin_addr.s_addr = htonl(INADDR_ANY) ;
+				int yes = 1;
+				if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1)
+					throw Fault("ERROR on set socket option");
 				if (bind(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0) 
-					throw Fault("ERROR on binding");
+					throw Fault("ERROR on socket binding");
 				
 				socklen_t clilen;
 				listen(sockfd,1);
