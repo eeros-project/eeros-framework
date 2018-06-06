@@ -695,6 +695,16 @@ namespace eeros {
 				}
 			}
 			
+			T norm() const {
+				T result = 0;
+				for(unsigned int m = 0; m < M; m++) {
+					for(unsigned int n = 0; n < N; n++) {
+						result += (*this)(m, n) * (*this)(m, n);
+					}
+				}
+				return std::sqrt(result);
+			}
+			
 			/********** Static functions **********/
 			
 			static Matrix<M, N, T> createRotX(double angle) {

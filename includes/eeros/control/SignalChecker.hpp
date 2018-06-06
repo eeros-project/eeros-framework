@@ -36,6 +36,11 @@ namespace eeros {
 				}
 			}
 			
+			virtual void setLimits(T lowerLimit, T upperLimit) {
+				this->lowerLimit = lowerLimit;
+				this->upperLimit = upperLimit;
+			}
+			
 			virtual void reset() {
 				fired = false;
 			}
