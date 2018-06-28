@@ -5,9 +5,9 @@
 using namespace eeros;
 using namespace eeros::safety;
 
-class SafetyPropertiesTest : public SafetyProperties {
+class SafetyPropertiesTest1 : public SafetyProperties {
 public:
-	SafetyPropertiesTest()  : 
+	SafetyPropertiesTest1()  : 
 		se1("se1"), se2("se2"), se3("se3"), se4("se4"),
 		sl1("1"), sl2("2"), sl3("3"), sl4("4"), sl5("5")
 		{	
@@ -35,14 +35,19 @@ public:
 
 // Test level ordering
 TEST(safetyLevelTest, order) {
-	SafetyPropertiesTest sp;
+	SafetyPropertiesTest1 sp;
 	EXPECT_TRUE(sp.sl1 < sp.sl2);
 	EXPECT_TRUE(sp.sl5 >= sp.sl2);
+	EXPECT_EQ(sp.sl1.id, 0);
+	EXPECT_EQ(sp.sl2.id, 1);
+	EXPECT_EQ(sp.sl3.id, 2);
+	EXPECT_EQ(sp.sl4.id, 3);
+	EXPECT_EQ(sp.sl5.id, 4);
 }
 
 // Test event triggering
 TEST(safetyLevelTest, trigger) {
-	SafetyPropertiesTest sp;
+	SafetyPropertiesTest1 sp;
 	SafetySystem ss(sp, 1);
 	EXPECT_TRUE(ss.getCurrentLevel() == sp.sl1);
 	ss.triggerEvent(sp.se1);	// go sl2

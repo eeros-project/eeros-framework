@@ -7,7 +7,7 @@ namespace eeros {
 	namespace safety {
 
 		SafetyProperties::SafetyProperties() : entryLevel(nullptr) {
-			// nothing to do
+			count = 0;
 		}
 		
 		SafetyProperties::~SafetyProperties() {
@@ -61,7 +61,6 @@ namespace eeros {
 		}
 		
 		void SafetyProperties::addLevel(SafetyLevel& level) {
-			static int count = 0;
 			level.id = count++;
 			levels.push_back(&level);
 		}

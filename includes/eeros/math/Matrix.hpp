@@ -437,6 +437,11 @@ namespace eeros {
 			
 			/********** Base operations **********/
 			
+			/**
+			* Compares this matrix to another matrix.
+			* @param right This matrix is compared to right.
+			* @return true if every element of this matrix is equal to the element in the matrix right.
+			*/
 			bool operator==(const Matrix<M, N, T>& right) const {
 				for(unsigned int m = 0; m < M; m++) {
 					for(unsigned int n = 0; n < N; n++) {
@@ -447,6 +452,11 @@ namespace eeros {
 				return true;
 			}
 
+			/**
+			* Compares this matrix to another matrix.
+			* @param right This matrix is compared to right.
+			* @return true if at least one element of this matrix is not equal to the element in the matrix right.
+			*/
 			bool operator!=(const Matrix<M, N, T>& right) const {
 				for(unsigned int m = 0; m < M; m++) {
 					for(unsigned int n = 0; n < N; n++) {
@@ -458,6 +468,11 @@ namespace eeros {
 				return false;
 			}
 			
+			/**
+			* Compares this matrix to another matrix.
+			* @param right This matrix is compared to right.
+			* @return true if every element of this matrix is smaller than the element in the matrix right.
+			*/
 			bool operator<(const Matrix<M, N, T>& right) const {
 				for(unsigned int m = 0; m < M; m++) {
 					for(unsigned int n = 0; n < N; n++) {
@@ -469,6 +484,11 @@ namespace eeros {
 				return true;
 			}
 			
+			/**
+			* Compares this matrix to another matrix.
+			* @param right This matrix is compared to right.
+			* @return true if every element of this matrix is smaller than or equal to the element in the matrix right.
+			*/
 			bool operator<=(const Matrix<M, N, T>& right) const {
 				for(unsigned int m = 0; m < M; m++) {
 					for(unsigned int n = 0; n < N; n++) {
@@ -480,6 +500,11 @@ namespace eeros {
 				return true;
 			}
 			
+			/**
+			* Compares this matrix to another matrix.
+			* @param right This matrix is compared to right.
+			* @return true if every element of this matrix is greater than the element in the matrix right.
+			*/
 			bool operator>(const Matrix<M, N, T>& right) const {
 				for(unsigned int m = 0; m < M; m++) {
 					for(unsigned int n = 0; n < N; n++) {
@@ -491,6 +516,11 @@ namespace eeros {
 				return true;
 			}
 			
+			/**
+			* Compares this matrix to another matrix.
+			* @param right This matrix is compared to right.
+			* @return true if every element of this matrix is greater than or equal to the element in the matrix right.
+			*/
 			bool operator>=(const Matrix<M, N, T>& right) const {
 				for(unsigned int m = 0; m < M; m++) {
 					for(unsigned int n = 0; n < N; n++) {

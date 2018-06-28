@@ -36,6 +36,7 @@ namespace eeros {
 			std::vector<eeros::hal::InputInterface*> criticalInputs;
 		private:
 			SafetyLevel* entryLevel;
+			uint32_t count;
 		};
 		
 	};

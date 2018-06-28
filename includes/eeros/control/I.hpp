@@ -26,12 +26,12 @@ namespace eeros {
 					T valin = this->in.getSignal().getValue();
 					T valprev = this->prev.getValue();
 					T output;
-					if(enabled)
-						output = valprev + valin * dt;
-					else
+					if(enabled) {
+						T val = valprev + valin * dt;
+						if ((val < upperLimit) && (val > lowerLimit)) output = val; 
+						else output = valprev;
+					} else
 						output = valprev;
-// 					if (output > upperLimit) output = upperLimit;
-// 					if (output < lowerLimit) output = lowerLimit;
 					this->out.getSignal().setValue(output);
 					this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
 					this->prev = this->out.getSignal();
