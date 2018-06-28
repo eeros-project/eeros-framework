@@ -38,11 +38,6 @@ TEST(safetyLevelTest, order) {
 	SafetyPropertiesTest1 sp;
 	EXPECT_TRUE(sp.sl1 < sp.sl2);
 	EXPECT_TRUE(sp.sl5 >= sp.sl2);
-	EXPECT_EQ(sp.sl1.id, 0);
-	EXPECT_EQ(sp.sl2.id, 1);
-	EXPECT_EQ(sp.sl3.id, 2);
-	EXPECT_EQ(sp.sl4.id, 3);
-	EXPECT_EQ(sp.sl5.id, 4);
 }
 
 // Test event triggering

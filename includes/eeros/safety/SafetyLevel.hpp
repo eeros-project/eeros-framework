@@ -51,9 +51,9 @@ namespace eeros {
 			bool operator>=(const SafetyLevel& level);
 			bool operator==(const SafetyLevel& level);
 			bool operator!=(const SafetyLevel& level);
-			int32_t id;
 		private:
 			std::function<void (SafetyContext*)> action;
+			int32_t id;
 			uint32_t nofActivations;
 			std::string description;
 			std::map<uint32_t, std::pair<SafetyLevel*, EventType>> transitions;
