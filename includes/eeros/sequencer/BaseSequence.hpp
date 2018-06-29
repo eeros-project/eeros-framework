@@ -50,17 +50,18 @@ namespace eeros {
 			void setPollingTime(int timeInMilliseconds);
 			
 			// Monitors
-			// ////////////////////////////////////////////////////////////////////////
 			std::vector<Monitor*> monitors;
 			void addMonitor(Monitor* monitor);
 			std::vector<Monitor*> getMonitors() const;
 			
 			// Timeout
-			// ////////////////////////////////////////////////////////////////////////
 			void setTimeoutTime(double timeoutInSec);		// in seconds. For this sequence
 			void resetTimeout();
 			void setTimeoutBehavior(SequenceProp behavior);	
 			void setTimeoutExceptionSequence(BaseSequence& sequence);
+			
+			// Abort
+			void resetAbort();
 			
 		protected:
 			virtual int action();		// handles different checks like preconditions

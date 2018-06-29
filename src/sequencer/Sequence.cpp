@@ -43,6 +43,7 @@ void Sequence::run() {	// runs in thread
 
 int Sequence::start() {
 	resetTimeout();
+	resetAbort();
 	if (isBlocking()) {	// starts action() blocking
 		log.info() << "sequence '" << name << "' (blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
 		BaseSequence::action();				//action gets overwritten by child class

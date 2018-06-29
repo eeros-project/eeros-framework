@@ -13,6 +13,7 @@ namespace eeros {
 			
 			bool validate() {return abort;}
 			void set() {abort = true;}
+			void reset() {abort = false;}
 		private:
 			bool abort = false;			
 		};

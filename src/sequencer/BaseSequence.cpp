@@ -205,6 +205,10 @@ namespace eeros {
 			monitorTimeout.setExceptionSequence(sequence);
 		}
 
+		void BaseSequence::resetAbort() {
+			conditionAbort.reset();
+		}
+
 		std::ostream& operator<<(std::ostream& os, SequenceState state) {
 			switch (state) {
 				case SequenceState::idle: os << "idle"; break;

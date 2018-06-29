@@ -15,6 +15,7 @@ namespace eeros {
 			virtual int action() = 0;			// this function has to be implemented in the derived sequence
 			int start() {
 				resetTimeout();
+				resetAbort();
 // 				if (!exceptionIsActive) log.info() << "step '" << name << "' started";
 				BaseSequence::action();
 				return 0;
