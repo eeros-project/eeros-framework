@@ -4,6 +4,7 @@
 #include <eeros/control/Block1i.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetySystem.hpp>
+#include <eeros/logger/Logger.hpp>
 
 namespace eeros {
 	namespace control {
@@ -28,6 +29,7 @@ namespace eeros {
 					if (!((val > lowerLimit) && (val < upperLimit))) {
 						if (safetySystem != nullptr && safetyEvent != nullptr) {
 							if (activeLevel == nullptr || (activeLevel != nullptr && safetySystem->getCurrentLevel() >= *activeLevel)) {
+								log.warn() << "Signal checker \'" + this->getName() + "\' fires!";
 								safetySystem->triggerEvent(*safetyEvent);
 								fired = true;
 							}
@@ -60,6 +62,7 @@ namespace eeros {
 			SafetySystem* safetySystem;
 			SafetyEvent* safetyEvent;
 			SafetyLevel* activeLevel;
+			eeros::logger::Logger log;
 		};
 		
 	};

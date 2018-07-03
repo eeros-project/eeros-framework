@@ -48,7 +48,6 @@ namespace eeros {
 		
 		void SafetySystem::triggerEvent(SafetyEvent event, SafetyContext* context) {
 			if(currentLevel) {
-				log.info() << "triggering event: \'" << event << "\' in level '" << currentLevel << "\'";
 				SafetyLevel* newLevel = currentLevel->getDestLevelForEvent(event, context == &privateContext);
 				if(newLevel != nullptr) {
 					bool transition = (newLevel != currentLevel);	// stage level change
@@ -63,10 +62,9 @@ namespace eeros {
 						nextLevel->nofActivations = 0;
 					}
 					mtx.unlock();
-					if(transition) log.info() << "new safety level: '" << nextLevel << "\'";	
+					log.info() << "triggering event \'" << event << "\' in level '" << currentLevel << "\': transition to safety level: '" << nextLevel << "\'";
 				} else {
-					log.error()	<< "no transition for event \'" << event
-								<< "\' in level \'" << currentLevel << "\'";
+					log.error() << "triggering event \'" << event << "\' in level '" << currentLevel << "\': no transition for this event";
 				}
 			} else {
 				throw Fault("current level not defined"); // TODO define error number and send error message to logger

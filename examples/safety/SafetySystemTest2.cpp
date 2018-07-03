@@ -33,6 +33,7 @@ public:
 	ControlSystem(SafetySystem& safetySys, SafetyPropertiesTest& ssProperties) : c(0.5), checker(0, 5) {
 		i.getOut().getSignal().setName("integrator output");
 		i.getIn().connect(c.getOut());
+		checker.setName("check integrator level");
 		checker.getIn().connect(i.getOut());
 	}
 
