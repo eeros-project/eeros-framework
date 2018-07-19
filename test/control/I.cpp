@@ -119,13 +119,13 @@ TEST(controlITest, limit) {
 	i2.setInitCondition({-0.5, 0.5});
 	i2.setLimit({5.6, 5.3}, -3.2);
 	for (int i = 0; i < 100; i++) {c2.run(); i2.run(); usleep(1000);}
-	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[0], 4.3, 0.1));
-	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[1], 5.3, 0.1));
+	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[0], 4.3, 0.15));
+	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[1], 5.3, 0.15));
 	c2.setValue(-100.0);
 	i2.setInitCondition({-0.5, 0.5});
 	for (int i = 0; i < 100; i++) {c2.run(); i2.run(); usleep(1000);}
-	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[0], -3.2, 0.1));
-	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[1], -2.2, 0.1));
+	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[0], -3.2, 0.15));
+	EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[1], -2.2, 0.15));
 }
 
 // test default limit
