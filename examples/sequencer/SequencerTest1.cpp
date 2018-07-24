@@ -54,7 +54,7 @@ void signalHandler(int signum) {
 int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
 	StreamLogWriter w(std::cout);
-// 	w.show(LogLevel::TRACE);
+	w.show(LogLevel::TRACE);
 	Logger::setDefaultWriter(&w);
 	Logger log;
 	

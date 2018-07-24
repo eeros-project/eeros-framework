@@ -76,6 +76,7 @@ int main() {
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
 	Logger log;
+	w.show();
 	
 	log.info() << "Safety System Example 2 started...";
 	
@@ -90,7 +91,7 @@ int main() {
 
 	TimeDomain td("td1", 0.5, true);
 	Periodic periodic("per1", 0.5, td);
-	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
+	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
 		log.info() << controlSystem.i.getOut().getSignal();
 	});
 	

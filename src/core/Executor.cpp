@@ -8,6 +8,8 @@
 #include <signal.h>
 #include <sched.h>
 #include <sys/mman.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 
 #include <eeros/core/Executor.hpp>
 #include <eeros/task/Async.hpp>
@@ -19,7 +21,6 @@
 #include <ros/callback_queue_interface.h>
 #include <ros/callback_queue.h>
 #endif
-
 
 volatile bool running = true;
 
@@ -204,7 +205,7 @@ void Executor::assignPriorities() {
 }
 
 void Executor::run() {
-	log.trace() << "starting executor with base period " << period << " sec and priority " << basePriority;
+	log.trace() << "starting executor with base period " << period << " sec and priority " << basePriority << " (thread " << getpid() << ":" << syscall(SYS_gettid) << ")";
 
 	if (period == 0.0)
 		throw std::runtime_error("period of executor not set");
@@ -348,5 +349,5 @@ void Executor::run() {
 	for (auto &t: threads)
 		t->async.join();
 
-	log.trace() << "exiting executor";
+	log.trace() << "exiting executor " << " (thread " << getpid() << ":" << syscall(SYS_gettid) << ")";
 }
