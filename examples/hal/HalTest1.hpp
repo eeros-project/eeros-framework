@@ -96,9 +96,7 @@ public:
 
 class SeqDigital : public Sequence {
 public:
-	SeqDigital(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Sequence(name, sequencer, caller), stepDigOut("step dig out", seq, this, cs) {
-		setNonBlocking();
-	}
+	SeqDigital(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Sequence(name, sequencer, caller, false), stepDigOut("step dig out", seq, this, cs) { }
 	int action() {
 		bool toggle;
 		while (true) {
@@ -113,9 +111,7 @@ private:
 
 class SeqAnalog : public Sequence {
 public:
-	SeqAnalog(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Sequence(name, sequencer, caller), stepAnalogOut("step analog out", seq, this, cs) {
-		setNonBlocking();
-	}
+	SeqAnalog(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Sequence(name, sequencer, caller, false), stepAnalogOut("step analog out", seq, this, cs) { }
 	int action() {
 		bool toggle;
 		while (true) {
@@ -130,9 +126,7 @@ private:
 
 class MyMainSequence : public Sequence {
 public:
-	MyMainSequence(Sequencer& seq, MyControlSystem& cs) : Sequence("main", seq), cs(cs), seqDigital("seq dig out", seq, this, cs), seqAnalog("seq analog out", seq, this, cs) { 
-		setNonBlocking();
-	}
+	MyMainSequence(Sequencer& seq, MyControlSystem& cs) : Sequence("main", seq), cs(cs), seqDigital("seq dig out", seq, this, cs), seqAnalog("seq analog out", seq, this, cs) { }
 	
 	int action() {
 		seqDigital();

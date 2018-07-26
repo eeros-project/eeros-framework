@@ -29,7 +29,7 @@ private:
 
 class ExceptionSeq : public Sequence {
 public:
-	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller) { }
+	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true) { }
 	int action() {time = std::chrono::steady_clock::now();}
 	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 3.0;}
 private:
@@ -38,8 +38,7 @@ private:
 
 class SequenceB : public Sequence {
 public:
-	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller), stepB("step B", seq, this), eSeq("exception sequence", seq, this) { 
-		setNonBlocking();
+	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, false), stepB("step B", seq, this), eSeq("exception sequence", seq, this) { 
 		setTimeoutTime(2.5);
 		setTimeoutExceptionSequence(*(seq.getSequenceByName("exception sequence")));
 		setTimeoutBehavior(SequenceProp::abort);
@@ -54,9 +53,7 @@ private:
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("seq B", seq, this), stepA("step A", seq, this) { 
-		setNonBlocking();
-	}
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("seq B", seq, this), stepA("step A", seq, this) { }
 		
 	int action() {
 		for (int i = 0; i < 3; i++) stepA();

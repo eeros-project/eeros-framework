@@ -22,7 +22,7 @@ private:
 
 class ExceptionSeq : public Sequence {
 public:
-	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller) { }
+	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true) { }
 	int action() {time = std::chrono::steady_clock::now(); count = 0;}
 	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 0.5;}
 private:
@@ -36,7 +36,6 @@ class MyCondition : public Condition {
 class MainSequence : public Sequence {
 public:
 	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", seq, this), eSeq("exception sequence", seq, this), m("myMonitor", this, cond, SequenceProp::resume, &eSeq) { 
-		setNonBlocking();
 		setTimeoutTime(7.0);
 		setTimeoutBehavior(SequenceProp::abort);
 		addMonitor(&m);

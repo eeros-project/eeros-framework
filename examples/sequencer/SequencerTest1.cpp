@@ -19,7 +19,7 @@ private:
 
 class ExceptionSeq : public Sequence {
 public:
-	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller) { }
+	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true) { }
 	int action() {time = std::chrono::steady_clock::now();}
 	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 3.0;}
 private:
@@ -29,12 +29,11 @@ private:
 class MainSequence : public Sequence {
 public:
 	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", seq, this), eSeq("exception sequence", seq, this) { 
-		setNonBlocking();
 		setTimeoutTime(2.5);
 		setTimeoutExceptionSequence(eSeq);
 // 		setTimeoutBehavior(SequenceProp::resume);
 //		setTimeoutBehavior(SequenceProp::abort);
-		setTimeoutBehavior(SequenceProp::restart);
+ 		setTimeoutBehavior(SequenceProp::restart);
 	}
 		
 	int action() {
@@ -62,8 +61,8 @@ int main(int argc, char **argv) {
 	
 	auto& sequencer = Sequencer::instance();
 	MainSequence mainSeq("Main Sequence", sequencer);
- 	sequencer.addSequence(mainSeq);
- 	mainSeq.start();
+	sequencer.addSequence(mainSeq);
+	mainSeq.start();
 	sequencer.join();	// wait until sequencer terminates
 	log.info() << "Simple Sequencer Example finished...";
 }

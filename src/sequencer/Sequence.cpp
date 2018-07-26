@@ -7,9 +7,9 @@
 using namespace eeros;
 using namespace eeros::sequencer;
 
-Sequence::Sequence(std::string name, Sequencer& seq) : Sequence(name, seq, nullptr) { }
+Sequence::Sequence(std::string name, Sequencer& seq) : Sequence(name, seq, nullptr, false) { }
 
-Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller) : BaseSequence(seq, caller) {
+Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller, bool blocking) : BaseSequence(seq, caller, blocking) {
 	static int sequenceCount;
 	setId(sequenceCount++);	//TODO check how many sequence objects of this type are allowed. Maybe singleton.
 	if (name == "") {
@@ -22,10 +22,11 @@ Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller) : Bas
 	}
 	
 	seq.addSequence(*this);	// register in sequencer
+	if (!blocking) t = new std::thread([this]() {this->run();});
 	log.trace() << "sequence '" << name << "' created";
 }
 
-Sequence::~Sequence() { }
+Sequence::~Sequence() {/*running = false;*/}
 
 void Sequence::run() {	// runs in thread
 	struct sched_param schedulingParam;
@@ -33,12 +34,17 @@ void Sequence::run() {	// runs in thread
 	if (sched_setscheduler(0, SCHED_OTHER, &schedulingParam) != 0) log.error() << "could not set scheduling parameter for sequence thread";
 	sched_getparam(0, &schedulingParam);
 	std::ostringstream s;
-	s << thread->get_id();
+	s << t->get_id();
 	std::string id = s.str();
 	log.trace() << "thread " << getpid() << ":" << syscall(SYS_gettid) << " for sequence '" << name << "' and with priority " << schedulingParam.sched_priority << " started";
-	log.info() << "sequence '" << name << "' (non-blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
-	BaseSequence::action();
-	log.info() << "sequence '" << name << "' terminated";
+	while (running) {
+		while(running && !go) usleep(1000);
+		if (!running) break;
+		go = false;
+		log.info() << "sequence '" << name << "' (non-blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
+		BaseSequence::action();
+		log.info() << "sequence '" << name << "' terminated";
+	}
 	log.trace() << "thread " << getpid() << ":" << syscall(SYS_gettid) << " finished.";
 }
 
@@ -46,20 +52,21 @@ int Sequence::start() {
 	resetTimeout();
 	resetAbort();
 	Sequencer::running = true;
-	if (isBlocking()) {	// starts action() blocking
+	if (blocking) {	// starts action() blocking
 		log.info() << "sequence '" << name << "' (blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
 		BaseSequence::action();				//action gets overwritten by child class
 		log.info() << "sequence '" << name << "' terminated";
 	} else {
-		thread.reset(new std::thread([this]() {this->run();}));
+		go = true;
+// 		thread.reset(new std::thread([this]() {this->run();}));
 	}
 	return 0;
 }
 
 void Sequence::join() {
-	if (thread != nullptr) {
-		if (thread->joinable())
-			thread->join();
+	if (t != nullptr) {
+		if (t->joinable())
+			t->join();
 	}
 }
 

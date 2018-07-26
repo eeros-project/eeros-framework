@@ -20,7 +20,7 @@ private:
 
 class SequenceB : public Sequence {
 public:
-	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller), stepB("step B", seq, this) { }
+	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true), stepB("step B", seq, this) { }
 	int action() {
 		for (int i = 0; i < 5; i++) stepB();
 	}
@@ -39,7 +39,7 @@ private:
 
 class SequenceA : public Sequence {
 public:
-	SequenceA(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller), stepA("step A", seq, this), seqB("sequence B", seq, this) { 
+	SequenceA(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true), stepA("step A", seq, this), seqB("sequence B", seq, this) { 
 		setTimeoutTime(3.5);
 		setTimeoutBehavior(SequenceProp::abort);
 	}
@@ -57,9 +57,7 @@ private:
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqA("sequence A", seq, this) { 
-		setNonBlocking();
-	}
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqA("sequence A", seq, this) { }
 		
 	int action() {
 		seqA();

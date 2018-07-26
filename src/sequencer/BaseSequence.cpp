@@ -6,9 +6,9 @@
 namespace eeros {
 	namespace sequencer {
 
-		BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller) : 
+		BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking) : 
 			seq(seq), caller(caller), monitorTimeout("timeout", this, conditionTimeout, SequenceProp::abort), monitorAbort("abort", this, conditionAbort, SequenceProp::abort),
-			state(SequenceState::idle), blocking(true), pollingTime(100), log('X')
+			state(SequenceState::idle), blocking(blocking), pollingTime(100), log('X')
 		{
 			if (caller != nullptr) {
 				callerStack = caller->getCallerStack();
@@ -84,7 +84,7 @@ namespace eeros {
 						BaseSequence* entry = callerStack[i];
 						log.trace() << "  entry '" << entry->getName() << "'";
 						tempStack.push_back(entry);
-						if (!entry->isBlocking()) break;	// stop, if caller is nonblocking
+						if (!entry->blocking) break;	// stop, if caller is nonblocking
 					}
 					log.trace() << "caller stack blocking of seq '" << name << "'";
 					for (int i = tempStack.size(); i--;) {		// reverse vector
@@ -172,8 +172,6 @@ namespace eeros {
 		void BaseSequence::setId(int id) {this->id = id;}
 
 		int BaseSequence::getId() const {return id;}
-
-		bool BaseSequence::isBlocking() const {return blocking;}
 
 		BaseSequence* BaseSequence::getCallerSequence() {
 			if (caller == nullptr) {

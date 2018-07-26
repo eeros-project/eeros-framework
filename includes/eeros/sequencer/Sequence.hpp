@@ -13,21 +13,19 @@ namespace eeros {
 		class Sequence : public BaseSequence {
 			friend class Sequencer;
 		public:
-			Sequence(std::string name, Sequencer& seq, BaseSequence* caller);
 			Sequence(std::string name, Sequencer& seq);	// only for mainSequence
+			Sequence(std::string name, Sequencer& seq, BaseSequence* caller, bool blocking);
 			virtual ~Sequence();
 			
  			virtual int operator() () {return start();}	// this operator can be overloaded in the derived sequence
 			virtual int action() = 0;		// this function has to be implemented in the derived sequence
 			int start();
 			void join();
-			void setBlocking() {blocking = true;}
-			void setNonBlocking() {blocking = false;}
 			
 		private:
-			std::mutex m;
-			std::condition_variable cv;
-			std::unique_ptr<std::thread> thread;
+			bool running = true, go = false;
+			std::thread* t;
+// 			std::unique_ptr<std::thread> thread;
 			void run();
 		};
 	};	//namespace sequencer

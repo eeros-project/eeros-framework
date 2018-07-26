@@ -28,7 +28,7 @@ namespace eeros {
 			friend class Monitor;
 			friend class Sequencer;
 		public:
-			BaseSequence(Sequencer& seq, BaseSequence* caller);
+			BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking);
 			virtual ~BaseSequence();
 			
 			virtual int start() = 0;
@@ -39,9 +39,6 @@ namespace eeros {
 			std::string getName() const;
 			void setId(int id);
 			int getId() const;		// steps allways have id=-99
-			virtual void setBlocking() = 0;
-			virtual void setNonBlocking() = 0;
-			bool isBlocking() const;
 			
 			BaseSequence* getCallerSequence();
 			std::vector<BaseSequence*> getCallerStack() const;

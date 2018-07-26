@@ -7,7 +7,6 @@
 #include "MockRobotControlSystem.hpp"
 
 using namespace eeros;
-using namespace eeros::task;
 using namespace eeros::sequencer;
 using namespace eeros::safety;
 using namespace eeros::logger;
@@ -38,9 +37,7 @@ private:
 
 class UpAndDownSequence : public Sequence {
 public:
-	UpAndDownSequence(std::string name, Sequencer& seq, MockRobotControlSystem& cs) : Sequence(name, seq), cs(cs), moveUp("move up", seq, this, cs), moveDown("move down", seq, this, cs) { 
-		setNonBlocking();
-	}
+	UpAndDownSequence(std::string name, Sequencer& seq, MockRobotControlSystem& cs) : Sequence(name, seq), cs(cs), moveUp("move up", seq, this, cs), moveDown("move down", seq, this, cs) { }
 		
 	int action() {
 		while (Sequencer::running) {
@@ -56,9 +53,7 @@ private:
 
 class HomingSequence : public Sequence {
 public:
-	HomingSequence(std::string name, Sequencer& seq, MockRobotControlSystem& cs) : Sequence(name, seq), cs(cs) { 
-		setNonBlocking();
-	}
+	HomingSequence(std::string name, Sequencer& seq, MockRobotControlSystem& cs) : Sequence(name, seq), cs(cs) { }
 		
 	int action() {
 		cs.setpointX.setValue(0.1);

@@ -29,7 +29,6 @@ public:
 	MainSequence(std::string name, Sequencer& seq, SafetySystem& safetySys, MySafetyProperties& safetyProp, MyControlSystem& cs, double angle) : 
 					Sequence(name, seq), safetySys(safetySys), safetyProp(safetyProp), angle(angle), controlSys(cs), move("move", seq, this, cs) {
 		log.info() << "Sequence created: " << name;
-		setNonBlocking();
 	}
 	int action() {
 		while(safetySys.getCurrentLevel() < safetyProp.slMoving);

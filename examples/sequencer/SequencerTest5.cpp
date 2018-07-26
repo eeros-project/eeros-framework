@@ -35,8 +35,7 @@ class MyCondition : public Condition {
 
 class SequenceB : public Sequence {
 public:
-	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller, Monitor& m) : Sequence(name, seq, caller), stepB("step B", seq, this), m(m) { 
-		setNonBlocking();
+	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller, Monitor& m) : Sequence(name, seq, caller, false), stepB("step B", seq, this), m(m) { 
 		addMonitor(&m);
 	}
 	int action() {
@@ -50,7 +49,6 @@ private:
 class MainSequence : public Sequence {
 public:
 	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), m("myMonitor", this, cond, SequenceProp::abort), seqB("sequence B", seq, this, m), stepA("step A", seq, this) { 
-		setNonBlocking();
 		addMonitor(&m);
 	}
 		
