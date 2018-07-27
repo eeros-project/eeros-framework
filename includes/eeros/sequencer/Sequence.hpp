@@ -20,12 +20,20 @@ namespace eeros {
  			virtual int operator() () {return start();}	// this operator can be overloaded in the derived sequence
 			virtual int action() = 0;		// this function has to be implemented in the derived sequence
 			int start();
-			void join();
+			/**
+			* Waits for this sequence to finish current run. 
+			* The sequence could be restarted later on.
+			*/
+			void wait();
+			/**
+			* Waits for this sequence to finish current run. 
+			* As soon as this happens, its associated thread will be terminated and ceases to exist.
+			*/
+			void waitAndTerminate();
 			
 		private:
-			bool running = true, go = false;
+			bool running = true, go = false, done = true;
 			std::thread* t;
-// 			std::unique_ptr<std::thread> thread;
 			void run();
 		};
 	};	//namespace sequencer

@@ -32,8 +32,8 @@ public:
 		setTimeoutTime(2.5);
 		setTimeoutExceptionSequence(eSeq);
 // 		setTimeoutBehavior(SequenceProp::resume);
-//		setTimeoutBehavior(SequenceProp::abort);
- 		setTimeoutBehavior(SequenceProp::restart);
+// 		setTimeoutBehavior(SequenceProp::abort);
+		setTimeoutBehavior(SequenceProp::restart);
 	}
 		
 	int action() {
@@ -53,7 +53,7 @@ void signalHandler(int signum) {
 int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
 	StreamLogWriter w(std::cout);
-	w.show(LogLevel::TRACE);
+// 	w.show(LogLevel::TRACE);
 	Logger::setDefaultWriter(&w);
 	Logger log;
 	
@@ -63,6 +63,7 @@ int main(int argc, char **argv) {
 	MainSequence mainSeq("Main Sequence", sequencer);
 	sequencer.addSequence(mainSeq);
 	mainSeq.start();
-	sequencer.join();	// wait until sequencer terminates
+	
+	mainSeq.waitAndTerminate();
 	log.info() << "Simple Sequencer Example finished...";
 }

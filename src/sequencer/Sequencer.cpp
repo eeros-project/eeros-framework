@@ -43,11 +43,6 @@ namespace eeros {
 			return sequenceList;
 		}
 		
-		void Sequencer::join() {
-			std::vector<Sequence*> list = getListOfAllSequences();
-			for (Sequence* s : list) s->join();
-		}
-
 		void Sequencer::singleStepping() {
 			stepping = true;
 		}
@@ -61,12 +56,18 @@ namespace eeros {
 			nextStep = true;
 		}
 
-		// can be used to terminate the threads of all sequences
+		void Sequencer::wait() {
+			std::vector<Sequence*> list = getListOfAllSequences();
+			for (Sequence* s : list) {
+				s->waitAndTerminate();
+			}
+		}
+
+		// can be used to terminate all sequences
 		void Sequencer::abort() {
 			std::vector<Sequence*> list = getListOfAllSequences();
 			for (Sequence* s : list) {
 				s->conditionAbort.set();
-				s->running = false;
 			}
 			running = false;
 		}

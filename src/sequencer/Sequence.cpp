@@ -44,6 +44,7 @@ void Sequence::run() {	// runs in thread
 		log.info() << "sequence '" << name << "' (non-blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
 		BaseSequence::action();
 		log.info() << "sequence '" << name << "' terminated";
+		done = true;
 	}
 	log.trace() << "thread " << getpid() << ":" << syscall(SYS_gettid) << " finished.";
 }
@@ -58,15 +59,22 @@ int Sequence::start() {
 		log.info() << "sequence '" << name << "' terminated";
 	} else {
 		go = true;
-// 		thread.reset(new std::thread([this]() {this->run();}));
+		done = false;
 	}
 	return 0;
 }
 
-void Sequence::join() {
+void Sequence::wait() {
 	if (t != nullptr) {
-		if (t->joinable())
-			t->join();
+		while (!done) usleep(1000);	// wait for thread to finish current run
+	}
+}
+
+void Sequence::waitAndTerminate() {
+	if (t != nullptr) {
+		while (!done) usleep(1000);	// wait for thread to finish current run
+		running = false;
+		if (t->joinable()) t->join();
 	}
 }
 

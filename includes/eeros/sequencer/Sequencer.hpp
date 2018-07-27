@@ -25,8 +25,11 @@ namespace eeros {
 			Sequence* getSequenceById(int id);
 			Sequence* getSequenceByName(std::string name);
 			std::vector<Sequence*> getListOfAllSequences();
+			/**
+			* Waits for the sequencer to terminate all its sequences together with their associated threads
+			*/
+			void wait();
 			void abort();
-			void join();
 			void singleStepping();
 			static bool running;
 		private:

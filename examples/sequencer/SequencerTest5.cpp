@@ -55,7 +55,7 @@ public:
 	int action() {
 		seqB();
 		for (int i = 0; i < 5; i++) stepA();
-		seqB.join();
+		seqB.waitAndTerminate();
 	}
 private:
 	SequenceB seqB;
@@ -82,8 +82,6 @@ int main(int argc, char **argv) {
 	sequencer.addSequence(mainSeq);
 	mainSeq.start();
 	
-	// Wait until sequencer terminates
-	sequencer.join();
-	
+	mainSeq.waitAndTerminate();
 	log.info() << "Simple Sequencer Example finished...";
 }

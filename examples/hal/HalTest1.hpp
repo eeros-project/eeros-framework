@@ -138,8 +138,8 @@ public:
 			log.info() << cs.anIn0.getOut().getSignal();
 			log.info() << cs.anIn2.getOut().getSignal();
 		}
-		seqDigital.join();
-		seqAnalog.join();
+		seqDigital.wait();
+		seqAnalog.wait();
 	}
 private:
 	MyControlSystem& cs;

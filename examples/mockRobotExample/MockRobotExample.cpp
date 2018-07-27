@@ -52,8 +52,6 @@ int main(int argc, char **argv) {
 	executor.add(periodic);
 	executor.run();
 	
-	// wait for sequencer thread 
-	sequencer.join();
-	
+	sequencer.wait();
 	log.info() << "Mock robot example finished...";
 }

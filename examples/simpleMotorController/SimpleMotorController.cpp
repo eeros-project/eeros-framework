@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
 	
 	executor.run();
 	
-	sequencer.join();
+	mainSequence.waitAndTerminate();
 	log.info() << "Example finished...";
 	return 0;
 }

@@ -59,7 +59,7 @@ public:
 		for (int i = 0; i < 3; i++) stepA();
 		seqB();
 		for (int i = 0; i < 5; i++) stepA();
-		seqB.join();
+		seqB.waitAndTerminate();
 	}
 private:
 	StepA stepA;
@@ -72,7 +72,6 @@ void signalHandler(int signum) {
 
 int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
-
 	StreamLogWriter w(std::cout);
 // 	w.show(LogLevel::TRACE);
 	Logger::setDefaultWriter(&w);
@@ -85,7 +84,7 @@ int main(int argc, char **argv) {
 	sequencer.addSequence(mainSeq);
 	mainSeq.start();
 	
-	sequencer.join();	// wait until sequencer terminates
+	mainSeq.waitAndTerminate();
 	
 	log.info() << "Simple Sequencer Example finished...";
 }
