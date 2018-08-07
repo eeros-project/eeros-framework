@@ -21,12 +21,12 @@ namespace eeros {
 			virtual int action() = 0;		// this function has to be implemented in the derived sequence
 			int start();
 			/**
-			* Waits for this sequence to finish current run. 
+			* Waits for this sequence to finish its current run. 
 			* The sequence could be restarted later on.
 			*/
 			void wait();
 			/**
-			* Waits for this sequence to finish current run. 
+			* Waits for this sequence to finish its current run. 
 			* As soon as this happens, its associated thread will be terminated and ceases to exist.
 			*/
 			void waitAndTerminate();

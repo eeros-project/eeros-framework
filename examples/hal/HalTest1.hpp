@@ -11,7 +11,6 @@
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Step.hpp>
-#include <unistd.h>
 
 using namespace eeros::safety;
 using namespace eeros::control;
@@ -46,7 +45,6 @@ public:
 		timedomain.addBlock(anIn2);
 		eeros::Executor::instance().add(timedomain);
 	}
-	virtual ~MyControlSystem() { }
 	
 	Constant<bool> c0;
 	Constant<> c1, c2;
@@ -68,10 +66,20 @@ public:
 	SafetyLevel slSingle;
 };
 
+class WaitTime : public Step {
+public:
+	WaitTime(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
+	int operator() (double waitingTime) {this->waitingTime = waitingTime; return start();}
+	int action() {time = std::chrono::steady_clock::now();}
+	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > waitingTime;}
+	std::chrono::time_point<std::chrono::steady_clock> time;
+	double waitingTime;
+};
+
 class StepDigOut : public Step {
 public:
 	StepDigOut(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Step(name, sequencer, caller), cs(cs) { }
-	int operator() (bool val) {state = val; return Step::start();}
+	int operator() (bool val) {state = val; return start();}
 	int action() {cs.c0.setValue(state);}
 	bool state;
 	MyControlSystem& cs;
@@ -80,7 +88,7 @@ public:
 class StepAnalogOut : public Step {
 public:
 	StepAnalogOut(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Step(name, sequencer, caller), cs(cs) { }
-	int operator() (bool val) {state = val; return Step::start();}
+	int operator() (bool val) {state = val; return start();}
 	int action() {
 		if (state) {
 			cs.c1.setValue(6.0);
@@ -96,32 +104,36 @@ public:
 
 class SeqDigital : public Sequence {
 public:
-	SeqDigital(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Sequence(name, sequencer, caller, false), stepDigOut("step dig out", seq, this, cs) { }
+	SeqDigital(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : 
+		Sequence(name, sequencer, caller, false), stepDigOut("step dig out", seq, this, cs), waitTime("waiting time digital", seq, this) { }
 	int action() {
 		bool toggle;
-		while (true) {
+		while (Sequencer::running) {
 			stepDigOut(toggle);
-			sleep(2);
+			waitTime(5);
 			toggle = !toggle;
 		}
 	}
 private:
 	StepDigOut stepDigOut;
+	WaitTime waitTime;
 };
 
 class SeqAnalog : public Sequence {
 public:
-	SeqAnalog(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Sequence(name, sequencer, caller, false), stepAnalogOut("step analog out", seq, this, cs) { }
+	SeqAnalog(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : 
+		Sequence(name, sequencer, caller, false), stepAnalogOut("step analog out", seq, this, cs), waitTime("waiting time analog", seq, this) { }
 	int action() {
 		bool toggle;
-		while (true) {
+		while (Sequencer::running) {
 			stepAnalogOut(toggle);
-			sleep(5);
+			waitTime(10);
 			toggle = !toggle;
 		}
 	}
 private:
 	StepAnalogOut stepAnalogOut;
+	WaitTime waitTime;
 };
 
 class MyMainSequence : public Sequence {
@@ -131,13 +143,6 @@ public:
 	int action() {
 		seqDigital();
 		seqAnalog();
-		while (true) {
-			sleep(1);
-			log.info() << cs.digIn0.getOut().getSignal();
-			log.info() << cs.digIn1.getOut().getSignal();
-			log.info() << cs.anIn0.getOut().getSignal();
-			log.info() << cs.anIn2.getOut().getSignal();
-		}
 		seqDigital.wait();
 		seqAnalog.wait();
 	}

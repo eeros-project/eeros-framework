@@ -1,10 +1,12 @@
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/hal/HAL.hpp>
+#include <eeros/task/Lambda.hpp>
 #include "HalTest2.hpp"
 
 using namespace eeros;
 using namespace eeros::logger;
+using namespace eeros::task;
 using namespace eeros::hal;
 using namespace eeros::safety;
 using namespace eeros::sequencer;
@@ -40,9 +42,15 @@ int main(int argc, char **argv){
 	// Set executor and run
 	auto &executor = Executor::instance();
 	executor.setMainTask(safetySystem);
+	Lambda l1 ([&] () { });
+	Periodic perLog("periodic log", 1, l1);
+	perLog.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
+		log.info() << cs.encMot1.getOut().getSignal();
+	});
+	executor.add(perLog);
 	executor.run();
 	
-	mainSequence.waitAndTerminate();
+	sequencer.wait();
 	log.info() << "end...";
 	return 0;
 }

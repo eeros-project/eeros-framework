@@ -9,7 +9,7 @@
 #include <eeros/core/Executor.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
-#include <unistd.h>
+#include <eeros/sequencer/Step.hpp>
 
 using namespace eeros::safety;
 using namespace eeros::control;
@@ -38,7 +38,6 @@ public:
 		timedomain.addBlock(pwm2);
 		eeros::Executor::instance().add(timedomain);
 	}
-	virtual ~MyControlSystem() { }
 	
 	Constant<bool> c1;
 	Constant<> c2;
@@ -62,36 +61,38 @@ public:
 	SafetyLevel slSingle;
 };
 
+class WaitTime : public Step {
+public:
+	WaitTime(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
+	int operator() (double waitingTime) {this->waitingTime = waitingTime; return start();}
+	int action() {time = std::chrono::steady_clock::now();}
+	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > waitingTime;}
+	std::chrono::time_point<std::chrono::steady_clock> time;
+	double waitingTime;
+};
+
 class MyMainSequence : public Sequence {
 public:
-	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), controlSys(controlSys) { }
+	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), waitTime("waiting time", seq, this), controlSys(controlSys) { }
 	
 	int action() {
-		log.trace() << "[ Main Sequence Started ]";
-		
 		// set PWM frequency here for example or in main of application
 		HAL& hal = HAL::instance();	
 		controlSys.pwm2.callOutputFeature("setPwmFrequency", 2000.0);
 		
-		log.info() << "Starting...";
-		for(int i = 0; (i < 1000000) /*&& (!isTerminating())*/; i++){
-			if(i%5 == 0){
-				log.info() << "enc: " << controlSys.encMot1.getOut().getSignal().getValue();
-			}
-			if(i%2 == 0){
-				controlSys.c2.setValue(-5);
-				controlSys.c1.setValue(true);
-			}
-			else{
-				controlSys.c2.setValue(5);
-				controlSys.c1.setValue(false);
-			}
-			usleep(100000);
+		while (Sequencer::running) {			
+			controlSys.c2.setValue(-5);
+			controlSys.c1.setValue(true);
+			waitTime(0.6);
+			controlSys.c2.setValue(5);
+			controlSys.c1.setValue(false);
+			waitTime(0.4);
 		}
 	}
 	
 private:
 	MyControlSystem& controlSys;
+	WaitTime waitTime;
 };
 
 #endif // ORG_EEROS_HALTEST2_HPP_
