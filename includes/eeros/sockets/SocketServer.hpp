@@ -31,6 +31,7 @@ namespace eeros {
 				read_ptr.store(&read1);
 				send_ptr.store(&send1);
 				running = false;
+				connected = false;
 			}
 			
 			virtual ~SocketServer() {
@@ -43,6 +44,10 @@ namespace eeros {
 			
 			virtual bool isRunning() {
 				return running;
+			}
+			
+			virtual bool isConnected() {
+				return connected;
 			}
 			
 			virtual std::array<outT, BufOutLen>& getReceiveBuffer() {
@@ -85,7 +90,7 @@ namespace eeros {
 				while (running) {
 					newsockfd = accept(sockfd, (struct sockaddr *) &cliAddr,  &clilen);
 					if (newsockfd < 0) throw Fault("ERROR on socket accept");
-					bool connected = true;
+					connected = true;
 					char cliName[INET6_ADDRSTRLEN];
 					getnameinfo((struct sockaddr*)&cliAddr, sizeof cliAddr, cliName, sizeof(cliName), NULL, 0, NI_NUMERICHOST|NI_NUMERICSERV);
 					log.info() << "Client connection from ip=" << cliName << " accepted";
@@ -166,6 +171,7 @@ namespace eeros {
 			struct hostent *server;
 			int sockfd;
 			int newsockfd;
+			bool connected;
 			
 			std::array<outT, BufOutLen> read1, read2, read3;
 			std::array<inT, BufInLen> send1, send2, send3;
@@ -183,6 +189,7 @@ namespace eeros {
 				signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application
 				send_ptr.store(&send1);
 				running = false;
+				connected = false;
 			}
 			
 			virtual ~SocketServer() {
@@ -195,6 +202,10 @@ namespace eeros {
 			
 			virtual bool isRunning() {
 				return running;
+			}
+			
+			virtual bool isConnected() {
+				return connected;
 			}
 			
 			virtual void setSendBuffer(std::array<inT, BufInLen>& data) {
@@ -230,7 +241,7 @@ namespace eeros {
 				while (running) {
 					newsockfd = accept(sockfd, (struct sockaddr *) &cliAddr,  &clilen);
 					if (newsockfd < 0) throw Fault("ERROR on accept");
-					bool connected = true;
+					connected = true;
 					char cliName[INET6_ADDRSTRLEN];
 					getnameinfo((struct sockaddr*)&cliAddr, sizeof cliAddr, cliName, sizeof(cliName), NULL, 0, NI_NUMERICHOST|NI_NUMERICSERV);
 					log.info() << "Client connection from ip=" << cliName << " accepted";
@@ -276,6 +287,7 @@ namespace eeros {
 			struct hostent *server;
 			int sockfd;
 			int newsockfd;
+			bool connected;
 			
 			std::array<inT, BufInLen> send1, send2, send3;
 			std::atomic< std::array<inT, BufInLen>* > send_ptr;

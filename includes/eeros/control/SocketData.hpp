@@ -61,6 +61,11 @@ namespace eeros {
 				if (isServer) server->newData = false; else client->newData = false;
 			}
 			
+			virtual bool isConnected() {
+				if (isServer) return server->isConnected();
+				else return client->isConnected();
+			}
+			
 			template <typename X, typename Y>
 			friend std::ostream& operator<<(std::ostream& os, SocketData<X,Y>& s);
 
@@ -120,6 +125,11 @@ namespace eeros {
 
 			virtual void resetNew() {
 				if (isServer) server->newData = false; else client->newData = false;
+			}
+			
+			virtual bool isConnected() {
+				if (isServer) return server->isConnected();
+				else return client->isConnected();
 			}
 			
 			template <typename X, typename Y>
@@ -182,6 +192,11 @@ namespace eeros {
 				if (isServer) server->newData = false; else client->newData = false;
 			}
 			
+			virtual bool isConnected() {
+				if (isServer) return server->isConnected();
+				else return client->isConnected();
+			}
+			
 			template <typename X, typename Y>
 			friend std::ostream& operator<<(std::ostream& os, SocketData<X,Y>& s);
 
@@ -242,6 +257,11 @@ namespace eeros {
 				if (isServer) server->newData = false; else client->newData = false;
 			}
 			
+			virtual bool isConnected() {
+				if (isServer) return server->isConnected();
+				else return client->isConnected();
+			}
+			
 			template <typename X, typename Y>
 			friend std::ostream& operator<<(std::ostream& os, SocketData<X,Y>& s);
 
@@ -276,6 +296,11 @@ namespace eeros {
 					if (isServer) server->setSendBuffer(sendData);
 					else client->setSendBuffer(sendData);
 				}
+			}
+			
+			virtual bool isConnected() {
+				if (isServer) return server->isConnected();
+				else return client->isConnected();
 			}
 			
 			template <typename X, typename Y>
@@ -330,6 +355,11 @@ namespace eeros {
 				if (isServer) server->newData = false; else client->newData = false;
 			}
 			
+			virtual bool isConnected() {
+				if (isServer) return server->isConnected();
+				else return client->isConnected();
+			}
+			
 			template <typename X, typename Y>
 			friend std::ostream& operator<<(std::ostream& os, SocketData<X,Y>& s);
 
@@ -364,6 +394,11 @@ namespace eeros {
 					if (isServer) server->setSendBuffer(sendData);
 					else client->setSendBuffer(sendData);
 				}
+			}
+			
+			virtual bool isConnected() {
+				if (isServer) return server->isConnected();
+				else return client->isConnected();
 			}
 			
 			template <typename X, typename Y>
@@ -415,6 +450,11 @@ namespace eeros {
 
 			virtual void resetNew() {
 				if (isServer) server->newData = false; else client->newData = false;
+			}
+			
+			virtual bool isConnected() {
+				if (isServer) return server->isConnected();
+				else return client->isConnected();
 			}
 			
 			template <typename X, typename Y>
