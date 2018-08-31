@@ -9,16 +9,11 @@
 #include <eeros/task/Periodic.hpp>
 #include <eeros/logger/Logger.hpp>
 
-//uncomment if etherCAT is needed
-//#ifndef ECMASTERLIB_FOUND
-//#define ECMASTERLIB_FOUND
-//#endif
-
-#ifdef ECMASTERLIB_FOUND
+#ifdef USE_ETHERCAT
 #include <EtherCATMain.hpp>
 #endif
 
-#ifdef ROS_FOUND
+#ifdef USE_ROS
 #include <ros/ros.h>
 #endif
 
@@ -40,7 +35,7 @@ namespace eeros {
 
 		virtual ~Executor();
 		static Executor& instance();
-#ifdef ECMASTERLIB_FOUND
+#ifdef USE_ETHERCAT
 		void syncWithEtherCATSTack(ethercat::EtherCATMain* etherCATStack);
 #endif
 		void setMainTask(task::Periodic &mainTask);
@@ -59,7 +54,7 @@ namespace eeros {
 		PeriodicCounter counter;
 		
 		
-#ifdef ROS_FOUND
+#ifdef USE_ROS
 		void syncWithRosTime();
 		void syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue);
 		ros::CallbackQueue* syncRosCallbackQueue;
@@ -69,7 +64,7 @@ namespace eeros {
 	private:
 		void assignPriorities();
 ;
-#ifdef ECMASTERLIB_FOUND
+#ifdef USE_ETHERCAT
 		ethercat::EtherCATMain* etherCATStack;
 		std::mutex* m;
 		std::condition_variable* cv;

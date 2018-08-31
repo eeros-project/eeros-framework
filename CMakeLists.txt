@@ -182,11 +182,11 @@ if (NOT ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
 endif (NOT ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
 
 if (ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
-	message(STATUS "--> 'ecmasterlib' is installed, but EtherCAT will NOT be used")
+	message(STATUS "--> 'ecmasterlib' is installed, but EtherCAT will NOT be used. You may want to use the -DUSE_ETHERCAT switch with cmake.")
 endif (ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
 
 if (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
-	message(STATUS "--> 'ecmasterlib' is NOT  installed. EtherCAT will NOT be used")
+	message(STATUS "--> 'ecmasterlib' is NOT  installed. EtherCAT will NOT be used.")
 endif (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
 message(STATUS "")
 
@@ -210,7 +210,7 @@ if (roslib_FOUND AND USE_ROS)
     find_package( roscpp QUIET )
     list(APPEND ROS_LIBRARIES "${roscpp_LIBRARIES}")
     list(APPEND EXTERNAL_LIBS "${ROS_LIBRARIES}")
-    add_definitions(-DROS_FOUND)
+    add_definitions(-DUSE_ROS)
 endif (roslib_FOUND AND USE_ROS)
 
 if (NOT roslib_FOUND AND USE_ROS)
@@ -218,11 +218,11 @@ if (NOT roslib_FOUND AND USE_ROS)
 endif (NOT roslib_FOUND AND USE_ROS)
 
 if (roslib_FOUND AND NOT USE_ROS)
-	message(STATUS "--> ROS is installed, but ROS will NOT be used")
+	message(STATUS "--> ROS is installed, but ROS will NOT be used. You may want to use the -DUSE_ROS switch with cmake.")
 endif (roslib_FOUND AND NOT USE_ROS)
 
 if (NOT roslib_FOUND AND NOT USE_ROS)
-	message(STATUS "--> ROS is NOT  installed. ROS will NOT be used")
+	message(STATUS "--> ROS is NOT  installed. ROS will NOT be used.")
 endif (NOT roslib_FOUND AND NOT USE_ROS)
 message(STATUS "")
 

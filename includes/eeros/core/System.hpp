@@ -13,7 +13,7 @@ namespace eeros {
 		static double getTime();
 		static uint64_t getTimeNs();
 		
-#ifdef ROS_FOUND
+#ifdef USE_ROS
 		static void useRosTime();	
 #endif
 		

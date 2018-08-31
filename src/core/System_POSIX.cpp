@@ -6,7 +6,7 @@
 #define CLOCK CLOCK_MONOTONIC_RAW
 
 
-#ifdef ROS_FOUND
+#ifdef USE_ROS
 #include <ros/ros.h>
 #endif
 
@@ -32,14 +32,14 @@ double System::getTime() {
 	return static_cast<double>(System::getTimeNs()) / NS_PER_SEC;
 }
 
-#ifdef ROS_FOUND
+#ifdef USE_ROS
 void System::useRosTime() {
 	rosTimeIsUsed = true;
 }
 #endif
 
 uint64_t System::getTimeNs() {
-#ifdef ROS_FOUND
+#ifdef USE_ROS
 	if (rosTimeIsUsed) {
 		auto time = ros::Time::now();
 		return time.toNSec();
