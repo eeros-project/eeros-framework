@@ -157,20 +157,44 @@ link_directories(${libucl_BINARY_DIR})
 
 ###### libucl ######
 
+
+##########################
+# EtherCAT support
+##########################
 ## Find package ecmasterlib
-message(STATUS "looking for package 'ecmasterlib'")
+message(STATUS "")
+message(STATUS "EtherCAT")
+message(STATUS "**********************************")
 find_package(ecmasterlib QUIET)
-if (ECMASTERLIB_LIB_DIR)
-	message(STATUS "-> ecmasterlib package available")
+#if (ECMASTERLIB_LIB_DIR)	# check if ecmasterlib is installed
+#if (USE_ETHERCAT)	# check if ecmasterlib should be used
+if (ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
+	message(STATUS "--> EtherCAT will be used")
 	include_directories("${ECMASTERLIB_INCLUDE_DIR}")
 	link_directories("${ECMASTERLIB_LIB_DIR}")
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ecmasterlib)
 	set(LIBECMASTER "${ECMASTERLIB_INCLUDE_DIR}")
-	add_definitions(-DECMASTERLIB_FOUND)
-else()
-	message( STATUS "-> ecmasterlib NOT found")
-endif()
+	add_definitions(-DUSE_ETHERCAT)
+endif (ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
 
+if (NOT ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
+	message( FATAL_ERROR "ERROR: EtherCAT should be used but 'ecmasterlib' can not be found. Please install 'ecmasterlib'.")
+endif (NOT ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
+
+if (ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
+	message(STATUS "--> 'ecmasterlib' is installed, but EtherCAT will NOT be used")
+endif (ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
+
+if (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
+	message(STATUS "--> 'ecmasterlib' is NOT  installed. EtherCAT will NOT be used")
+endif (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
+message(STATUS "")
+
+
+
+##########################
+# ROS support
+##########################
 ## Find package ROS
 if (!DO_NOT_USE_ROS OR NOT DEFINED DO_NOT_USE_ROS)
   message( STATUS "ROS_ROOT: " $ENV{ROS_ROOT} )
