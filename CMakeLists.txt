@@ -195,30 +195,37 @@ message(STATUS "")
 ##########################
 # ROS support
 ##########################
-## Find package ROS
-if (!DO_NOT_USE_ROS OR NOT DEFINED DO_NOT_USE_ROS)
-  message( STATUS "ROS_ROOT: " $ENV{ROS_ROOT} )
-  message(STATUS "looking for package 'ROS'")
-  find_package( roslib QUIET )
-  if (roslib_FOUND)
-    message( STATUS "-> ROS found")
-    add_definitions(-DROS_FOUND)
-    set( ROS_FOUND true)
+message(STATUS "ROS")
+message(STATUS "**********************************")
+message( STATUS "ROS_ROOT: " $ENV{ROS_ROOT} )
+find_package( roslib QUIET )
+
+if (roslib_FOUND AND USE_ROS)
+    message( STATUS "--> ROS will be used")
+#    set( ROS_FOUND true)
     include_directories( "${roslib_INCLUDE_DIRS}" )
     list(APPEND ROS_LIBRARIES "${roslib_LIBRARIES}")
     find_package( rosconsole QUIET)
     list(APPEND ROS_LIBRARIES "${rosconsole_LIBRARIES}")
     find_package( roscpp QUIET )
     list(APPEND ROS_LIBRARIES "${roscpp_LIBRARIES}")
-
     list(APPEND EXTERNAL_LIBS "${ROS_LIBRARIES}")
-	else()
-		message( STATUS "-> ROS NOT found")
-		set( ROS_FOUND false)
-	endif()
-else()
-	message( STATUS "ROS will NOT be used" )
-endif()
+    add_definitions(-DROS_FOUND)
+endif (roslib_FOUND AND USE_ROS)
+
+if (NOT roslib_FOUND AND USE_ROS)
+	message( FATAL_ERROR "ERROR: ROS should be used but could not be found. ROS may be not installed or setup.bash (for ROS) was not executed.")
+endif (NOT roslib_FOUND AND USE_ROS)
+
+if (roslib_FOUND AND NOT USE_ROS)
+	message(STATUS "--> ROS is installed, but ROS will NOT be used")
+endif (roslib_FOUND AND NOT USE_ROS)
+
+if (NOT roslib_FOUND AND NOT USE_ROS)
+	message(STATUS "--> ROS is NOT  installed. ROS will NOT be used")
+endif (NOT roslib_FOUND AND NOT USE_ROS)
+message(STATUS "")
+
 
 ## Config include file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
