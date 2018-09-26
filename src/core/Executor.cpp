@@ -17,7 +17,7 @@
 #include <eeros/task/HarmonicTaskList.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/safety/SafetySystem.hpp>
-#ifdef ROS_FOUND
+#ifdef USE_ROS
 #include <ros/callback_queue_interface.h>
 #include <ros/callback_queue.h>
 #endif
@@ -108,7 +108,7 @@ Executor& Executor::instance() {
 }
 
 
-#ifdef ECMASTERLIB_FOUND
+#ifdef USE_ETHERCAT
 void Executor::syncWithEtherCATSTack(ethercat::EtherCATMain* etherCATStack) {
 	syncWithEtherCatStackIsSet = true;
 	this->etherCATStack = etherCATStack;
@@ -161,12 +161,12 @@ bool Executor::set_priority(int nice) {
 void Executor::stop() {
 	running = false;
 	auto &instance = Executor::instance();
-#ifdef ECMASTERLIB_FOUND
+#ifdef USE_ETHERCAT
 	if(instance.etherCATStack) instance.cv->notify_one();
 #endif
 }
 
-#ifdef ROS_FOUND
+#ifdef USE_ROS
 void Executor::syncWithRosTime() {
 	syncWithRosTimeIsSet = true;
 }
@@ -242,7 +242,7 @@ void Executor::run() {
 		log.error() << "could not lock memory in RAM";
 
 	bool useDefaultExecutor = true;
-#ifdef ECMASTERLIB_FOUND
+#ifdef USE_ETHERCAT
 	if (etherCATStack) {
 		log.trace() << "starting execution synced to etcherCAT stack";
 		if (syncWithRosTimeIsSet)	log.error() << "Can't use both etherCAT and RosTime to sync executor";
@@ -262,7 +262,7 @@ void Executor::run() {
 		}
 	}
 #endif
-#ifdef ROS_FOUND
+#ifdef USE_ROS
 	if (syncWithRosTimeIsSet) {
 		log.trace() << "starting execution synced to rosTime";
 		if (syncWithEtherCatStackIsSet)	log.error() << "Can't use both RosTime and etherCAT to sync executor";

@@ -157,44 +157,75 @@ link_directories(${libucl_BINARY_DIR})
 
 ###### libucl ######
 
+
+##########################
+# EtherCAT support
+##########################
 ## Find package ecmasterlib
-message(STATUS "looking for package 'ecmasterlib'")
+message(STATUS "")
+message(STATUS "EtherCAT")
+message(STATUS "**********************************")
 find_package(ecmasterlib QUIET)
-if (ECMASTERLIB_LIB_DIR)
-	message(STATUS "-> ecmasterlib package available")
+#if (ECMASTERLIB_LIB_DIR)	# check if ecmasterlib is installed
+#if (USE_ETHERCAT)	# check if ecmasterlib should be used
+if (ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
+	message(STATUS "--> EtherCAT will be used")
 	include_directories("${ECMASTERLIB_INCLUDE_DIR}")
 	link_directories("${ECMASTERLIB_LIB_DIR}")
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ecmasterlib)
 	set(LIBECMASTER "${ECMASTERLIB_INCLUDE_DIR}")
-	add_definitions(-DECMASTERLIB_FOUND)
-else()
-	message( STATUS "-> ecmasterlib NOT found")
-endif()
+	add_definitions(-DUSE_ETHERCAT)
+endif (ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
 
-## Find package ROS
-if (!DO_NOT_USE_ROS OR NOT DEFINED DO_NOT_USE_ROS)
-  message( STATUS "ROS_ROOT: " $ENV{ROS_ROOT} )
-  message(STATUS "looking for package 'ROS'")
-  find_package( roslib QUIET )
-  if (roslib_FOUND)
-    message( STATUS "-> ROS found")
-    add_definitions(-DROS_FOUND)
-    set( ROS_FOUND true)
+if (NOT ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
+	message( FATAL_ERROR "ERROR: EtherCAT should be used but 'ecmasterlib' can not be found. Please install 'ecmasterlib'.")
+endif (NOT ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
+
+if (ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
+	message(STATUS "--> 'ecmasterlib' is installed, but EtherCAT will NOT be used. You may want to use the -DUSE_ETHERCAT switch with cmake.")
+endif (ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
+
+if (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
+	message(STATUS "--> 'ecmasterlib' is NOT  installed. EtherCAT will NOT be used.")
+endif (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
+message(STATUS "")
+
+
+
+##########################
+# ROS support
+##########################
+message(STATUS "ROS")
+message(STATUS "**********************************")
+message( STATUS "ROS_ROOT: " $ENV{ROS_ROOT} )
+find_package( roslib QUIET )
+
+if (roslib_FOUND AND USE_ROS)
+    message( STATUS "--> ROS will be used")
+#    set( ROS_FOUND true)
     include_directories( "${roslib_INCLUDE_DIRS}" )
     list(APPEND ROS_LIBRARIES "${roslib_LIBRARIES}")
     find_package( rosconsole QUIET)
     list(APPEND ROS_LIBRARIES "${rosconsole_LIBRARIES}")
     find_package( roscpp QUIET )
     list(APPEND ROS_LIBRARIES "${roscpp_LIBRARIES}")
-
     list(APPEND EXTERNAL_LIBS "${ROS_LIBRARIES}")
-	else()
-		message( STATUS "-> ROS NOT found")
-		set( ROS_FOUND false)
-	endif()
-else()
-	message( STATUS "ROS will NOT be used" )
-endif()
+    add_definitions(-DUSE_ROS)
+endif (roslib_FOUND AND USE_ROS)
+
+if (NOT roslib_FOUND AND USE_ROS)
+	message( FATAL_ERROR "ERROR: ROS should be used but could not be found. ROS may be not installed or setup.bash (for ROS) was not executed.")
+endif (NOT roslib_FOUND AND USE_ROS)
+
+if (roslib_FOUND AND NOT USE_ROS)
+	message(STATUS "--> ROS is installed, but ROS will NOT be used. You may want to use the -DUSE_ROS switch with cmake.")
+endif (roslib_FOUND AND NOT USE_ROS)
+
+if (NOT roslib_FOUND AND NOT USE_ROS)
+	message(STATUS "--> ROS is NOT  installed. ROS will NOT be used.")
+endif (NOT roslib_FOUND AND NOT USE_ROS)
+message(STATUS "")
+
 
 ## Config include file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
