@@ -26,6 +26,10 @@ namespace eeros {
 				value = newValue;
 			}
 
+			virtual T getValue() {
+				return value;
+			}
+
 			template <typename X>
 			friend std::ostream& operator<<(std::ostream& os, Constant<X>& c);
 

@@ -58,17 +58,21 @@ public:
 		setEntryLevel(slOff);
 		
 		slOff.setLevelAction([&](SafetyContext* privateContext) {
-			if ((slOff.getNofActivations() % 5) == 0) {
-				cs.c1.setValue(cs.c1.getOut().getSignal().getValue() + 0.1);
-				cs.c2.setValue(cs.c2.getOut().getSignal().getValue() - 0.01);
+			cs.c1.setValue(cs.c1.getValue() + diff);
+			cs.c2.setValue(cs.c2.getValue() - diff);
+			if ((slOff.getNofActivations() % 10) == 0) {
 				log.info() << cs.doubleIn.getOut().getSignal();
 				log.info() << cs.vectorIn.getOut().getSignal();
+			}
+			if ((slOff.getNofActivations() % 50) == 0) {
+				diff = -diff;
 			}
 		});
 	}
 
 	SafetyLevel slOff;
 	Logger log;
+	double diff = 0.1;
 };
 
 void signalHandler(int signum) {
@@ -76,7 +80,7 @@ void signalHandler(int signum) {
 }
 
 int main(int argc, char **argv) {	
-	double dt = 0.2;
+	double dt = 0.1;
 
 	StreamLogWriter w(std::cout);
 	Logger::setDefaultWriter(&w);
