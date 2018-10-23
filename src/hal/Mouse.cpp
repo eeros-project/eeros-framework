@@ -39,7 +39,7 @@ Mouse::~Mouse() {
 
 bool Mouse::open(const char* device) {
 	fd = ::open(device, O_RDONLY);
-	if (fd < 0) throw eeros::Fault("Mouse: could not open input device on " + std::string(device));
+	if (fd < 0) log.error() << "Mouse: could not open input device on " + std::string(device);
 	return fd;
 }
 

@@ -30,7 +30,7 @@ SpaceNavigator::~SpaceNavigator() {
 bool SpaceNavigator::open(const char* device) {
 	file = ::fopen(device, "rb");
 	if (file == NULL) {
-		throw eeros::Fault("Space Navigator: could not open input device on " + std::string(device));
+		log.error() << "Space Navigator: could not open input device on " + std::string(device);
 	}
 	return true;
 }

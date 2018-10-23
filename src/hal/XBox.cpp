@@ -46,7 +46,7 @@ XBox::~XBox() {
 
 bool XBox::open(const char* device) {
 	fd = ::open(device, O_RDONLY);
-	if (fd < 0) throw eeros::Fault("XBox: could not open input device on " + std::string(device));
+	if (fd < 0) log.error() << "XBox: could not open input device on " + std::string(device);
 	return fd;
 }
 
