@@ -11,6 +11,8 @@ add_eeros_test_sources(SignalChecker.cpp)
 add_eeros_test_sources(SocketData.cpp)
 add_eeros_test_sources(Sum.cpp)
 add_eeros_test_sources(Transition.cpp)
+add_eeros_test_sources(MAFilter.cpp)
+
 
 # Blocks, old, delete when replaced by new tests
 add_subdirectory(d)
