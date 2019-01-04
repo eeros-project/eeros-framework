@@ -4,14 +4,16 @@
 
 #include <gtest/gtest.h>
 
-#include <iostream>
+#include <sstream>
+#include <string>
+
 using namespace eeros;
 using namespace eeros::control;
 
 TEST(MAFilterUnitTest, templateInstantiations) {
   double dcoeffs[] = {0.5, 0.5};
   MAFilter<2> f1{dcoeffs};
-  
+
   double d5coeffs[] = {0.2, 0.2, 0.2, 0.2, 0.2};
   MAFilter<5> f2{d5coeffs};
   
@@ -70,7 +72,12 @@ TEST(MAFilterUnitTest, enableDisable) {
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue(), 5);
   ma.run();
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue(), 5);
-  
+  ma.setName("myFilter");
+  std::stringstream sstream{};
+  sstream << ma;
+  std::string str1 = "Block MAFilter: 'myFilter' is enabled=1, coefficients:[0.5,0.5], previousValues:[5,5]";
+  std::string str2 = sstream.str();
+  ASSERT_STREQ (str1.c_str(), str2.c_str());
   ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), ma.getOut().getSignal().getTimestamp());
 }
 

@@ -49,8 +49,8 @@ namespace eeros {
 			}
 			
 
-// 			template <typename Xout, typename Xgain>
-// 			friend std::ostream& operator<<(std::ostream& os, Gain<Xout,Xgain>& gain);
+			template <size_t No, typename ValT, typename CoeffT>
+			friend std::ostream& operator<<(std::ostream& os, MAFilter<No,ValT,CoeffT>& filter);
 
 		protected:
 			Tcoeff * coefficients;
@@ -59,13 +59,23 @@ namespace eeros {
 		};
 		
 		
-				/********** Print functions **********/
-		/*
-		template <typename Tout, typename Tgain>
-		std::ostream& operator<<(std::ostream& os, Gain<Tout,Tgain>& gain) {
-			os << "Block gain: '" << gain.getName() << "' gain val = " << gain.gain; 
-		} */
+		/********** Print functions **********/
+		template <size_t N, typename Tval, typename Tcoeff>
+		std::ostream& operator<<(std::ostream& os, MAFilter<N,Tval,Tcoeff>& filter) {
+			os << "Block MAFilter: '" << filter.getName() << "' is enabled=" << filter.enabled << ", coefficients:[";
 
+			os << filter.coefficients[0];
+			for(size_t i = 1; i < N; i++){
+				os << "," << filter.coefficients[i];
+			}
+			os << "], previousValues:[";
+
+			os << filter.previousValues[0];
+			for(size_t i = 1; i < N; i++){
+				os << "," << filter.previousValues[i];
+			}
+			os << "]";
+		}
 	};
 };
 
