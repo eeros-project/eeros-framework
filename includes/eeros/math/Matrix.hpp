@@ -36,7 +36,7 @@ namespace eeros {
 			
 			/********** Constructors **********/
 			
-			Matrix() { }
+			Matrix() = default;
 			
 			Matrix(const T v) {
 				(*this) = v;
@@ -851,7 +851,7 @@ namespace eeros {
 			}
 			
 		protected:
-			T value[M * N];
+			T value[M * N]{};
 			
 		}; // END class Matrix
 		
@@ -947,7 +947,7 @@ namespace eeros {
 			
 			using value_type = T;
 			
-			Matrix() { }
+			Matrix() = default;
 			
 			Matrix(const T v) { value = v; }
 			
@@ -1018,7 +1018,7 @@ namespace eeros {
 			}
 			
 		protected:
-			T value;
+			T value{};
 		};
 		
 	} // END namespace math
