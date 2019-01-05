@@ -10,6 +10,7 @@
 using namespace eeros;
 using namespace eeros::control;
 
+
 TEST(MAFilterUnitTest, templateInstantiations) {
   double dcoeffs[] = {0.5, 0.5};
   MAFilter<2> f1{dcoeffs};
@@ -37,7 +38,7 @@ TEST(MAFilterUnitTest, doubleMAFilter) {
   c1.run();
   ma.getIn().connect(c1.getOut());
   
-  // also tests if enable is true by default.
+  // this test case also tests if enable is true by default.
   
   ma.run();
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue(), 1);
@@ -72,12 +73,7 @@ TEST(MAFilterUnitTest, enableDisable) {
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue(), 5);
   ma.run();
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue(), 5);
-  ma.setName("myFilter");
-  std::stringstream sstream{};
-  sstream << ma;
-  std::string str1 = "Block MAFilter: 'myFilter' is enabled=1, coefficients:[0.5,0.5], previousValues:[5,5]";
-  std::string str2 = sstream.str();
-  ASSERT_STREQ (str1.c_str(), str2.c_str());
+  
   ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), ma.getOut().getSignal().getTimestamp());
 }
 
@@ -115,4 +111,39 @@ TEST(MAFilterUnitTest, vectorMAFilter) {
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue()[2], 3);
   
   ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), ma.getOut().getSignal().getTimestamp());
+}
+
+
+TEST(MAFilterUnitTest, printMAFilter) {
+  double coeffs[] = {0.2, 0.2, 0.2, 0.2, 0.2};
+  MAFilter<5> f1{coeffs};
+  f1.setName("my1stMAFilter");
+  
+  Constant<> c1{1.0};
+  f1.getIn().connect(c1.getOut());
+  
+  c1.run();
+  f1.run();
+  
+  c1.setValue(2.0);
+  c1.run();
+  f1.run();
+  
+  c1.setValue(3.0);
+  c1.run();
+  f1.run();
+  
+  c1.setValue(4.0);
+  c1.run();
+  f1.run();
+  
+  c1.setValue(3.14159);
+  c1.run();
+  f1.run();
+  
+  std::stringstream sstream{};
+  sstream << f1;
+  std::string str1 = "Block MAFilter: 'my1stMAFilter' is enabled=1, coefficients:[0.2,0.2,0.2,0.2,0.2], previousValues:[1,2,3,4,3.14159]";
+  std::string str2 = sstream.str();
+  ASSERT_STREQ (str1.c_str(), str2.c_str());
 }
