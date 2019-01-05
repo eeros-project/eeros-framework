@@ -17,8 +17,9 @@ namespace eeros {
 		 * output signal. The following terms represents the operation performed in
 		 * this block.
 		 * 
-		 * y[t] = c[0]*x[t-N] + c[1]*x[t-N-1] + ... +  c[N]*x[t]
-		 * Outp = c[0]*Inp[0] + c[1]*Inp[1]   + ... +  c[N]*Inp[N]
+		 * y[t] = c[0]*x[t-N]  + c[1]*x[t-N+1]  + ... +  c[N]*x[t]
+		 *
+		 * Outp = c[0]*prev[0] + c[1]*prev[1]   + ... +  c[N]*Inp
 		 * 
 		 * MAFilter is a Class Template with two type and one non-type template arguments.
 		 * The two type template arguments specify the types which are used for the 
@@ -62,7 +63,7 @@ namespace eeros {
 			virtual void run() {
 				Tval result{};
 				
-				for(size_t i = 0; i < N; i++){
+				for(size_t i = 0; i < N; i++) {
 					if(i < N-1) {
 						previousValues[i] = previousValues[i+1];
 					} else {
