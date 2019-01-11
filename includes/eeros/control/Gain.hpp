@@ -2,18 +2,21 @@
 #define ORG_EEROS_CONTROL_GAIN_HPP_
 
 #include <eeros/control/Block1i1o.hpp>
+#include <type_traits>
+//#include <iostream>
+
 
 namespace eeros {
 	namespace control {
 
 		/**
 		 * A gain block is used to amplify an input signal. This is basically done by
-		 * multiplying the gain set in the Gain instance with the input signal.
-		 * The output signal is therefore the gain multiplied with the input signal.
+		 * multiplying the gain with the input signal value.
+		 * The following term represents the operation performed in this block.
 		 * 
 		 * output = gain * input
 		 * 
-		 * Gain is a Class Template with two type and one non-type template arguments.
+		 * Gain is a class template with two type and one non-type template arguments.
 		 * The two type template arguments specify the types which are used for the 
 		 * output type and the gain type when the class template is instanciated.
 		 * The non-type template argument specifies if the multiplication will be done
@@ -32,47 +35,36 @@ namespace eeros {
 		public:
 			/**
 			 * Constructs a default gain instance with a gain of 1.\n
-			 * Sets the max gain to 1000.\n
-			 * Sets the min gain to -1000.\n
-			 * Sets the target gain to 1.\n
-			 * Sets the gain diff to 0.\n
+			 * Calls Gain(Tgain c).
+			 * 
+			 * @see Gain(Tgain c)
 			 */
-			Gain() {
-				gain = 1;
-				maxGain = 1000;
-				minGain = -1000;
-				targetGain = gain;
-				gainDiff = 0;
-			}
+			Gain() : Gain(1.0) {}
 
 
 			/**
-			 * Constructs a default gain instance with a gain of the parameter c.\n
-			 * Sets the max gain to 1000.\n
-			 * Sets the min gain to -1000.\n
-			 * Sets the target gain to the parameter c.\n
-			 * Sets the gain diff to 0.\n
+			 * Constructs a gain instance with a gain of the value of the parameter c.\n
+			 * Calls Gain(Tgain c, Tgain maxGain, Tgain minGain).\n
+			 *
+			 * @see Gain(Tgain c, Tgain maxGain, Tgain minGain)
+			 * 
 			 * @param c - initial gain value
 			 */
-			Gain(Tgain c) {
-				gain = c; 
-				maxGain = 1000;
-				minGain = -1000;
-				targetGain = gain;
-				gainDiff = 0;
+			Gain(Tgain c) : Gain(c, 1.0, -1.0) { // 1.0 and -1.0 are temp values only.
+			  resetMinMaxGain<Tgain>(); // set limits to smallest/largest value.
 			}
 
 
 			/**
-			 * Constructs a gain instance with a gain of the parameter c,
+			 * Constructs a gain instance with a gain of the value of the parameter c,
 			 * a maximum gain of maxGain and a minimum gain of minGain.\n
-			 * Sets the target gain to the parameter c.\n
+			 * Sets the target gain to the value of the parameter c.\n
 			 * Sets the gain diff to 0.\n
 			 * @param c - initial gain value
 			 * @param maxGain - initial maximum gain value
 			 * @param minGain - initial minimum gain value
 			 */
-			Gain(Tgain c, Tgain maxGain, Tgain minGain = 1) {
+			Gain(Tgain c, Tgain maxGain, Tgain minGain) {
 				gain = c;
 				this->maxGain = maxGain;
 				this->minGain = minGain;
@@ -100,31 +92,35 @@ namespace eeros {
 			 * @see disable()
 			 */
 			virtual void run() {
-				if(smoothChange){
-				    if(gain < targetGain){
+				if(smoothChange) {
+				    if(gain < targetGain) {
 					gain += gainDiff;
-					if(gain > targetGain){ //overshoot case
+					if(gain > targetGain) { // overshoot case
 					  gain = targetGain;
 					}
 				    }
     
-				    if(gain > targetGain){
+				    if(gain > targetGain) {
 					gain -= gainDiff;
-					if(gain < targetGain){
+					if(gain < targetGain) {
 					  gain = targetGain;
 					}
 				    }
 				}  
     
-				if(gain > maxGain){ //if diff will cause gain to be too large.
+				if(gain > maxGain) { // if diff will cause gain to be too large.
 				    gain = maxGain;
 				}
 
-				if(gain < minGain){
+				if(gain < minGain) {
 				    gain = minGain;
 				}
+				//std::cout << "gain:     " << gain << "\n";
+				//std::cout << "inp val:  " << this->in.getSignal().getValue() << "\n";
 				if(enabled) {
-					this->out.getSignal().setValue(gain * this->in.getSignal().getValue());
+					//this->out.getSignal().setValue(gain * this->in.getSignal().getValue());
+					this->out.getSignal().setValue(calculateResults<Tout>(this->in.getSignal().getValue()));
+					//std::cout << "res mat:  " << this->out.getSignal().getValue() << "\n";
 				} else {
 					this->out.getSignal().setValue(this->in.getSignal().getValue());
 				}
@@ -175,7 +171,7 @@ namespace eeros {
 			 * @see enable()
 			 * @see disable() 
 			 */
-			virtual void enableSmoothChange(bool enable){
+			virtual void enableSmoothChange(bool enable) {
 				smoothChange = enable;
 			}
 
@@ -190,9 +186,14 @@ namespace eeros {
 			 * @param c - gain value
 			 */
 			virtual void setGain(Tgain c) {
+			  //std::cout << "maxGain: " << maxGain <<"\n";
+			  //std::cout << "minGain: " << minGain <<"\n";
+			  //std::cout << "c Matrix:" << c <<"\n";
+			  //std::cout << "> minG:  " << (c>=minGain) << "\n";
 				if(c <= maxGain && c >= minGain) {
 				  if(smoothChange) {
 				    targetGain = c;
+				    //std::cout << "targGain:" << targetGain <<"\n";
 				  }else {
 				    gain = c;
 				  }
@@ -238,6 +239,31 @@ namespace eeros {
 			Tgain gainDiff;
 			bool enabled{true};
 			bool smoothChange{false};
+
+		private:
+			template <typename S> typename std::enable_if<!elementWise,S>::type calculateResults(S value) {
+			  return gain * value;
+			}
+			template <typename S> typename std::enable_if<elementWise,S>::type calculateResults(S value) {
+			  return value.multiplyElementWise(gain);
+			}
+
+			template <typename S> typename std::enable_if<std::is_integral<S>::value>::type resetMinMaxGain() {
+				minGain = std::numeric_limits<int32_t>::max() * -1; // smallest value. min() would return smallest value greater than 0.
+				maxGain = std::numeric_limits<int32_t>::max();
+			}
+			template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type resetMinMaxGain() {
+				minGain = std::numeric_limits<int32_t>::max() * -1;
+				maxGain = std::numeric_limits<double>::max();
+			}
+			template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type resetMinMaxGain() {
+				minGain.fill(std::numeric_limits<int32_t>::max() * -1);
+				maxGain.fill(std::numeric_limits<int32_t>::max());
+			}
+			template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type resetMinMaxGain() {
+				minGain.fill(std::numeric_limits<int32_t>::max() * -1);
+				maxGain.fill(std::numeric_limits<double>::max());
+			}
 		};
 
 
@@ -247,28 +273,18 @@ namespace eeros {
 		 * The most of the code is copied from the class template above. The only difference
 		 * is the run() method.
 		 * TODO: We need a solution so we do not have duplicated code.
-		 */
+		 
 		template <typename Tout, typename Tgain>
 		class Gain<Tout, Tgain, true> : public Block1i1o<Tout> {
 		
 		public:
-			Gain() {
-				gain = 1;
-				maxGain = 1000;
-				minGain = -1000;
-				targetGain = gain;
-				gainDiff = 0;
+			Gain() : Gain(1.0) {}
+			
+			Gain(Tgain c) : Gain(c, 1.0, -1.0) { // 1.0 and -1.0 are temp values only.
+			  resetMinMaxGain<Tgain>(); // set limits to smallest/largest value.
 			}
 			
-			Gain(Tgain c) {
-				gain = c; 
-				maxGain = 1000;
-				minGain = -1000;
-				targetGain = gain;
-				gainDiff = 0;
-			}
-			
-			Gain(Tgain c, Tgain maxGain, Tgain minGain = 1) {
+			Gain(Tgain c, Tgain maxGain, Tgain minGain) {
 				gain = c;
 				this->maxGain = maxGain;
 				this->minGain = minGain;
@@ -277,27 +293,27 @@ namespace eeros {
 			}
 			
 			virtual void run() {
-				if(smoothChange){
-				    if(gain < targetGain){
+				if(smoothChange) {
+				    if(gain < targetGain) {
 					gain += gainDiff;
-					if(gain > targetGain){ //overshoot case
+					if(gain > targetGain) { // overshoot case
 					  gain = targetGain;
 					}
 				    }
 				    
-				    if(gain > targetGain){
+				    if(gain > targetGain) {
 				      gain -= gainDiff;
-				      if(gain < targetGain){
+				      if(gain < targetGain) {
 					  gain = targetGain;
 					}
 				    }
 				}  
 			  
-				if(gain > maxGain){
+				if(gain > maxGain) { // if diff will cause gain to be too large.
 				  gain = maxGain;
 				}
 			  
-				if(gain < minGain){
+				if(gain < minGain) {
 				  gain = minGain;
 				}
 				
@@ -317,7 +333,7 @@ namespace eeros {
 				enabled = false;
 			}
 			
-			virtual void enableSmoothChange(bool enable){
+			virtual void enableSmoothChange(bool enable) {
 				smoothChange = enable;
 			}
 			
@@ -351,6 +367,24 @@ namespace eeros {
 			Tgain gainDiff;
 			bool enabled{true};
 			bool smoothChange{false};
+		
+		private:
+			template <typename S> typename std::enable_if<std::is_integral<S>::value>::type resetMinMaxGain() {
+				minGain = std::numeric_limits<int32_t>::max() * -1; // smallest value. min() would return smallest value greater than 0.
+				maxGain = std::numeric_limits<int32_t>::max();
+			}
+			template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type resetMinMaxGain() {
+				minGain = std::numeric_limits<int32_t>::max() * -1;
+				maxGain = std::numeric_limits<double>::max();
+			}
+			template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type resetMinMaxGain() {
+				minGain.fill(std::numeric_limits<int32_t>::max() * -1);
+				maxGain.fill(std::numeric_limits<int32_t>::max());
+			}
+			template <typename S> typename std::enable_if<   !std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type resetMinMaxGain() {
+				minGain.fill(std::numeric_limits<int32_t>::max() * -1);
+				maxGain.fill(std::numeric_limits<double>::max());
+			}
 		};
 
 

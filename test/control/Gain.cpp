@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <iostream>
+
 using namespace eeros;
 using namespace eeros::control;
 
@@ -15,7 +16,6 @@ TEST(GainUnitTest, templateInstantiations) {
   Gain<double,int> g4{};
   Gain<int,double> g5{};
   Gain<> g6{1.0};
-  Gain<> g7{1.0, 2.0};
   Gain<> g8{1.0, 2.0,-2.0};
   
   using namespace math;
@@ -118,11 +118,13 @@ TEST(GainUnitTest, minMaxDoubleGain) {
  
   g1.getIn().connect(c1.getOut());
   c1.run();
-  g1.setGain(10000); //should not change gain since higher than default maxGain
+  g1.setMaxGain(1000);
+  g1.setGain(10000); //should not change gain since higher than set maxGain
   g1.run();
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 3.25);
   
-  g1.setGain(-10000); //should not change gain since lower than default minGain
+  g1.setMinGain(-1000);
+  g1.setGain(-10000); //should not change gain since lower than set minGain
   g1.run();
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 3.25);
   
@@ -202,30 +204,6 @@ TEST(GainUnitTest, simpleMatrixGain2) {
   EXPECT_DOUBLE_EQ (res[2],7);
   EXPECT_DOUBLE_EQ (res[3],10);
 }
-
-
-/* shouldn't this work?
-TEST(GainUnitTest, simpleMatrixGain3) {
-  using namespace math;
-  Matrix<1,6> gM{2,2,2,2,2,2};
-  Gain<Matrix<6,1>,Matrix<1,6>> g1{gM};
-  
-  Matrix<6,1> m1{1,2,3,4,5,6};
-  Constant<Matrix<6,1>> c1{m1};
-
-  g1.getIn().connect(c1.getOut());
-  c1.run();
-  g1.run();
- 
-  Matrix<6,1> res = g1.getOut().getSignal().getValue();
-  EXPECT_DOUBLE_EQ (res[0],2);
-  EXPECT_DOUBLE_EQ (res[1],4);
-  EXPECT_DOUBLE_EQ (res[2],6);
-  EXPECT_DOUBLE_EQ (res[3],8);
-  EXPECT_DOUBLE_EQ (res[4],10);
-  EXPECT_DOUBLE_EQ (res[5],12);
-}
-*/
 
 
 TEST(GainUnitTest, simpleMatrixElementWiseGain1) {
@@ -368,6 +346,7 @@ TEST(GainUnitTest, smoothChangingMatrixGainMinMaxLimits) {
   
   for(int i = 0 ; i< 10; i++){
     g1.run(); // must not go above maxGain
+    //std::cout << "result:   " << g1.getOut().getSignal().getValue() << "\n";
   }
  
   Matrix<2,2> res = g1.getOut().getSignal().getValue();
