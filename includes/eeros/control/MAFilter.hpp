@@ -2,8 +2,8 @@
 #define ORG_EEROS_CONTROL_MAFILTER_HPP_
 
 #include <eeros/control/Block1i1o.hpp>
-
 #include <ostream>
+
 
 namespace eeros {
 	namespace control {
@@ -13,15 +13,15 @@ namespace eeros {
 		 * The output signal value depends linearly on the current and various past
 		 * input signal values.
 		 * This is achieved by multiplying the current and the past values with
-		 * the specified coefficients. The results are accumulated and yield to the
-		 * output signal. The following terms represents the operation performed in
+		 * the specified coefficients. The results are accumulated and lead to the
+		 * output signal value. The following terms represents the operation performed in
 		 * this block.
 		 * 
 		 * y[t] = c[0]*x[t-N]  + c[1]*x[t-N+1]  + ... +  c[N]*x[t]
 		 *
 		 * Outp = c[0]*prev[0] + c[1]*prev[1]   + ... +  c[N]*Inp
 		 * 
-		 * MAFilter is a Class Template with two type and one non-type template arguments.
+		 * MAFilter is a class template with two type and one non-type template arguments.
 		 * The two type template arguments specify the types which are used for the 
 		 * values and the coefficients when the class template is instanciated.
 		 * The non-type template argument specifies the number of coefficients and the
@@ -33,10 +33,10 @@ namespace eeros {
 		 * 
 		 * @since v0.6
 		 */
-	  
+
 		template <size_t N, typename Tval = double, typename Tcoeff = Tval>
 		class MAFilter : public Block1i1o<Tval> {
-			
+
 		public:
 			/**
 			 * Constructs a MAFilter instance with the coefficients coeff.\n
@@ -62,7 +62,8 @@ namespace eeros {
 			 */
 			virtual void run() {
 				Tval result{};
-				
+				result = 0; // needed to zero initialize Matrix
+
 				for(size_t i = 0; i < N; i++) {
 					if(i < N-1) {
 						previousValues[i] = previousValues[i+1];
