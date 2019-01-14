@@ -49,6 +49,28 @@ TEST(GainUnitTest, simpleDoubleGain) {
 }
 
 
+TEST(GainUnitTest, simpleIntGain) {
+  Gain<int,int> g1{2};
+  Constant<int> c1{1};
+
+  g1.getIn().connect(c1.getOut());
+  c1.run();
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 2);
+
+  g1.disable();
+  g1.setGain(4.0);
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 1);
+
+  g1.enable();
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 4);
+
+  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), g1.getOut().getSignal().getTimestamp());
+}
+
+
 TEST(GainUnitTest, smoothChangingDoubleGain) {
   Gain<> g1{};
   Constant<> c1{3.1};
@@ -75,6 +97,35 @@ TEST(GainUnitTest, smoothChangingDoubleGain) {
   g1.setGainDiff(0.5);
   g1.run();
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 4.65);
+}
+
+
+TEST(GainUnitTest, smoothChangingIntGain) {
+  Gain<int,int> g1{};
+  Constant<int> c1{3};
+
+  g1.getIn().connect(c1.getOut());
+  c1.run();
+  g1.setGain(3);
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 9);
+
+  g1.enableSmoothChange(true); // gainDiff is 0 per default, so same results expected.
+  g1.run();
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 9);
+  g1.setGain(1);
+  g1.run();
+  g1.run();
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 9);
+
+  // gain is at 3 and targetGain at 1 since smooth change is on!
+  // => after one run gainDiff 1 will be subtracted.
+  // so gain will go to 2; so 2*3 = 6
+  g1.setGainDiff(1);
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 6);
 }
 
 
@@ -138,6 +189,34 @@ TEST(GainUnitTest, minMaxDoubleGain) {
 }
 
 
+TEST(GainUnitTest, minMaxIntGain) {
+  Gain<int,int> g1{3};
+  Constant<int> c1{1};
+
+  g1.getIn().connect(c1.getOut());
+  c1.run();
+  g1.setMaxGain(1000);
+  g1.setGain(10000); // should not change gain since higher than set maxGain
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 3);
+
+  g1.setMinGain(-1000);
+  g1.setGain(-10000); // should not change gain since lower than set minGain
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 3);
+
+  g1.setMaxGain(100000);
+  g1.setGain(10000);
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 10000);
+
+  g1.setMinGain(-100000);
+  g1.setGain(-10000);
+  g1.run();
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), -10000);
+}
+
+
 TEST(GainUnitTest, smoothChangingDoubleGainMinMaxLimits) {
   Gain<> g1{8.5};
   Constant<> c1{5.2};
@@ -162,7 +241,6 @@ TEST(GainUnitTest, smoothChangingDoubleGainMinMaxLimits) {
   }
 
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 44.2);
-
 }
 
 

@@ -256,28 +256,28 @@ namespace eeros {
 
 			template <typename S>
 			typename std::enable_if<std::is_integral<S>::value>::type resetMinMaxGain() {
-				minGain = std::numeric_limits<int32_t>::max() * -1; // smallest value. min() would return smallest value greater than 0.
+				minGain = std::numeric_limits<int32_t>::min();
 				maxGain = std::numeric_limits<int32_t>::max();
 			}
 
 
 			template <typename S>
 			typename std::enable_if<std::is_floating_point<S>::value>::type resetMinMaxGain() {
-				minGain = std::numeric_limits<int32_t>::max() * -1;
+				minGain = std::numeric_limits<double>::lowest();
 				maxGain = std::numeric_limits<double>::max();
 			}
 
 
 			template <typename S>
 			typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type resetMinMaxGain() {
-				minGain.fill(std::numeric_limits<int32_t>::max() * -1);
+				minGain.fill(std::numeric_limits<int32_t>::min());
 				maxGain.fill(std::numeric_limits<int32_t>::max());
 			}
 
 
 			template <typename S>
 			typename std::enable_if<!std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type resetMinMaxGain() {
-				minGain.fill(std::numeric_limits<int32_t>::max() * -1);
+				minGain.fill(std::numeric_limits<double>::lowest());
 				maxGain.fill(std::numeric_limits<double>::max());
 			}
 		};
