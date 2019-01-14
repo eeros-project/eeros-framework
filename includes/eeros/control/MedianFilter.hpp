@@ -23,9 +23,9 @@ namespace eeros {
 		 * 
 		 * If the MedianFilter is use with matrices (Matrix, Vector), the filter algorithm
 		 * will concider all values in the matrice and will not separate them.
-		 * For example a 3-tuple of a Vector3 instance will keep together during processing
+		 * For example a 3-tuple of a Vector3 instance will be kept together during processing
 		 * in the MedianFilter.\n
-		 * If the sort algorithm can not sort the values, the will be kept in the same 
+		 * If the sort algorithm can not sort the values, they will be kept in the same
 		 * order as when they were inserted into the MedianFilter.   
 		 * 
 		 * @tparam N - number of concidered values
@@ -54,13 +54,11 @@ namespace eeros {
 			 * @see disable()
 			 */
 			virtual void run() {
-				for(size_t i = 0; i < N; i++) {
-					if(i < N-1) {
-						currentValues[i] = currentValues[i+1];
-					} else {
-						currentValues[i] = this->in.getSignal().getValue();
-					}
+				for(size_t i = 0; i < N-1; i++) {
+					currentValues[i] = currentValues[i+1];
 				}
+
+				currentValues[N-1] = this->in.getSignal().getValue();
 
 				if(enabled) {
 					Tval temp[N]{};
