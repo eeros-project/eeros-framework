@@ -18,17 +18,16 @@ namespace eeros {
 		 * 
 		 * MedianFilter is a class template with one type and one non-type template argument.
 		 * The type template argument specifies the type which is used for the 
-		 * values when the class template is instanciated.
-		 * The non-type template argument specifies the number of concidered values.
+		 * values when the class template is instantiated.
+		 * The non-type template argument specifies the number of stored values.
 		 * 
-		 * If the MedianFilter is use with matrices (Matrix, Vector), the filter algorithm
-		 * will concider all values in the matrice and will not separate them.
+		 * If the MedianFilter is used with matrices (Matrix, Vector), the filter algorithm
+		 * will consider all values in the matrice and will not separate them.
 		 * For example a 3-tuple of a Vector3 instance will be kept together during processing
 		 * in the MedianFilter.\n
-		 * If the sort algorithm can not sort the values, they will be kept in the same
-		 * order as when they were inserted into the MedianFilter.   
+		 * If the sort algorithm can not sort the values, they will be left unchanged.
 		 * 
-		 * @tparam N - number of concidered values
+		 * @tparam N - number of considered values
 		 * @tparam Tval - value type (double - default type)
 		 * 
 		 * @since v0.6
