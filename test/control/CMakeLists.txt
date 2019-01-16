@@ -12,6 +12,7 @@ add_eeros_test_sources(SocketData.cpp)
 add_eeros_test_sources(Sum.cpp)
 add_eeros_test_sources(Transition.cpp)
 add_eeros_test_sources(MAFilter.cpp)
+add_eeros_test_sources(MedianFilter.cpp)
 
 
 # Blocks, old, delete when replaced by new tests
