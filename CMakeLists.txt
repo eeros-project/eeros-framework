@@ -13,7 +13,6 @@ project(EEROS)
 include(cmake/MunkeiVersionFromGit.cmake)
 version_from_git()
 
-set(EEROS_VERSION_SO 0.0)
 set(EEROS_VERSION_MAJOR ${VERSION_MAJOR})
 set(EEROS_VERSION_MINOR ${VERSION_MINOR})
 set(EEROS_VERSION_PATCH ${VERSION_PATCH})
