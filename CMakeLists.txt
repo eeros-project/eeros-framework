@@ -8,11 +8,16 @@ cmake_minimum_required(VERSION 2.8)
 ## EEROS Robotic Framework
 project(EEROS)
 
+
+## Fetch the version information from git
+include(cmake/MunkeiVersionFromGit.cmake)
+version_from_git()
+
 set(EEROS_VERSION_SO 0.0)
-set(EEROS_VERSION_MAJOR 0)
-set(EEROS_VERSION_MINOR 0)
-set(EEROS_VERSION_PATCH 0)
-set(EEROS_VERSION_TWEAK 0)
+set(EEROS_VERSION_MAJOR ${VERSION_MAJOR})
+set(EEROS_VERSION_MINOR ${VERSION_MINOR})
+set(EEROS_VERSION_PATCH ${VERSION_PATCH})
+set(EEROS_VERSION_TWEAK ${VERSION_TWEAK})
 set(EEROS_VERSION ${EEROS_VERSION_MAJOR}.${EEROS_VERSION_MINOR}.${EEROS_VERSION_PATCH}.${EEROS_VERSION_TWEAK})
 
 
