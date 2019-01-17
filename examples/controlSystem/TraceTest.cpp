@@ -81,7 +81,7 @@ void signalHandler(int signum) {
 int main() {
 	signal(SIGINT, signalHandler);
 
-	StreamLogWriter w(std::cout, "/tmp/hgkljklkjl");
+	StreamLogWriter w(std::cout, "/tmp/consoleOutput");
 	w.show(LogLevel::TRACE);
 	Logger::setDefaultWriter(&w);
 	Logger log;
