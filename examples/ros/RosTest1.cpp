@@ -6,6 +6,7 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/control/ros/RosPublisherDoubleArray.hpp>
 #include <eeros/control/ros/RosPublisherDouble.hpp>
+#include <eeros/control/ros/RosPublisherSafetyLevel.hpp>
 #include <eeros/control/ros/RosSubscriberDoubleArray.hpp>
 #include <eeros/control/ros/RosSubscriberDouble.hpp>
 #include <ros/ros.h>
@@ -23,8 +24,9 @@ public:
 	MyControlSystem(double dt):
 		c1({2.4, 0, 4.443, 23.6, -11.2, 1.3, 0.003}),
 		c2(0.5),
-		vectorOut("/test1/vector"),
-		doubleOut("/test1/val"),
+		vectorOut("/test/vector"),
+		doubleOut("/test/val"),
+		slOut("/test/safetyLevel"),
 		vectorIn("/rosNodeTalker/vector"),
 		doubleIn("/rosNodeTalker/val"),
 		timedomain("Main time domain", dt, true) 
@@ -35,6 +37,7 @@ public:
 		timedomain.addBlock(c2);
 		timedomain.addBlock(vectorOut);
 		timedomain.addBlock(doubleOut);
+		timedomain.addBlock(slOut);
 		timedomain.addBlock(vectorIn);
 		timedomain.addBlock(doubleIn);
 		eeros::Executor::instance().add(timedomain);
@@ -46,6 +49,7 @@ public:
 	Constant<> c2;
 	RosPublisherDoubleArray<Vector7> vectorOut;	
 	RosPublisherDouble doubleOut;	
+	RosPublisherSafetyLevel slOut;	
 	RosSubscriberDoubleArray<Vector2> vectorIn;	
 	RosSubscriberDouble doubleIn;
 	TimeDomain timedomain;
@@ -53,24 +57,42 @@ public:
 
 class MySafetyProperties : public SafetyProperties {
 public:
-	MySafetyProperties(MyControlSystem& cs) : slOff("off") {	
-		addLevel(slOff);
-		setEntryLevel(slOff);
+	MySafetyProperties(MyControlSystem& cs) : slOne("one"), slTwo("two"), se("change") {	
+		addLevel(slOne);
+		addLevel(slTwo);
+		slOne.addEvent(se, slTwo, kPrivateEvent);
+		slTwo.addEvent(se, slOne, kPublicEvent);
+		setEntryLevel(slOne);
 		
-		slOff.setLevelAction([&](SafetyContext* privateContext) {
+		slOne.setLevelAction([&](SafetyContext* privateContext) {
 			cs.c1.setValue(cs.c1.getValue() + diff);
 			cs.c2.setValue(cs.c2.getValue() - diff);
-			if ((slOff.getNofActivations() % 10) == 0) {
+			if ((slOne.getNofActivations() % 10) == 0) {
 				log.info() << cs.doubleIn.getOut().getSignal();
 				log.info() << cs.vectorIn.getOut().getSignal();
 			}
-			if ((slOff.getNofActivations() % 50) == 0) {
-				diff = -diff;
+			if ((slOne.getNofActivations() % 50) == 0) {
+				privateContext->triggerEvent(se);
 			}
 		});
+
+		slTwo.setLevelAction([&](SafetyContext* privateContext) {
+			cs.c1.setValue(cs.c1.getValue() - diff);
+			cs.c2.setValue(cs.c2.getValue() + diff);
+			if ((slTwo.getNofActivations() % 10) == 0) {
+				log.info() << cs.doubleIn.getOut().getSignal();
+				log.info() << cs.vectorIn.getOut().getSignal();
+			}
+			if ((slTwo.getNofActivations() % 50) == 0) {
+				privateContext->triggerEvent(se);
+			}
+		});
+
 	}
 
-	SafetyLevel slOff;
+	SafetyLevel slOne;
+	SafetyLevel slTwo;
+	SafetyEvent se;
 	Logger log;
 	double diff = 0.1;
 };
@@ -89,12 +111,13 @@ int main(int argc, char **argv) {
  
 	log.info() << "ROS Test1 started";
 
-	rosTools::initNode("rosTest1");
+	rosTools::initNode("eerosNode");
 	log.trace() << "ROS node initialized.";
 		
 	MyControlSystem controlSystem(dt);
 	MySafetyProperties safetyProperties(controlSystem);
-	eeros::safety::SafetySystem safetySystem(safetyProperties, dt);
+	SafetySystem safetySystem(safetyProperties, dt);
+	controlSystem.slOut.setSafetySystem(safetySystem);
 	
 	signal(SIGINT, signalHandler);	
 	auto &executor = Executor::instance();

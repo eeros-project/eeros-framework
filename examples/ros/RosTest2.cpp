@@ -22,8 +22,8 @@ public:
 		c1(0.5),
 		doubleOut("doubleOut"),
 		doubleIn("doubleIn"),
-		boolIn("batteryPresent"),
-		boolOut("batteryPresentEcho"),
+		boolIn("boolIn"),
+		boolOut("boolOut"),
 		timedomain("Main time domain", ts, true) 
 	{
 		doubleOut.getIn().connect(c1.getOut());
@@ -54,8 +54,7 @@ public:
 		slOff.setLevelAction([&](SafetyContext* privateContext) {
 			if ((slOff.getNofActivations() % 5) == 0) {
 				cs.c1.setValue(cs.c1.getOut().getSignal().getValue() + 0.01);
-				log.info() << cs.doubleIn.getOut().getSignal();
-				log.info() << cs.boolIn.getOut().getSignal();
+				log.info() << cs.doubleIn.getOut().getSignal() << "   " << cs.boolIn.getOut().getSignal();
 			}
 		});
 	}
@@ -82,11 +81,6 @@ int main(int argc, char **argv) {
 	HAL& hal = HAL::instance();
 	hal.readConfigFromFile(&argc, argv);
 
-	rosTools::initNode("rosTest1");
-	log.trace() << "ROS node initialized.";
-	
-	eeros::System::useRosTime();	// "ros::Time::now()" is used to get system time
-			
 	MyControlSystem controlSystem(dt);
 	MySafetyProperties safetyProperties(controlSystem);
 	eeros::safety::SafetySystem safetySystem(safetyProperties, dt);
