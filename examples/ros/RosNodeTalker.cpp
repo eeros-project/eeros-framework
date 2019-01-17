@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	ros::Publisher chatter_topic2 = n.advertise<std_msgs::Float64MultiArray>("rosNodeTalker/vector", 1000);
 	ros::Publisher chatter_topic3 = n.advertise<sensor_msgs::Joy>("rosNodeTalker/TestTopic3", 1000);
 	ros::Publisher chatter_topic4 = n.advertise<sensor_msgs::LaserScan>("rosNodeTalker/TestTopic4", 1000);
-	ros::Publisher chatter_topic5 = n.advertise<sensor_msgs::BatteryState>("rosNodeTalker/batteryState", 1000);
+	ros::Publisher chatter_topic5 = n.advertise<sensor_msgs::BatteryState>("rosNodeTalker/state", 1000);
 	ros::Rate loop_rate(5);	// 5Hz
 
 	cout << "'rosNodeTalker' initialized" << endl;

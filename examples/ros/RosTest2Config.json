@@ -39,7 +39,7 @@
 			"channel0": {
 				"signalId": "boolIn",
 				"inverted": false,
-				"additionalArguments": "topic=/rosNodeTalker/batteryState; msgType=sensor_msgs::BatteryState; dataField=present"
+				"additionalArguments": "topic=/rosNodeTalker/state; msgType=sensor_msgs::BatteryState; dataField=present"
 			}
 		},
 		"subdevice3": {
@@ -47,7 +47,7 @@
 			"channel0": {
 				"signalId": "boolOut",
 				"inverted": false,
-				"additionalArguments": "topic=/test/batteryStateEcho; msgType=sensor_msgs::BatteryState; dataField=present"
+				"additionalArguments": "topic=/test/state; msgType=sensor_msgs::BatteryState; dataField=present"
 			}
 		}
 	}
