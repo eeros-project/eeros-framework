@@ -51,6 +51,10 @@ namespace eeros {
 			return description;
 		}
 
+		uint32_t SafetyLevel::getLevelId() {
+			return id;
+		}
+
 		uint32_t SafetyLevel::getNofActivations() {
 			return nofActivations;
 		}
