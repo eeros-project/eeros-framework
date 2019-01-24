@@ -61,19 +61,15 @@ namespace eeros {
 			 * @see disable()
 			 */
 			virtual void run() {
-				Tval result{};
-				result = 0; // needed to zero initialize Matrix
+				 Tval actualValue = this->in.getSignal().getValue();
+				Tval result = coefficients[N-1] * actualValue;
 
-				for(size_t i = 0; i < N; i++) {
-					if(i < N-1) {
-						previousValues[i] = previousValues[i+1];
-					} else {
-						previousValues[i] = this->in.getSignal().getValue();
-					}
-
+				for(size_t i = 0; i < N-1; i++) {
+					previousValues[i] = previousValues[i+1];
 					result += coefficients[i] * previousValues[i];
 				}
-				
+				previousValues[N-1] = actualValue;
+
 				if(enabled) {
 					this->out.getSignal().setValue(result);
 				} else {
