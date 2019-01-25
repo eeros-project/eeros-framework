@@ -6,5 +6,6 @@ EEROS is a fully open-source software framework for the developement of robots u
 ## Documentation
 
 - Project Website: (http://www.eeros.org)
-- Project Wiki: (http://wiki.eeros.org) 
-- EEROS API: (http://api.eeros.org) 
+- Project Wiki: (http://wiki.eeros.org)
+- EEROS API: (http://api.eeros.org)
+- Contribute to EEROS: (http://wiki.eeros.org/for_developers/contribute)
