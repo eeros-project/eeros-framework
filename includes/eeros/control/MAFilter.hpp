@@ -2,6 +2,7 @@
 #define ORG_EEROS_CONTROL_MAFILTER_HPP_
 
 #include <eeros/control/Block1i1o.hpp>
+#include <type_traits>
 #include <ostream>
 
 
@@ -42,7 +43,9 @@ namespace eeros {
 			 * Constructs a MAFilter instance with the coefficients coeff.\n
 			 * @param coeff - coefficients
 			 */
-			explicit MAFilter(Tcoeff (& coeff)[N]) : coefficients{coeff} {}
+			explicit MAFilter(Tcoeff (& coeff)[N]) : coefficients{coeff} {
+				zeroInitPreviousValues<Tval>();
+			}
 
 
 			/**
@@ -117,6 +120,21 @@ namespace eeros {
 			Tcoeff * coefficients;
 			Tval previousValues[N]{};
 			bool enabled{true};
+
+
+		private:
+			template <typename S>
+			typename std::enable_if<std::is_arithmetic<S>::value>::type zeroInitPreviousValues() {
+				// is zeroed when initialized by default.
+			}
+
+
+			template <typename S>
+			typename std::enable_if<!std::is_arithmetic<S>::value>::type zeroInitPreviousValues() {
+				  for(size_t i = 0; i < N; i++) {
+					previousValues[i].zero();
+				  }
+			}
 		};
 
 
