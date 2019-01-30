@@ -2,6 +2,7 @@
 #define ORG_EEROS_CONTROL_MAFILTER_HPP_
 
 #include <eeros/control/Block1i1o.hpp>
+#include <type_traits>
 #include <ostream>
 
 
@@ -42,7 +43,9 @@ namespace eeros {
 			 * Constructs a MAFilter instance with the coefficients coeff.\n
 			 * @param coeff - coefficients
 			 */
-			explicit MAFilter(Tcoeff (& coeff)[N]) : coefficients{coeff} {}
+			explicit MAFilter(Tcoeff (& coeff)[N]) : coefficients{coeff} {
+				zeroInitPreviousValues<Tval>();
+			}
 
 
 			/**
@@ -61,19 +64,15 @@ namespace eeros {
 			 * @see disable()
 			 */
 			virtual void run() {
-				Tval result{};
-				result = 0; // needed to zero initialize Matrix
+				 Tval actualValue = this->in.getSignal().getValue();
+				Tval result = coefficients[N-1] * actualValue;
 
-				for(size_t i = 0; i < N; i++) {
-					if(i < N-1) {
-						previousValues[i] = previousValues[i+1];
-					} else {
-						previousValues[i] = this->in.getSignal().getValue();
-					}
-
+				for(size_t i = 0; i < N-1; i++) {
+					previousValues[i] = previousValues[i+1];
 					result += coefficients[i] * previousValues[i];
 				}
-				
+				previousValues[N-1] = actualValue;
+
 				if(enabled) {
 					this->out.getSignal().setValue(result);
 				} else {
@@ -121,6 +120,21 @@ namespace eeros {
 			Tcoeff * coefficients;
 			Tval previousValues[N]{};
 			bool enabled{true};
+
+
+		private:
+			template <typename S>
+			typename std::enable_if<std::is_arithmetic<S>::value>::type zeroInitPreviousValues() {
+				// is zeroed when initialized by default.
+			}
+
+
+			template <typename S>
+			typename std::enable_if<!std::is_arithmetic<S>::value>::type zeroInitPreviousValues() {
+				  for(size_t i = 0; i < N; i++) {
+					previousValues[i].zero();
+				  }
+			}
 		};
 
 

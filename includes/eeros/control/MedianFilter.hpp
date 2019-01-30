@@ -3,6 +3,7 @@
 
 #include <eeros/control/Block1i1o.hpp>
 #include <algorithm>
+#include <type_traits>
 #include <cmath>
 
 
@@ -37,6 +38,14 @@ namespace eeros {
 		class MedianFilter : public Block1i1o<Tval> {
 
 		public:
+			/**
+			 * Constructs a MedianFilter instance.
+			 */
+			 MedianFilter() {
+				zeroInitCurrentValues<Tval>();
+			 }
+
+
 			/**
 			 * Runs the filter algorithm.
 			 * 
@@ -114,6 +123,21 @@ namespace eeros {
 			Tval currentMedianValue;
 			bool enabled{true};
 			constexpr static int medianIndex{static_cast<int>(floor(N/2))};
+
+
+		private:
+			template <typename S>
+			typename std::enable_if<std::is_arithmetic<S>::value>::type zeroInitCurrentValues() {
+				// is zeroed when initialized by default.
+			}
+
+
+			template <typename S>
+			typename std::enable_if<!std::is_arithmetic<S>::value>::type zeroInitCurrentValues() {
+				  for(size_t i = 0; i < N; i++) {
+					currentValues[i].zero();
+				  }
+			}
 		};
 
 
