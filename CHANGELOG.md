@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 (v1.1.0 targeted for 2019-06-30) ([Github compare v1.0.0...master](https://github.com/eeros-project/eeros-framework/compare/v1.0.0...master))
 
+### Added Features
+* **control:** Add connection information to SocketData, SocketServer, SocketClient classes ([e3243d1](https://github.com/eeros-project/eeros-framework/commit/e3243d1))
+
 
 ## v1.0.0
 (2019-01-29) ([Github compare v0.6.0...v1.0.0](https://github.com/eeros-project/eeros-framework/compare/v0.6.0...v1.0.0))
