@@ -35,8 +35,7 @@ public:
 
 class ControlSystem {
 public:
-	ControlSystem(TimeDomain& td) : g(10), p("out"), td(td) {
-		c = Constant<>(0.568);
+	ControlSystem(TimeDomain& td) : g(10), p("out"), c(0.568), td(td) {
 		c.getOut().getSignal().setName("constant output");
 		g.getOut().getSignal().setName("gain output");
 		g.getIn().connect(c.getOut());
