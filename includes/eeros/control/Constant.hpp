@@ -2,6 +2,7 @@
 #define ORG_EEROS_CONTROL_CONSTANT_HPP_
 
 #include <type_traits>
+#include <mutex>
 #include <eeros/control/Block1o.hpp>
 #include <eeros/core/System.hpp>
 
@@ -18,15 +19,17 @@ namespace eeros {
 			Constant(T v) : value(v) { }
 			
 			virtual void run() {
+				std::lock_guard<std::mutex> lock(mtx);
 				this->out.getSignal().setValue(value);
 				this->out.getSignal().setTimestamp(System::getTimeNs());
 			}
 			
 			virtual void setValue(T newValue) {
+				std::lock_guard<std::mutex> lock(mtx);
 				value = newValue;
 			}
 
-			virtual T getValue() {
+			virtual T getValue () const {
 				return value;
 			}
 
@@ -35,6 +38,7 @@ namespace eeros {
 
 		protected:
 			T value;
+			std::mutex mtx;
 			
 		private:
 			template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _clear() {
