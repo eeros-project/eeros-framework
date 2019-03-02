@@ -20,7 +20,7 @@
 				"signalId": "ioIn"
 			},
 		},
-		"subdevice4": {
+		"subdevice2": {
 			"type": "AnalogOut",
 			"channel0": {
 				"signalId": "aOut0",
@@ -96,7 +96,7 @@
 				"unit": "V"
 			}
 		},
-		"subdevice6": {
+		"subdevice3": {
 			"type": "AnalogIn",
 			"channel0": {
 				"signalId": "aIn0",

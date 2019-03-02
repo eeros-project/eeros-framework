@@ -2,7 +2,7 @@
 	"device0": {
 		"library": "libsimeeros.so",
 		"devHandle": "reflect",
-		"subdevice4": {
+		"subdevice2": {
 			"type": "AnalogOut",
 			"channel0": {
 				"signalId": "aOutDummy",
