@@ -109,7 +109,7 @@ Executor& Executor::instance() {
 
 
 #ifdef USE_ETHERCAT
-void Executor::syncWithEtherCATSTack(ethercat::EtherCATMain* etherCATStack) {
+void Executor::syncWithEtherCATSTack(ecmasterlib::EtherCATMain* etherCATStack) {
 	syncWithEtherCatStackIsSet = true;
 	this->etherCATStack = etherCATStack;
 	cv = etherCATStack->getConditionalVariable();

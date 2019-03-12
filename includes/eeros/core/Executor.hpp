@@ -36,7 +36,7 @@ namespace eeros {
 		virtual ~Executor();
 		static Executor& instance();
 #ifdef USE_ETHERCAT
-		void syncWithEtherCATSTack(ethercat::EtherCATMain* etherCATStack);
+		void syncWithEtherCATSTack(ecmasterlib::EtherCATMain* etherCATStack);
 #endif
 		void setMainTask(task::Periodic &mainTask);
 		void setMainTask(safety::SafetySystem &mainTask);
@@ -65,7 +65,7 @@ namespace eeros {
 		void assignPriorities();
 ;
 #ifdef USE_ETHERCAT
-		ethercat::EtherCATMain* etherCATStack;
+		ecmasterlib::EtherCATMain* etherCATStack;
 		std::mutex* m;
 		std::condition_variable* cv;
 #endif
