@@ -26,7 +26,7 @@ Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller, bool 
 	log.trace() << "sequence '" << name << "' created";
 }
 
-Sequence::~Sequence() {/*running = false;*/}
+Sequence::~Sequence() {running = false;}
 
 void Sequence::run() {	// runs in thread
 	struct sched_param schedulingParam;
@@ -50,18 +50,19 @@ void Sequence::run() {	// runs in thread
 }
 
 int Sequence::start() {
+	int retVal = -1;
 	resetTimeout();
 	resetAbort();
 	Sequencer::running = true;
 	if (blocking) {	// starts action() blocking
 		log.info() << "sequence '" << name << "' (blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
-		BaseSequence::action();				//action gets overwritten by child class
+		retVal = BaseSequence::action();
 		log.info() << "sequence '" << name << "' terminated";
 	} else {
 		go = true;
 		done = false;
 	}
-	return 0;
+	return retVal;
 }
 
 void Sequence::wait() {

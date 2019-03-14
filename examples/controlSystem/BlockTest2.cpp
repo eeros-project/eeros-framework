@@ -36,7 +36,7 @@ public:
 class ControlSystem {
 public:
 	ControlSystem(TimeDomain& td) : g(10), p("out"), td(td) {
- 		c.setValue(0.568);
+		c.setValue(0.568);
 		c.setName("constant");
 		g.setName("gain");
 		c.getOut().getSignal().setName("constant output");
