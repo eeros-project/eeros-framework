@@ -29,12 +29,12 @@ public:
 		HAL& hal = HAL::instance();
 
 		// ############ Define critical outputs ############
-		out1 = hal.getLogicOutput("out1");
-		criticalOutputs = { out1 };
+		out = hal.getLogicOutput("out");
+		criticalOutputs = { out };
 
 		// ############ Define critical inputs ############
-		in1 = hal.getLogicInput("in1");
-		criticalInputs = { in1 };
+		in = hal.getLogicInput("in");
+		criticalInputs = { in };
 		
 		// ############ Get test in and outputs ############ 
 		outTest = hal.getLogicOutput("outTest");
@@ -57,18 +57,18 @@ public:
 		addEventToLevelAndAbove(slIinitializing, seShutDown, slShuttingDown, kPublicEvent);
 
 		// ############ Define input states and events for all levels ############
-		slOff.setInputActions({ ignore(in1) });
-		slShuttingDown.setInputActions({ ignore(in1) });
-		slIinitializing.setInputActions({ ignore(in1) });
-		slInitialized.setInputActions({ check(in1, false, seStartRunning) });
-		slRunning.setInputActions({ check(in1, true, seStopRunning) });
+		slOff.setInputActions({ ignore(in) });
+		slShuttingDown.setInputActions({ ignore(in) });
+		slIinitializing.setInputActions({ ignore(in) });
+		slInitialized.setInputActions({ check(in, false, seStartRunning) });
+		slRunning.setInputActions({ check(in, true, seStopRunning) });
 
 		// ############ Define output states and events for all levels ############
-		slOff.setOutputActions({ set(out1, false) });
-		slShuttingDown.setOutputActions({ set(out1, false) });
-		slIinitializing.setOutputActions({ set(out1, false) });
-		slInitialized.setOutputActions({ set(out1, false) });
-		slRunning.setOutputActions({ toggle(out1) });
+		slOff.setOutputActions({ set(out, false) });
+		slShuttingDown.setOutputActions({ set(out, false) });
+		slIinitializing.setOutputActions({ set(out, false) });
+		slInitialized.setOutputActions({ set(out, false) });
+		slRunning.setOutputActions({ toggle(out) });
 
 		// Define and add level functions
 		slOff.setLevelAction([&](SafetyContext* privateContext) {Executor::stop();});
@@ -92,10 +92,10 @@ public:
 	}
 	
 	// critical outputs
-	Output<bool>* out1;
+	Output<bool>* out;
 	
 	// critical inputs
-	Input<bool>* in1;
+	Input<bool>* in;
 	
 	// test inputs
 	Input<bool>* inTest;

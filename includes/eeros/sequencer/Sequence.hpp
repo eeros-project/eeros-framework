@@ -33,7 +33,7 @@ namespace eeros {
 			
 		private:
 			bool running = true, go = false, done = true;
-			std::thread* t;
+			std::thread* t = nullptr;
 			void run();
 		};
 	};	//namespace sequencer

@@ -17,8 +17,7 @@ namespace eeros {
 				resetTimeout();
 				resetAbort();
 // 				if (!exceptionIsActive) log.info() << "step '" << name << "' started";
-				BaseSequence::action();
-				return 0;
+				return BaseSequence::action();
 			}
 		};
 	};	//namespace sequencer

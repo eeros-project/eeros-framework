@@ -210,3 +210,89 @@ TEST(halConfigFileTest, rangeAnalogIn0){
 		FAIL() << e.what();
 	}
 }
+
+TEST(halConfigFileTest, scaleOffsetAnalogOut4){
+	HAL& hal = HAL::instance();
+	
+	try{
+		eeros::hal::ScalableOutput<double> &aOut = *hal.getScalableOutput("aOut4");
+		
+		EXPECT_NEAR(20.0/1000, aOut.getScale(), 0.000000000000001);
+		EXPECT_NEAR(-10, aOut.getOffset(), 000000000000001);
+		EXPECT_NEAR(0, aOut.getMinOut(), 000000000000001);
+		EXPECT_NEAR(1000, aOut.getMaxOut(), 000000000000001);
+		
+		hal.releaseOutput("aOut4");
+	}
+	catch(eeros::Fault const & err){
+		FAIL() << err.what();
+	}
+	catch(const std::exception& e){
+		FAIL() << e.what();
+	}
+}
+
+TEST(halConfigFileTest, scaleOffsetAnalogOut5){
+	HAL& hal = HAL::instance();
+	
+	try{
+		eeros::hal::ScalableOutput<double> &aOut = *hal.getScalableOutput("aOut5");
+		
+		EXPECT_NEAR(20.0/800, aOut.getScale(), 0.000000000000001);
+		EXPECT_NEAR(-10, aOut.getOffset(), 000000000000001);
+		EXPECT_NEAR(0, aOut.getMinOut(), 000000000000001);
+		EXPECT_NEAR(800, aOut.getMaxOut(), 000000000000001);
+		
+		hal.releaseOutput("aOut5");
+	}
+	catch(eeros::Fault const & err){
+		FAIL() << err.what();
+	}
+	catch(const std::exception& e){
+		FAIL() << e.what();
+	}
+}
+
+TEST(halConfigFileTest, scaleOffsetAnalogOut6){
+	HAL& hal = HAL::instance();
+	
+	try{
+		eeros::hal::ScalableOutput<double> &aOut = *hal.getScalableOutput("aOut6");
+		
+		EXPECT_NEAR(20.0/800, aOut.getScale(), 0.000000000000001);
+		EXPECT_NEAR(-15, aOut.getOffset(), 000000000000001);
+		EXPECT_NEAR(200, aOut.getMinOut(), 000000000000001);
+		EXPECT_NEAR(1000, aOut.getMaxOut(), 000000000000001);
+		
+		hal.releaseOutput("aOut6");
+	}
+	catch(eeros::Fault const & err){
+		FAIL() << err.what();
+	}
+	catch(const std::exception& e){
+		FAIL() << e.what();
+	}
+}
+
+TEST(halConfigFileTest, scaleOffsetAnalogOut7){
+	HAL& hal = HAL::instance();
+	
+	try{
+		eeros::hal::ScalableOutput<double> &aOut = *hal.getScalableOutput("aOut7");
+		
+		EXPECT_NEAR(20.0/600, aOut.getScale(), 0.000000000000001);
+		EXPECT_NEAR(-16.667, aOut.getOffset(), 000000000000001);
+		EXPECT_NEAR(200, aOut.getMinOut(), 000000000000001);
+		EXPECT_NEAR(800, aOut.getMaxOut(), 000000000000001);
+		
+		hal.releaseOutput("aOut7");
+	}
+	catch(eeros::Fault const & err){
+		FAIL() << err.what();
+	}
+	catch(const std::exception& e){
+		FAIL() << e.what();
+	}
+}
+
+

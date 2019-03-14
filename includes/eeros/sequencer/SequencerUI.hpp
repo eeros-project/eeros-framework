@@ -8,8 +8,6 @@ namespace eeros {
 				
 		void sigPipeHandler(int signum);
 		
-// 		class Sequencer;
-
 		class SequencerUI : public eeros::Thread {
 		public:
 			SequencerUI();
