@@ -1,7 +1,7 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
-#include <eeros/sequencer/Step.hpp>
+#include <eeros/sequencer/Wait.hpp>
 #include <signal.h>
 #include <chrono>
 #include <unistd.h>
@@ -9,31 +9,12 @@
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
-class StepA : public Step {
-public:
-	StepA(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 2.0;}
-private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
-};
-
-class StepB : public Step {
-public:
-	StepB(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
-private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
-};
-
 class ExceptionSeq : public Sequence {
 public:
-	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 3.0;}
+	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true), wait("wait", seq, this) { }
+	int action() {wait(3);}
 private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
+	Wait wait;
 };
 
 class SequenceB : public Sequence {
@@ -44,10 +25,10 @@ public:
 		setTimeoutBehavior(SequenceProp::abort);
 	}
 	int action() {
-		for (int i = 0; i < 5; i++) stepB();
+		for (int i = 0; i < 5; i++) stepB(1);
 	}
 private:
-	StepB stepB;
+	Wait stepB;
 	ExceptionSeq eSeq;
 };
 
@@ -56,13 +37,13 @@ public:
 	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("seq B", seq, this), stepA("step A", seq, this) { }
 		
 	int action() {
-		for (int i = 0; i < 3; i++) stepA();
+		for (int i = 0; i < 3; i++) stepA(2);
 		seqB();
-		for (int i = 0; i < 5; i++) stepA();
+		for (int i = 0; i < 5; i++) stepA(2);
 		seqB.waitAndTerminate();
 	}
 private:
-	StepA stepA;
+	Wait stepA;
 	SequenceB seqB;
 };
 

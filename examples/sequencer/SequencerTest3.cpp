@@ -1,7 +1,7 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
-#include <eeros/sequencer/Step.hpp>
+#include <eeros/sequencer/Wait.hpp>
 
 #include <chrono>
 #include <signal.h>
@@ -9,32 +9,14 @@
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
-class StepB : public Step {
-public:
-	StepB(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
-private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
-};
-
 class SequenceB : public Sequence {
 public:
 	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true), stepB("step B", seq, this) { }
 	int action() {
-		for (int i = 0; i < 5; i++) stepB();
+		for (int i = 0; i < 5; i++) stepB(1);
 	}
 private:
-	StepB stepB;
-};
-
-class StepA : public Step {
-public:
-	StepA(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
-private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
+	Wait stepB;
 };
 
 class SequenceA : public Sequence {
@@ -44,14 +26,14 @@ public:
 		setTimeoutBehavior(SequenceProp::abort);
 	}
 	int action() {
-		stepA();
-		stepA();
+		stepA(1);
+		stepA(1);
 		seqB();
-		stepA();
-		stepA();
+		stepA(1);
+		stepA(1);
 	}
 private:
-	StepA stepA;
+	Wait stepA;
 	SequenceB seqB;
 };
 
