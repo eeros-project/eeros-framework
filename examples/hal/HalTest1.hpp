@@ -11,6 +11,7 @@
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Step.hpp>
+#include <eeros/sequencer/Wait.hpp>
 
 using namespace eeros::safety;
 using namespace eeros::control;
@@ -66,16 +67,6 @@ public:
 	SafetyLevel slSingle;
 };
 
-class WaitTime : public Step {
-public:
-	WaitTime(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int operator() (double waitingTime) {this->waitingTime = waitingTime; return start();}
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > waitingTime;}
-	std::chrono::time_point<std::chrono::steady_clock> time;
-	double waitingTime;
-};
-
 class StepDigOut : public Step {
 public:
 	StepDigOut(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Step(name, sequencer, caller), cs(cs) { }
@@ -105,35 +96,35 @@ public:
 class SeqDigital : public Sequence {
 public:
 	SeqDigital(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : 
-		Sequence(name, sequencer, caller, false), stepDigOut("step dig out", seq, this, cs), waitTime("waiting time digital", seq, this) { }
+		Sequence(name, sequencer, caller, false), stepDigOut("step dig out", seq, this, cs), wait("waiting time digital", seq, this) { }
 	int action() {
 		bool toggle;
 		while (Sequencer::running) {
 			stepDigOut(toggle);
-			waitTime(5);
+			wait(5);
 			toggle = !toggle;
 		}
 	}
 private:
 	StepDigOut stepDigOut;
-	WaitTime waitTime;
+	Wait wait;
 };
 
 class SeqAnalog : public Sequence {
 public:
 	SeqAnalog(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : 
-		Sequence(name, sequencer, caller, false), stepAnalogOut("step analog out", seq, this, cs), waitTime("waiting time analog", seq, this) { }
+		Sequence(name, sequencer, caller, false), stepAnalogOut("step analog out", seq, this, cs), wait("waiting time analog", seq, this) { }
 	int action() {
 		bool toggle;
 		while (Sequencer::running) {
 			stepAnalogOut(toggle);
-			waitTime(10);
+			wait(10);
 			toggle = !toggle;
 		}
 	}
 private:
 	StepAnalogOut stepAnalogOut;
-	WaitTime waitTime;
+	Wait wait;
 };
 
 class MyMainSequence : public Sequence {
@@ -143,8 +134,8 @@ public:
 	int action() {
 		seqDigital();
 		seqAnalog();
-		seqDigital.wait();
-		seqAnalog.wait();
+		Sequence::wait();
+		Sequence::wait();
 	}
 private:
 	MyControlSystem& cs;

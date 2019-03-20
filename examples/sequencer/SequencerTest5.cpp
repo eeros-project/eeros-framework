@@ -1,7 +1,7 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
-#include <eeros/sequencer/Step.hpp>
+#include <eeros/sequencer/Wait.hpp>
 
 #include <chrono>
 #include <signal.h>
@@ -10,24 +10,6 @@ using namespace eeros::sequencer;
 using namespace eeros::logger;
 
 int count = 0;
-
-class StepA : public Step {
-public:
-	StepA(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now(); count++;}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
-private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
-};
-
-class StepB : public Step {
-public:
-	StepB(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
-private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
-};
 
 class MyCondition : public Condition {
 	bool validate() {return count > 2;}
@@ -39,10 +21,10 @@ public:
 		addMonitor(&m);
 	}
 	int action() {
-		for (int i = 0; i < 5; i++) stepB();
+		for (int i = 0; i < 5; i++) stepB(1);
 	}
 private:
-	StepB stepB;
+	Wait stepB;
 	Monitor& m;
 };
 
@@ -54,12 +36,15 @@ public:
 		
 	int action() {
 		seqB();
-		for (int i = 0; i < 5; i++) stepA();
+		for (int i = 0; i < 5; i++) {
+			stepA(1);
+			count++;
+		}
 		seqB.waitAndTerminate();
 	}
 private:
 	SequenceB seqB;
-	StepA stepA;
+	Wait stepA;
 	MyCondition cond;
 	Monitor m;
 };

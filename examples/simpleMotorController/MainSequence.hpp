@@ -16,7 +16,7 @@ using namespace eeros::logger;
 class Move : public Step {
 public:
 	Move(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Step(name, sequencer, caller), cs(cs) { }
-	int operator() (double pos) {this->pos = pos; return Step::start();}
+	int operator() (double pos) {this->pos = pos; return start();}
 	int action() {
 		cs.setpoint.setValue(pos);
 	}
