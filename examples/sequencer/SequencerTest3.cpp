@@ -11,7 +11,7 @@ using namespace eeros::logger;
 
 class SequenceB : public Sequence {
 public:
-	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true), stepB("step B", seq, this) { }
+	SequenceB(std::string name, Sequence* caller) : Sequence(name, caller, true), stepB("step B", this) { }
 	int action() {
 		for (int i = 0; i < 5; i++) stepB(1);
 	}
@@ -21,7 +21,7 @@ private:
 
 class SequenceA : public Sequence {
 public:
-	SequenceA(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true), stepA("step A", seq, this), seqB("sequence B", seq, this) { 
+	SequenceA(std::string name, Sequence* caller) : Sequence(name, caller, true), stepA("step A", this), seqB("sequence B", this) { 
 		setTimeoutTime(3.5);
 		setTimeoutBehavior(SequenceProp::abort);
 	}
@@ -39,7 +39,7 @@ private:
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqA("sequence A", seq, this) { }
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqA("sequence A", this) { }
 		
 	int action() {
 		seqA();

@@ -13,7 +13,7 @@ using namespace eeros::logger;
 
 class MoveUp : public Step {
 public:
-	MoveUp(std::string name, Sequencer& sequencer, BaseSequence* caller, MockRobotControlSystem& cs) : Step(name, sequencer, caller), cs(cs) { }
+	MoveUp(std::string name, Sequence* caller, MockRobotControlSystem& cs) : Step(name, caller), cs(cs) { }
 	int action() {
 		cs.setpointX.setValue(0.7);
 		cs.setpointY.setValue(0.3);
@@ -25,7 +25,7 @@ private:
 
 class MoveDown : public Step {
 public:
-	MoveDown(std::string name, Sequencer& sequencer, BaseSequence* caller, MockRobotControlSystem& cs) : Step(name, sequencer, caller), cs(cs) { }
+	MoveDown(std::string name, Sequence* caller, MockRobotControlSystem& cs) : Step(name, caller), cs(cs) { }
 	int action() {
 		cs.setpointX.setValue(-0.6);
 		cs.setpointY.setValue(-0.3);
@@ -37,7 +37,7 @@ private:
 
 class UpAndDownSequence : public Sequence {
 public:
-	UpAndDownSequence(std::string name, Sequencer& seq, MockRobotControlSystem& cs) : Sequence(name, seq), cs(cs), moveUp("move up", seq, this, cs), moveDown("move down", seq, this, cs) { }
+	UpAndDownSequence(std::string name, Sequencer& seq, MockRobotControlSystem& cs) : Sequence(name, seq), cs(cs), moveUp("move up", this, cs), moveDown("move down", this, cs) { }
 		
 	int action() {
 		while (Sequencer::running) {

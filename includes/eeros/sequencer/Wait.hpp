@@ -8,7 +8,7 @@ namespace eeros {
 
 		class Wait : public Step {
 		public:
-			Wait(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
+			Wait(std::string name, BaseSequence* caller) : Step(name, caller) { }
 			virtual ~Wait() { };
 			
 			int operator() (double waitingTime) {this->waitingTime = waitingTime; return start();}

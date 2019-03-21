@@ -11,7 +11,7 @@ using namespace eeros::logger;
 
 class ExceptionSeq : public Sequence {
 public:
-	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true), wait("wait", seq, this) { }
+	ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait", this) { }
 	int action() {wait(3);}
 private:
 	Wait wait;
@@ -19,7 +19,7 @@ private:
 
 class SequenceB : public Sequence {
 public:
-	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, false), stepB("step B", seq, this), eSeq("exception sequence", seq, this) { 
+	SequenceB(std::string name, Sequencer& seq, Sequence* caller) : Sequence(name, caller, false), stepB("step B", this), eSeq("exception sequence", this) { 
 		setTimeoutTime(2.5);
 		setTimeoutExceptionSequence(*(seq.getSequenceByName("exception sequence")));
 		setTimeoutBehavior(SequenceProp::abort);
@@ -34,7 +34,7 @@ private:
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("seq B", seq, this), stepA("step A", seq, this) { }
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("seq B", seq, this), stepA("step A", this) { }
 		
 	int action() {
 		for (int i = 0; i < 3; i++) stepA(2);

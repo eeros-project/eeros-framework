@@ -9,6 +9,8 @@ using namespace eeros::sequencer;
 
 Sequence::Sequence(std::string name, Sequencer& seq) : Sequence(name, seq, nullptr, false) { }
 
+Sequence::Sequence(std::string name, BaseSequence* caller, bool blocking) : Sequence(name, caller->seq, caller, blocking) { }
+
 Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller, bool blocking) : BaseSequence(seq, caller, blocking) {
 	static int sequenceCount;
 	setId(sequenceCount++);	//TODO check how many sequence objects of this type are allowed. Maybe singleton.

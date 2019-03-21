@@ -69,7 +69,7 @@ public:
 
 class StepDigOut : public Step {
 public:
-	StepDigOut(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Step(name, sequencer, caller), cs(cs) { }
+	StepDigOut(std::string name, Sequence* caller, MyControlSystem& cs) : Step(name, caller), cs(cs) { }
 	int operator() (bool val) {state = val; return start();}
 	int action() {cs.c0.setValue(state);}
 	bool state;
@@ -78,7 +78,7 @@ public:
 
 class StepAnalogOut : public Step {
 public:
-	StepAnalogOut(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : Step(name, sequencer, caller), cs(cs) { }
+	StepAnalogOut(std::string name, Sequence* caller, MyControlSystem& cs) : Step(name, caller), cs(cs) { }
 	int operator() (bool val) {state = val; return start();}
 	int action() {
 		if (state) {
@@ -95,8 +95,8 @@ public:
 
 class SeqDigital : public Sequence {
 public:
-	SeqDigital(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : 
-		Sequence(name, sequencer, caller, false), stepDigOut("step dig out", seq, this, cs), wait("waiting time digital", seq, this) { }
+	SeqDigital(std::string name, Sequence* caller, MyControlSystem& cs) : 
+		Sequence(name, caller, false), stepDigOut("step dig out", this, cs), wait("waiting time digital", this) { }
 	int action() {
 		bool toggle;
 		while (Sequencer::running) {
@@ -112,8 +112,8 @@ private:
 
 class SeqAnalog : public Sequence {
 public:
-	SeqAnalog(std::string name, Sequencer& sequencer, BaseSequence* caller, MyControlSystem& cs) : 
-		Sequence(name, sequencer, caller, false), stepAnalogOut("step analog out", seq, this, cs), wait("waiting time analog", seq, this) { }
+	SeqAnalog(std::string name, Sequence* caller, MyControlSystem& cs) : 
+		Sequence(name, caller, false), stepAnalogOut("step analog out", this, cs), wait("waiting time analog", this) { }
 	int action() {
 		bool toggle;
 		while (Sequencer::running) {
@@ -129,7 +129,7 @@ private:
 
 class MyMainSequence : public Sequence {
 public:
-	MyMainSequence(Sequencer& seq, MyControlSystem& cs) : Sequence("main", seq), cs(cs), seqDigital("seq dig out", seq, this, cs), seqAnalog("seq analog out", seq, this, cs) { }
+	MyMainSequence(Sequencer& seq, MyControlSystem& cs) : Sequence("main", seq), cs(cs), seqDigital("seq dig out", this, cs), seqAnalog("seq analog out", this, cs) { }
 	
 	int action() {
 		seqDigital();

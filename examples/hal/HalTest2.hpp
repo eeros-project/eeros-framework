@@ -64,7 +64,7 @@ public:
 
 class MyMainSequence : public Sequence {
 public:
-	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), wait("waiting time", seq, this), controlSys(controlSys) { }
+	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), wait("waiting time", this), controlSys(controlSys) { }
 	
 	int action() {
 		// set PWM frequency here for example or in main of application

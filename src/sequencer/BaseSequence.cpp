@@ -6,6 +6,8 @@
 namespace eeros {
 	namespace sequencer {
 
+		BaseSequence::BaseSequence(BaseSequence* caller, bool blocking) : BaseSequence(caller->seq, caller, blocking) { }
+		
 		BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking) : 
 			seq(seq), caller(caller), monitorTimeout("timeout", this, conditionTimeout, SequenceProp::abort), monitorAbort("abort", this, conditionAbort, SequenceProp::abort),
 			state(SequenceState::idle), blocking(blocking), pollingTime(100), log('X')
