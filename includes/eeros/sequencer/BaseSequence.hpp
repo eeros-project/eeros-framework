@@ -27,8 +27,10 @@ namespace eeros {
 		class BaseSequence {	
 			friend class Monitor;
 			friend class Sequencer;
+			friend class Sequence;
 		public:
 			BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking);
+			BaseSequence(BaseSequence* caller, bool blocking);
 			virtual ~BaseSequence();
 			
 			virtual int start() = 0;

@@ -13,7 +13,7 @@ int count = 0;
 
 class ExceptionSeq : public Sequence {
 public:
-	ExceptionSeq(std::string name, Sequencer& seq, BaseSequence* caller) : Sequence(name, seq, caller, true), wait("wait E", seq, this) { }
+	ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait E", this) { }
 	int action() {count = 0; wait(0.5);}
 private:
 	Wait wait;
@@ -25,7 +25,7 @@ class MyCondition : public Condition {
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", seq, this), eSeq("exception sequence", seq, this), m("myMonitor", this, cond, SequenceProp::resume, &eSeq) { 
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", this), eSeq("exception sequence", this), m("myMonitor", this, cond, SequenceProp::resume, &eSeq) { 
 		setTimeoutTime(7.0);
 		setTimeoutBehavior(SequenceProp::abort);
 		addMonitor(&m);
