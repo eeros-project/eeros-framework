@@ -6,6 +6,8 @@
 namespace eeros {
 	namespace sequencer {
 
+		BaseSequence::BaseSequence(BaseSequence* caller, bool blocking) : BaseSequence(caller->seq, caller, blocking) { }
+		
 		BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking) : 
 			seq(seq), caller(caller), monitorTimeout("timeout", this, conditionTimeout, SequenceProp::abort), monitorAbort("abort", this, conditionAbort, SequenceProp::abort),
 			state(SequenceState::idle), blocking(blocking), pollingTime(100), log('X')
@@ -21,6 +23,7 @@ namespace eeros {
 		BaseSequence::~BaseSequence() { }
 
 		int BaseSequence::action() {
+			int retVal = -1;
 			auto& seq = Sequencer::instance();
 			if (seq.stepping) {
 				log.warn() << "wait for next step command";
@@ -45,7 +48,7 @@ namespace eeros {
 					checkActiveException();		// check if this or a caller sequence is 'exceptionIsActive', set state accordingly
 					if (state == SequenceState::running) {
 						log.info() << "start '" << name <<"'";
-						action();	// call to custom implementation of method
+						retVal = action();	// call to custom implementation of method
 					}
 					while (state == SequenceState::running) {
 						if (!firstCheck) {
@@ -65,6 +68,7 @@ namespace eeros {
 			if (state == SequenceState::aborting) state = SequenceState::aborted;
 			else state = SequenceState::terminated;
 			if (Sequencer::instance().stepping) log.warn() << "'" << name << "' done";
+			return retVal;
 		}
 
 		void BaseSequence::addMonitor(Monitor* monitor) {monitors.push_back(monitor);}

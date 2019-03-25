@@ -10,6 +10,7 @@
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Step.hpp>
+#include <eeros/sequencer/Wait.hpp>
 
 using namespace eeros::safety;
 using namespace eeros::control;
@@ -61,19 +62,9 @@ public:
 	SafetyLevel slSingle;
 };
 
-class WaitTime : public Step {
-public:
-	WaitTime(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int operator() (double waitingTime) {this->waitingTime = waitingTime; return start();}
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > waitingTime;}
-	std::chrono::time_point<std::chrono::steady_clock> time;
-	double waitingTime;
-};
-
 class MyMainSequence : public Sequence {
 public:
-	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), waitTime("waiting time", seq, this), controlSys(controlSys) { }
+	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), wait("waiting time", this), controlSys(controlSys) { }
 	
 	int action() {
 		// set PWM frequency here for example or in main of application
@@ -83,16 +74,16 @@ public:
 		while (Sequencer::running) {			
 			controlSys.c2.setValue(-5);
 			controlSys.c1.setValue(true);
-			waitTime(0.6);
+			wait(0.6);
 			controlSys.c2.setValue(5);
 			controlSys.c1.setValue(false);
-			waitTime(0.4);
+			wait(0.4);
 		}
 	}
 	
 private:
 	MyControlSystem& controlSys;
-	WaitTime waitTime;
+	Wait wait;
 };
 
 #endif // ORG_EEROS_HALTEST2_HPP_

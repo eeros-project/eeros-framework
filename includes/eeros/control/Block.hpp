@@ -10,7 +10,7 @@ namespace eeros {
 		class Block : public Runnable {
 		public:
 			virtual void setName(std::string name);
-			virtual std::string getName();
+			virtual std::string getName() const;
 			
 		private:
 			std::string name;

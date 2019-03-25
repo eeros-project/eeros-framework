@@ -5,25 +5,19 @@
 		"subdevice0": {
 			"type": "DigOut",
 			"channel0": {
-				"signalId": "out1"
+				"signalId": "out"
+			},
+			"channel1":{
+				"signalId": "outTest"
 			}
 		},
 		"subdevice1": {
 			"type": "DigIn",
 			"channel0": {
 				"signalId": "inTest"
-			}
-		},
-		"subdevice2": {
-			"type": "DigIn",
-			"channel0":{
-				"signalId": "in1"
-			}
-		},
-		"subdevice3": {
-			"type": "DigOut",
-			"channel0":{
-				"signalId": "outTest"
+			},
+			"channel1":{
+				"signalId": "in"
 			}
 		}
 	}

@@ -14,7 +14,7 @@ namespace eeros {
 			friend class Sequencer;
 		public:
 			Sequence(std::string name, Sequencer& seq);	// only for mainSequence
-			Sequence(std::string name, Sequencer& seq, BaseSequence* caller, bool blocking);
+			Sequence(std::string name, BaseSequence* caller, bool blocking);
 			virtual ~Sequence();
 			
  			virtual int operator() () {return start();}	// this operator can be overloaded in the derived sequence
@@ -32,8 +32,9 @@ namespace eeros {
 			void waitAndTerminate();
 			
 		private:
+			Sequence(std::string name, Sequencer& seq, BaseSequence* caller, bool blocking);
 			bool running = true, go = false, done = true;
-			std::thread* t;
+			std::thread* t = nullptr;
 			void run();
 		};
 	};	//namespace sequencer

@@ -8,7 +8,7 @@ namespace eeros {
 
 		class Step : public BaseSequence {
 		public:
-			Step(std::string name, Sequencer& seq, BaseSequence* caller) : BaseSequence(seq, caller, true) {this->name = name;}
+			Step(std::string name, BaseSequence* caller) : BaseSequence(caller, true) {this->name = name;}
 			virtual ~Step() { };
 			
 			virtual int operator() () {return start();}	// this operator can be overloaded in the derived sequence
@@ -17,8 +17,7 @@ namespace eeros {
 				resetTimeout();
 				resetAbort();
 // 				if (!exceptionIsActive) log.info() << "step '" << name << "' started";
-				BaseSequence::action();
-				return 0;
+				return BaseSequence::action();
 			}
 		};
 	};	//namespace sequencer

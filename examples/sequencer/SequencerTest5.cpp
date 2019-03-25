@@ -1,7 +1,7 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
-#include <eeros/sequencer/Step.hpp>
+#include <eeros/sequencer/Wait.hpp>
 
 #include <chrono>
 #include <signal.h>
@@ -11,55 +11,40 @@ using namespace eeros::logger;
 
 int count = 0;
 
-class StepA : public Step {
-public:
-	StepA(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now(); count++;}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
-private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
-};
-
-class StepB : public Step {
-public:
-	StepB(std::string name, Sequencer& seq, BaseSequence* caller) : Step(name, seq, caller) { }
-	int action() {time = std::chrono::steady_clock::now();}
-	bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > 1.0;}
-private:
-	std::chrono::time_point<std::chrono::steady_clock> time;
-};
-
 class MyCondition : public Condition {
 	bool validate() {return count > 2;}
 };
 
 class SequenceB : public Sequence {
 public:
-	SequenceB(std::string name, Sequencer& seq, BaseSequence* caller, Monitor& m) : Sequence(name, seq, caller, false), stepB("step B", seq, this), m(m) { 
+	SequenceB(std::string name, Sequence* caller, Monitor& m) : Sequence(name, caller, false), stepB("step B", this), m(m) { 
 		addMonitor(&m);
 	}
 	int action() {
-		for (int i = 0; i < 5; i++) stepB();
+		for (int i = 0; i < 5; i++) stepB(1);
 	}
 private:
-	StepB stepB;
+	Wait stepB;
 	Monitor& m;
 };
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), m("myMonitor", this, cond, SequenceProp::abort), seqB("sequence B", seq, this, m), stepA("step A", seq, this) { 
+	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), m("myMonitor", this, cond, SequenceProp::abort), seqB("sequence B", this, m), stepA("step A", this) { 
 		addMonitor(&m);
 	}
 		
 	int action() {
 		seqB();
-		for (int i = 0; i < 5; i++) stepA();
+		for (int i = 0; i < 5; i++) {
+			stepA(1);
+			count++;
+		}
 		seqB.waitAndTerminate();
 	}
 private:
 	SequenceB seqB;
-	StepA stepA;
+	Wait stepA;
 	MyCondition cond;
 	Monitor m;
 };

@@ -18,6 +18,11 @@ namespace eeros {
 			
 			Constant(T v) : value(v) { }
 			
+			Constant(const Constant& other) {
+				value = other.value;
+				this->setName(other.getName());
+			}
+			
 			virtual void run() {
 				std::lock_guard<std::mutex> lock(mtx);
 				this->out.getSignal().setValue(value);

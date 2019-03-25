@@ -5,80 +5,66 @@
 #include <eeros/control/Step.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/control/Sum.hpp>
-#include <eeros/core/Thread.hpp>
-#include <eeros/sequencer/Sequencer.hpp>
-#include <eeros/sequencer/Sequence.hpp>
-#include <eeros/sequencer/Step.hpp>
-
-#include <chrono>
-#include <unistd.h>
-#include <thread>
-#include <sys/mman.h>
 
 using namespace eeros::logger;
 using namespace eeros::control;
 using namespace eeros::math;
-using namespace eeros::sequencer;
-
-class MainSequence : public Sequence {
-public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq) { 
-//		setNonBlocking();
-	}
-		
-	int action() {
-		for (int i = 0; i < 5; i++) usleep(1000000);
-	}
-private:
-};
 
 int main() {
 	StreamLogWriter w(std::cout);
 	w.show(LogLevel::TRACE);
 	Logger log;
-	Logger::setDefaultWriter(&w);
 	log.set(&w);
  
 	log.info() << "Block Test started";
 	
-	unsigned char dummy[8*1024] = {};
-	(mlockall(MCL_CURRENT | MCL_FUTURE) != -1);
-
-	using clk = std::chrono::steady_clock;
-	using time_point = clk::time_point;
-	time_point start = clk::now();
-	time_point stop = clk::now();
-	double def = std::chrono::duration<double>(stop - start).count();
-	start = clk::now();
-// 	eeros::Thread t;
- 	std::thread* t = new std::thread();
-// 	usleep(4000);
-
-	stop = clk::now();
-	double run = std::chrono::duration<double>(stop - start).count() - def;
-	log.info() << run;
-
-	log.info() << "start seq";
-	auto& sequencer = Sequencer::instance();
-	MainSequence mainSeq("Main Sequence", sequencer);
- 	sequencer.addSequence(mainSeq);
-	start = clk::now();
- 	mainSeq.start();
-	stop = clk::now();
-	run = std::chrono::duration<double>(stop - start).count() - def;
-	log.info() << run;
+	Constant<> c1(0.2);
+	c1.setName("constant 1");
+	c1.getOut().getSignal().setName("signal 1");
+	c1.run();
+	log.info() << c1 << ": output = " << c1.getOut().getSignal();
 	
-	mainSeq.wait();	// wait until sequencer terminates
-
-	start = clk::now();
- 	mainSeq.start();
-	stop = clk::now();
-	run = std::chrono::duration<double>(stop - start).count() - def;
-	log.info() << run;
+	Vector3 v1{3,4,5};
+	log.info() << v1;
+	Constant<Vector3> c2(v1);	
+	c2.setName("constant 2");
+	c2.getOut().getSignal().setName("signal 2");
+	c2.run();
+	log.info() << c2 << ": output = " << c2.getOut().getSignal();
 	
-	mainSeq.wait();	// wait until sequencer terminates
-	stop = clk::now();
-	run = std::chrono::duration<double>(stop - start).count() - def;
-	log.info() << run;
+	Constant<Matrix<3,1>> c3({1.2, 2.5, 3});
+	c3.setName("constant 3");
+	c3.getOut().getSignal().setName("signal 3");
+	c3.run();
+	log.info() << c3 << ": output = " << c3.getOut().getSignal();
+	
+	Step<Vector3> step(1.5, -3.14159265359, 5);
+	step.setName("step");
+	step.getOut().getSignal().setName("signal step");
+	step.run();
+	log.info() << step << ": output = " << step.getOut().getSignal();
+
+	Step<Vector3> step2({2, 2.5, 3}, -3.14159265359, 5);	
+	step2.setName("step 2");
+	log.info() << step2;
+	
+	Sum<2,Vector3> sum;
+	sum.setName("summation");
+	sum.getOut().getSignal().setName("signal summation");
+	sum.getIn(0).connect(c2.getOut());
+	sum.getIn(1).connect(step.getOut());
+	sum.run();
+	log.info() << sum << ":output = " << sum.getOut().getSignal();
+
+	Constant<Matrix<1,1>> c4(6);		
+	Constant<Matrix<2,2>> c5(2.7);		
+	Constant<Matrix<2,2>> c6({2.7, -1.2, 0, 0});
+	c4.run(); 
+	c5.run();
+	c6.run();
+	log.info() << c4.getOut().getSignal();
+	log.info() << c5.getOut().getSignal();
+	log.info() << c6.getOut().getSignal();
+
 	return 0;
 }

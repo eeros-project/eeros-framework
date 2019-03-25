@@ -9,6 +9,8 @@ using namespace eeros::sequencer;
 
 Sequence::Sequence(std::string name, Sequencer& seq) : Sequence(name, seq, nullptr, false) { }
 
+Sequence::Sequence(std::string name, BaseSequence* caller, bool blocking) : Sequence(name, caller->seq, caller, blocking) { }
+
 Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller, bool blocking) : BaseSequence(seq, caller, blocking) {
 	static int sequenceCount;
 	setId(sequenceCount++);	//TODO check how many sequence objects of this type are allowed. Maybe singleton.
@@ -26,7 +28,7 @@ Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller, bool 
 	log.trace() << "sequence '" << name << "' created";
 }
 
-Sequence::~Sequence() {/*running = false;*/}
+Sequence::~Sequence() {running = false;}
 
 void Sequence::run() {	// runs in thread
 	struct sched_param schedulingParam;
@@ -50,18 +52,19 @@ void Sequence::run() {	// runs in thread
 }
 
 int Sequence::start() {
+	int retVal = -1;
 	resetTimeout();
 	resetAbort();
 	Sequencer::running = true;
 	if (blocking) {	// starts action() blocking
 		log.info() << "sequence '" << name << "' (blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
-		BaseSequence::action();				//action gets overwritten by child class
+		retVal = BaseSequence::action();
 		log.info() << "sequence '" << name << "' terminated";
 	} else {
 		go = true;
 		done = false;
 	}
-	return 0;
+	return retVal;
 }
 
 void Sequence::wait() {

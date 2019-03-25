@@ -55,51 +55,60 @@ namespace eeros {
 			
 			running = true;
 			while (running) {
-				newsockfd = accept(sockfd, (struct sockaddr *) &cliAddr,  &clilen);
-				if (newsockfd < 0) throw Fault("ERROR on accept");
-				bool connected = true;
-				char cliName[INET6_ADDRSTRLEN];
-				getnameinfo((struct sockaddr*)&cliAddr, sizeof cliAddr, cliName, sizeof(cliName), NULL, 0, NI_NUMERICHOST|NI_NUMERICSERV);
-				log.info() << "Client connection from ip=" << cliName << " accepted";
-				char ch;
-				using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
-				auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
-			
-				while (connected) {
-					std::this_thread::sleep_until(next_cycle);
-								
-					size_t count = 1;
-					auto endTime = std::chrono::steady_clock::now() + seconds(period * 100);
-					while (connected && count) {
-						if (std::chrono::steady_clock::now() > endTime) {
-							log.trace() << "error = socket read timed out";
-							connected = false;
+				fd_set fds;
+				int res;
+				FD_ZERO (&fds);
+				FD_SET (sockfd, &fds);
+				struct timeval timeout;
+				timeout.tv_sec = 0;
+				timeout.tv_usec = 50000;
+				if (select(sockfd + 1, &fds, NULL, NULL, &timeout) > 0) {
+					newsockfd = accept(sockfd, (struct sockaddr *) &cliAddr,  &clilen);
+					if (newsockfd < 0) throw Fault("ERROR on accept");
+					bool connected = true;
+					char cliName[INET6_ADDRSTRLEN];
+					getnameinfo((struct sockaddr*)&cliAddr, sizeof cliAddr, cliName, sizeof(cliName), NULL, 0, NI_NUMERICHOST|NI_NUMERICSERV);
+					log.info() << "Client connection from ip=" << cliName << " accepted";
+					char ch;
+					using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
+					auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
+				
+					while (connected) {
+						std::this_thread::sleep_until(next_cycle);
+									
+						size_t count = 1;
+						auto endTime = std::chrono::steady_clock::now() + seconds(period * 100);
+						while (connected && count) {
+							if (std::chrono::steady_clock::now() > endTime) {
+								log.trace() << "error = socket read timed out";
+								connected = false;
+							}
+	// 						log.trace() << "try to read " << count << " Bytes";
+							int n = read(newsockfd, &ch, count);
+							if (n < 0) {
+								log.trace() << "error = " << std::strerror(errno);
+								connected = false;
+							}
+							count -= n;
 						}
-// 						log.trace() << "try to read " << count << " Bytes";
-						int n = read(newsockfd, &ch, count);
-						if (n < 0) {
-							log.trace() << "error = " << std::strerror(errno);
-							connected = false;
+						Sequencer& seq = Sequencer::instance();
+						switch (ch) {
+							case 's': 
+								seq.singleStepping();
+								seq.step();
+								break;
+							case 'c':
+								seq.restart();
+								break;
+							case 'b':
+								seq.singleStepping();
+								break;
+							default: ;
 						}
-						count -= n;
+						next_cycle += seconds(period);
 					}
-					Sequencer& seq = Sequencer::instance();
-					switch (ch) {
-						case 's': 
-							seq.singleStepping();
-							seq.step();
-							break;
-						case 'c':
-							seq.restart();
-							break;
-						case 'b':
-							seq.singleStepping();
-							break;
-						default: ;
-					}
-					next_cycle += seconds(period);
+					close(newsockfd);
 				}
-				close(newsockfd);
 			}
 			close(sockfd);
 		}
