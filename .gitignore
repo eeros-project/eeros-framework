@@ -1,6 +1,6 @@
 build*/
 *.kdev4
 .directory
-cmake.sh
+cmake*.sh
 install*/
 *.txt.user
