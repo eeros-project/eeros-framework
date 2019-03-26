@@ -23,14 +23,6 @@ bool HAL::readConfigFromFile(std::string file) {
 }
 
 bool HAL::readConfigFromFile(int* argc, char** argv) {
-  
-	// available long_options
-	static struct option long_options_hal[] =
-	{
-	    {"config", 		required_argument, NULL, 'c'},
-	    {"configFile", 	required_argument, NULL, 'f'},
-	    {NULL, 		0, 		   NULL,  0 }
-	};
 	
 	// Error message if long dashes (en dash) are used
 	int i;
@@ -41,20 +33,12 @@ bool HAL::readConfigFromFile(int* argc, char** argv) {
 		 }
 	}
 	
-	/* Compute command line arguments */
+	/* Compute the first two command line arguments */
 	int c;
 	std::string configPath;
-	while ((c = getopt_long(*argc, argv, "c:f:", long_options_hal, NULL)) != -1) {
+	while ((c = getopt(3, argv, "c:")) != -1) {
 		switch(c) {
 			case 'c': 	// config found
-				if(optarg){
-					configPath = optarg;
-				}
-				else{
-					throw eeros::Fault("optarg empty, no path given!");
-				}
-				break;
-			case 'f': 	// configFile found
 				if(optarg){
 					configPath = optarg;
 				}
@@ -68,10 +52,12 @@ bool HAL::readConfigFromFile(int* argc, char** argv) {
 				else log.trace() << "Unknown option character `\\x" << optopt << "'.";
 				break;
 			default:
+				log.trace() << "ignoring: " << c;
 				// ignore all other args
 				break;
 		}
 	}
+	
 	
 	parser = JsonParser(configPath);
 	parser.createHalObjects(hwLibraries);
