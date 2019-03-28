@@ -29,28 +29,9 @@ public:
 		
 		slHoming.addEvent(homingDone, slReady, kPublicEvent);
 		slReady.addEvent(startMoving, slMoving, kPublicEvent);
-		addEventToLevelAndAbove(slHoming, abort, slOff, kPublicEvent);
+		addEventToLevelAndAbove(slHoming, abort, slOff, kPrivateEvent);
 		
 		slOff.setLevelAction([&](SafetyContext* privateContext) {eeros::Executor::stop();});
-		
-		slHoming.setLevelAction([&](SafetyContext* privateContext) {
-			if (slHoming.getNofActivations() == 1)
-				Sequencer::instance().getSequenceByName("Homing Sequence")->start();
-			if (cs.iX.getOut().getSignal().getValue() >= 1.0) cs.setpointX.setValue(0);
-			if (cs.iY.getOut().getSignal().getValue() >= 1.0) cs.setpointY.setValue(0);
-			if (Sequencer::instance().getSequenceByName("Homing Sequence")->getRunningState() == SequenceState::terminated)
-				privateContext->triggerEvent(homingDone);
-		});
-		
-		slReady.setLevelAction([=](SafetyContext* privateContext) {
-			if (slReady.getNofActivations() * ts >= 2)
-				privateContext->triggerEvent(startMoving);
-		});
-		
-		slMoving.setLevelAction([&](SafetyContext* privateContext) {
-			if (slMoving.getNofActivations() == 1)
-				Sequencer::instance().getSequenceByName("UpAndDown Sequence")->start();
-		});
 		
 		setEntryLevel(slHoming);
 		
