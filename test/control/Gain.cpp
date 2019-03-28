@@ -9,7 +9,7 @@ using namespace eeros;
 using namespace eeros::control;
 
 
-TEST(GainUnitTest, templateInstantiations) {
+TEST(controlGainTest, templateInstantiations) {
   Gain<> g1{};
   Gain<int> g2{};
   Gain<int,int> g3{};
@@ -27,7 +27,7 @@ TEST(GainUnitTest, templateInstantiations) {
 }
 
 
-TEST(GainUnitTest, simpleDoubleGain) {
+TEST(controlGainTest, simpleDoubleGain) {
   Gain<> g1{2.5};
   Constant<> c1{1.3};
 
@@ -49,7 +49,7 @@ TEST(GainUnitTest, simpleDoubleGain) {
 }
 
 
-TEST(GainUnitTest, simpleIntGain) {
+TEST(controlGainTest, simpleIntGain) {
   Gain<int,int> g1{2};
   Constant<int> c1{1};
 
@@ -71,7 +71,7 @@ TEST(GainUnitTest, simpleIntGain) {
 }
 
 
-TEST(GainUnitTest, smoothChangingDoubleGain) {
+TEST(controlGainTest, smoothChangingDoubleGain) {
   Gain<> g1{};
   Constant<> c1{3.1};
 
@@ -100,7 +100,7 @@ TEST(GainUnitTest, smoothChangingDoubleGain) {
 }
 
 
-TEST(GainUnitTest, smoothChangingIntGain) {
+TEST(controlGainTest, smoothChangingIntGain) {
   Gain<int,int> g1{};
   Constant<int> c1{3};
 
@@ -129,7 +129,7 @@ TEST(GainUnitTest, smoothChangingIntGain) {
 }
 
 
-TEST(GainUnitTest, smoothChangingDoubleGainRealWorldTest) {
+TEST(controlGainTest, smoothChangingDoubleGainRealWorldTest) {
   Gain<> g1{5.6};
   Constant<> c1{1.4};
   g1.getIn().connect(c1.getOut());
@@ -161,7 +161,7 @@ TEST(GainUnitTest, smoothChangingDoubleGainRealWorldTest) {
 }
 
 
-TEST(GainUnitTest, minMaxDoubleGain) {
+TEST(controlGainTest, minMaxDoubleGain) {
   Gain<> g1{2.5};
   Constant<> c1{1.3};
 
@@ -189,7 +189,7 @@ TEST(GainUnitTest, minMaxDoubleGain) {
 }
 
 
-TEST(GainUnitTest, minMaxIntGain) {
+TEST(controlGainTest, minMaxIntGain) {
   Gain<int,int> g1{3};
   Constant<int> c1{1};
 
@@ -217,7 +217,7 @@ TEST(GainUnitTest, minMaxIntGain) {
 }
 
 
-TEST(GainUnitTest, smoothChangingDoubleGainMinMaxLimits) {
+TEST(controlGainTest, smoothChangingDoubleGainMinMaxLimits) {
   Gain<> g1{8.5};
   Constant<> c1{5.2};
   g1.getIn().connect(c1.getOut());
@@ -244,7 +244,7 @@ TEST(GainUnitTest, smoothChangingDoubleGainMinMaxLimits) {
 }
 
 
-TEST(GainUnitTest, simpleMatrixGain1) {
+TEST(controlGainTest, simpleMatrixGain1) {
   using namespace math;
   Matrix<2,2> gM{2,0,1,2};
   Gain<Matrix<2,2>,Matrix<2,2>> g1{gM};
@@ -265,7 +265,7 @@ TEST(GainUnitTest, simpleMatrixGain1) {
 }
 
 
-TEST(GainUnitTest, simpleMatrixGain2) {
+TEST(controlGainTest, simpleMatrixGain2) {
   using namespace math;
   Matrix<2,2> gM{1,2,3,4};
   Gain<Matrix<2,2>,Matrix<2,2>> g1{gM};
@@ -286,7 +286,7 @@ TEST(GainUnitTest, simpleMatrixGain2) {
 }
 
 
-TEST(GainUnitTest, simpleMatrixElementWiseGain1) {
+TEST(controlGainTest, simpleMatrixElementWiseGain1) {
   using namespace math;
   Matrix<2,2> gM{1,2,3,4};
   Gain<Matrix<2,2>,Matrix<2,2>,true> g1{gM};
@@ -307,7 +307,7 @@ TEST(GainUnitTest, simpleMatrixElementWiseGain1) {
 }
 
 
-TEST(GainUnitTest, simpleMatrixElementWiseGain2) {
+TEST(controlGainTest, simpleMatrixElementWiseGain2) {
   using namespace math;
   Matrix<3,2> gM{1,2,3, 1,4,9};
   Gain<Matrix<3,2>,Matrix<3,2>,true> g1{gM};
@@ -329,7 +329,7 @@ TEST(GainUnitTest, simpleMatrixElementWiseGain2) {
 }
 
 
-TEST(GainUnitTest, smoothChangingMatrixGainRealWorldTest) {
+TEST(controlGainTest, smoothChangingMatrixGainRealWorldTest) {
   using namespace math;
   Matrix<3,3> gM{1,2,3, 4,5,6, 10,9,8};
   Gain<Matrix<3,3>,Matrix<3,3>> g1{gM};
@@ -410,7 +410,7 @@ TEST(GainUnitTest, smoothChangingMatrixGainRealWorldTest) {
 }
 
 
-TEST(GainUnitTest, smoothChangingMatrixGainMinMaxLimits) {
+TEST(controlGainTest, smoothChangingMatrixGainMinMaxLimits) {
   using namespace math;
   Matrix<2,2> gM{1,2,3,4};
   Gain<Matrix<2,2>,Matrix<2,2>> g1{gM};
@@ -451,7 +451,7 @@ TEST(GainUnitTest, smoothChangingMatrixGainMinMaxLimits) {
 }
 
 
-TEST(GainUnitTest, printGain) {
+TEST(controlGainTest, printGain) {
   Gain<> g{10.5};
   Constant<> c{5.2};
   g.setName("myGain");
