@@ -12,7 +12,6 @@ namespace eeros {
 
 		void Monitor::startExceptionSequence() {
 			if (exceptionSequence != nullptr) {
-				exceptionSequence->caller->inExcProcessing = true;
 				exceptionSequence->start();
 			}
 		}

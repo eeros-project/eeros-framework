@@ -43,7 +43,7 @@ void Sequence::run() {	// runs in thread
 		while(running && !go) usleep(1000);
 		if (!running) break;
 		go = false;
-		log.info() << "sequence '" << name << "' (non-blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
+		log.info() << "create sequence '" << name << "' (non-blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
 		BaseSequence::action();
 		log.info() << "sequence '" << name << "' terminated";
 		done = true;
@@ -57,7 +57,7 @@ int Sequence::start() {
 	resetAbort();
 	Sequencer::running = true;
 	if (blocking) {	// starts action() blocking
-		log.info() << "sequence '" << name << "' (blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
+		log.info() << "create sequence '" << name << "' (blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
 		retVal = BaseSequence::action();
 		log.info() << "sequence '" << name << "' terminated";
 	} else {

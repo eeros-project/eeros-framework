@@ -27,7 +27,7 @@ namespace eeros {
 		protected:
 			bool checkCondition();
 			void startExceptionSequence();
-			BaseSequence* owner;
+			BaseSequence* owner;	// every monitor has an owner, sequence property of monitor determines what owner does
 			BaseSequence* exceptionSequence;
 			Condition& condition;
 			SequenceProp behavior;
