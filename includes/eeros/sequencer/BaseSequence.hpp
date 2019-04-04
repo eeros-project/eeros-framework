@@ -70,29 +70,38 @@ namespace eeros {
 			Sequencer& seq;			// reference to sequencer
 			BaseSequence* caller;		// calling sequence
 			bool blocking;			// standard run mode
-			bool exceptionIsActive = false;	// one of its monitors fired
-			bool inExcProcessing = false;	// this sequence already started an exception sequence of one of its monitors
+			bool monitorFired = false;	// one of its monitors fired
+			bool inExcProcessing = false;	// this sequence started an exception sequence due to one of its monitors which is still running
 			SequenceState state;	
 			Logger log;
 			
 		private:
 			void checkMonitorsOfBlockedCallers();
 			void checkMonitorsOfThisSequence();
-			void checkMonitor(Monitor* monitor);
-			void setActiveException(Monitor* activeMonitor);
-			void clearActiveException();
-			void checkActiveException();
+			void checkMonitor(Monitor* m);	// check if monitor has fired, set state and active monitor of owner sequence, start exception sequence
+			void clearActiveMonitor();	// clears any active monitor
+			/**
+			* Checks if this or a sequence in the call stack of this sequence has a monitor which fired. 
+			* If so, two cases must be considered. 
+			* Case 1: monitor of this sequence fired
+			*	set sequence state of this sequence to monitor property
+			* Case 2: monitor of one of the callers fired
+			*	set sequence state of this sequence to monitor property 
+			*   repeat setting the state of all the sequences in the call stack backwards up to the sequence
+			*   which owns the monitor who fired
+			*/
+			void checkActiveMonitor();
 			
 			int id;
 			std::vector<BaseSequence*> callerStack;		// vector with all caller sequences. Latest element is latest caller
-			std::vector<BaseSequence*> callerStackBlocking;	// vector with all sequences, which are blocked by this sequence. Element[0] is the oldest blocked caller
+			std::vector<BaseSequence*> callerStackReverse;	// vector with all sequences, which are blocked by this sequence. Element[0] is the oldest blocked caller
 			bool callerStackCreated = false;
 			Monitor monitorTimeout;
 			ConditionTimeout conditionTimeout;
 			Monitor monitorAbort;
 			ConditionAbort conditionAbort;
 			int pollingTime;		//in milliseconds for checkExitCondition monitors)
-			Monitor* activeException;
+			Monitor* activeMonitor;	// monitor, which fired and caused exception sequence to run
 		};
 		
 		/********** Print functions **********/

@@ -9,7 +9,7 @@
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
-int count = 0;
+int count;
 
 class ExceptionSeq : public Sequence {
 public:
@@ -28,10 +28,13 @@ public:
 	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", this), eSeq("exception sequence", this), m("myMonitor", this, cond, SequenceProp::resume, &eSeq) { 
 		setTimeoutTime(7.0);
 		setTimeoutBehavior(SequenceProp::abort);
+// 		setTimeoutBehavior(SequenceProp::restart);
+// 		m.setBehavior(SequenceProp::restart);
 		addMonitor(&m);
 	}
 		
 	int action() {
+		count = 0;
 		for (int i = 0; i < 5; i++) {
 			stepA(2);
 			count++;

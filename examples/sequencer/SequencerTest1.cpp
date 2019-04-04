@@ -11,7 +11,12 @@ using namespace eeros::logger;
 class ExceptionSeq : public Sequence {
 public:
 	ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait", this) { }
-	int action() {wait(3);}
+	int action() {
+		wait(3);
+// 		caller->resetTimeout(); 
+// 		caller->setTimeoutTime(4.5);
+// 		caller->setTimeoutBehavior(SequenceProp::abort);
+	}
 private:
 	Wait wait;
 };
@@ -27,9 +32,8 @@ public:
 	}
 		
 	int action() {
-		auto& sequencer = Sequencer::instance();
-		if (Sequencer::running)
-			for (int i = 0; i < 5; i++) stepA(1);
+		for (int i = 0; i < 5; i++) stepA(1);
+// 		while (getRunningState() == SequenceState::running) stepA(1);
 	}
 private:
 	Wait stepA;
