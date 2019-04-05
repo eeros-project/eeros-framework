@@ -10,7 +10,7 @@ namespace eeros {
 		
 		BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking) : 
 			seq(seq), caller(caller), monitorTimeout("timeout", this, conditionTimeout, SequenceProp::abort), monitorAbort("abort", this, conditionAbort, SequenceProp::abort),
-			state(SequenceState::idle), blocking(blocking), pollingTime(500), log('X')
+			state(SequenceState::idle), blocking(blocking), pollingTime(100), log('X')
 		{
 			if (caller != nullptr) {
 				callerStack = caller->getCallerStack();
