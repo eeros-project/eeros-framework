@@ -1,6 +1,6 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <iomanip>
-#include <time.h>
+#include <chrono>
 
 #define COLOR_RESET		"\033[0m"
 #define COLOR_BLACK		"\033[22;30m"
@@ -53,15 +53,18 @@ void StreamLogWriter::begin(std::ostringstream& os, LogLevel level, unsigned cat
 	enabled = (level <= visible_level);
 	if (!enabled) return;
 	
-	using namespace std;
-	
-	time_t t(time(nullptr));
-	tm* local(localtime(&t));
+ 	using namespace std;	
 
+	tm localTime;
+    std::chrono::system_clock::time_point tx = std::chrono::system_clock::now();
+    time_t now = std::chrono::system_clock::to_time_t(tx);
+    localtime_r(&now, &localTime);
+    const std::chrono::duration<double> tse = tx.time_since_epoch();
+    std::chrono::seconds::rep milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tse).count() % 1000;
 	os << setfill('0');
-	os << setw(4) << (1900 + local->tm_year) << '-' << setw(2) << (local->tm_mon + 1) << '-' << setw(2) << local->tm_mday;
+	os << setw(4) << (1900 + localTime.tm_year) << '-' << setw(2) << (localTime.tm_mon + 1) << '-' << setw(2) << localTime.tm_mday;
 	os << ' ';
-	os << setw(2) << local->tm_hour << ':' << setw(2) << local->tm_min << ':' << setw(2) << local->tm_sec;
+	os << setw(2) << localTime.tm_hour << ':' << setw(2) << localTime.tm_min << ':' << setw(2) << localTime.tm_sec << ':' << setw(3) << milliseconds;
 	os << "  ";
 
 	if (category == 0) os << ' ';
@@ -109,5 +112,5 @@ void StreamLogWriter::end(std::ostringstream& os) {
 
 void StreamLogWriter::endl(std::ostringstream& os) {
 	if (!enabled) return;
-	os << std::endl << "\t\t\t   ";
+	os << std::endl << "\t\t\t       ";
 }
