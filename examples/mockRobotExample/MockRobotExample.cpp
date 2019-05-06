@@ -27,27 +27,26 @@ int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
 	
 	StreamLogWriter w(std::cout);
-// 	w.show(LogLevel::TRACE);
+	w.show(LogLevel::TRACE);
 	Logger::setDefaultWriter(&w);
 	Logger log;
 	
 	log.info() << "Mock robot example started...";
 	
 	double period = 0.01;
-	MockRobotControlSystem controlSystem(period);
-	MockRobotSafetyProperties ssProperties(controlSystem, period);
-	SafetySystem safetySys(ssProperties, period);
+	MockRobotControlSystem cs(period);
+	MockRobotSafetyProperties sp(cs, period);
+	SafetySystem ss(sp, period);
 
 	auto& executor = Executor::instance();
-	executor.setMainTask(safetySys);
+	executor.setMainTask(ss);
 
 	auto& sequencer = Sequencer::instance();
-	HomingSequence homingSeq("Homing Sequence", sequencer, controlSystem);
-	sequencer.addSequence(homingSeq);
-	UpAndDownSequence upDownSeq("UpAndDown Sequence", sequencer, controlSystem);
-	sequencer.addSequence(upDownSeq);
+	MainSequence mainSeq("Main Sequence", sequencer, cs, ss, sp);
+	sequencer.addSequence(mainSeq);
+	mainSeq.start();
 	
-	eeros::task::Lambda l1 ([&] () {log.warn() << "robot at " << controlSystem.iX.getOut().getSignal().getValue() << "/" << controlSystem.iY.getOut().getSignal().getValue();});
+	eeros::task::Lambda l1 ([&] () {log.warn() << "robot at " << cs.iX.getOut().getSignal().getValue() << "/" << cs.iY.getOut().getSignal().getValue();});
 	Periodic periodic("per1", 0.5, l1);
 	executor.add(periodic);
 	executor.run();

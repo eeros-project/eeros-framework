@@ -52,9 +52,9 @@ TEST(controlTransitionSimpleTest, simple) {
 	c1.run();
 	timestamp_t start = c1.getOut().getSignal().getTimestamp();
 	t1.inBlock.run();
-	usleep(1000);
+	usleep(10000);
 	c2.run();	// fix the timestamp
-	usleep(1000);
+	usleep(10000);
 	c1.setValue(1.0);
 	c1.run();
 	timestamp_t end = c1.getOut().getSignal().getTimestamp();
@@ -62,12 +62,12 @@ TEST(controlTransitionSimpleTest, simple) {
 	t1.outBlock.run();
 	for (int i = 0; i < 5; i++) {
 		EXPECT_EQ(t1.outBlock.getOut().getSignal().getTimestamp(), start + i * (end - start) / 5);
-		EXPECT_TRUE(Utils::compareApprox(t1.outBlock.getOut().getSignal().getValue(), i * 0.2, 1e-10));
+		EXPECT_TRUE(Utils::compareApprox(t1.outBlock.getOut().getSignal().getValue(), i * 0.2, 0.001));
 		t1.outBlock.run();
 		t2.inBlock.run();
 	}
 	t2.outBlock.run();
-	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue(), 0.4, 1e-10));
+	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue(), 0.4, 0.001));
 }
 
 TEST(controlTransitionSimpleTest, vector) {
@@ -80,9 +80,9 @@ TEST(controlTransitionSimpleTest, vector) {
 	c1.run();
 	timestamp_t start = c1.getOut().getSignal().getTimestamp();
 	t1.inBlock.run();
-	usleep(1000);
+	usleep(10000);
 	c2.run();	// fix the timestamp
-	usleep(1000);
+	usleep(10000);
 	c1.setValue({1.0, 2.0});
 	c1.run();
 	timestamp_t end = c1.getOut().getSignal().getTimestamp();
@@ -91,14 +91,14 @@ TEST(controlTransitionSimpleTest, vector) {
 	EXPECT_EQ(t1.outBlock.getOut().getSignal().getValue()[0], 0);
 	for (int i = 0; i < 5; i++) {
 		EXPECT_EQ(t1.outBlock.getOut().getSignal().getTimestamp(), start + i * (end - start) / 5);
-		EXPECT_TRUE(Utils::compareApprox(t1.outBlock.getOut().getSignal().getValue()[0], i * 0.2, 1e-10));
-		EXPECT_TRUE(Utils::compareApprox(t1.outBlock.getOut().getSignal().getValue()[1], i * 0.4, 1e-10));
+		EXPECT_TRUE(Utils::compareApprox(t1.outBlock.getOut().getSignal().getValue()[0], i * 0.2, 0.001));
+		EXPECT_TRUE(Utils::compareApprox(t1.outBlock.getOut().getSignal().getValue()[1], i * 0.4, 0.001));
 		t1.outBlock.run();
 		t2.inBlock.run();
 	}
 	t2.outBlock.run();
-	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue()[0], 0.4, 1e-10));
-	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue()[1], 0.8, 1e-10));
+	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue()[0], 0.4, 0.001));
+	EXPECT_TRUE(Utils::compareApprox(t2.outBlock.getOut().getSignal().getValue()[1], 0.8, 0.001));
 }
 
 TEST(controlTransitionSimpleTest, steady) {

@@ -38,7 +38,7 @@ Mouse::~Mouse() {
 }
 
 bool Mouse::open(const char* device) {
-	fd = ::open(device, O_RDONLY);
+	fd = ::open(device, O_RDONLY | O_NONBLOCK);
 	if (fd < 0) log.error() << "Mouse: could not open input device on " + std::string(device);
 	return fd;
 }
@@ -75,30 +75,31 @@ void Mouse::run() {
 	struct input_event e;
 	while (running) {
 		ssize_t n = read(fd, &e, sizeof(struct input_event));
+		if (n > 0) {
+			if (e.type == EV_KEY) {
+				switch (e.code) {
+					case BTN_LEFT: current.button.left = e.value; break;
+					case BTN_MIDDLE: current.button.middle = e.value; break;
+					case BTN_RIGHT: current.button.right = e.value; break;
+					default: break;
+				}
 
-		if (e.type == EV_KEY) {
-			switch (e.code) {
-				case BTN_LEFT: current.button.left = e.value; break;
-				case BTN_MIDDLE: current.button.middle = e.value; break;
-				case BTN_RIGHT: current.button.right = e.value; break;
-				default: break;
+				if (button_action != nullptr) button_action(e.code, e.value);
+			} else if (e.type == EV_REL) {
+				switch (e.code) {
+					case REL_X: current.axis.x += e.value; break;
+					case REL_Y: current.axis.y += e.value; break;
+					case REL_WHEEL: current.axis.z += e.value; break;
+					case REL_HWHEEL: current.axis.r += e.value; break;
+					default: break;
+				}
+
+				if (axis_action != nullptr) axis_action(e.code, e.value);
 			}
 
-			if (button_action != nullptr) button_action(e.code, e.value);
-		} else if (e.type == EV_REL) {
-			switch (e.code) {
-				case REL_X: current.axis.x += e.value; break;
-				case REL_Y: current.axis.y += e.value; break;
-				case REL_WHEEL: current.axis.z += e.value; break;
-				case REL_HWHEEL: current.axis.r += e.value; break;
-				default: break;
-			}
+			if (event_action != nullptr) event_action(e);
 
-			if (axis_action != nullptr) axis_action(e.code, e.value);
-		}
-
-		if (event_action != nullptr) event_action(e);
-
-		last = current;
+			last = current;
+		} else usleep(1000);
 	}
 }

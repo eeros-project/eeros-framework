@@ -31,10 +31,10 @@ namespace eeros {
 				seq.nextStep = false;
 			}
 			state = SequenceState::running;
-			checkActiveException();	// check if this or a caller sequence is 'exceptionIsActive', set state accordingly
+			checkActiveMonitor();	// check if this or a caller sequence is 'exceptionIsActive', set state accordingly
 
-			if ((caller != NULL) && (state == SequenceState::running) && (caller->state == SequenceState::restarting)) 
-				state = SequenceState::aborting;
+// 			if ((caller != NULL) && (state == SequenceState::running) && (caller->state == SequenceState::restarting)) 
+// 				state = SequenceState::aborting;
 			
 			do {	//for restarting
 				if (state == SequenceState::restarting) {	// sequence got restarted
@@ -44,8 +44,9 @@ namespace eeros {
 				} 
 				bool firstCheck = true;
 				if (checkPreCondition()) {
+// 					usleep(pollingTime*100);
 					checkMonitorsOfBlockedCallers();	// check for monitors of all callers, start exception sequence, mark owner of fired monitor with 'exceptionIsActive'
-					checkActiveException();		// check if this or a caller sequence is 'exceptionIsActive', set state accordingly
+					checkActiveMonitor();		// check if this or a caller sequence is 'exceptionIsActive', set state accordingly
 					if (state == SequenceState::running) {
 						log.info() << "start '" << name <<"'";
 						retVal = action();	// call to custom implementation of method
@@ -56,10 +57,11 @@ namespace eeros {
 							if (state != SequenceState::terminated) {
 								checkMonitorsOfThisSequence();		// sets activeException if needed
 								checkMonitorsOfBlockedCallers();	// sets activeException if needed
+// 								usleep(pollingTime*1000);
 							}
 						} else firstCheck = false;
 						
-						checkActiveException();					// sets state according to activeException
+						checkActiveMonitor();					// sets state according to activeException
 						if (state == SequenceState::running) usleep(pollingTime*1000);
 					}
 				} else { state = SequenceState::terminated;}
@@ -76,10 +78,12 @@ namespace eeros {
 		std::vector<Monitor*> BaseSequence::getMonitors() const {return monitors;}
 
 		void BaseSequence::checkMonitorsOfThisSequence() {
-			for (Monitor* monitor : getMonitors()) checkMonitor(monitor);
+			log.trace() << "check monitor of seq " << name;
+			for (Monitor* m : getMonitors()) checkMonitor(m);
 		}
 
 		void BaseSequence::checkMonitorsOfBlockedCallers() {
+// 			log.trace() << "check monitor of blocked callers in seq "  << name << " state is " << getRunningState();
 			if (!callerStackCreated) {	// when first called, caller stack has to be created
 				if (this->blocking) {	// nonblocking sequences have no blocking callers
 					std::vector<BaseSequence*> tempStack;
@@ -90,74 +94,82 @@ namespace eeros {
 						tempStack.push_back(entry);
 						if (!entry->blocking) break;	// stop, if caller is nonblocking
 					}
-					log.trace() << "caller stack blocking of seq '" << name << "'";
+// 					log.trace() << "reverse caller stack of seq '" << name << "'";
 					for (int i = tempStack.size(); i--;) {		// reverse vector
-						callerStackBlocking.push_back(tempStack[i]);
-						log.trace() << "  entry '" << tempStack[i]->getName() << "'";
+						callerStackReverse.push_back(tempStack[i]);
+// 						log.trace() << "  entry '" << tempStack[i]->getName() << "'";
 					}
 				}
 				callerStackCreated = true;
 			}
-			for (BaseSequence* s : callerStackBlocking) {
+			for (BaseSequence* s : callerStackReverse) {
 				if (!s->inExcProcessing) 
 					for (Monitor* m : s->getMonitors()) checkMonitor(m);
 			}
 		}
 
-		void BaseSequence::checkMonitor(Monitor* monitor) {
-			if (monitor->checkCondition() == true) {
-				BaseSequence* owner = monitor->getOwner();
-				if (!owner->exceptionIsActive) {
-					log.info() << "monitor '" << monitor->name << "' fired";
-		// 			log.info() << owner->getName();
-					switch (monitor->getBehavior()) {
+		void BaseSequence::checkMonitor(Monitor* m) {
+			if (m->checkCondition()) {
+				BaseSequence* owner = m->getOwner();
+				if (!owner->monitorFired) {	// fire only once, is cleared after exception processing
+					log.info() << "monitor '" << m->name << " of " << owner->getName() << "' fired";
+					switch (m->getBehavior()) {
 						case SequenceProp::resume : break;
 						case SequenceProp::abort : 
-						case SequenceProp::restart : owner->setActiveException(monitor); break;
+						case SequenceProp::restart : {
+// 							log.trace() << "set state and active monitor in seq " << owner->name << " state is " << owner->getRunningState();
+							switch (m->getBehavior()) {
+								case SequenceProp::abort : owner->state = SequenceState::aborting; break;
+								case SequenceProp::restart : owner->state = SequenceState::restarting; break;
+								default : break;
+							}
+							owner->monitorFired = true;
+							owner->activeMonitor = m;
+							break;
+						}
 						default : break;
 					}
-					monitor->startExceptionSequence();	// start only if not yet in exception processing, blocking
+					owner->inExcProcessing = true;
+					m->startExceptionSequence();	// start only if not yet in exception processing, blocking
 					owner->inExcProcessing = false;
 				}
 			}
 		}
 
-		void BaseSequence::setActiveException(Monitor* activeMonitor) {
-			switch (activeMonitor->getBehavior()) {
-				case SequenceProp::resume :
-				case SequenceProp::abort :
-				case SequenceProp::restart :
-					activeMonitor->getOwner()->exceptionIsActive = true;
-					activeMonitor->getOwner()->activeException = activeMonitor;
-					break;
-				default : break;
-			}
+		void BaseSequence::clearActiveMonitor() {
+			monitorFired = false;
+			activeMonitor = nullptr;
 		}
 
-		void BaseSequence::clearActiveException() {
-			exceptionIsActive = false;
-			activeException = nullptr;
-		}
-
-		void BaseSequence::checkActiveException() {
-			if (exceptionIsActive == true) {	// this sequence got the order to abort, restart ...
-				switch (activeException->getBehavior()) {
+		void BaseSequence::checkActiveMonitor() {
+// 			log.trace() << "check active monitor in seq " << name << " state is " << getRunningState();
+			if (monitorFired) {	// this sequence got the order to abort, restart ...
+				switch (activeMonitor->getBehavior()) {
 					case SequenceProp::resume : break;
 					case SequenceProp::abort : state = SequenceState::aborting; break;
 					case SequenceProp::restart : state = SequenceState::restarting; break;
 					default : break;
 				}
-				clearActiveException();
+				clearActiveMonitor();
 			} else {				// a caller got the order to abort, restart ...
 				for (BaseSequence* s : getCallerStack()) {
-					if (s->exceptionIsActive && !s->inExcProcessing) {
-		// 				log.warn() << s->exceptionIsActive;
-						switch (s->activeException->getBehavior()) {
+					if (s->monitorFired && !s->inExcProcessing) {
+						switch (s->activeMonitor->getBehavior()) {
 							case SequenceProp::resume : break;
 							case SequenceProp::abort : 
-							case SequenceProp::restart : state = SequenceState::aborting; break;
+							case SequenceProp::restart : {	
+								// this sequence as well as all the callers up to the calling sequences whose monitor fired have to be aborted
+								state = SequenceState::aborting;
+								BaseSequence* s = caller;
+								while (s != nullptr && !s->monitorFired) {
+									s->state = SequenceState::aborting;
+									s = s->caller;
+								}
+								break;
+							}
 							default : break;
 						}
+// 						log.trace() << "state of seq " << name << " is "  << state;
 					}
 				}
 			}
