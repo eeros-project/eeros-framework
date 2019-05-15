@@ -10,7 +10,7 @@
 #include <eeros/logger/Logger.hpp>
 
 #ifdef USE_ETHERCAT
-#include <EtherCATMain.hpp>
+#include <EcMasterlibMain.hpp>
 #endif
 
 #ifdef USE_ROS
@@ -36,7 +36,7 @@ namespace eeros {
 		virtual ~Executor();
 		static Executor& instance();
 #ifdef USE_ETHERCAT
-		void syncWithEtherCATSTack(ecmasterlib::EtherCATMain* etherCATStack);
+		void syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack);
 #endif
 		void setMainTask(task::Periodic &mainTask);
 		void setMainTask(safety::SafetySystem &mainTask);
@@ -65,7 +65,7 @@ namespace eeros {
 		void assignPriorities();
 ;
 #ifdef USE_ETHERCAT
-		ecmasterlib::EtherCATMain* etherCATStack;
+		ecmasterlib::EcMasterlibMain* etherCATStack;
 		std::mutex* m;
 		std::condition_variable* cv;
 #endif
