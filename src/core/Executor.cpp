@@ -109,7 +109,6 @@ Executor& Executor::instance() {
 
 
 #ifdef USE_ETHERCAT
-// void Executor::syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack) {
 void Executor::syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack) {
 	syncWithEtherCatStackIsSet = true;
 	this->etherCATStack = etherCATStack;
@@ -260,9 +259,6 @@ void Executor::run() {
 			if (mainTask != nullptr)
 				mainTask->run();
 			counter.tock();
-			
-
-// 			etherCATStack->getInstance()->getConditionalVariable2()->notify_one();
 		}
 	}
 #endif
