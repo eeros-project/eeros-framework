@@ -17,10 +17,10 @@ TEST(controlBlockTest, BlockFeatures) {
   };
 
   BlockStub block{};
-  ASSERT_STREQ (block.getName().c_str(), "");
+  EXPECT_STREQ (block.getName().c_str(), "");
 
   block.setName("THE test Block");
-  ASSERT_STREQ (block.getName().c_str(), "THE test Block");
+  EXPECT_STREQ (block.getName().c_str(), "THE test Block");
 }
 
 
