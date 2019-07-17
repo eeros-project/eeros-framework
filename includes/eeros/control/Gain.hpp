@@ -3,6 +3,8 @@
 
 #include <eeros/control/Block1i1o.hpp>
 #include <type_traits>
+#include <memory>
+#include <mutex>
 
 
 namespace eeros {
@@ -20,7 +22,11 @@ namespace eeros {
 		 * output type and the gain type when the class template is instanciated.
 		 * The non-type template argument specifies if the multiplication will be done
 		 * element wise in case the gain is used with matrices.
-		 * 
+		 *
+		 * A gain block is suitable for use with multiple threads. However,
+		 * enabling/disabling of the gain and the smooth change feature
+		 * is not synchronized.
+		 *
 		 * @tparam Tout - output type (double - default type)
 		 * @tparam Tgain - gain type (double - default type)
 		 * @tparam elementWise - amplify element wise (false - default value)
@@ -92,7 +98,9 @@ namespace eeros {
 			 * @see disable()
 			 */
 			virtual void run() {
-				if(smoothChange) {
+                std::lock_guard<std::mutex> lock(mtx);
+
+                if(smoothChange) {
 				    if(gain < targetGain) {
 					gain += gainDiff;
 					if(gain > targetGain) { // overshoot case.
@@ -183,7 +191,9 @@ namespace eeros {
 			 * @param c - gain value
 			 */
 			virtual void setGain(Tgain c) {
-				if(c <= maxGain && c >= minGain) {
+                std::lock_guard<std::mutex> lock(mtx);
+
+                if(c <= maxGain && c >= minGain) {
 				    if(smoothChange) {
 					targetGain = c;
 				    }else {
@@ -199,7 +209,8 @@ namespace eeros {
 			 * @param maxGain - maximum allowed gain value
 			 */
 			virtual void setMaxGain(Tgain maxGain) {
-				this->maxGain = maxGain;
+                std::lock_guard<std::mutex> lock(mtx);
+			    this->maxGain = maxGain;
 			}
 
 
@@ -209,7 +220,8 @@ namespace eeros {
 			 * @param minGain - minimum allowed gain value
 			 */
 			virtual void setMinGain(Tgain minGain) {
-				this->minGain = minGain;
+                std::lock_guard<std::mutex> lock(mtx);
+			    this->minGain = minGain;
 			}
 
 
@@ -219,7 +231,8 @@ namespace eeros {
 			 * @param gainDiff - gain differential
 			 */
 			virtual void setGainDiff(Tgain gainDiff) {
-				    this->gainDiff = gainDiff;
+                std::lock_guard<std::mutex> lock(mtx);
+			    this->gainDiff = gainDiff;
 			}
 
 
@@ -239,6 +252,7 @@ namespace eeros {
 			Tgain gainDiff;
 			bool enabled{true};
 			bool smoothChange{false};
+            std::mutex mtx;
 
 
 		private:
