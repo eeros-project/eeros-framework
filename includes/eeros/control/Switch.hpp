@@ -13,8 +13,9 @@ namespace eeros {
 
 		/**
 		 * A switch allows to select a signal from severel inputs to be routed to the output.
-		 * If a signal at a chosen input exceeds a limit, the switch can automatically switch 
+		 * If a signal at a chosen input is close to a predefined value, the switch can automatically switch 
 		 * to a predefined position and a safety event can be triggered.
+		 * Two or more switches can be connected together. This mechanism allows to switch them simultaneously.
 		 * 
 		 * @tparam N - number of inputs
 		 * @tparam T - value type (double - default type)
@@ -97,7 +98,7 @@ namespace eeros {
                        
 			/**
 			* Registers a safety system together with a safety event, which will be
-			* triggered as soon as auto switching takes place.
+			* triggered as soon as auto switching takes place and the trigger was armed beforehand.
 			 * @see setCondition()
 			* 
 			* @tparam ss - safety system
@@ -109,12 +110,15 @@ namespace eeros {
 			}
 
 			/**
-			* Registers a safety system together with a safety event, which will be
-			* triggered as soon as auto switching takes place.
-			* @see setCondition()
+			* Configure the switch so that it switches only after the input signal is close 
+			* to a given level within a certain margin. Switching will then happen automatically
+			* if the switch is armed.
+			* It is possible to trigger a safety event upon switching
+			 * @see registerSafetyEvent()
 			* 
-			* @tparam ss - safety system
-			* @tparam e - safety event
+			* @tparam switchLevel - level, that the input signal has to reach
+			* @tparam delta - level margin, that the input signal has to reach
+			* @tparam index - position to switch to 
 			*/
 			virtual void setCondition(T switchLevel, T delta, uint8_t index) {
 				this->switchLevel = switchLevel;
@@ -123,7 +127,7 @@ namespace eeros {
 			}
                        
 			/**
-			* Allows to trigger a safety event.
+			* Allows to switch automatically.
 			* @see setCondition()
 			*/
 			virtual void arm() {
