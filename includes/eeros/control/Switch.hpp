@@ -15,7 +15,7 @@ namespace eeros {
 		 * A switch allows to select a signal from severel inputs to be routed to the output.
 		 * If a signal at a chosen input is close to a predefined value, the switch can automatically switch 
 		 * to a predefined position and a safety event can be triggered.
-		 * Two or more switches can be connected together. This mechanism allows to switch them simultaneously.
+		 * Two or more switches can be combined. This mechanism allows to switch them simultaneously.
 		 * 
 		 * @tparam N - number of inputs
 		 * @tparam T - value type (double - default type)
@@ -152,7 +152,7 @@ namespace eeros {
 			* 
 			* @tparam s - switch to be connected to this switch
 			*/
-			virtual void connect(Switch& s) {
+			virtual void combine(Switch& s) {
 				c.push_back(&s);
 				s.switchToInput(currentInput);
 			}
