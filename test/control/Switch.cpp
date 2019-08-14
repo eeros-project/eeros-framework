@@ -43,7 +43,7 @@ TEST(controlSwitchTest, combined) {
 	EXPECT_EQ(s1.getCurrentInput(), 1);
 	EXPECT_EQ(s2.getCurrentInput(), 0);
 	EXPECT_EQ(s3.getCurrentInput(), 1);
-	s1.connect(s2);
+	s1.combine(s2);
 	EXPECT_EQ(s1.getCurrentInput(), 1);
 	EXPECT_EQ(s2.getCurrentInput(), 1);
 	EXPECT_EQ(s3.getCurrentInput(), 1);
@@ -51,7 +51,7 @@ TEST(controlSwitchTest, combined) {
 	EXPECT_EQ(s1.getCurrentInput(), 0);
 	EXPECT_EQ(s2.getCurrentInput(), 0);
 	EXPECT_EQ(s3.getCurrentInput(), 1);
-	s1.connect(s3);
+	s1.combine(s3);
 	EXPECT_EQ(s1.getCurrentInput(), 0);
 	EXPECT_EQ(s2.getCurrentInput(), 0);
 	EXPECT_EQ(s3.getCurrentInput(), 0);
