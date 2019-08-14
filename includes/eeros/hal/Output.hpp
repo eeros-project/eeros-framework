@@ -24,6 +24,8 @@ namespace eeros {
 			virtual void set(T value) = 0;
 			virtual void setTimestampSignalIn(uint64_t timestampNs) { return; }
 			virtual void *getLibHandle() { return libHandle; }
+
+			T safe;
 		private:
 			std::string id;
 			void *libHandle;

@@ -16,13 +16,13 @@ HAL& HAL::instance() {
 }
 
 bool HAL::readConfigFromFile(std::string file) {
-	
 	parser = JsonParser(file);
 	parser.createHalObjects(hwLibraries);
 	return true;
 }
 
 bool HAL::readConfigFromFile(int* argc, char** argv) {
+	if (*argc < 3) throw Fault("no configuration file given as argument. Use -c ConfigFile.json");
 	
 	// Error message if long dashes (en dash) are used
 	int i;

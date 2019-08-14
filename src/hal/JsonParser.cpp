@@ -45,6 +45,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	double offset = 0;
 	double rangeMin = 0;
 	double rangeMax = 0;
+	double safe = std::numeric_limits<double>::quiet_NaN();
 	bool channelCreated = false;
   
 	if (halRootObj) {
@@ -93,7 +94,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 								if(libIt != libHandles.end()){
 									if(!devHandle.empty()){
 									  
-										parseChannelProperties(chanObj, &chanType, &sigId, &scale, &offset, &rangeMin, &rangeMax, &chanUnit, &inverted, &additionalArguments);
+										parseChannelProperties(chanObj, &chanType, &sigId, &scale, &offset, &rangeMin, &rangeMax, &safe, &chanUnit, &inverted, &additionalArguments);
 										
 										if(chanType.empty()){
 											chanType = type;
@@ -120,7 +121,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										auto typeIt = typeOfChannel.find(chanType);
 										if(typeIt != typeOfChannel.end() && !channelCreated){
 											if(typeIt->second == Real){
-												createRealObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, chanUnit, additionalArguments);
+												createRealObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, safe, chanUnit, additionalArguments);
 											}
 											else if(typeIt->second == Logic){
 												createLogicObject(libIt->second, chanType, sigId, devHandle, subDevNumber, channelNumber, inverted, additionalArguments);
@@ -139,6 +140,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 										offset = 0;
 										rangeMin = 0;
 										rangeMax = 0;
+										safe = std::numeric_limits<double>::quiet_NaN();
 										channelCreated = false;
 									}
 									else{
@@ -171,7 +173,7 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 	log.trace() << "HAL objects created";
 }
 
-void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType, std::string* sigId, double* scale, double* offset, double* rangeMin, double* rangeMax, std::string *chanUnit, bool *inverted, std::string* additionalArguments){
+void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType, std::string* sigId, double* scale, double* offset, double* rangeMin, double* rangeMax, double* safe, std::string *chanUnit, bool *inverted, std::string* additionalArguments){
 	*sigId = chanObj["signalId"].string_value();
 	*chanType = chanObj["type"].string_value();
 	*inverted = chanObj["inverted"].bool_value();
@@ -181,7 +183,9 @@ void JsonParser::parseChannelProperties(ucl::Ucl chanObj, std::string* chanType,
 		if(chanProp.key() == "unit"){
 			*chanUnit = chanProp.string_value();
 		}
-		
+		if(chanProp.key() == "safe"){
+			*safe = chanProp.number_value();
+		}		
 	}
 	
 	calcScale(chanObj, scale, offset, rangeMin, rangeMax);
@@ -380,7 +384,7 @@ void JsonParser::createLogicObject(void *libHandle, std::string type, std::strin
 	}
 }
 
-void JsonParser::createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset, double rangeMin, double rangeMax, std::string unit, std::string additionalArguments){
+void JsonParser::createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset, double rangeMin, double rangeMax, double safe, std::string unit, std::string additionalArguments){
 	HAL& hal = HAL::instance();
 	
 	if(libHandle == nullptr || type.empty() || id.empty() || devHandle.empty()){
@@ -400,6 +404,7 @@ void JsonParser::createRealObject(void *libHandle, std::string type, std::string
 		}
 		else if(dirIt->second == Out){
 			ScalableOutput<double> *halObj = reinterpret_cast<ScalableOutput<double> *(*)(std::string, void*, std::string, uint32_t, uint32_t, double, double, double, double, std::string, std::string)>(createHandle)(id, libHandle, devHandle, subDevNumber, channelNumber, scale, offset, rangeMin, rangeMax, unit, additionalArguments);
+			halObj->safe = safe;
 			hal.addOutput(halObj);
 		}
 		else{
