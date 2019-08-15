@@ -38,7 +38,7 @@ namespace eeros {
 		
 		class SpaceNavigator : public eeros::Thread {
 		public:
-			explicit SpaceNavigator(std::string dev);
+			explicit SpaceNavigator(std::string dev, int priority);
 			~SpaceNavigator();
 			virtual std::string name();
 			

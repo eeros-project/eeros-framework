@@ -3,7 +3,7 @@
 using namespace eeros::control;
 using namespace eeros::math;
 
-SpaceNavigatorInput::SpaceNavigatorInput(std::string dev) : sn(dev), rotOut(this), buttonOut(this) {
+SpaceNavigatorInput::SpaceNavigatorInput(std::string dev, int priority) : sn(dev, priority), rotOut(this), buttonOut(this) {
 	setInitPos({0,0,0});
 }
 

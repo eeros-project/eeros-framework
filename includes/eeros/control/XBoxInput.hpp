@@ -16,7 +16,7 @@ namespace eeros {
 
 		class XBoxInput: public Block1o<Matrix<XBOX_AXIS_COUNT>> {
 		public:
-			XBoxInput(std::string dev);
+			XBoxInput(std::string dev, int priority = 5);
 			virtual ~XBoxInput();
 			
 			virtual void run();

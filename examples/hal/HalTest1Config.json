@@ -34,6 +34,7 @@
 							"minIn":	0,  	"maxIn": 	65536,
 							"minOut":	-10.0,	"maxOut": 	10.0 }
 					 ],
+				"safe": 2.5,
 				"unit": "V"
 			},
 			"channel1": {

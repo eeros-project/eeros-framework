@@ -16,7 +16,7 @@ namespace eeros {
 
 		void sigPipeHandler(int signum) {std::cout << "SIGPIPE received" << std::endl; }
 		
-		SequencerUI::SequencerUI() {
+		SequencerUI::SequencerUI(int priority) : Thread(priority) {
 			this->port = 7799;
 			this->period = 0.01;
 			signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application

@@ -21,7 +21,7 @@ namespace eeros {
 
 		class Keyboard : public eeros::Thread {
 		public:
-			explicit Keyboard();
+			explicit Keyboard(int priority);
 			~Keyboard();
 			Events events;
 			bool homed[5];
