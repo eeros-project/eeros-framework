@@ -10,7 +10,7 @@ namespace eeros {
 		
 		class SequencerUI : public eeros::Thread {
 		public:
-			SequencerUI();
+			SequencerUI(int priority = 5);
 			virtual ~SequencerUI();
 			
 			virtual void stop();

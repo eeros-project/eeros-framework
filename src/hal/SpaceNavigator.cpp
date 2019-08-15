@@ -9,7 +9,7 @@
 
 using namespace eeros::hal;
 
-SpaceNavigator::SpaceNavigator(std::string dev) {
+SpaceNavigator::SpaceNavigator(std::string dev, int priority) : Thread(priority) {
 		this->open(dev.c_str());
 		this->useRaw = (dev.find("raw") != std::string::npos);
 		button[0] = new SpaceNavigatorDigIn("SpaceNavButtonL", this);

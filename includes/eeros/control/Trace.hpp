@@ -88,7 +88,7 @@ namespace eeros {
 		template < typename T = double >
 		class TraceWriter : public eeros::Thread {
 		public:
-			explicit TraceWriter(Trace<T>& trace, std::string fileName) : trace(trace), name(fileName) { }
+			explicit TraceWriter(Trace<T>& trace, std::string fileName, int priority = 5) : Thread(priority), trace(trace), name(fileName) { }
 			~TraceWriter() {running = false;}
 			void write() {go = true;}
 			

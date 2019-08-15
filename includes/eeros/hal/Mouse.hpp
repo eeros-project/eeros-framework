@@ -29,7 +29,7 @@ namespace eeros {
 		
 		class Mouse : public eeros::Thread {
 		public:
-			explicit Mouse(std::string dev);
+			explicit Mouse(std::string dev, int priority);
 			~Mouse();
 			virtual void on_event(std::function<void(struct input_event)> action);
 			virtual void on_button(std::function<void(int, bool)> action);

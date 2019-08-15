@@ -9,7 +9,7 @@
 
 using namespace eeros::hal;
 
-Mouse::Mouse(std::string dev) {
+Mouse::Mouse(std::string dev, int priority) : Thread(priority) {
 	open(dev.c_str());
 	left = new MouseDigIn("leftMouseButton", this);
 	middle = new MouseDigIn("middleMouseButton", this);
@@ -21,14 +21,14 @@ Mouse::Mouse(std::string dev) {
 
 	current.button.left = 0;
 	current.button.middle = 0;
-        current.button.right = 0;
+	current.button.right = 0;
 
-        current.axis.x = 0;
-        current.axis.y = 0;
-        current.axis.z = 0;
-        current.axis.r = 0;
+	current.axis.x = 0;
+	current.axis.y = 0;
+	current.axis.z = 0;
+	current.axis.r = 0;
 
-        last = current;
+	last = current;
 }
 
 Mouse::~Mouse() {

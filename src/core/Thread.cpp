@@ -6,9 +6,9 @@
 
 using namespace eeros;
 
-Thread::Thread() : t([&]() {
+Thread::Thread(int priority) : t([&,priority]() {
 	struct sched_param schedulingParam;
-	schedulingParam.sched_priority = 5;
+	schedulingParam.sched_priority = priority;
 	if (sched_setscheduler(0, SCHED_FIFO, &schedulingParam) != 0) log.error() << "could not set realtime priority";
 	sched_getparam(0, &schedulingParam);
 	log.trace() << "thread " << getpid() << ":" << syscall(SYS_gettid) << " with priority " << schedulingParam.sched_priority << " started.";
