@@ -5,7 +5,17 @@
 		"subdevice2": {
 			"type": "AnalogOut",
 			"channel0": {
-				"signalId": "out"
+				"signalId": "out",
+				"scale": [ { "id" : "dac",
+							"minIn": 	0, 		"maxIn": 	1023,
+							"minOut": 	-10.0,	"maxOut": 	10.0 }
+					 ],
+				"range": [ { "id" : "dac",
+							"minIn":	0,  	"maxIn": 	1023,
+							"minOut":	-10.0,	"maxOut": 	10.0 }
+					 ],
+				"safe": 1.2,
+				"unit": "V"
 			}
 		}
 	}
