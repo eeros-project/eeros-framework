@@ -5,6 +5,9 @@
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/logger/Logger.hpp>
+#include <type_traits>
+#include <memory>
+#include <mutex>
 
 
 namespace eeros {
@@ -30,6 +33,7 @@ namespace control {
  * is limit checked. This is for example useful with the class Matrix when
  * the norm of a vector must be limit checked.
  *
+ * A signal checker block is suitable for use with multiple threads.
  *
  * @tparam Tsig - signal type (double - default type)
  * @tparam Tlim - limit type (Tsig - default type)
@@ -74,6 +78,8 @@ class SignalChecker : public Block1i<Tsig> {
    * @see setActiveLevel(safety::SafetyLevel)
    */
   virtual void run() override {
+    std::lock_guard<std::mutex> lock(mtx);
+
     auto val = this->in.getSignal().getValue();
     if (!fired) {
       if (limitsExceeded<bool>(val)) {
@@ -98,6 +104,7 @@ class SignalChecker : public Block1i<Tsig> {
    * @param upperLimit - upper limit value
    */
   virtual void setLimits(Tlim lowerLimit, Tlim upperLimit) {
+    std::lock_guard<std::mutex> lock(mtx);
     this->lowerLimit = lowerLimit;
     this->upperLimit = upperLimit;
   }
@@ -107,6 +114,7 @@ class SignalChecker : public Block1i<Tsig> {
    * Resets the checker so it can fire a safety event again.
    */
   virtual void reset() {
+    std::lock_guard<std::mutex> lock(mtx);
     fired = false;
   }
 
@@ -118,6 +126,7 @@ class SignalChecker : public Block1i<Tsig> {
    * @param e - SafetyEvent
    */
   virtual void registerSafetyEvent(safety::SafetySystem &ss, safety::SafetyEvent &e) {
+    std::lock_guard<std::mutex> lock(mtx);
     safetySystem = &ss;
     safetyEvent = &e;
   }
@@ -129,6 +138,7 @@ class SignalChecker : public Block1i<Tsig> {
    * @param level - SafetyLevel
    */
   virtual void setActiveLevel(safety::SafetyLevel &level) {
+    std::lock_guard<std::mutex> lock(mtx);
     activeLevel = &level;
   }
 
@@ -140,6 +150,7 @@ class SignalChecker : public Block1i<Tsig> {
   safety::SafetyEvent *safetyEvent;
   safety::SafetyLevel *activeLevel;
   eeros::logger::Logger log{};
+  std::mutex mtx{};
 
 
  private:
