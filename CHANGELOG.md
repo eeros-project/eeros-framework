@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added Features
 * **control:** Add connection information to SocketData, SocketServer, SocketClient classes ([e3243d1](https://github.com/eeros-project/eeros-framework/commit/e3243d1))
+* **examples/development:** Add thread safety manual test example. ([pull request #24](https://github.com/eeros-project/eeros-framework/pull/24))
+* **test:** Upgrade Google Test framework. ([pull request #24](https://github.com/eeros-project/eeros-framework/pull/24))
+* **test/control:** Improve unit tests. ([pull request #24](https://github.com/eeros-project/eeros-framework/pull/24))
 
 
 ## v1.0.0
