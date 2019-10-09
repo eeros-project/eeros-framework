@@ -16,7 +16,7 @@ namespace eeros {
 
 		class MouseInput: public Block1o<Vector4> {
 		public:
-			MouseInput(std::string dev);
+			MouseInput(std::string dev, int priority = 5);
 			virtual ~MouseInput();
 
 			Output<Matrix<3,1,bool>>& getButtonOut();

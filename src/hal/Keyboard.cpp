@@ -9,7 +9,7 @@
 
 using namespace eeros::hal;
 
-Keyboard::Keyboard() {
+Keyboard::Keyboard(int priority) : Thread(priority) {
 	tcgetattr(STDIN_FILENO, &tio);
 	tio.c_lflag &=(~ICANON & ~ECHO);
 	tcsetattr(STDIN_FILENO, TCSANOW, &tio);

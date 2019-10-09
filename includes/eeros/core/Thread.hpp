@@ -11,7 +11,7 @@ namespace eeros {
 	
 	class Thread {
 	public:
-		Thread();
+		Thread(int priority);
 		virtual ~Thread();
 		
 		virtual std::string getId() const;
@@ -23,6 +23,7 @@ namespace eeros {
 		virtual void run();
 		
 		std::thread t;
+// 		int priority;
 		eeros::logger::Logger log;
 	};
 };

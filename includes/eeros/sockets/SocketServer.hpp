@@ -23,7 +23,7 @@ namespace eeros {
 		template < uint32_t BufInLen, typename inT, uint32_t BufOutLen, typename outT >
 		class SocketServer : public eeros::Thread {
 		public:
-			SocketServer(uint16_t port, double period = 0.01, double timeout = 1.0) : read1({0}), read2({0}), read3({0}) {
+			SocketServer(uint16_t port, double period = 0.01, double timeout = 1.0, int priority = 5) : Thread(priority), read1({0}), read2({0}), read3({0}) {
 				this->port = port;
 				this->period = period;
 				this->timeout = timeout;

@@ -46,7 +46,7 @@ namespace eeros {
 		
 		class XBox : public eeros::Thread{
 		public:
-			explicit XBox(std::string dev);
+			explicit XBox(std::string dev, int priority);
 			~XBox();
 			virtual void on_event(std::function<void(struct js_event)> action);
 			virtual void on_button(std::function<void(int, bool)> action);

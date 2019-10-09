@@ -16,7 +16,7 @@ namespace eeros {
 
 		class SpaceNavigatorInput : public Block1o<Matrix<SPACENAVIGATOR_AXIS_COUNT>> {
 		public:
-			SpaceNavigatorInput(std::string dev);
+			SpaceNavigatorInput(std::string dev, int priority = 5);
 			virtual ~SpaceNavigatorInput();
 			
 			virtual void run();

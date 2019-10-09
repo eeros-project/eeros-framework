@@ -16,7 +16,7 @@ namespace eeros {
 
 		class KeyboardInput: public Block1o<Vector4> {
 		public:
-			KeyboardInput();
+			KeyboardInput(int priority = 5);
 			virtual ~KeyboardInput();
 
 			Output<Vector<5,bool>>& getIsHomed();

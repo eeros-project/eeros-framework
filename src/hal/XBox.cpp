@@ -10,7 +10,7 @@ using namespace eeros::hal;
 
 const double XBoxState::axis_max = 0x7fff;
 
-XBox::XBox(std::string dev) {
+XBox::XBox(std::string dev, int priority) : Thread(priority) {
 	open(dev.c_str());
 	button[0] = new XBoxDigIn("XBoxButtonA", this);
 	button[1] = new XBoxDigIn("XBoxButtonB", this);
