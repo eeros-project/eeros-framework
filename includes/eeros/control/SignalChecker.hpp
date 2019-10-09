@@ -1,5 +1,5 @@
-#ifndef ORG_EEROS_SIGNAL_CHECKER_HPP_
-#define ORG_EEROS_SIGNAL_CHECKER_HPP_
+#ifndef ORG_EEROS_CONTROL_SIGNALCHECKER_HPP_
+#define ORG_EEROS_CONTROL_SIGNALCHECKER_HPP_
 
 #include <eeros/control/Block1i.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
@@ -10,11 +10,44 @@
 namespace eeros {
 namespace control {
 
-using namespace safety;
+/**
+ * A signal checker block is used to check if a signal is between a lower
+ * and upper limit. If it exceeds the limits, a safety event is triggered.
+ * The safety event is triggered only if a safety event is registered and the
+ * current safety level is greater or the same as the active level set on this
+ * signal checker.
+ * If a safety event was already triggered, the signal checker must be reset
+ * before it will trigger another safety event.
+ * @see reset()
+ *
+ *
+ * SignalChecker is a class template with two type and one non-type
+ * template arguments.
+ * The two type template arguments specify the types which are used for the
+ * signal type and the limit type when the class template is instanciated.
+ * The non-type template argument enables the usage of the norm() method
+ * on the signal type. If set to true, the return value of the norm() method
+ * is limit checked. This is for example useful with the class Matrix when
+ * the norm of a vector must be limit checked.
+ *
+ *
+ * @tparam Tsig - signal type (double - default type)
+ * @tparam Tlim - limit type (Tsig - default type)
+ * @tparam checkNorm - use of the norm() method (false - default value)
+ *
+ * @since v0.6
+ */
 
 template<typename Tsig = double, typename Tlim = Tsig, bool checkNorm = false>
 class SignalChecker : public Block1i<Tsig> {
+
  public:
+  /**
+   * Constructs a signal checker instance with a lower and upper limit.\n
+   *
+   * @param lowerLimit - initial lower limit value
+   * @param upperLimit - initial upper limit value
+   */
   SignalChecker(Tlim lowerLimit, Tlim upperLimit) :
       lowerLimit(lowerLimit),
       upperLimit(upperLimit),
@@ -24,6 +57,22 @@ class SignalChecker : public Block1i<Tsig> {
       activeLevel(nullptr) {}
 
 
+  /**
+   * Runs the checker algorithm.
+   *
+   * Checks if the signal is in the band in between lower and upper limit.
+   *
+   * Triggers a safety event otherwise.
+   *
+   * The safety event is triggered only if:\n
+   *  * a safety event is registered\n
+   *  * the current safety level is greater or the same
+   *    as the active level set on this signal checker
+   *
+   *
+   * @see registerSafetyEvent(safety::SafetySystem, safety::SafetyEvent)
+   * @see setActiveLevel(safety::SafetyLevel)
+   */
   virtual void run() override {
     auto val = this->in.getSignal().getValue();
     if (!fired) {
@@ -42,24 +91,44 @@ class SignalChecker : public Block1i<Tsig> {
   }
 
 
+  /**
+   * Sets the lower and upper limit.
+   *
+   * @param lowerLimit - lower limit value
+   * @param upperLimit - upper limit value
+   */
   virtual void setLimits(Tlim lowerLimit, Tlim upperLimit) {
     this->lowerLimit = lowerLimit;
     this->upperLimit = upperLimit;
   }
 
 
+  /**
+   * Resets the checker so it can fire a safety event again.
+   */
   virtual void reset() {
     fired = false;
   }
 
 
-  virtual void registerSafetyEvent(SafetySystem &ss, SafetyEvent &e) {
+  /**
+   * Registers a safety event.
+   *
+   * @param ss - SafetySystem
+   * @param e - SafetyEvent
+   */
+  virtual void registerSafetyEvent(safety::SafetySystem &ss, safety::SafetyEvent &e) {
     safetySystem = &ss;
     safetyEvent = &e;
   }
 
 
-  virtual void setActiveLevel(SafetyLevel &level) {
+  /**
+   * Sets the active safety level on this signal checker.
+   *
+   * @param level - SafetyLevel
+   */
+  virtual void setActiveLevel(safety::SafetyLevel &level) {
     activeLevel = &level;
   }
 
@@ -67,9 +136,9 @@ class SignalChecker : public Block1i<Tsig> {
  protected:
   Tlim lowerLimit, upperLimit;
   bool fired;
-  SafetySystem *safetySystem;
-  SafetyEvent *safetyEvent;
-  SafetyLevel *activeLevel;
+  safety::SafetySystem *safetySystem;
+  safety::SafetyEvent *safetyEvent;
+  safety::SafetyLevel *activeLevel;
   eeros::logger::Logger log{};
 
 
@@ -84,9 +153,8 @@ class SignalChecker : public Block1i<Tsig> {
   typename std::enable_if<checkNorm, S>::type limitsExceeded(Tsig value) {
     return !(value.norm() > lowerLimit && value.norm() < upperLimit);
   }
-
 };
 }
 }
 
-#endif /* ORG_EEROS_SIGNAL_CHECKER_HPP_ */
+#endif /* ORG_EEROS_CONTROL_SIGNALCHECKER_HPP_ */
