@@ -9,17 +9,17 @@ using namespace eeros;
 using namespace eeros::control;
 using namespace eeros::math;
 
-class SafetyPropertiesTest : public SafetyProperties {
+ class SafetyPropertiesTest : public safety::SafetyProperties {
 public:
 	SafetyPropertiesTest() : seUp("se up"), seDown("se Down"), sl1("sl 1"), sl2("sl 2") {	
 		addLevel(sl1);
 		addLevel(sl2);
-		sl1.addEvent(seUp, sl2, kPublicEvent);
-		sl2.addEvent(seDown, sl1, kPublicEvent);
+		sl1.addEvent(seUp, sl2, safety::kPublicEvent);
+		sl2.addEvent(seDown, sl1, safety::kPublicEvent);
 		setEntryLevel(sl1);	
 	}
-	SafetyEvent seUp, seDown;	
-	SafetyLevel sl1, sl2;
+   safety::SafetyEvent seUp, seDown;
+   safety::SafetyLevel sl1, sl2;
 };
 
 // Test unconnected input
@@ -43,7 +43,7 @@ TEST(controlSignalCheckerTest, limitsDouble) {
 	c1.run();
 	s1.run();
 	SafetyPropertiesTest ssProperties;
-	SafetySystem ss(ssProperties, 0.1);
+  safety::SafetySystem ss(ssProperties, 0.1);
 	ss.run();
 	EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl1);
 	s1.registerSafetyEvent(ss, ssProperties.seUp);
@@ -91,7 +91,7 @@ TEST(controlSignalCheckerTest, limitsMatrix) {
 	c1.run();
 	s1.run();
 	SafetyPropertiesTest ssProperties;
-	SafetySystem ss(ssProperties, 0.1);
+  safety::SafetySystem ss(ssProperties, 0.1);
 	ss.run();
 	EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl1);
 	s1.registerSafetyEvent(ss, ssProperties.seUp);
@@ -131,7 +131,7 @@ TEST(controlSignalCheckerTest, limitsMatrixNorm) {
   c1.run();
   s1.run(); // doesn't fire since no SE registered
   SafetyPropertiesTest ssProperties;
-  SafetySystem ss(ssProperties, 0.1);
+  safety::SafetySystem ss(ssProperties, 0.1);
   ss.run();
   EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl1);
   s1.registerSafetyEvent(ss, ssProperties.seUp);
