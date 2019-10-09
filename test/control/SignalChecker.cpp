@@ -123,3 +123,42 @@ TEST(controlSignalCheckerTest, limitsMatrix) {
 	ss.run();
 	EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl2);
 }
+
+TEST(controlSignalCheckerTest, limitsMatrixNorm) {
+  SignalChecker<Matrix<3,1,double>, double, true> s1(0.5, 1.0); // norm limit: 0.5 to 1.0
+  Constant<Matrix<3,1,double>> c1({0.57737, 0.57737, 0.57737}); // norm: 1.00003
+  s1.getIn().connect(c1.getOut());
+  c1.run();
+  s1.run(); // doesn't fire since no SE registered
+  SafetyPropertiesTest ssProperties;
+  SafetySystem ss(ssProperties, 0.1);
+  ss.run();
+  EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl1);
+  s1.registerSafetyEvent(ss, ssProperties.seUp);
+  s1.run(); // fires
+  ss.run();
+  EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl2);
+  ss.triggerEvent(ssProperties.seDown);
+  ss.run();
+  EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl1);
+  c1.setValue({0.577351, 0.577351, 0.577351}); // norm: 1.0
+  c1.run();
+  s1.reset();
+  s1.run(); // fires
+  ss.run();
+  EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl2);
+  ss.triggerEvent(ssProperties.seDown);
+  ss.run();
+  EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl1);
+  c1.setValue({0.577, 0.577, 0.577}); // norm: 0.999393
+  c1.run();
+  s1.reset();
+  s1.run(); // doesn't fire
+  ss.run();
+  EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl1);
+  c1.setValue({0.25, 0.25, 0.25}); // norm: 0.433013
+  c1.run();
+  s1.run(); // fires
+  ss.run();
+  EXPECT_TRUE(ss.getCurrentLevel() == ssProperties.sl2);
+}
