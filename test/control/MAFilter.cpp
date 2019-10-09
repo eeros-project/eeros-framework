@@ -26,7 +26,7 @@ TEST(MAFilterUnitTest, templateInstantiations) {
   
   using namespace math; 
   MAFilter<2,Matrix<2,2>, double> f5{dcoeffs};
-  ASSERT_TRUE(true); // they would fail at compile time.
+  EXPECT_TRUE(true); // they would fail at compile time.
 }
 
 
@@ -48,8 +48,8 @@ TEST(MAFilterUnitTest, doubleMAFilter) {
   ma.run();
   ma.run();
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue(), 2);
-  
-  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), ma.getOut().getSignal().getTimestamp());
+
+  EXPECT_EQ (c1.getOut().getSignal().getTimestamp(), ma.getOut().getSignal().getTimestamp());
 }
 
 
@@ -73,8 +73,8 @@ TEST(MAFilterUnitTest, enableDisable) {
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue(), 5);
   ma.run();
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue(), 5);
-  
-  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), ma.getOut().getSignal().getTimestamp());
+
+  EXPECT_EQ (c1.getOut().getSignal().getTimestamp(), ma.getOut().getSignal().getTimestamp());
 }
 
 
@@ -109,8 +109,8 @@ TEST(MAFilterUnitTest, vectorMAFilter) {
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue()[0], 1);
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue()[1], 2);
   EXPECT_DOUBLE_EQ (ma.getOut().getSignal().getValue()[2], 3);
-  
-  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), ma.getOut().getSignal().getTimestamp());
+
+  EXPECT_EQ (c1.getOut().getSignal().getTimestamp(), ma.getOut().getSignal().getTimestamp());
 }
 
 
@@ -145,5 +145,5 @@ TEST(MAFilterUnitTest, printMAFilter) {
   sstream << f1;
   std::string str1 = "Block MAFilter: 'my1stMAFilter' is enabled=1, coefficients:[0.2,0.2,0.2,0.2,0.2], previousValues:[1,2,3,4,3.14159]";
   std::string str2 = sstream.str();
-  ASSERT_STREQ (str1.c_str(), str2.c_str());
+  EXPECT_STREQ (str1.c_str(), str2.c_str());
 }

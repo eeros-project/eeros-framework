@@ -18,8 +18,8 @@ TEST(MedianFilterUnitTest, templateInstantiations) {
   
   using namespace math; 
   MedianFilter<2,Matrix<2,2>> f4{};
-  
-  ASSERT_TRUE(true); // they would fail at compile time.
+
+  EXPECT_TRUE(true); // they would fail at compile time.
 }
 
 
@@ -46,9 +46,9 @@ TEST(MedianFilterUnitTest, intMAFilter) {
   c1.run();
   mf.run();
 
-  ASSERT_EQ (mf.getOut().getSignal().getValue(), 3);
-  
-  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), mf.getOut().getSignal().getTimestamp());
+  EXPECT_EQ (mf.getOut().getSignal().getValue(), 3);
+
+  EXPECT_EQ (c1.getOut().getSignal().getTimestamp(), mf.getOut().getSignal().getTimestamp());
 }
 
 
@@ -70,8 +70,8 @@ TEST(MedianFilterUnitTest, doubleMAFilter1) {
   }
 
   EXPECT_DOUBLE_EQ (mf.getOut().getSignal().getValue(), -24.69);
-  
-  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), mf.getOut().getSignal().getTimestamp());
+
+  EXPECT_EQ (c1.getOut().getSignal().getTimestamp(), mf.getOut().getSignal().getTimestamp());
 }
 
 
@@ -176,8 +176,8 @@ TEST(MedianFilterUnitTest, doubleMAFilter2) {
 	mf.run();
   
   EXPECT_DOUBLE_EQ (mf.getOut().getSignal().getValue(), 2.26000000000001);
-  
-  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), mf.getOut().getSignal().getTimestamp());
+
+  EXPECT_EQ (c1.getOut().getSignal().getTimestamp(), mf.getOut().getSignal().getTimestamp());
 }
 
 
@@ -205,8 +205,8 @@ TEST(MedianFilterUnitTest, vector2MAFilter1) {
 
   EXPECT_DOUBLE_EQ (mf.getOut().getSignal().getValue()[0], 3);
   EXPECT_DOUBLE_EQ (mf.getOut().getSignal().getValue()[1], 8);
-  
-  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), mf.getOut().getSignal().getTimestamp());
+
+  EXPECT_EQ (c1.getOut().getSignal().getTimestamp(), mf.getOut().getSignal().getTimestamp());
 }
 
 
@@ -234,8 +234,8 @@ TEST(MedianFilterUnitTest, vector2MAFilter2) {
 
   EXPECT_DOUBLE_EQ (mf.getOut().getSignal().getValue()[0], 5);
   EXPECT_DOUBLE_EQ (mf.getOut().getSignal().getValue()[1], 100);
-  
-  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), mf.getOut().getSignal().getTimestamp());
+
+  EXPECT_EQ (c1.getOut().getSignal().getTimestamp(), mf.getOut().getSignal().getTimestamp());
 }
 
 
@@ -319,5 +319,5 @@ TEST(MedianFilterUnitTest, printMAFilter) {
   sstream << mf;
   std::string str1 = "Block MedianFilter: 'myMedianFilter' is enabled=1, current median=2, medianIndex=1, current values:[2,3,1]";
   std::string str2 = sstream.str();
-  ASSERT_STREQ (str1.c_str(), str2.c_str());
+  EXPECT_STREQ (str1.c_str(), str2.c_str());
 }

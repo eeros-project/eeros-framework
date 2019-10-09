@@ -23,7 +23,7 @@ TEST(controlGainTest, templateInstantiations) {
   Gain<Matrix<3,1>,Matrix<3,3>> g10{};
   Gain<Matrix<3,1>,Matrix<3,1>,true> g11{};
 
-  ASSERT_TRUE(true);
+  EXPECT_TRUE(true);
 }
 
 
@@ -45,7 +45,7 @@ TEST(controlGainTest, simpleDoubleGain) {
   g1.run();
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 5.2);
 
-  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), g1.getOut().getSignal().getTimestamp());
+  EXPECT_EQ (c1.getOut().getSignal().getTimestamp(), g1.getOut().getSignal().getTimestamp());
 }
 
 
@@ -67,7 +67,7 @@ TEST(controlGainTest, simpleIntGain) {
   g1.run();
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue(), 4);
 
-  ASSERT_EQ (c1.getOut().getSignal().getTimestamp(), g1.getOut().getSignal().getTimestamp());
+  EXPECT_EQ (c1.getOut().getSignal().getTimestamp(), g1.getOut().getSignal().getTimestamp());
 }
 
 
@@ -469,5 +469,5 @@ TEST(controlGainTest, printGain) {
   sstream << g;
   std::string str1 = "Block Gain: 'myGain' is enabled=1, gain=8.2, smoothChange=1, minGain=-8, maxGain=8.2, targetGain=2, gainDiff=0.1";
   std::string str2 = sstream.str();
-  ASSERT_STREQ (str1.c_str(), str2.c_str());
+  EXPECT_STREQ (str1.c_str(), str2.c_str());
 }
