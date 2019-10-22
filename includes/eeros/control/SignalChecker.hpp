@@ -74,8 +74,8 @@ class SignalChecker : public Block1i<Tsig> {
    *    as the active level set on this signal checker
    *
    *
-   * @see registerSafetyEvent(safety::SafetySystem, safety::SafetyEvent)
-   * @see setActiveLevel(safety::SafetyLevel)
+   * @see registerSafetyEvent()
+   * @see setActiveLevel()
    */
   virtual void run() override {
     std::lock_guard<std::mutex> lock(mtx);
