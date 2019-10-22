@@ -8,11 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 (v1.1.0 targeted for 2019-06-30) ([Github compare v1.0.0...master](https://github.com/eeros-project/eeros-framework/compare/v1.0.0...master))
 
 ### Added Features
-* **control:** Add connection information to SocketData, SocketServer, SocketClient classes ([e3243d1](https://github.com/eeros-project/eeros-framework/commit/e3243d1))
-* **control/Gain:** Block is suitable for use with multiple threads. ([pull request #23](https://github.com/eeros-project/eeros-framework/pull/23))
-* **examples/development:** Add thread safety manual test example. ([pull request #24](https://github.com/eeros-project/eeros-framework/pull/24))
-* **test:** Upgrade Google Test framework. ([pull request #24](https://github.com/eeros-project/eeros-framework/pull/24))
-* **test/control:** Improve unit tests. ([pull request #24](https://github.com/eeros-project/eeros-framework/pull/24))
+* Make control blocks thread safe
+* Simplify creation of steps and sequences
+* Allow for switches to be combined
+* Add millisecond resolution to logger output
+* Peripheral output block now has fail safe state
+* Thread priorities can be chosen upon construction
+* Add connection information to Socket connection classes
+* SignalChecker can limit check the norm of a vector
+* Improve unit tests
 
 
 ## v1.0.0
