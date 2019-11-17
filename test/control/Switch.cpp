@@ -16,7 +16,7 @@ TEST(controlSwitchTest, templateInstantiations) {
 	Switch<3,int> s3{0};
 	Switch<2,double> s4{0};
 	Switch<4,Matrix<2,2>> s5{1};
-	ASSERT_TRUE(true);
+	EXPECT_TRUE(true);
 }
 
 // Test initial values for NaN

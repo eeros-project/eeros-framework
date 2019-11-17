@@ -5,11 +5,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## Unreleased
-(v1.1.0 targeted for 2019-06-30) ([Github compare v1.0.0...master](https://github.com/eeros-project/eeros-framework/compare/v1.0.0...master))
+(v1.2.0 targeted for 2020-03-31) ([GitHub compare v1.1.0...master](https://github.com/eeros-project/eeros-framework/compare/v1.1.0...master))
+
+
+## v1.1.0
+(2019-10-22) ([GitHub compare v1.0.0...v1.1.0](https://github.com/eeros-project/eeros-framework/compare/v1.0.0...v1.1.0))
 
 ### Added Features
-* **control:** Add connection information to SocketData, SocketServer, SocketClient classes ([e3243d1](https://github.com/eeros-project/eeros-framework/commit/e3243d1))
-* **control/Gain:** Block is suitable for use with multiple threads. ([pull request #23](https://github.com/eeros-project/eeros-framework/pull/23))
+* Make control blocks thread safe
+* Simplify creation of steps and sequences
+* Allow for switches to be combined
+* Add millisecond resolution to logger output
+* Peripheral output block now has fail safe state
+* Thread priorities can be chosen upon construction
+* Add connection information to Socket connection classes
+* SignalChecker can limit check the norm of a vector
+* Improve unit tests
+
 
 ## v1.0.0
 (2019-01-29) ([Github compare v0.6.0...v1.0.0](https://github.com/eeros-project/eeros-framework/compare/v0.6.0...v1.0.0))
@@ -30,3 +42,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notes
 In this version, CMake does not fetch the library version information from git.
+
