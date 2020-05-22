@@ -88,24 +88,22 @@ int main() {
 	
 	log.info() << "Trace test started...";
 	
-	ControlSystem controlSystem;
-
-	// Create and initialize safety system
-	SafetyPropertiesTest ssProperties(controlSystem);
-	SafetySystem safetySys(ssProperties, period);
+	ControlSystem cs;
+	SafetyPropertiesTest sp(cs);
+	SafetySystem safetySys(sp, period);
 	
 	// create time domain and add blocks of control system
 	TimeDomain td("td1", period, true);
-	td.addBlock(controlSystem.c);
-	td.addBlock(controlSystem.i);
-	td.addBlock(controlSystem.trace1);
-	td.addBlock(controlSystem.trace2);
+	td.addBlock(cs.c);
+	td.addBlock(cs.i);
+	td.addBlock(cs.trace1);
+	td.addBlock(cs.trace2);
 	
 	// create periodic function for logging
 	Lambda l1 ([&] () { });
 	Periodic periodic("per1", 0.5, l1);
 	periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
-		log.info() << controlSystem.i.getOut().getSignal();
+		log.info() << cs.i.getOut().getSignal();
 	});
 	
 	// Create and run executor
@@ -120,10 +118,10 @@ int main() {
 	uint64_t start = eeros::System::getTimeNs();
 	std::ofstream file;
 	file.open(fileName, std::ios::trunc);
-	timestamp_t* timeStampBuf = controlSystem.trace1.getTimestampTrace();
-	Vector3* buf1 = controlSystem.trace1.getTrace();
-	Vector3* buf2 = controlSystem.trace2.getTrace();
-	for (uint32_t i = 0; i < controlSystem.trace1.getSize(); i++) file << timeStampBuf[i] << " " << buf1[i] << " " << buf2[i] << std::endl;
+	timestamp_t* timeStampBuf = cs.trace1.getTimestampTrace();
+	Vector3* buf1 = cs.trace1.getTrace();
+	Vector3* buf2 = cs.trace2.getTrace();
+	for (uint32_t i = 0; i < cs.trace1.getSize(); i++) file << timeStampBuf[i] << " " << buf1[i] << " " << buf2[i] << std::endl;
 	file.close();
 	uint64_t stop = eeros::System::getTimeNs();
 	log.info() << "file written in " << (stop - start) << "ns";

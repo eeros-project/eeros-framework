@@ -18,9 +18,14 @@ namespace eeros {
 		class Trace : public Block1i<T> {
 		public:
 			Trace(uint32_t bufLen) : maxBufLen(bufLen) {
-				this->buf = new T[bufLen];
-				this->timeBuf = new timestamp_t[bufLen];
+				buf = new T[bufLen];
+				timeBuf = new timestamp_t[bufLen];
 			}
+			
+			~Trace() {
+               delete(buf);
+               delete(timeBuf);
+            }
 
 			virtual void run() {
 				if (running) {
