@@ -5,6 +5,7 @@
 #include <eeros/control/Block.hpp>
 #include <eeros/control/Input.hpp>
 #include <eeros/control/Output.hpp>
+#include <eeros/math/Matrix.hpp>
 #include <eeros/core/Fault.hpp>
 #include <canopen-drv.h>
 #include <canopen.h>
@@ -12,22 +13,17 @@
 
 using namespace eeros::control;
 using namespace eeros::logger;
+using namespace eeros::math;
 
 namespace eeros {
 namespace control {
 
+template < uint8_t N = 2 >
 class CanSendFaulhaber : public Block {
  public:
-  CanSendFaulhaber(int socket, std::initializer_list<int> node)
-      : socket(socket), nodes(node), lastCtrlValue(node.size(), 0), log('Y') {
-    for (int i = 0; i < node.size(); i++) {
-      inPos.push_back(new Input<double>());
-      inPosScale.push_back(1.0);
-      inVel.push_back(new Input<double>());
-      inVelScale.push_back(1.0);
-      inCtrl.push_back(new Input<uint16_t>());
-      lastCtrlValue.push_back(0);
-    }
+  CanSendFaulhaber(int socket, std::initializer_list<uint8_t> node, std::initializer_list<uint8_t> functionCode)
+      : socket(socket), nodes(node), functionCodes(functionCode), log('Y') {
+    log.info() << "CAN send block constructed, " << node.size() << " nodes with " << functionCode.size() << " PDO's";
   }
 
   virtual ~CanSendFaulhaber() {
@@ -40,22 +36,22 @@ class CanSendFaulhaber : public Block {
       if ((err = canopen_send_sync(socket)) != 0) throw eeros::Fault("send sync failed");
         
       //send control word to all nodes
-      for (int i = 0; i < nodes.size(); i++) {  
-        if (inCtrl[i]->getSignal().getValue() != lastCtrlValue[i]) {
-          log.info() << "CAN ctrl changed: send " << inCtrl[i]->getSignal().getValue();
-          err = canopen_pdo_send_2bytes(socket, nodes[i], CANOPEN_FC_PDO1_RX, inCtrl[i]->getSignal().getValue());
-          lastCtrlValue[i] = inCtrl[i]->getSignal().getValue();
+      for (uint32_t i = 0; i < nodes.size(); i++) {  
+        if (ctrl.getSignal().getValue()[i] != lastCtrl[i]) {
+          log.info() << "CAN ctrl changed: send " << ctrl.getSignal().getValue()[i];
+          err = canopen_pdo_send_2bytes(socket, nodes[i], CANOPEN_FC_PDO1_RX, ctrl.getSignal().getValue()[i]);
+          lastCtrl[i] = ctrl.getSignal().getValue()[i];
           if (err != 0) throw eeros::Fault("CAN send ctrl failed");
         }
       }
         
-      //send velocity reference to all nodes      
+      // send velocity reference to all nodes      
       if (ipMode) {
-        for (int i = 0; i < nodes.size(); i++) {
-        err = canopen_pdo_send_4bytes(socket, nodes[i], CANOPEN_FC_PDO2_RX, inVel[i]->getSignal().getValue() * inVelScale[i]);
-        if (err != 0) throw eeros::Fault("set of velocity over CAN failed");
+        for (std::size_t i = 0; i < nodes.size(); i++) {
+          err = canopen_pdo_send_4bytes(socket, nodes[i], CANOPEN_FC_PDO2_RX, vel.getSignal().getValue()[i] * velScale[i]);
+          if (err != 0) throw eeros::Fault("set of velocity over CAN failed");
+        }
       }
-    }
         
 //      if (ip_mode_enabled) {
 //          for (int i = 0; i < nodes.size(); i++) {
@@ -70,22 +66,18 @@ class CanSendFaulhaber : public Block {
     }
   }
         
-  Input<double>* getInVel(int node) {
-    for (int i = 0; i < nodes.size(); i++) {
-        if (nodes[i] == node) {
-            return inVel[i];
-        }
-    }   
-    throw eeros::Fault("Error: specified CAN node not found");
+  /**
+   * Getter function for the input with a given index.
+   * 
+   * @tparam index - index of input
+   * @return The input with this index
+   */
+  virtual Input<Matrix<N,1,double>>& getInVel() {
+    return vel;
   }
           
-  Input<uint16_t>* getInCtrl(int node) {
-    for (int i = 0; i < nodes.size(); i++) {
-        if (nodes[i] == node) {
-            return inCtrl[i];
-        }
-    }   
-    throw eeros::Fault("Error: specified CAN node not found");
+  virtual Input<Matrix<N,1,uint16_t>>& getInCtrl() {
+    return ctrl;
   }
 
   virtual void enable() {
@@ -104,43 +96,21 @@ class CanSendFaulhaber : public Block {
     ipMode = false;
   }
 
-  virtual void setPosScale(uint8_t node, double scale) {
-    inPosScale[node] = scale;
-  }
-
   virtual void setVelScale(uint8_t node, double scale) {
-    inVelScale[node] = scale;
+    velScale[node] = scale;
   }
 
  private:
-  virtual void sendPdo2Bytes(int node, uint8_t function_code, uint16_t userData) {
-    int err = canopen_pdo_send_2bytes(socket, node, function_code, userData);
-    if (err != 0) throw eeros::Fault("send pdo failed");
-  }
-  virtual void sendPdo4Bytes(int node, uint8_t function_code, uint32_t userData) {
-    int err = canopen_pdo_send_4bytes(socket, node, function_code, userData);
-    if (err != 0) throw eeros::Fault("send pdo failed");
-  }
-  virtual void sendPdo6Bytes(int node, uint8_t function_code, uint16_t ctrlWord, uint32_t userData) {
-    int err = canopen_pdo_send_6bytes(socket, node, function_code, ctrlWord, userData);
-    if (err != 0) throw eeros::Fault("send pdo failed");
-  }
-  virtual void sendPdo8Bytes(int node, uint8_t function_code, uint32_t userData1, uint32_t userData2) {
-    int err = canopen_pdo_send_8bytes(socket, node, function_code, userData1, userData2);
-    if (err != 0) throw eeros::Fault("send pdo failed");
-  }
-		
   int socket;
   bool enabled = false;
   bool ipMode = false;
+  Input<Matrix<N,1,double>> vel;
+  Matrix<N,1,double> velScale;
+  Input<Matrix<N,1,uint16_t>> ctrl;
+  Matrix<N,1,uint16_t> lastCtrl;
+  std::vector<uint8_t> nodes;
+  std::vector<uint8_t> functionCodes;
   Logger log;
-  std::vector<Input<double>*> inPos;
-  std::vector<double> inPosScale;
-  std::vector<Input<double>*> inVel;
-  std::vector<double> inVelScale;
-  std::vector<Input<uint16_t>*> inCtrl;
-  std::vector<uint16_t> lastCtrlValue;
-  std::vector<int> nodes;
 };
 
 }

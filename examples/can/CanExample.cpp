@@ -8,6 +8,7 @@
 #include <eeros/control/can/CanSendFaulhaber.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/core/Executor.hpp>
+#include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
 
@@ -15,6 +16,7 @@ using namespace eeros;
 using namespace eeros::logger;
 using namespace eeros::control;
 using namespace eeros::safety;
+using namespace eeros::sequencer;
 
 
 int main(int argc, char **argv) {
@@ -23,14 +25,18 @@ int main(int argc, char **argv) {
   StreamLogWriter w(std::cout);
   Logger::setDefaultWriter(&w);
   Logger log;
-  w.show();
- 
+//   w.show();
+
   log.info() << "CAN test start";
 
-  MyControlSystem cs(dt);
-  MySafetyProperties sp(cs);
+  ControlSystem cs(dt);
+  MySafetyProperties sp;
   SafetySystem ss(sp, dt);
-	
+  auto& sequencer = Sequencer::instance();
+  MainSequence mainSeq("Main Sequence", sequencer, cs, ss, sp);
+  sequencer.addSequence(mainSeq);
+  mainSeq.start();
+    
   auto& executor = Executor::instance();
   executor.setMainTask(ss);
   executor.run();

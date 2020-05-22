@@ -5,6 +5,7 @@
 #include <eeros/control/Block.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
+#include <eeros/math/Matrix.hpp>
 #include <eeros/core/Fault.hpp>
 #include <canopen.h>
 #include <canopen-drv.h>
@@ -13,6 +14,7 @@
 #include <memory>
 
 using namespace eeros::control;
+using namespace eeros::math;
 using namespace eeros::logger;
 
 namespace eeros {
@@ -41,37 +43,20 @@ namespace control {
  *
  * @since v1.1
  */
-
+template < uint8_t N = 2 >
 class CanReceiveFaulhaber: public Block {
  public:
   CanReceiveFaulhaber(int socket, std::initializer_list<uint8_t> node, std::initializer_list<uint8_t> functionCode) 
       :  socket(socket), nodes(node), functionCodes(functionCode), log('C') {
     log.info() << "CAN receive block constructed, " << node.size() << " nodes with " << functionCode.size() << " PDO's";
-    for (int i = 0; i < node.size(); i++) {
-      outStatus.push_back(std::make_unique<Output<uint16_t>>(Output<uint16_t>()));
-      outStatus[i]->getSignal().clear();
-      outPos.push_back(std::make_unique<Output<double>>(Output<double>()));
-      outPos[i]->getSignal().clear();
-      outPosScale.push_back(1.0);
-      outVel.push_back(std::make_unique<Output<double>>(Output<double>()));
-      outVel[i]->getSignal().clear();
-      outVelScale.push_back(1.0);
-      outWarning.push_back(std::make_unique<Output<uint32_t>>(Output<uint32_t>()));
-      outWarning[i]->getSignal().clear();
-    }
   }
           
   virtual ~CanReceiveFaulhaber() { }
   
-  /**
-   * Copying of this object is forbidden due to the internal use of unique_ptr
-   */
-  CanReceiveFaulhaber(const CanReceiveFaulhaber&) = delete;
-
   virtual void run() {
     if (enabled) {
       uint32_t nof = nodes.size() * functionCodes.size();
-      for (int i = 0; i < nof; i++) {
+      for (uint32_t i = 0; i < nof; i++) {
         uint64_t ts = eeros::System::getTimeNs();
         int readLen = 0;
         canopen_frame_t readFrame;
@@ -90,67 +75,55 @@ class CanReceiveFaulhaber: public Block {
           if(readFrame.function_code == CANOPEN_FC_PDO1_TX) {
             uint16_t tmpStatus = (readFrame.payload.data[0] & 0xFF);
             tmpStatus |= (uint16_t(readFrame.payload.data[1] & 0xFF) << 8);
-            outStatus[node]->getSignal().setValue(tmpStatus & 0x26F);
-            outStatus[node]->getSignal().setTimestamp(ts);
+            auto s = status.getSignal().getValue();
+            s[node] = tmpStatus & 0x26F;
+            status.getSignal().setValue(s);
+            status.getSignal().setTimestamp(ts);
             int32_t tmpVel = (readFrame.payload.data[2] & 0x00FF);
             tmpVel |= ((readFrame.payload.data[3] & 0x00FF) << 8);
             tmpVel |= ((readFrame.payload.data[4] & 0x00FF) << 16);
             tmpVel |= ((readFrame.payload.data[5] & 0x00FF) << 24);
-            outVel[node]->getSignal().setValue(tmpVel * outVelScale[node]);
-            outVel[node]->getSignal().setTimestamp(ts);
+            auto v = vel.getSignal().getValue();
+            v[node] = tmpVel * velScale[node]; 
+            vel.getSignal().setValue(v);
+            vel.getSignal().setTimestamp(ts);
           } else if (readFrame.function_code == CANOPEN_FC_PDO2_TX) {
             int32_t tmpPos = (readFrame.payload.data[0] & 0x00FF);
             tmpPos |= ((readFrame.payload.data[1] & 0x00FF) << 8);
             tmpPos |= ((readFrame.payload.data[2] & 0x00FF) << 16);
             tmpPos |= ((readFrame.payload.data[3] & 0x00FF) << 24);
-            outPos[node]->getSignal().setValue(tmpPos * outPosScale[node]);
-            outPos[node]->getSignal().setTimestamp(ts);
+            auto p = pos.getSignal().getValue();
+            p[node] = tmpPos * posScale[node]; 
+            pos.getSignal().setValue(p);
+            pos.getSignal().setTimestamp(ts);
             uint32_t tmpWarning = (readFrame.payload.data[4] & 0x00FF);
             tmpWarning |= ((readFrame.payload.data[5] & 0x00FF) << 8);
             tmpWarning |= ((readFrame.payload.data[6] & 0x00FF) << 16);
             tmpWarning |= ((readFrame.payload.data[7] & 0x00FF) << 24);
-            outWarning[node]->getSignal().setValue(tmpWarning);
-            outWarning[node]->getSignal().setTimestamp(ts);
+            auto w = warning.getSignal().getValue();
+            w[node] = tmpWarning; 
+            warning.getSignal().setValue(w);
+            warning.getSignal().setTimestamp(ts);
           } else log.warn() << "PDO not parsed";
         }
       }
     }
   }
 
-  virtual Output<uint16_t>& getOutStatus(uint8_t node) {
-    for (std::size_t i = 0; i < nodes.size(); i++) {
-      if (node == nodes[i]) {
-        return (*outStatus[i]);
-      }
-    }
-    throw eeros::Fault("Error: specified CAN node not found");
+  virtual Output<Matrix<N,1,uint16_t>>& getOutStatus() {
+        return status;
   }
   
-  virtual Output<double>& getOutPos(uint8_t node) {
-    for (std::size_t i = 0; i < nodes.size(); i++) {
-      if (node == nodes[i]) {
-        return (*outPos[i]);
-      }
-    }
-    throw eeros::Fault("Error: specified CAN node not found");
+  virtual Output<Matrix<N,1,double>>& getOutPos() {
+    return pos;
   }
   
-  virtual Output<double>& getOutVel(uint8_t node) {
-    for (std::size_t i = 0; i < nodes.size(); i++) {
-      if (node == nodes[i]) {
-        return (*outVel[i]);
-      }
-    }
-    throw eeros::Fault("Error: specified CAN node not found");
+  virtual Output<Matrix<N,1,double>>& getOutVel() {
+    return vel;
   }
   
-  virtual Output<uint32_t>& getOutWarning(uint8_t node) {
-    for (std::size_t i = 0; i < nodes.size(); i++) {
-      if (node == nodes[i]) {
-        return (*outWarning[i]);
-      }
-    }
-    throw eeros::Fault("Error: specified CAN node not found");
+  virtual Output<Matrix<N,1,uint32_t>>& getOutWarning() {
+    return warning;
   }
 
   virtual void enable() {
@@ -162,25 +135,25 @@ class CanReceiveFaulhaber: public Block {
   }
   
   virtual void setPosScale(uint8_t node, double scale) {
-    outPosScale[node] = scale;
+    posScale[node] = scale;
   }
 
   virtual void setVelScale(uint8_t node, double scale) {
-    outVelScale[node] = scale;
+    velScale[node] = scale;
   }
 
 
  private:
   int socket;
   bool enabled = false;
-  std::vector<std::unique_ptr<Output<uint16_t>>> outStatus;
-  std::vector<std::unique_ptr<Output<double>>> outPos;
-  std::vector<double> outPosScale;
-  std::vector<std::unique_ptr<Output<double>>> outVel;
-  std::vector<double> outVelScale;
-  std::vector<std::unique_ptr<Output<uint32_t>>> outWarning;
-  std::vector<uint8_t> functionCodes;
+  Output<Matrix<N,1,uint16_t>> status;
+  Output<Matrix<N,1,double>> pos;
+  Matrix<N,1,double> posScale;
+  Output<Matrix<N,1,double>> vel;
+  Matrix<N,1,double> velScale;
+  Output<Matrix<N,1,uint32_t>> warning;
   std::vector<uint8_t> nodes;
+  std::vector<uint8_t> functionCodes;
   Logger log;
 };
 

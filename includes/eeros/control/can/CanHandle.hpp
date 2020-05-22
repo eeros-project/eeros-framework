@@ -4,6 +4,7 @@
 #include <eeros/core/Fault.hpp>
 #include <can-if.h>
 #include <canopen-drv.h>
+#include <canopen-com.h>
 #include <canopen-faulhaber-drv.h>
 #include <sys/socket.h>
 #include <linux/can.h>
