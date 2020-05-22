@@ -47,6 +47,7 @@ namespace eeros {
 		template <uint8_t N, typename T>
 		std::ostream& operator<<(std::ostream& os, Sum<N,T>& sum) {
 			os << "Block sum: '" << sum.getName() << "'"; 
+            return os;
 		}
 
 	};

@@ -19,7 +19,7 @@ namespace eeros {
 		template < typename T = eeros::math::Matrix<1,1,double> >
 		class PathPlannerTrapezoid: public eeros::control::Block {
 		public:
-			PathPlannerTrapezoid(T velMax, T accMax, T decMax, double dt) : velMax(velMax), accMax(accMax), decMax(decMax), dt(dt), posOut(this), velOut(this), accOut(this), jerkOut(this), log('F') {
+			PathPlannerTrapezoid(T velMax, T accMax, T decMax, double dt) : posOut(this), velOut(this), accOut(this), jerkOut(this), dt(dt), velMax(velMax), accMax(accMax), decMax(decMax), log('F') {
 				coefficients.zero();
 				coefficients.transpose();
 				posOut.getSignal().clear();
@@ -81,7 +81,7 @@ namespace eeros {
 				zero.zero();
 				int nofPoints = 0;
 
-				for (int i = 0; i < pos.size(); i++) {
+				for (std::size_t i = 0; i < pos.size(); i++) {
 					if (pos[i] < zero) i = pos.size(); else nofPoints++;
 				}
 				
@@ -122,7 +122,7 @@ namespace eeros {
 				
 				// set array dimension, time and jerk values
 				int nofPoints = 0;
-				for(int j = 0; j < input_time.size(); j++){
+				for(std::size_t j = 0; j < input_time.size(); j++){
 					file >> input_time[j]; 
 					file >> input_jerk[j];
 					if (input_time[j] < 0.0) j = input_time.size(); else nofPoints++;
@@ -242,7 +242,7 @@ namespace eeros {
 							a_prev = coefficients(k,2);
 							v_prev = coefficients(k,3);
 							p_prev = coefficients(k,4);
-							for (int i=0; i<j_prev.size() ;i++) {
+							for (std::size_t i = 0; i < j_prev.size(); i++) {
 								j0 =   6.0 * coefficients(k,2)(i) / coefficients(k,0)(i);
 								s0 = -12.0 * coefficients(k,2)(i) / (coefficients(k,0)(i)*coefficients(k,0)(i));
 							}
@@ -392,7 +392,7 @@ namespace eeros {
 						
 						cj1 = coefficients(k,1);
 						
-						for(int i=0; i<ca1.size(); i++){
+						for(std::size_t i=0; i<ca1.size(); i++){
 							ca1(i) = a_old(i) + j_old(i) * t_old(i);
 							cv1(i) = v_old(i) + a_old(i) * t_old(i) + j_old(i) / 2.0 * t_old(i) * t_old(i);
 							cp1(i) = p_old(i) + v_old(i) * t_old(i) + a_old(i) / 2.0 * t_old(i) * t_old(i) + j_old(i) / 6.0 * t_old(i) * t_old(i) * t_old(i);

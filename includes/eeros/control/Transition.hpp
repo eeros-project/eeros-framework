@@ -78,7 +78,7 @@ namespace eeros {
 					} else {	//down
 						auto time = this->getIn().getSignal().getTimestamp();
 						container->mtx.lock();
-						int i = 0;
+						std::size_t i = 0;
 						while (i < container->buf.size() && time > container->buf[i].getTimestamp()) i++;
 						if (i > 0) i--;
 						Signal<T> sig = container->buf[i];
@@ -105,7 +105,7 @@ namespace eeros {
 		friend class TransitionInBlock<T>;
 		friend class TransitionOutBlock<T>;
 		public:
-			Transition(double ratio, bool steady = false) : ratio(ratio), inBlock(this), outBlock(this), steady(steady) {
+			Transition(double ratio, bool steady = false) : inBlock(this), outBlock(this), steady(steady), ratio(ratio) {
 				if (ratio >= 1.0) {	// slow to fast time domain
 					inBlock.up = true;
 					outBlock.up = true;
@@ -137,6 +137,7 @@ namespace eeros {
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, Transition<T>& t) {
 			os << "Block transition: '" << t.getName() << "'"; 
+            return os;
 		}
 
 	};

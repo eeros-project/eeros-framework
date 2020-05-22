@@ -150,15 +150,13 @@ namespace eeros {
 			}
 			
 		protected:
+			bool finish;
 			std::mutex mtx;
-			double dt;
 			T velMax, accMax, decMax;
-			
+			double dt;	
 			double dT1, dT2, dT3;
 			T a1p, c1p, b1v, c1a, b2p, c2p, c2v, c2a, a3p, b3p, c3p, b3v, c3v, c3a; 
-			
 			double t;
-			bool finish;
 		};
 	};
 };

@@ -681,7 +681,6 @@ namespace eeros {
 					// This algorithm needs a lot of time maybe there is a better one?
 					Matrix<M, N, T> result;
 					Matrix<M - 1, N - 1, T> smallerPart;
-					unsigned int ignoredRow = 0, ignoredColum = 0;
 					for(unsigned int m = 0; m < M; m++) {
 						for(unsigned int n = 0; n < N; n++) {
 							unsigned int a = 0, b = 0;

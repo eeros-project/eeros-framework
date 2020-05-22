@@ -118,7 +118,7 @@ class CanReceiveFaulhaber: public Block {
   }
 
   virtual Output<uint16_t>& getOutStatus(uint8_t node) {
-    for (int i = 0; i < nodes.size(); i++) {
+    for (std::size_t i = 0; i < nodes.size(); i++) {
       if (node == nodes[i]) {
         return (*outStatus[i]);
       }
@@ -127,7 +127,7 @@ class CanReceiveFaulhaber: public Block {
   }
   
   virtual Output<double>& getOutPos(uint8_t node) {
-    for (int i = 0; i < nodes.size(); i++) {
+    for (std::size_t i = 0; i < nodes.size(); i++) {
       if (node == nodes[i]) {
         return (*outPos[i]);
       }
@@ -136,7 +136,7 @@ class CanReceiveFaulhaber: public Block {
   }
   
   virtual Output<double>& getOutVel(uint8_t node) {
-    for (int i = 0; i < nodes.size(); i++) {
+    for (std::size_t i = 0; i < nodes.size(); i++) {
       if (node == nodes[i]) {
         return (*outVel[i]);
       }
@@ -145,7 +145,7 @@ class CanReceiveFaulhaber: public Block {
   }
   
   virtual Output<uint32_t>& getOutWarning(uint8_t node) {
-    for (int i = 0; i < nodes.size(); i++) {
+    for (std::size_t i = 0; i < nodes.size(); i++) {
       if (node == nodes[i]) {
         return (*outWarning[i]);
       }
@@ -173,15 +173,15 @@ class CanReceiveFaulhaber: public Block {
  private:
   int socket;
   bool enabled = false;
-  Logger log;
   std::vector<std::unique_ptr<Output<uint16_t>>> outStatus;
   std::vector<std::unique_ptr<Output<double>>> outPos;
   std::vector<double> outPosScale;
   std::vector<std::unique_ptr<Output<double>>> outVel;
   std::vector<double> outVelScale;
   std::vector<std::unique_ptr<Output<uint32_t>>> outWarning;
-  std::vector<uint8_t> nodes;
   std::vector<uint8_t> functionCodes;
+  std::vector<uint8_t> nodes;
+  Logger log;
 };
 
 }

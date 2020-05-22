@@ -109,7 +109,7 @@ TEST(controlTransitionSimpleTest, steady) {
 	t2.inBlock.getIn().connect(t1.outBlock.getOut());
 	t2.outBlock.getIn().connect(c2.getOut());
 	c1.run();
-	timestamp_t start = c1.getOut().getSignal().getTimestamp();
+//	timestamp_t start = c1.getOut().getSignal().getTimestamp();
 	t1.inBlock.run();
 	usleep(5000);
 	c1.setValue(1.0);

@@ -54,7 +54,7 @@ public:
 		// Define and add level functions
 		slOff.setLevelAction([&](SafetyContext* privateContext) {Executor::stop();});
 		slRunning.setLevelAction([&](SafetyContext* privateContext) {
-			if (slRunning.getNofActivations() == (int)(3 / period)) {	// start after 3s
+			if (slRunning.getNofActivations() == (uint32_t)(3 / period)) {	// start after 3s
 				log.info() << "start tracing";
 				cs.trace1.enable();
 				cs.trace2.enable();
@@ -123,7 +123,7 @@ int main() {
 	timestamp_t* timeStampBuf = controlSystem.trace1.getTimestampTrace();
 	Vector3* buf1 = controlSystem.trace1.getTrace();
 	Vector3* buf2 = controlSystem.trace2.getTrace();
-	for (int i = 0; i < controlSystem.trace1.getSize(); i++) file << timeStampBuf[i] << " " << buf1[i] << " " << buf2[i] << std::endl;
+	for (uint32_t i = 0; i < controlSystem.trace1.getSize(); i++) file << timeStampBuf[i] << " " << buf1[i] << " " << buf2[i] << std::endl;
 	file.close();
 	uint64_t stop = eeros::System::getTimeNs();
 	log.info() << "file written in " << (stop - start) << "ns";

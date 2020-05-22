@@ -64,7 +64,7 @@ void Config::add(const char *name, std::size_t length, int *start, int *end, int
 	properties[name] = ConfigPropertyAccessor{
 		[length, start] (const char *name, char *buffer, int size) -> int {
 			std::stringstream ss;
-			for (int i = 0; i < length; i++) {
+			for (std::size_t i = 0; i < length; i++) {
 				if (i != 0) ss << ", ";
 				ss << start[i];
 			}
@@ -80,12 +80,12 @@ void Config::add(const char *name, std::size_t length, int *start, int *end, int
 			constexpr std::size_t value_buffer_size = (64 - 1);
 			char value_buffer[value_buffer_size + 1] = { };
 
-			int current_value = 0;
+			std::size_t current_value = 0;
 			int i = 0;
 			int j = 0;
 			while (true) {
 				if (buffer[i] == ',' || i >= size) {
-					int n = (i - j);
+					std::size_t n = (i - j);
 					if (n >= value_buffer_size) throw eeros::Fault(std::string("Property '") + name + "': buffer too small");
 					if (n <= 0) break;
 					strncpy(value_buffer,&buffer[j], n);
@@ -116,7 +116,7 @@ void Config::add(const char *name, std::size_t length, double *start, double *en
 	properties[name] = ConfigPropertyAccessor{
 		[length, start] (const char *name, char *buffer, int size) -> int {
 			std::stringstream ss;
-			for (int i = 0; i < length; i++) {
+			for (std::size_t i = 0; i < length; i++) {
 				if (i != 0) ss << ", ";
 				ss << start[i];
 			}
@@ -131,12 +131,12 @@ void Config::add(const char *name, std::size_t length, double *start, double *en
 		constexpr std::size_t value_buffer_size = (64 - 1);
 		char value_buffer[value_buffer_size + 1] = { };
 
-		int current_value = 0;
+		std::size_t current_value = 0;
 		int i = 0;
 		int j = 0;
 		while (true) {
 			if (buffer[i] == ',' || i >= size) {
-				int n = (i - j);
+				std::size_t n = (i - j);
 				if (n >= value_buffer_size) throw eeros::Fault(std::string("Property '") + name + "': buffer too small");
 				if (n <= 0) break;
 				strncpy(value_buffer,&buffer[j], n);

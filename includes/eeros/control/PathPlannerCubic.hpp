@@ -38,9 +38,9 @@ namespace eeros {
 			
 			bool finished = true;
 			double dt;
-			int index = 0;
-			bool first = true;
 			double timeInterval;
+			std::size_t index = 0;
+			bool first = true;
 			double t = 0;
 			double prevJerk, prevAcc, prevVel, prevPos;
 			std::vector<double> timeCoeffRaw, jerkCoeffRaw, accCoeffRaw, velCoeffRaw, posCoeffRaw;

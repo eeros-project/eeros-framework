@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 			
 			// write
 			std::cout << "w: ";
-			for (int i = 0; i < sizeof(writeBuf)/sizeof(writeBuf[0]); i++) {
+			for (uint32_t i = 0; i < sizeof(writeBuf)/sizeof(writeBuf[0]); i++) {
 				writeBuf[i] = dataToSend;
 				dataToSend += 0.1;
 				std::cout << writeBuf[i] << "\t";
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 			if (n < 0) std::cout << "ERROR reading from socket" << std::endl;
 			
 			std::cout << "rec: ";
-			for (int i = 0; i < sizeof(readBuf)/sizeof(readBuf[0]); i++) {
+			for (uint32_t i = 0; i < sizeof(readBuf)/sizeof(readBuf[0]); i++) {
 				std::cout << readBuf[i] << "\t";
 			}
 			std::cout << std::endl;

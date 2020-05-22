@@ -64,6 +64,7 @@ namespace eeros {
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, Constant<T>& c) {
 			os << "Block constant: '" << c.getName() << "' init val = " << c.value; 
+            return os;
 		}
 	};
 };

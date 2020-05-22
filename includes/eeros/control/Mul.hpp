@@ -37,6 +37,7 @@ namespace eeros {
 		template <typename In1T = double, typename In2T = double, typename OutT = double>
 		std::ostream& operator<<(std::ostream& os, Mul<In1T,In2T,OutT>& mul) {
 			os << "Block multiplier: '" << mul.getName() << "'"; 
+            return os;
 		}
 
 	};

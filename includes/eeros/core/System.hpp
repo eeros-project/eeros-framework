@@ -5,7 +5,7 @@
 
 namespace eeros {
 
-	static bool rosTimeIsUsed = false;
+//	static bool rosTimeIsUsed = false;
 		
 	class System {
 	public:

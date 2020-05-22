@@ -53,7 +53,6 @@ void JsonParser::createHalObjects(std::map<std::string, void*> libHandles){
 		for (const auto &o : halRootObj) {
 			auto devObj = o;
 			for(const auto &subO : devObj){
-				void *createDevHandle = nullptr;
 				std::regex sdRegex("subdevice[0-9]+", std::regex_constants::extended);
 				if(subO.key() == "library"){
 					library = subO.string_value();

@@ -36,14 +36,14 @@ namespace eeros {
 				SigOutType output; 
 				if (isServer) {
 					std::array<SigOutValueType, sizeof(SigOutType) / sizeof(SigOutValueType)>& getData = server->getReceiveBuffer();
-					for (int i = 0; i < bufOutLen; i++) output(i) = getData[i];
+					for (uint32_t i = 0; i < bufOutLen; i++) output(i) = getData[i];
 				} else {
 					std::array<SigOutValueType, sizeof(SigOutType) / sizeof(SigOutValueType)>& getData = client->getReceiveBuffer();
-					for (int i = 0; i < bufOutLen; i++) output(i) = getData[i];
+					for (uint32_t i = 0; i < bufOutLen; i++) output(i) = getData[i];
 				}
 				// send
 				if (this->in.isConnected()) {
-					for(int i = 0; i < bufInLen; i++) sendData[i] = this->in.getSignal().getValue()(i);
+					for(uint32_t i = 0; i < bufInLen; i++) sendData[i] = this->in.getSignal().getValue()(i);
 					if (isServer) server->setSendBuffer(sendData);
 					else client->setSendBuffer(sendData);
 				}
@@ -471,6 +471,7 @@ namespace eeros {
 		template <typename X, typename Y>
 		std::ostream& operator<<(std::ostream& os, SocketData<X,Y>& s) {
 			os << "Block socket data: '" << s.getName() << "'"; 
+            return os;
 		}
 
 	};

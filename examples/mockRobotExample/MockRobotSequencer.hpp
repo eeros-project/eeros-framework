@@ -19,6 +19,7 @@ public:
 	int action() {
 		cs.setpointX.setValue(0.7);
 		cs.setpointY.setValue(0.3);
+        return 0;
 	}
 	bool checkExitCondition() {return cs.iX.getOut().getSignal().getValue() >= 5.0;}
 private:
@@ -31,6 +32,7 @@ public:
 	int action() {
 		cs.setpointX.setValue(-0.6);
 		cs.setpointY.setValue(-0.3);
+        return 0;
 	}
 	bool checkExitCondition() {return cs.iX.getOut().getSignal().getValue() <= -5.0;}
 private:
@@ -49,6 +51,7 @@ public:
 			moveUp();
 			moveDown();
 		}
+		return 0;
 	}
 private:
 	MoveUp moveUp;
@@ -64,6 +67,7 @@ public:
 	int action() {
 		cs.setpointX.setValue(0.1);
 		cs.setpointY.setValue(0.1);
+        return 0;
 	}
 	bool checkExitCondition() {
 		bool done = cs.iX.getOut().getSignal().getValue() >= 1.0 && cs.iY.getOut().getSignal().getValue() >= 1.0;
@@ -99,13 +103,14 @@ public:
 			}
 			wait(0.1);
 		}
+		return 0;
 	}
 private:
+	SafetySystem& ss;
+	MockRobotSafetyProperties& sp;
 	HomingSequence homing;
 	UpAndDownSequence upDown;
 	Wait wait;
-	SafetySystem& ss;
-	MockRobotSafetyProperties& sp;
 };
 
 

@@ -135,10 +135,12 @@ namespace eeros {
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, Signal<T>& signal) {
 			os << "Signal: '" << signal.getName() << "' timestamp = " << signal.getTimestamp() << " value = " << signal.getValue(); 
+            return os;
 		}
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, Signal<T>* signal) {
 			os << "Signal: '" << signal.getName() << "' timestamp = " << signal.getTimestamp() << " value = " << signal.getValue(); 
+            return os;
 		}
 
 	};

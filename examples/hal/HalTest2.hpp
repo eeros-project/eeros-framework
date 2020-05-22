@@ -43,10 +43,10 @@ public:
 	Constant<bool> c1;
 	Constant<> c2;
 	Constant<double> c3;
-	PeripheralOutput<double> dac1;		// analog output
 	PeripheralOutput<bool> io1;		// digital output 
 	PeripheralOutput<bool> ioOut;		// digital output
 	PeripheralInput<bool> ioIn;		// digital input
+	PeripheralOutput<double> dac1;		// analog output
 	PeripheralInput<double> encMot1;	// encoder input
 	PeripheralOutput<double> pwm2;		// pwm output
 	TimeDomain timedomain;
@@ -64,11 +64,10 @@ public:
 
 class MyMainSequence : public Sequence {
 public:
-	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), wait("waiting time", this), controlSys(controlSys) { }
+	MyMainSequence(Sequencer& sequencer, MyControlSystem& controlSys) : Sequence("main", sequencer), controlSys(controlSys), wait("waiting time", this) { }
 	
 	int action() {
 		// set PWM frequency here for example or in main of application
-		HAL& hal = HAL::instance();	
 		controlSys.pwm2.callOutputFeature("setPwmFrequency", 2000.0);
 		
 		while (Sequencer::running) {			
@@ -79,6 +78,7 @@ public:
 			controlSys.c1.setValue(false);
 			wait(0.4);
 		}
+		return 0;
 	}
 	
 private:

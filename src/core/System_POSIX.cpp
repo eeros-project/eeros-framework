@@ -46,7 +46,6 @@ uint64_t System::getTimeNs() {
 	}
 #endif
 
-	uint64_t time;
 	struct timespec ts;
 	if(clock_gettime(CLOCK, &ts) != 0) {
 		throw Fault("Failed to get time!");

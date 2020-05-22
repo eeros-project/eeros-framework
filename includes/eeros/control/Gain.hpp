@@ -311,6 +311,7 @@ std::ostream &operator<<(std::ostream &os, Gain<Tout, Tgain> &gain) {
   os << "Block Gain: '" << gain.getName() << "' is enabled=" << gain.enabled << ", gain=" << gain.gain << ", ";
   os << "smoothChange=" << gain.smoothChange << ", minGain=" << gain.minGain << ", maxGain=" << gain.maxGain;
   os << ", targetGain=" << gain.targetGain << ", gainDiff=" << gain.gainDiff;
+  return os;
 }
 };
 };

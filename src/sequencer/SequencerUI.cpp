@@ -59,7 +59,6 @@ namespace eeros {
 			running = true;
 			while (running) {
 				fd_set fds;
-				int res;
 				FD_ZERO (&fds);
 				FD_SET (sockfd, &fds);
 				struct timeval timeout;

@@ -8,7 +8,6 @@ using namespace eeros::hal;
 
 HAL::HAL() : log('H')  { }
 HAL::HAL(const HAL&) : log('H') { }
-HAL& HAL::operator=(const HAL&) { }
 
 HAL& HAL::instance() {
 	static HAL halInstance;

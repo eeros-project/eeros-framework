@@ -103,7 +103,7 @@ namespace eeros {
 			
 						// write
 						std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
-						for(int i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
+						for(uint32_t i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
 // 						log.trace() << "try to write " << b_write[0];
 						int n = write(newsockfd, b_write, BufInLen * sizeof(inT));
 						if (n < 0) {
@@ -130,7 +130,7 @@ namespace eeros {
 							count -= n;
 						}
 						std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
-						for(int i = 0; i < BufOutLen; i++) readValue[i] = b_read[i];
+						for(uint32_t i = 0; i < BufOutLen; i++) readValue[i] = b_read[i];
 						newData = true;
 						flip();
 						next_cycle += seconds(period);
@@ -138,7 +138,7 @@ namespace eeros {
 					close(newsockfd);
 					// if disconnected clear receive buffer
 					std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
-					for(int i = 0; i < BufOutLen; i++) readValue[i] = 0;
+					for(uint32_t i = 0; i < BufOutLen; i++) readValue[i] = 0;
 					newData = true;
 					flip();
 				}
@@ -149,14 +149,14 @@ namespace eeros {
 				auto p = read_ptr.load();
 				if (p == &read1) return read2;
 				else if (p == &read2) return read3;
-				else if (p == &read3) return read1;
+				else return read1;
 			}
 			
 			std::array<inT, BufInLen>& getNextSendBuffer() {
 				auto p = send_ptr.load();
 				if (p == &send1) return send2;
 				else if (p == &send2) return send3;
-				else if (p == &send3) return send1;
+				else return send1;
 			}
 			
 			void flip(){

@@ -48,13 +48,12 @@ class MyControlSystem {
     eeros::Executor::instance().add(timedomain);
   }
     
+  PeripheralInput<bool> digIn0, digIn1;
+  PeripheralOutput<bool> digOut0, digOut1;
+  PeripheralInput<double> anIn0, anIn2;
+  PeripheralOutput<double> anOut0, anOut2;
   Constant<bool> c0;
   Constant<> c1, c2;
-  PeripheralOutput<bool> digOut0, digOut1;
-  PeripheralInput<bool> digIn0, digIn1;
-  PeripheralOutput<double> anOut0, anOut2;
-  PeripheralInput<double> anIn0;
-  PeripheralInput<double> anIn2;
   TimeDomain timedomain;
 };
 
@@ -72,7 +71,7 @@ class StepDigOut : public Step {
  public:
   StepDigOut(std::string name, Sequence* caller, MyControlSystem& cs) : Step(name, caller), cs(cs) { }
   int operator() (bool val) {state = val; return start();}
-  int action() {cs.c0.setValue(state);}
+  int action() {cs.c0.setValue(state); return 0;}
   bool state;
   MyControlSystem& cs;
 };
@@ -89,6 +88,7 @@ class StepAnalogOut : public Step {
       cs.c1.setValue(-2.0);
       cs.c2.setValue(7.6);
     }
+    return 0;
   }
   bool state;
   MyControlSystem& cs;
@@ -105,6 +105,7 @@ class SeqDigital : public Sequence {
         wait(5);
         toggle = !toggle;
       }
+      return 0;
     }
 
  private:
@@ -123,6 +124,7 @@ class SeqAnalog : public Sequence {
         wait(10);
         toggle = !toggle;
       }
+      return 0;
     }
  
  private:
@@ -138,6 +140,7 @@ class MyMainSequence : public Sequence {
     seqAnalog();
     Sequence::wait();
     Sequence::wait();
+    return 0;
   }
 
  private:

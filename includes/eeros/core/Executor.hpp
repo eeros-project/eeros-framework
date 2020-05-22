@@ -69,13 +69,13 @@ namespace eeros {
 		std::mutex* m;
 		std::condition_variable* cv;
 #endif
-		bool syncWithEtherCatStackIsSet;
-		bool syncWithRosTimeIsSet;
-		bool syncWithRosTopicIsSet;
-		logger::Logger log;
 		double period;
 		task::Periodic* mainTask;
 		std::vector<task::Periodic> tasks;
+        bool syncWithEtherCatStackIsSet;
+        bool syncWithRosTimeIsSet;
+        bool syncWithRosTopicIsSet;
+        logger::Logger log;
 	};
 
 }

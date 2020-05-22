@@ -14,7 +14,7 @@ int count;
 class ExceptionSeq : public Sequence {
 public:
 	ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait E", this) { }
-	int action() {count = 0; wait(0.5);}
+	int action() {count = 0; wait(0.5); return 0;}
 private:
 	Wait wait;
 };
@@ -39,6 +39,7 @@ public:
 			stepA(2);
 			count++;
 		}
+		return 0;
 	}
 private:
 	Wait stepA;

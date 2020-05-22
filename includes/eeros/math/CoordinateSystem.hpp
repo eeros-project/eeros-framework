@@ -24,7 +24,7 @@ namespace eeros {
 			
 		private:
 			CoordinateSystem(const CoordinateSystem&);
-			CoordinateSystem& operator=(const CoordinateSystem&);
+			CoordinateSystem& operator=(const CoordinateSystem&) = delete;
 			
 			std::string id;
 			

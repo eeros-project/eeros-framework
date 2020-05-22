@@ -159,6 +159,7 @@ namespace eeros {
 				os << "," << filter.previousValues[i];
 			}
 			os << "]";
+            return os;
 		}
 	};
 };

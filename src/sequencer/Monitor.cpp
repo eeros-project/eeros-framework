@@ -5,7 +5,7 @@ namespace eeros {
 	namespace sequencer {
 
 		Monitor::Monitor(std::string name, BaseSequence* owner, Condition& condition, SequenceProp behavior, BaseSequence* exceptionSequence)
-		: name(name), owner(owner), condition(condition), behavior(behavior), exceptionSequence(exceptionSequence)
+		: owner(owner), exceptionSequence(exceptionSequence), condition(condition), behavior(behavior), name(name)
 		{ }
 
 		Monitor::~Monitor() { }

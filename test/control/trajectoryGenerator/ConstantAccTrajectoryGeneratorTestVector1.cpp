@@ -30,7 +30,6 @@ class ConstantAccTrajectoryGeneratorTest {
 				
 			int line = 0;
 			int error = 0;
-			uint64_t timestamp = 0;
 			
 			std::array<Vector, 3> start = {0.15}; std::array<Vector, 3> end = {0.59};
 			Vector velMax = 1.0; Vector accMax = 1.0; Vector decMax = 1.0;

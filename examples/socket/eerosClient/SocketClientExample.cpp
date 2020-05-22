@@ -21,13 +21,13 @@ using namespace eeros;
 class TestAppCS {
 public:
 	TestAppCS(double dt) : 
-		dt(dt),
-		log('C'),
-		socketA("127.0.0.1", 9876, 0.1),	// client
 		c1({0.2, 0.3, 0.4, 0.5, 0.6, -0.7}),
 		c2(56.5),
 		c3(-28),
 		c4({-5,8,-321}),
+		socketA("127.0.0.1", 9876, 0.1),	// client
+		log('C'),
+		dt(dt),
 		timedomain("Main time domain", dt, true) {
 		
 		socketA.getOut().getSignal().setName("socketRead");
@@ -59,9 +59,9 @@ public:
 // 	SocketData<Matrix<6,1,double>, int> socketA;		// send Matrix<6,1,double>, receive int, connect to c1
 // 	SocketData<Matrix<6,1,double>, std::nullptr_t> socketA;	// send Matrix<6,1,double>, receive nothing, connect to c1
 // 	SocketData<int, std::nullptr_t> socketA;		// send int, receive nothing, connect to c3
-	Logger log;
 		
 protected:
+	Logger log;
 	double dt;
 	bool realtime;
 	TimeDomain timedomain;
