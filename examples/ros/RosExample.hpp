@@ -96,7 +96,7 @@ public:
 	}
 	
 	SafetyLevel slOff;
-	MyControlSystem cs;
+	MyControlSystem& cs;
 	Logger log;
 };
 

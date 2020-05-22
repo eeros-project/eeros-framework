@@ -22,7 +22,7 @@ namespace eeros {
 				value = other.value;
 				this->setName(other.getName());
 			}
-			
+
 			virtual void run() {
 				std::lock_guard<std::mutex> lock(mtx);
 				this->out.getSignal().setValue(value);

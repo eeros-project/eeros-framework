@@ -57,28 +57,29 @@ class CanHandle {
     struct ifreq ifr;
     memset(&ifr, 0, sizeof(struct ifreq));
     iface.copy(ifr.ifr_name, iface.length(), 0);
-    if(ioctl(sock, SIOCGIFINDEX, &ifr) < 0){        // ifr.ifr_ifindex gets filled with that device's index
-      throw eeros::Fault("Error: Failed to locate can interface");
-      return;
-    }
+//     if(ioctl(sock, SIOCGIFINDEX, &ifr) < 0){        // ifr.ifr_ifindex gets filled with that device's index
+//       throw eeros::Fault("Error: Failed to locate can interface");
+//       return;
+//     }
     
     // Select that CAN interface, and bind the socket to it
-    struct sockaddr_can addr;
-    memset(&addr, 0, sizeof(struct sockaddr_can));
-    addr.can_family = AF_CAN;
-    addr.can_ifindex = ifr.ifr_ifindex;
-    if(bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0){
-        throw eeros::Fault("Error: Failed to bind can socket");
-        return;
-    }
-    int flags = fcntl(sock, F_GETFL, 0);
-    fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+//     struct sockaddr_can addr;
+//     memset(&addr, 0, sizeof(struct sockaddr_can));
+//     addr.can_family = AF_CAN;
+//     addr.can_ifindex = ifr.ifr_ifindex;
+//     if(bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0){
+//         throw eeros::Fault("Error: Failed to bind can socket");
+//         return;
+//     }
+//     int flags = fcntl(sock, F_GETFL, 0);
+//     fcntl(sock, F_SETFL, flags | O_NONBLOCK);
 
   }
                 
   virtual ~CanHandle() {
     close(sock);
   }
+  
   int getSocket() {
     return sock;
   }

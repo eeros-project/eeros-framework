@@ -108,10 +108,13 @@ else()
 endif()
 
 ## Check and set C++ compiler flags
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+if(COMPILER_SUPPORTS_CXX14)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+elseif(COMPILER_SUPPORTS_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 elseif(COMPILER_SUPPORTS_CXX0X)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
@@ -194,6 +197,12 @@ if (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
 endif (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
 message(STATUS "")
 
+#set(CMAKE_PREFIX_PATH pathTo/canopenlib/install/)
+
+#find_package(canopenlib)
+
+#include_directories(${canopenlib_INCLUDE_DIR})
+#link_directories(${canopenlib_DIR})
 
 
 ##########################
