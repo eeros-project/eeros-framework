@@ -39,10 +39,10 @@ namespace eeros {
 			double max_r = 2.8;
 
 		protected:
+			Mouse mouse;
 			Output<Matrix<3,1,bool>> buttonOut;
 			double x, y, z, r;
 			bool first;
-			Mouse mouse;
 		};
 	};
 };

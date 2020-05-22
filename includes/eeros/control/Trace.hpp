@@ -18,9 +18,14 @@ namespace eeros {
 		class Trace : public Block1i<T> {
 		public:
 			Trace(uint32_t bufLen) : maxBufLen(bufLen) {
-				this->buf = new T[bufLen];
-				this->timeBuf = new timestamp_t[bufLen];
+				buf = new T[bufLen];
+				timeBuf = new timestamp_t[bufLen];
 			}
+			
+			~Trace() {
+               delete(buf);
+               delete(timeBuf);
+            }
 
 			virtual void run() {
 				if (running) {
@@ -37,13 +42,13 @@ namespace eeros {
 				if (cycle) {
 					size = maxBufLen;
 					T* tmp = new T[maxBufLen];
-					for (int i = 0; i < maxBufLen; i++)
+					for (uint32_t i = 0; i < maxBufLen; i++)
 						tmp[i] = buf[(i + index) % maxBufLen];
 					return tmp;
 				} else {
 					T* tmp = new T[index];
 					size = index;
-					for (int i = 0; i < index; i++)
+					for (uint32_t i = 0; i < index; i++)
 						tmp[i] = buf[i];
 					return tmp;
 				}
@@ -52,13 +57,13 @@ namespace eeros {
 				if (cycle) {
 					size = maxBufLen;
 					timestamp_t* tmp = new timestamp_t[maxBufLen];
-					for (int i = 0; i < maxBufLen; i++)
+					for (uint32_t i = 0; i < maxBufLen; i++)
 						tmp[i] = timeBuf[(i + index) % maxBufLen];
 					return tmp;
 				} else {
 					size = index;
 					timestamp_t* tmp = new timestamp_t[index];
-					for (int i = 0; i < index; i++)
+					for (uint32_t i = 0; i < index; i++)
 						tmp[i] = timeBuf[i];
 					return tmp;
 				}
@@ -82,6 +87,7 @@ namespace eeros {
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, Trace<T>& trace) {
 			os << "Block trace: '" << trace.getName() << "'"; 
+            return os;
 		}
 
 
@@ -113,14 +119,14 @@ namespace eeros {
 					timestamp_t* timeStampBuf = trace.getTimestampTrace();
 					T* buf = trace.getTrace();
 					file << "name = " << trace.getName() << ", size = " << trace.getSize() << ", maxBufLen = " << trace.maxBufLen << "\n";
-					for (int i = 0; i < trace.getSize(); i++) file << timeStampBuf[i] << " " << buf[i] << std::endl;
+					for (uint32_t i = 0; i < trace.getSize(); i++) file << timeStampBuf[i] << " " << buf[i] << std::endl;
 					file.close();
 					log.info() << "trace file written";
 				}
 			}
-			std::string name;
 			Trace<T>& trace;
 			eeros::logger::Logger log;
+			std::string name;
 		};
 
 	};

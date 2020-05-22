@@ -73,6 +73,7 @@ namespace eeros {
 	namespace control {
 		std::ostream& operator<<(std::ostream& os, TimeDomain& td) {
 			os << "Time domain: '" << td.getName() << "'"; 
+            return os;
 		}
 	}
 }

@@ -12,7 +12,7 @@ using namespace eeros::logger;
 class ExceptionSeq : public Sequence {
 public:
 	ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait", this) { }
-	int action() {wait(3);}
+	int action() {wait(3); return 0;}
 private:
 	Wait wait;
 };
@@ -26,6 +26,7 @@ public:
 	}
 	int action() {
 		for (int i = 0; i < 5; i++) stepB(1);
+        return 0;
 	}
 private:
 	Wait stepB;
@@ -41,10 +42,11 @@ public:
 		seqB();
 		for (int i = 0; i < 5; i++) stepA(2);
 		seqB.waitAndTerminate();
+        return 0;
 	}
 private:
-	Wait stepA;
 	SequenceB seqB;
+	Wait stepA;
 };
 
 void signalHandler(int signum) {

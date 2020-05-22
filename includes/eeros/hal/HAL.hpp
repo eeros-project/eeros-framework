@@ -57,7 +57,7 @@ namespace eeros {
 		private:
 			HAL();
 			HAL(const HAL&);
-			HAL& operator=(const HAL&);
+			HAL& operator=(const HAL&) = delete;
 			
 			bool loadModule(std::string moduleName);
 			

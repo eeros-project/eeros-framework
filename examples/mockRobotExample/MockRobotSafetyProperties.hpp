@@ -13,14 +13,14 @@ using namespace eeros::sequencer;
 class MockRobotSafetyProperties : public SafetyProperties {
 public:
 	MockRobotSafetyProperties(MockRobotControlSystem& cs, double ts) : 
-		cs(cs),
 		slOff("off"),
 		slHoming("homing"),
 		slReady("ready"),
 		slMoving("moving"),
 		abort("abort"),
 		homingDone("homing done"),
-		startMoving("start moving")
+		startMoving("start moving"),
+		cs(cs)
 	{
 		addLevel(slOff);
 		addLevel(slHoming);
@@ -42,15 +42,15 @@ public:
 	}
 	virtual ~MockRobotSafetyProperties() { }
 	
-	SafetyEvent abort;
-	SafetyEvent homingDone;
-	SafetyEvent startMoving;
-
 	SafetyLevel slOff;
 	SafetyLevel slHoming;
 	SafetyLevel slReady;
 	SafetyLevel slMoving;
 	
+	SafetyEvent abort;
+	SafetyEvent homingDone;
+	SafetyEvent startMoving;
+
 	MockRobotControlSystem& cs;
 };
 

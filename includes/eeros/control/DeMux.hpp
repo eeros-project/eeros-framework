@@ -12,14 +12,14 @@ namespace eeros {
 		class DeMux: public Block1i<C> {
 		public:
 			DeMux() { 
-				for(int i = 0; i < N; i++) {
+				for(uint32_t i = 0; i < N; i++) {
 					this->out[i].getSignal().clear();
 					out[i].setOwner(this);
 				}
 			}
 			
 			virtual void run() {
-				for(int i = 0; i < N; i++) {
+				for(uint32_t i = 0; i < N; i++) {
 					out[i].getSignal().setValue(this->in.getSignal().getValue()(i));
 					out[i].getSignal().setTimestamp(this->in.getSignal().getTimestamp());
 				}

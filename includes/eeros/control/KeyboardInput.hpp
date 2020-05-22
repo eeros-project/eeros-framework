@@ -28,13 +28,13 @@ namespace eeros {
 			virtual void run();
 			
 		protected:
+			Keyboard k;
 			Output<Vector<5,bool>> isHomed;
 			Output<bool> esc;
 			Output<bool> emergency;
 			Output<bool> reset;
 			Output<bool> start;
 			Output<bool> stop;
-			Keyboard k;
 		};
 	};
 };

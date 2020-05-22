@@ -19,7 +19,7 @@ namespace eeros {
 			
 			virtual void run() {
 				C newValue;
-				for(int i = 0; i < N; i++) {
+				for(uint32_t i = 0; i < N; i++) {
 					newValue(i) = in[i].getSignal().getValue();
 				}
 				out.getSignal().setValue(newValue);

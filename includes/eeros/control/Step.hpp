@@ -61,6 +61,7 @@ namespace eeros {
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, Step<T>& step) {
 			os << "Block step: '" << step.getName() << "' init val = " << step.initValue << " step height = " << step.stepHeight << " delay time = " << step.delayTime; 
+            return os;
 		}
 
 	};

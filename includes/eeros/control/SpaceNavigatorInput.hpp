@@ -25,9 +25,9 @@ namespace eeros {
 			Output<Matrix<SPACENAVIGATOR_BUTTON_COUNT,1,bool>>& getButtonOut();			
 
 		protected:
+			SpaceNavigator sn;
 			Output<Matrix<SPACENAVIGATOR_ROT_AXIS_COUNT,1,double>> rotOut;
 			Output<Matrix<SPACENAVIGATOR_BUTTON_COUNT,1,bool>> buttonOut;
-			SpaceNavigator sn;
 		};
 
 	};

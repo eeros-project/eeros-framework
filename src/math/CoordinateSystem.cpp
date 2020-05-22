@@ -8,8 +8,6 @@ std::map<std::string, CoordinateSystem*> CoordinateSystem::list;
 
 CoordinateSystem::CoordinateSystem(const CoordinateSystem&) { }
 
-CoordinateSystem& CoordinateSystem::operator=(const CoordinateSystem&) { }
-
 CoordinateSystem::CoordinateSystem(std::string id) : id(id) {
 	if(!CoordinateSystem::list.insert( {id, this} ).second) {
 		std::stringstream msg;

@@ -10,14 +10,14 @@ TEST(halHalManagerTest, availableDigInOut){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &ioIn = *hal.getLogicInput("ioIn");
-		eeros::hal::Output<bool> &io1 = *hal.getLogicOutput("io1");
-		eeros::hal::Output<bool> &ioOut = *hal.getLogicOutput("ioOut");
-		eeros::hal::Output<bool> &ioOut4 = *hal.getLogicOutput("ioOut4");
+		hal.getLogicInput("ioIn");
+		hal.getLogicOutput("io1");
+		hal.getLogicOutput("ioOut");
+		hal.getLogicOutput("ioOut4");
 		
-		eeros::hal::Output<double> &dac1 = *hal.getScalableOutput("aOut0");
+		hal.getScalableOutput("aOut0");
 		
-		eeros::hal::Input<double> &aIn0 = *hal.getScalableInput("aIn0");
+		hal.getScalableInput("aIn0");
 		
 		hal.releaseInput("ioIn");
 		hal.releaseOutput("io1");
@@ -38,7 +38,7 @@ TEST(halHalManagerTest, notAvailableDigInOut){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &en = *hal.getLogicInput("enable56");
+		hal.getLogicInput("enable56");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -53,7 +53,7 @@ TEST(halHalManagerTest, emptySignalIdLogicIn){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &en = *hal.getLogicInput("");
+		hal.getLogicInput("");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -68,7 +68,7 @@ TEST(halHalManagerTest, emptySignalIdLogicOut){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<bool> &en = *hal.getLogicOutput("");
+		hal.getLogicOutput("");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -83,7 +83,7 @@ TEST(halHalManagerTest, emptySignalIdRealIn){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &en = *hal.getLogicInput("");
+		hal.getLogicInput("");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -98,7 +98,7 @@ TEST(halHalManagerTest, emptySignalIdRealOut){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<double> &en = *hal.getScalableOutput("");
+		hal.getScalableOutput("");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -113,7 +113,7 @@ TEST(halHalManagerTest, wrongTypeRealIn){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<double> &ioIn = *hal.getScalableInput("ioIn");
+		hal.getScalableInput("ioIn");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -128,7 +128,7 @@ TEST(halHalManagerTest, wrongTypeRealOut){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<double> &aOut = *hal.getScalableOutput("ioOut");
+		hal.getScalableOutput("ioOut");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -143,7 +143,7 @@ TEST(halHalManagerTest, wrongTypeLogicIn){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &dac = *hal.getLogicInput("aIn0");
+		hal.getLogicInput("aIn0");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -158,7 +158,7 @@ TEST(halHalManagerTest, wrongTypeLogicOut){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<bool> &ioOut = *hal.getLogicOutput("aOut0");
+		hal.getLogicOutput("aOut0");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -173,7 +173,7 @@ TEST(halHalManagerTest, wrongDirectionLogicIn){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &ioIn = *hal.getLogicInput("ioOut");
+		hal.getLogicInput("ioOut");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -188,7 +188,7 @@ TEST(halHalManagerTest, wrongDirectionLogicOut){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<bool> &ioOut = *hal.getLogicOutput("ioIn");
+		hal.getLogicOutput("ioIn");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -203,7 +203,7 @@ TEST(halHalManagerTest, wrongDirectionRealIn){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<double> &aIn0 = *hal.getScalableInput("aOut0");
+		hal.getScalableInput("aOut0");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -218,7 +218,7 @@ TEST(halHalManagerTest, wrongDirectionRealOut){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<double> &aOut = *hal.getScalableOutput("aIn0");
+		hal.getScalableOutput("aIn0");
 		FAIL();
 	}
 	catch(eeros::Fault const & err){
@@ -233,8 +233,8 @@ TEST(halHalManagerTest, claimReservedInput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &ioIn = *hal.getLogicInput("ioIn");
-		eeros::hal::Input<bool> &ioIn2 = *hal.getLogicInput("ioIn");
+		hal.getLogicInput("ioIn");
+		hal.getLogicInput("ioIn");
 		
 		FAIL();
 	}
@@ -251,9 +251,9 @@ TEST(halHalManagerTest, claimNonExclusiveInput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &ioIn = *hal.getLogicInput("ioIn", false);
-		eeros::hal::Input<bool> &ioIn2 = *hal.getLogicInput("ioIn", false);
-		eeros::hal::Input<bool> &ioIn3 = *hal.getLogicInput("ioIn", false);
+		hal.getLogicInput("ioIn", false);
+		hal.getLogicInput("ioIn", false);
+		hal.getLogicInput("ioIn", false);
 		
 		hal.releaseInput("ioIn");
 	}
@@ -269,11 +269,11 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveInput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &ioIn = *hal.getLogicInput("ioIn", false);
+		hal.getLogicInput("ioIn", false);
 		
 		hal.releaseInput("ioIn");
 		
-		eeros::hal::Input<bool> &ioInEx = *hal.getLogicInput("ioIn");
+		hal.getLogicInput("ioIn");
 		
 		hal.releaseInput("ioIn");
 	}
@@ -289,8 +289,8 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveInputFail){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &ioIn = *hal.getLogicInput("ioIn", false);
-		eeros::hal::Input<bool> &ioInEx = *hal.getLogicInput("ioIn");
+		hal.getLogicInput("ioIn", false);
+		hal.getLogicInput("ioIn");
 		
 		FAIL();
 	}
@@ -307,8 +307,8 @@ TEST(halHalManagerTest, claimReservedNonExclusiveInput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<bool> &ioIn = *hal.getLogicInput("ioIn");
-		eeros::hal::Input<bool> &ioIn2 = *hal.getLogicInput("ioIn", false);
+		hal.getLogicInput("ioIn");
+		hal.getLogicInput("ioIn", false);
 		
 		FAIL();
 	}
@@ -325,8 +325,8 @@ TEST(halHalManagerTest, claimReservedOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<bool> &ioOut = *hal.getLogicOutput("ioOut");
-		eeros::hal::Output<bool> &ioOut2 = *hal.getLogicOutput("ioOut");
+		hal.getLogicOutput("ioOut");
+		hal.getLogicOutput("ioOut");
 		
 		FAIL();
 	}
@@ -343,9 +343,9 @@ TEST(halHalManagerTest, claimNonExclusiveOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<bool> &ioOut = *hal.getLogicOutput("ioOut", false);
-		eeros::hal::Output<bool> &ioOut2 = *hal.getLogicOutput("ioOut", false);
-		eeros::hal::Output<bool> &ioOut3 = *hal.getLogicOutput("ioOut", false);
+		hal.getLogicOutput("ioOut", false);
+		hal.getLogicOutput("ioOut", false);
+		hal.getLogicOutput("ioOut", false);
 		
 		hal.releaseOutput("ioOut");
 	}
@@ -361,11 +361,11 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<bool> &ioOut = *hal.getLogicOutput("ioOut", false);
+		hal.getLogicOutput("ioOut", false);
 		
 		hal.releaseOutput("ioOut");
 		
-		eeros::hal::Output<bool> &ioOut2 = *hal.getLogicOutput("ioOut");
+		hal.getLogicOutput("ioOut");
 		
 		hal.releaseOutput("ioOut");
 	}
@@ -381,8 +381,8 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveOutputFail){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<bool> &ioOut = *hal.getLogicOutput("ioOut", false);
-		eeros::hal::Output<bool> &ioOut2 = *hal.getLogicOutput("ioOut");
+		hal.getLogicOutput("ioOut", false);
+		hal.getLogicOutput("ioOut");
 		
 		FAIL();
 	}
@@ -399,8 +399,8 @@ TEST(halHalManagerTest, claimReservedNonExclusiveOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<bool> &ioOut = *hal.getLogicOutput("ioOut");
-		eeros::hal::Output<bool> &ioOut2 = *hal.getLogicOutput("ioOut", false);
+		hal.getLogicOutput("ioOut");
+		hal.getLogicOutput("ioOut", false);
 		
 		FAIL();
 	}
@@ -417,8 +417,8 @@ TEST(halHalManagerTest, claimReservedRealInput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<double> &aIn0 = *hal.getScalableInput("aIn0");
-		eeros::hal::Input<double> &aIn2 = *hal.getScalableInput("aIn0");
+		hal.getScalableInput("aIn0");
+		hal.getScalableInput("aIn0");
 		
 		FAIL();
 	}
@@ -435,9 +435,9 @@ TEST(halHalManagerTest, claimNonExclusiveRealInput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<double> &aIn0 = *hal.getScalableInput("aIn0", false);
-		eeros::hal::Input<double> &aIn2 = *hal.getScalableInput("aIn0", false);
-		eeros::hal::Input<double> &aIn3 = *hal.getScalableInput("aIn0", false);
+		hal.getScalableInput("aIn0", false);
+		hal.getScalableInput("aIn0", false);
+		hal.getScalableInput("aIn0", false);
 		
 		hal.releaseInput("aIn0");
 	}
@@ -453,11 +453,11 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealInput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<double> &aIn0 = *hal.getScalableInput("aIn0", false);
+		hal.getScalableInput("aIn0", false);
 		
 		hal.releaseInput("aIn0");
 		
-		eeros::hal::Input<double> &aIn2 = *hal.getScalableInput("aIn0");
+		hal.getScalableInput("aIn0");
 		
 		hal.releaseInput("aIn0");
 	}
@@ -473,8 +473,8 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealInputFail){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<double> &aIn0 = *hal.getScalableInput("aIn0", false);
-		eeros::hal::Input<double> &aIn2 = *hal.getScalableInput("aIn0");
+		hal.getScalableInput("aIn0", false);
+		hal.getScalableInput("aIn0");
 		
 		FAIL();
 	}
@@ -491,8 +491,8 @@ TEST(halHalManagerTest, claimReservedNonExclusiveRealInput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Input<double> &aIn0 = *hal.getScalableInput("aIn0");
-		eeros::hal::Input<double> &aIn2 = *hal.getScalableInput("aIn0", false);
+		hal.getScalableInput("aIn0");
+		hal.getScalableInput("aIn0", false);
 		
 		FAIL();
 	}
@@ -509,8 +509,8 @@ TEST(halHalManagerTest, claimReservedRealOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<double> &aOut = *hal.getScalableOutput("aOut0");
-		eeros::hal::Output<double> &aOut2 = *hal.getScalableOutput("aOut0");
+		hal.getScalableOutput("aOut0");
+		hal.getScalableOutput("aOut0");
 		
 		FAIL();
 	}
@@ -527,9 +527,9 @@ TEST(halHalManagerTest, claimNonExclusiveRealOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<double> &aOut = *hal.getScalableOutput("aOut0", false);
-		eeros::hal::Output<double> &aOut2 = *hal.getScalableOutput("aOut0", false);
-		eeros::hal::Output<double> &aOut3 = *hal.getScalableOutput("aOut0", false);
+		hal.getScalableOutput("aOut0", false);
+		hal.getScalableOutput("aOut0", false);
+		hal.getScalableOutput("aOut0", false);
 		
 		hal.releaseOutput("aOut0");
 	}
@@ -545,11 +545,11 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<double> &aOut = *hal.getScalableOutput("aOut0", false);
+		hal.getScalableOutput("aOut0", false);
 		
 		hal.releaseOutput("aOut0");
 		
-		eeros::hal::Output<double> &aOut2 = *hal.getScalableOutput("aOut0");
+		hal.getScalableOutput("aOut0");
 		
 		hal.releaseOutput("aOut0");
 	}
@@ -565,8 +565,8 @@ TEST(halHalManagerTest, claimNonExclusiveThenExclusiveRealOutputFail){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<double> &aOut = *hal.getScalableOutput("aOut0", false);
-		eeros::hal::Output<double> &aOut2 = *hal.getScalableOutput("aOut0");
+		hal.getScalableOutput("aOut0", false);
+		hal.getScalableOutput("aOut0");
 		
 		FAIL();
 	}
@@ -583,8 +583,8 @@ TEST(halHalManagerTest, claimReservedNonExclusiveRealOutput){
 	HAL& hal = HAL::instance();
 	
 	try{
-		eeros::hal::Output<double> &aOut = *hal.getScalableOutput("aOut0");
-		eeros::hal::Output<double> &aOut2 = *hal.getScalableOutput("aOut0", false);
+		hal.getScalableOutput("aOut0");
+		hal.getScalableOutput("aOut0", false);
 		
 		FAIL();
 	}

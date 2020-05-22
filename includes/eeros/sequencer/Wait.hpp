@@ -12,7 +12,7 @@ namespace eeros {
 			virtual ~Wait() { };
 			
 			int operator() (double waitingTime) {this->waitingTime = waitingTime; return start();}
-			int action() {time = std::chrono::steady_clock::now();}
+			int action() {time = std::chrono::steady_clock::now(); return 0;}
 			bool checkExitCondition() {return ((std::chrono::duration<double>)(std::chrono::steady_clock::now() - time)).count() > waitingTime;}
 			
 			std::chrono::time_point<std::chrono::steady_clock> time;

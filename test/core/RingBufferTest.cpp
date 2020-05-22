@@ -67,7 +67,7 @@ void pop_fail(int line) {
 
 void len(int len, int line) {
 	cout << "len " << len;
-	if(rb.length() != len) error(line, rb);
+	if(rb.length() != (uint32_t)len) error(line, rb);
 	std::cout << std::endl;
 }
 

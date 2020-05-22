@@ -52,36 +52,30 @@ void Keyboard::run() {
 		else if (c == '5') for (int i = 0; i < 4; i++) speed[i] = 0;	// speed = 0
 		else if (c == '8') {						// forward
 			if (speed[0] > -1.0) speed[0] -= 0.02;
-                }
-		else if (c == '2') {						// backward
+        } else if (c == '2') {						// backward
 			if (speed[0] < 1.0) speed[0] += 0.02;
-                }
-		else if (c == '4') {						// to the right
+        } else if (c == '4') {						// to the right
 			if (speed[1] < 1.0) speed[1] += 0.02;
-                }
-		else if (c == '6') {						// to the left
+        } else if (c == '6') {						// to the left
 			if (speed[1] > -1.0) speed[1] -= 0.02;
-                }
-		else if (c == '9') {						// turn right
+        } else if (c == '9') {						// turn right
 			if (speed[3] > -1.0) speed[3] -= 0.02;
-                }
-		else if (c == '7') {						// turn left
+        } else if (c == '7') {						// turn left
 			if (speed[3] < 1.0) speed[3] += 0.02;
-                }
-		else if (c == 'q') 
+        } else if (c == 'q') {
 			if (homed[0] == true) homed[0] = false; else homed[0] = true;
-		else if (c == 'w') 
+        } else if (c == 'w') {
 			if (homed[1] == true) homed[1] = false; else homed[1] = true;
-		else if (c == 'e') 
+        } else if (c == 'e') {
 			if (homed[2] == true) homed[2] = false; else homed[2] = true;
-		else if (c == 'r') 
+        } else if (c == 'r') {
 			if (homed[3] == true) homed[3] = false; else homed[3] = true;
-		else if (c == 't') 
+        } else if (c == 't') {
 			if (homed[4] == true) homed[4] = false; else homed[4] = true;
-		
+        }
 		for (int i = 0; i < 4; i++) {
 			if (speed[i] < -1.0) speed[i] = -1.0;
 			else if (speed[i] > 1.0) speed[i] = 1.0;
 		}
-        }
+    }
 }

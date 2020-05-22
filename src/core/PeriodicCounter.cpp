@@ -3,7 +3,7 @@
 using namespace eeros;
 
 PeriodicCounter::PeriodicCounter(double period, unsigned logger_category) :
-	log(logger_category), reset_after(20)
+	reset_after(20), log(logger_category)
 {
 	setPeriod(period);
 	start = clk::now();

@@ -22,7 +22,7 @@ namespace eeros {
 				value = other.value;
 				this->setName(other.getName());
 			}
-			
+
 			virtual void run() {
 				std::lock_guard<std::mutex> lock(mtx);
 				this->out.getSignal().setValue(value);
@@ -64,6 +64,7 @@ namespace eeros {
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, Constant<T>& c) {
 			os << "Block constant: '" << c.getName() << "' init val = " << c.value; 
+            return os;
 		}
 	};
 };

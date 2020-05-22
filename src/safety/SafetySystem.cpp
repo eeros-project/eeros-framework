@@ -50,7 +50,6 @@ namespace eeros {
 			if(currentLevel) {
 				SafetyLevel* newLevel = currentLevel->getDestLevelForEvent(event, context == &privateContext);
 				if(newLevel != nullptr) {
-					bool transition = (newLevel != currentLevel);	// stage level change
 					// prioritize multiple events, 
 					// can be called by different threads
 					mtx.lock();

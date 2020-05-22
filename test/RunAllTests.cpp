@@ -95,13 +95,13 @@ int main(int argc, char **argv){
 	
 	if (libflink || libcomedi || libsim) {
 		// environment with invalid config for tests
-		testing::Environment* const eeros_env_invalid = testing::AddGlobalTestEnvironment(new EerosEnvironmentInvalidConfig);
+		testing::AddGlobalTestEnvironment(new EerosEnvironmentInvalidConfig);
 		
 		// environment with valid config for tests
-		testing::Environment* const eeros_env = testing::AddGlobalTestEnvironment(new EerosEnvironment);
+		testing::AddGlobalTestEnvironment(new EerosEnvironment);
 	}
 	// init googleTest and run
-	::testing::InitGoogleTest(&argc, argv);
+	testing::InitGoogleTest(&argc, argv);
 		
 	return RUN_ALL_TESTS();
   

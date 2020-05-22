@@ -30,7 +30,6 @@ class ConstantAccTrajectoryGeneratorTest {
 
 			int line = 0;
 			int error = 0;
-			uint64_t timestamp = 0;
 			
 			Vector4 startPos; startPos << 4, 1, 2.4, 1.7;
 			Vector4 startVel; startVel << 0.0, 0.0, 0.0, 0.0;

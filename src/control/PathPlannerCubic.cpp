@@ -7,7 +7,7 @@
 using namespace eeros;
 using namespace eeros::control;
 
-PathPlannerCubic::PathPlannerCubic(double dt) : dt(dt), timeInterval(-dt), log('P'), posOut(this), velOut(this), accOut(this), jerkOut(this) {
+PathPlannerCubic::PathPlannerCubic(double dt) : posOut(this), velOut(this), accOut(this), jerkOut(this), dt(dt), timeInterval(-dt), log('P') {
 	prevPos = 0.0;
 	prevVel = 0.0;
 	prevAcc = 0.0;
@@ -168,7 +168,7 @@ bool PathPlannerCubic::move(double initPos){
 	velCoeff.resize(timeCoeffRaw.size());
 	posCoeff.resize(timeCoeffRaw.size());
 	posCoeffShifted.resize(timeCoeffRaw.size());
-	for (int i = 0; i < timeCoeffRaw.size(); i++) {
+	for (std::size_t i = 0; i < timeCoeffRaw.size(); i++) {
 		timeCoeff[i] = timeCoeffRaw[i];
 		jerkCoeff[i] = jerkCoeffRaw[i];
 		accCoeff[i] = accCoeffRaw[i];
@@ -187,7 +187,7 @@ bool PathPlannerCubic::move(double time, double startPos, double deltaPos){
 	scalePath(time, deltaPos); 
 	
 	posCoeffShifted.resize(posCoeff.size());
-	for (int i = 0; i < posCoeff.size(); i++) posCoeffShifted[i] = posCoeff[i] + startPos;	// set start position
+	for (std::size_t i = 0; i < posCoeff.size(); i++) posCoeffShifted[i] = posCoeff[i] + startPos;	// set start position
 	finished = false;
 	return true;
 }
@@ -220,7 +220,7 @@ void PathPlannerCubic::run() {
 			vel = prevVel + prevAcc * dt + jerk / 2 * dt * dt;
 			pos = prevPos + prevVel * dt + prevAcc / 2 * dt * dt + jerk / 6 * dt * dt * dt;
 		} else {
-			if (first) {index == 0; timeInterval = timeCoeff[index]; first = false;}
+			if (first) {index = 0; timeInterval = timeCoeff[index]; first = false;}
 			else {
 				index++;
 				if (index == timeCoeff.size() - 1) finished = true;

@@ -44,9 +44,9 @@ namespace eeros {
 			double max_r = 2.8;
 
 		protected:
+            XBox x;
 			Output<Matrix<XBOX_BUTTON_COUNT,1,bool>> buttonOut;
 			Matrix<4,4,double> axisScale;
-			XBox x;
 		};
 
 	};

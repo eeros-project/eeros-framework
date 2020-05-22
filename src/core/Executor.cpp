@@ -96,7 +96,7 @@ namespace {
 }
 
 Executor::Executor() :
-	log('E'), period(0), mainTask(nullptr), syncWithEtherCatStackIsSet(false), syncWithRosTimeIsSet(false), syncWithRosTopicIsSet(false) { }
+	period(0), mainTask(nullptr), syncWithEtherCatStackIsSet(false), syncWithRosTimeIsSet(false), syncWithRosTopicIsSet(false), log('E') { }
 
 Executor::~Executor() {
 
@@ -146,6 +146,7 @@ void Executor::add(control::TimeDomain &timedomain) {
 
 void Executor::prefault_stack() {
 	unsigned char dummy[8*1024] = {};
+    (void)dummy;
 }
 
 bool Executor::lock_memory() {
@@ -161,6 +162,7 @@ bool Executor::set_priority(int nice) {
 void Executor::stop() {
 	running = false;
 	auto &instance = Executor::instance();
+    (void)instance;
 #ifdef USE_ETHERCAT
 	if(instance.etherCATStack) instance.cv->notify_one();
 #endif

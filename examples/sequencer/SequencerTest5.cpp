@@ -1,72 +1,72 @@
-#include <eeros/logger/StreamLogWriter.hpp>
-#include <eeros/sequencer/Sequencer.hpp>
+#include <iostream>
 #include <eeros/sequencer/Sequence.hpp>
-#include <eeros/sequencer/Wait.hpp>
-
-#include <chrono>
-#include <signal.h>
+#include <eeros/sequencer/Step.hpp>
+#include <eeros/sequencer/Sequencer.hpp>
+#include <eeros/logger/Logger.hpp>
+#include <eeros/logger/StreamLogWriter.hpp>
+#include <functional>
+#include <utility>
 
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
-int count = 0;
+StreamLogWriter w(std::cout);
+Logger logger;
 
-class MyCondition : public Condition {
-	bool validate() {return count > 2;}
-};
-
-class SequenceB : public Sequence {
+class GenericStep: public Step
+{
 public:
-	SequenceB(std::string name, Sequence* caller, Monitor& m) : Sequence(name, caller, false), stepB("step B", this), m(m) { 
-		addMonitor(&m);
-	}
-	int action() {
-		for (int i = 0; i < 5; i++) stepB(1);
-	}
+    GenericStep(std::string name, Sequence *caller, std::function<int()> f): Step(std::move(name), caller), function(std::move(f)){}
+
+    int action() override
+    {
+        return function();
+    }
+
 private:
-	Wait stepB;
-	Monitor& m;
+    std::function<int()> function;
 };
 
-class MainSequence : public Sequence {
+class MainSequence : public Sequence
+{
 public:
-	MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), m("myMonitor", this, cond, SequenceProp::abort), seqB("sequence B", this, m), stepA("step A", this) { 
-		addMonitor(&m);
-	}
-		
-	int action() {
-		seqB();
-		for (int i = 0; i < 5; i++) {
-			stepA(1);
-			count++;
-		}
-		seqB.waitAndTerminate();
-	}
+    MainSequence(std::string name, Sequencer& seq): Sequence(std::move(name), seq) {}
+
+    int action() override
+    {
+        log.info() << "Hello from an action!";
+//         for (auto &step : steps)
+//             step();
+        GenericStep("1", this, []{logger.info() << "1"; return 0;})();
+        GenericStep("2", this, []{logger.info() << "2"; return 0;})();
+        return 0;
+    }
+
+    void addStep(GenericStep&& step)
+    {
+        steps.push_back(std::move(step));
+    }
+
+
 private:
-	SequenceB seqB;
-	Wait stepA;
-	MyCondition cond;
-	Monitor m;
+    std::vector<GenericStep> steps;
 };
 
-void signalHandler(int signum) {
-	Sequencer::instance().abort();
-}
+int main() {
+    logger.set(w);
+    Logger::setDefaultWriter(&w);
 
-int main(int argc, char **argv) {
-	signal(SIGINT, signalHandler);
-	StreamLogWriter w(std::cout);
-// 	w.show(LogLevel::TRACE);
-	Logger::setDefaultWriter(&w);
-	Logger log;
-	
-	log.info() << "Sequencer example started...";
-	
-	auto& sequencer = Sequencer::instance();
-	MainSequence mainSeq("Main Sequence", sequencer);
-	sequencer.addSequence(mainSeq);
-	mainSeq.start();
-	
-	sequencer.wait();
-	log.info() << "Simple Sequencer Example finished...";
+    logger.info() << "start";
+
+    auto sequencer = Sequencer::instance();
+    auto mySequence = MainSequence("main", sequencer);
+
+    mySequence.addStep(GenericStep("1", &mySequence, []{logger.info() << "1"; return 0;}));
+    mySequence.addStep(GenericStep("2", &mySequence, []{logger.info() << "2"; return 0;}));
+
+    sequencer.addSequence(mySequence);
+    mySequence.start();
+    sequencer.wait();
+    return 0;
+  
 }

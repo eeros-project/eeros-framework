@@ -109,13 +109,13 @@ namespace eeros {
 		
 		private:
 			template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _clear() {
-				value = std::numeric_limits<int32_t>::min();
+				value = std::numeric_limits<uint32_t>::min();
 			}
 			template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type _clear() {
 				value = std::numeric_limits<double>::quiet_NaN();
 			}
 			template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type _clear() {
-				value.fill(std::numeric_limits<int32_t>::min());
+				value.fill(std::numeric_limits<uint32_t>::min());
 			}
 			template <typename S> typename std::enable_if<   !std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
 				value.fill(std::numeric_limits<double>::quiet_NaN());
@@ -135,10 +135,12 @@ namespace eeros {
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, Signal<T>& signal) {
 			os << "Signal: '" << signal.getName() << "' timestamp = " << signal.getTimestamp() << " value = " << signal.getValue(); 
+            return os;
 		}
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, Signal<T>* signal) {
 			os << "Signal: '" << signal.getName() << "' timestamp = " << signal.getTimestamp() << " value = " << signal.getValue(); 
+            return os;
 		}
 
 	};

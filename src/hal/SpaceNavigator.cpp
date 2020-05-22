@@ -95,10 +95,9 @@ void SpaceNavigator::run() {
 		uint8_t readbuff[14];
 		while (running) {
 			*readbuff = fgetc(file);
-			ssize_t n;
 			switch(*readbuff) {
 			case 0x01: // position/rotation packet 
-				n = fread(readbuff+1, 1, 13, file);
+				fread(readbuff+1, 1, 13, file);
 				current.axis[0] = (int16_t)(((int16_t)readbuff[2]<<8)&0xff00) | ((int16_t)readbuff[1]&0xff);
 				current.axis[1] = (int16_t)(((int16_t)readbuff[4]<<8)&0xff00) | ((int16_t)readbuff[3]&0xff);
 				current.axis[2] = (int16_t)(((int16_t)readbuff[6]<<8)&0xff00) | ((int16_t)readbuff[5]&0xff);
@@ -107,7 +106,7 @@ void SpaceNavigator::run() {
 				current.rotAxis[2] = (int16_t)(((int16_t)readbuff[13]<<8)&0xff00) | ((int16_t)readbuff[12]&0xff);
 				break;
 			case 0x03: // button event
-				n = fread(readbuff+1, 1, 2, file); 
+				fread(readbuff+1, 1, 2, file); 
 				switch(readbuff[1]) {
 				case 0x00:
 					current.button[0] = false;
@@ -136,7 +135,7 @@ void SpaceNavigator::run() {
 	} else {	// read events
 		struct input_event ev;
 		while (running) {
-			int rd = fread(&ev, sizeof(struct input_event), 1, file);
+			fread(&ev, sizeof(struct input_event), 1, file);
 			switch(ev.type) {
 			case 1: // button event
 				switch(ev.code) {

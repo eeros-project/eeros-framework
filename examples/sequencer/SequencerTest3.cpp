@@ -15,6 +15,7 @@ public:
 	int action() {
 		caller->resetTimeout(); 
 		caller->setTimeoutTime(10);
+        return 0;
 	}
 private:
 	Wait wait;
@@ -26,6 +27,7 @@ public:
 	int action() {
 		for (int i = 0; i < 5; i++) stepB(1);
 // 		while (getRunningState() == SequenceState::running) stepB(1);
+        return 0;
 	}
 private:
 	Wait stepB;
@@ -46,6 +48,7 @@ public:
 		seqB();
 		stepA(1);
 		stepA(1);
+        return 0;
 	}
 private:
 	Wait stepA;
@@ -59,6 +62,7 @@ public:
 		
 	int action() {
 		seqA();
+        return 0;
 	}
 private:
 	SequenceA seqA;

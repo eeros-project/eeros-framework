@@ -21,13 +21,13 @@ using namespace eeros;
 class TestAppCS {
 public:
 	TestAppCS(double dt) : 
-		dt(dt),
-		log('C'),
-		socketA("", 9876, 0.1),	// server
 		c1({1.5, 2.2, 3.3, 4.6}),
 		c2(56.5),
 		c3(-28),
 		c4(-34.987),
+		socketA("", 9876, 0.1),	// server
+		log('C'),
+		dt(dt),
 		timedomain("Main time domain", dt, true) {
 	
 		socketA.getOut().getSignal().setName("socketRead");
