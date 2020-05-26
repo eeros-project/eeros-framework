@@ -12,6 +12,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
 
 namespace eeros {
 namespace control {
@@ -92,4 +94,5 @@ class CanHandle {
 }
 }
 
-#endif // ORG_EEROS_CONTROL_CANHANDLE_HPP_ 
+#endif // ORG_EEROS_CONTROL_CANHANDLE_HPP_
+

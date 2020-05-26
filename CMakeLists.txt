@@ -197,12 +197,19 @@ if (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
 endif (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
 message(STATUS "")
 
-#set(CMAKE_PREFIX_PATH pathTo/canopenlib/install/)
 
-#find_package(canopenlib)
+##########################
+# CAN support
+##########################
+if(USE_CAN)
+	message(STATUS "")
+	message(STATUS "Use canopenlib")
+	message(STATUS "**********************************")
 
-#include_directories(${canopenlib_INCLUDE_DIR})
-#link_directories(${canopenlib_DIR})
+	find_package(canopenlib QUIET)
+	include_directories(${canopenlib_INCLUDE_DIR})
+	link_directories(${canopenlib_DIR})
+endif()
 
 
 ##########################
