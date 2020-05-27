@@ -10,8 +10,7 @@
 #include <canopen.h>
 #include <canopen-drv.h>
 #include <vector>
-#include <algorithm>
-#include <memory>
+
 
 using namespace eeros::control;
 using namespace eeros::math;
@@ -21,38 +20,52 @@ namespace eeros {
 namespace control {
 
 /**
- * A gain block is used to amplify an input signal. This is basically done by
- * multiplying the gain with the input signal value.
- * The following term represents the operation performed in this block.
+ * This block serves to receive CAN messages from a Faulhaber or similar drive.
+ * The drive has to be initialized and brought up to its operational state 
+ * through SDO transfers. After this, SDO transfer must stop. All further 
+ * communication is done through PDO transfer. These PDOs must have been 
+ * configured on the drive beforehand. 
+ * 
+ * The drive must be configured to send TPDOs as follows
+ *   TPDO1: status word (16 bit unsigned), actual velocity (32 bit signed)
+ *   TPDO2: actual position (32 bit signed), warnings (32 bit unsigned)
  *
- * output = gain * input
+ * The drive will send its TPDOs upen receiving a sync package. This must be
+ * sent by a CanSend block.
  *
- * Gain is a class template with two type and one non-type template arguments.
- * The two type template arguments specify the types which are used for the
- * output type and the gain type when the class template is instanciated.
- * The non-type template argument specifies if the multiplication will be done
- * element wise in case the gain is used with matrices.
+ * @tparam N - number of CAN nodes (2 - default)
  *
- * A gain block is suitable for use with multiple threads. However,
- * enabling/disabling of the gain and the smooth change feature
- * is not synchronized.
- *
- * @tparam Tout - output type (double - default type)
- * @tparam Tgain - gain type (double - default type)
- * @tparam elementWise - amplify element wise (false - default value)
- *
- * @since v1.1
+ * @since v1.2
  */
 template < uint8_t N = 2 >
 class CanReceiveFaulhaber: public Block {
+  
  public:
+  /**
+   * Constructs a CAN receive block instance for a given set of nodes.
+   * Sets the scale of velocity and position to 1.
+   *
+   * @param socket - socket of number of associated CAN bus
+   * @param node - vector with node id's of all connected CAN nodes 
+   * @param functionCode - vector with function codes of all PDO's to be received
+   */
   CanReceiveFaulhaber(int socket, std::initializer_list<uint8_t> node, std::initializer_list<uint8_t> functionCode) 
       :  socket(socket), nodes(node), functionCodes(functionCode), log('C') {
+    for (int i = 0; i < node.size(); i++) {
+      posScale[i] = 1;
+      velScale[i] = 1;
+    }
     log.info() << "CAN receive block constructed, " << node.size() << " nodes with " << functionCode.size() << " PDO's";
   }
           
-  virtual ~CanReceiveFaulhaber() { }
-  
+  /**
+   * Reads from the CAN bus.
+   *
+   * If enabled reads 2 PDO's from each CAN node. 
+   *
+   * @see enable()
+   * @see disable()
+   */
   virtual void run() {
     if (enabled) {
       uint32_t nof = nodes.size() * functionCodes.size();
@@ -110,34 +123,86 @@ class CanReceiveFaulhaber: public Block {
     }
   }
 
+  /**
+   * Getter function for the status output.
+   * 
+   * @return The output carrying the status information
+   */
   virtual Output<Matrix<N,1,uint16_t>>& getOutStatus() {
         return status;
   }
   
+  /**
+   * Getter function for the position output.
+   * 
+   * @return The output carrying the position information
+   */
   virtual Output<Matrix<N,1,double>>& getOutPos() {
     return pos;
   }
   
+  /**
+   * Getter function for the velocity output.
+   * 
+   * @return The output carrying the velocity information
+   */
   virtual Output<Matrix<N,1,double>>& getOutVel() {
     return vel;
   }
   
+  /**
+   * Getter function for the warning output.
+   * 
+   * @return The output carrying the warning information
+   */
   virtual Output<Matrix<N,1,uint32_t>>& getOutWarning() {
     return warning;
   }
 
+  /**
+   * Enables the block.
+   *
+   * If enabled, run() will read PDOs on the CAN bus and parse them.
+   *
+   * @see run()
+   */
   virtual void enable() {
     enabled = true;
   }
   
+  /**
+   * Disables the block.
+   *
+   * If disabled, no PDOs will be read.
+   *
+   * @see run()
+   */
   virtual void disable() {
     enabled = false;
   }
   
+  /**
+   * Sets the scaling for the position information.
+   *
+   * The drive sends its positioning information as a 4 bytes counter value.
+   * The scaling allows to transform this counter value into meaningful 
+   * position information in rad or m.
+   *
+   * @see run()
+   */
   virtual void setPosScale(uint8_t node, double scale) {
     posScale[node] = scale;
   }
 
+  /**
+   * Sets the scaling for the velocity information.
+   *
+   * The drive sends its velocity information as a 4 bytes counter value.
+   * The scaling allows to transform this counter value into meaningful 
+   * velocity information in rad/s or m/s.
+   *
+   * @see run()
+   */
   virtual void setVelScale(uint8_t node, double scale) {
     velScale[node] = scale;
   }
