@@ -80,7 +80,7 @@ void XBox::run() {
 	if (fd < 0) return;
 	struct js_event e;
 	while (running) 	{
-		read(fd, &e, sizeof(struct js_event));
+		if (read(fd, &e, sizeof(struct js_event)));
 		
 		switch (e.type) {
 			case (JS_EVENT_BUTTON | JS_EVENT_INIT):
