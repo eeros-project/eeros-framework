@@ -59,12 +59,19 @@ namespace eeros {
 			void setTimeoutBehavior(SequenceProp behavior);	
 			void setTimeoutExceptionSequence(BaseSequence& sequence);
 			
-			// Abort
-			void resetAbort();
+  /**
+   * Aborts this sequence.
+   * The sequence will have to finish its action method beforehand, then check its
+   * exit condition. The sequence will not terminate until the exit condition becomes true.
+   * With abort you can stop this sequence with the exit condition still being false.
+   */
+   void abort();
 			
 		protected:
 			virtual int action();		// handles different checks like preconditions
 			virtual int operator() () = 0;	// has to be implemented in derived class	
+            // Abort
+            void resetAbort();
 		
 			std::string name;			
 			Sequencer& seq;			// reference to sequencer
