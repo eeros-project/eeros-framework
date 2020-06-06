@@ -224,6 +224,10 @@ namespace eeros {
 			conditionAbort.reset();
 		}
 
+        void BaseSequence::abort() {
+            conditionAbort.set();
+        }
+
 		std::ostream& operator<<(std::ostream& os, SequenceState state) {
 			switch (state) {
 				case SequenceState::idle: os << "idle"; break;
