@@ -1,8 +1,5 @@
 #include "CanExample.hpp"
-
-#include <iostream>
 #include <signal.h>
-
 #include <eeros/control/can/CanHandle.hpp>
 #include <eeros/control/can/CanReceiveFaulhaber.hpp>
 #include <eeros/control/can/CanSendFaulhaber.hpp>
@@ -17,10 +14,14 @@ using namespace eeros::logger;
 using namespace eeros::control;
 using namespace eeros::safety;
 using namespace eeros::sequencer;
-
+ 
+void signalHandler(int signum) {
+  SafetySystem::exitHandler();
+}
 
 int main(int argc, char **argv) {
   double dt = 0.2;
+  signal(SIGINT, signalHandler);
   
   StreamLogWriter w(std::cout);
   Logger::setDefaultWriter(&w);

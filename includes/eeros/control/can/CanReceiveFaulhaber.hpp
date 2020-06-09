@@ -7,9 +7,9 @@
 #include <eeros/core/System.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/core/Fault.hpp>
-#include <canopen.h>
 #include <canopen-drv.h>
 #include <vector>
+#include <algorithm>
 
 
 using namespace eeros::control;
@@ -83,7 +83,7 @@ class CanReceiveFaulhaber: public Block {
         if (readLen > 0) {
           // find associated node
           std::vector<uint8_t>::iterator it = std::find(nodes.begin(), nodes.end(), readFrame.id);
-          if (it == nodes.end()) throw eeros::Fault("CAN node not found");
+          if (it == nodes.end()) log.warn() << "CAN receive: node id " << readFrame.id << " not found";
           int node = std::distance(nodes.begin(), it);
           if(readFrame.function_code == CANOPEN_FC_PDO1_TX) {
             uint16_t tmpStatus = (readFrame.payload.data[0] & 0xFF);
@@ -97,7 +97,7 @@ class CanReceiveFaulhaber: public Block {
             tmpVel |= ((readFrame.payload.data[4] & 0x00FF) << 16);
             tmpVel |= ((readFrame.payload.data[5] & 0x00FF) << 24);
             auto v = vel.getSignal().getValue();
-            v[node] = tmpVel * velScale[node]; 
+            v[node] = tmpVel / velScale[node]; 
             vel.getSignal().setValue(v);
             vel.getSignal().setTimestamp(ts);
           } else if (readFrame.function_code == CANOPEN_FC_PDO2_TX) {
@@ -106,7 +106,7 @@ class CanReceiveFaulhaber: public Block {
             tmpPos |= ((readFrame.payload.data[2] & 0x00FF) << 16);
             tmpPos |= ((readFrame.payload.data[3] & 0x00FF) << 24);
             auto p = pos.getSignal().getValue();
-            p[node] = tmpPos * posScale[node]; 
+            p[node] = tmpPos / posScale[node]; 
             pos.getSignal().setValue(p);
             pos.getSignal().setTimestamp(ts);
             uint32_t tmpWarning = (readFrame.payload.data[4] & 0x00FF);
@@ -117,7 +117,7 @@ class CanReceiveFaulhaber: public Block {
             w[node] = tmpWarning; 
             warning.getSignal().setValue(w);
             warning.getSignal().setTimestamp(ts);
-          } else log.warn() << "PDO not parsed";
+          } else log.warn() << "PDO not parsed: " << (int)readFrame.function_code;
         }
       }
     }
@@ -188,10 +188,10 @@ class CanReceiveFaulhaber: public Block {
    * The scaling allows to transform this counter value into meaningful 
    * position information in rad or m.
    *
-   * @see run()
+   * @param scale The scaling factor for the position for all drives
    */
-  virtual void setPosScale(uint8_t node, double scale) {
-    posScale[node] = scale;
+  virtual void setPosScale(Matrix<N,1,double>& scale) {
+    posScale = scale;
   }
 
   /**
@@ -201,10 +201,10 @@ class CanReceiveFaulhaber: public Block {
    * The scaling allows to transform this counter value into meaningful 
    * velocity information in rad/s or m/s.
    *
-   * @see run()
+   * @param scale The scaling factor for the velocity for all drives
    */
-  virtual void setVelScale(uint8_t node, double scale) {
-    velScale[node] = scale;
+  virtual void setVelScale(Matrix<N,1,double>& scale) {
+    velScale = scale;
   }
 
 
