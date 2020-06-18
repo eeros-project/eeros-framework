@@ -26,7 +26,7 @@ public:
 	}
 	int action() {
 		for (int i = 0; i < 5; i++) stepB(1);
-        return 0;
+    return 0;
 	}
 private:
 	Wait stepB;

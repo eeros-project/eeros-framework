@@ -3,6 +3,7 @@
 
 #include <eeros/control/ros/RosPublisher.hpp>
 #include <eeros/math/Matrix.hpp>
+#include <eeros/control/ros/EerosRosTools.hpp>
 
 // A-1 Include the header file of the ROS message
 #include <sensor_msgs/LaserScan.h>

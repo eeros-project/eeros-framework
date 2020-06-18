@@ -23,8 +23,6 @@ using namespace eeros::logger;
 class MyControlSystem {
 public:
 	MyControlSystem(double ts):
-		dt(ts),
-
 		analogIn0("scanTimeIn0"),		// argument has to match signalId of json
 		digitalIn0("batteryPresent0"),
 		analogOut0("scanTimeEchoOut0"),
@@ -34,6 +32,7 @@ public:
 		laserScanOut("/rosExample/TestTopic23", 100),
 
 		debugOut0("debugNode/debugOut0"),
+		dt(ts),
 		
 		timedomain("Main time domain", dt, true) 
 		{

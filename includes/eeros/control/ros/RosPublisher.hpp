@@ -4,7 +4,6 @@
 #include <ros/ros.h>
 #include <ros/callback_queue.h>
 // #include <eeros/core/System.hpp>
-#include <eeros/control/ros/EerosRosTools.hpp>
 #include <eeros/control/Block1i.hpp>
 
 namespace eeros {

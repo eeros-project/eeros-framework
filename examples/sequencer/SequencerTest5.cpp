@@ -22,6 +22,7 @@ public:
     }
     int action() {
         for (int i = 0; i < 5; i++) stepB(1);
+        return 0;
     }
 private:
     Wait stepB;
@@ -41,12 +42,13 @@ public:
             count++;
         }
         seqB.waitAndTerminate();
+        return 0;
     }
 private:
-    SequenceB seqB;
-    Wait stepA;
-    MyCondition cond;
     Monitor m;
+    SequenceB seqB;
+    MyCondition cond;
+    Wait stepA;
 };
 
 void signalHandler(int signum) {
