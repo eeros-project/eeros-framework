@@ -271,8 +271,8 @@ void Executor::run() {
 		if (syncWithRosTopicIsSet)		log.error() << "Can't use both RosTime and RosTopic to sync executor";
 		useDefaultExecutor = false;
 		
-		long periodNsec = static_cast<long>(period * 1.0e9);
-		long next_cycle = ros::Time::now().toNSec()+periodNsec;
+		uint64_t periodNsec = static_cast<uint64_t>(period * 1.0e9);
+		uint64_t next_cycle = ros::Time::now().toNSec() + periodNsec;
 		
 // 		auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
 		while (running) { 
