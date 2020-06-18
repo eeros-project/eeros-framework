@@ -7,8 +7,6 @@
 #include <eeros/control/Output.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/core/Fault.hpp>
-#include <canopen-drv.h>
-#include <canopen.h>
 #include <canopen-com.h>
 
 using namespace eeros::control;
@@ -52,6 +50,8 @@ class CanSendFaulhaber : public Block {
     for (int i = 0; i < node.size(); i++) {
       velScale[i] = 1;
     }
+    lastCtrl = 0;
+    ctrl = 0;
     log.info() << "CAN send block constructed, " << node.size() << " nodes with " << functionCode.size() << " PDO's";
   }
 
@@ -72,11 +72,11 @@ class CanSendFaulhaber : public Block {
         
       // send control word to all nodes
       for (uint32_t i = 0; i < nodes.size(); i++) {  
-        if (ctrl.getSignal().getValue()[i] != lastCtrl[i]) {
-          log.info() << "CAN ctrl changed: send " << ctrl.getSignal().getValue()[i];
-          err = canopen_pdo_send_2bytes(socket, nodes[i], CANOPEN_FC_PDO1_RX, ctrl.getSignal().getValue()[i]);
-          lastCtrl[i] = ctrl.getSignal().getValue()[i];
-          if (err != 0) throw eeros::Fault("CAN send ctrl failed");
+        if (ctrl[i] != lastCtrl[i]) {
+          log.info() << "CAN ctrl changed for node " << std::to_string(nodes[i]) << ": send 0x" << std::hex << ctrl[i];
+          err = canopen_pdo_send_2bytes(socket, nodes[i], CANOPEN_FC_PDO1_RX, ctrl[i]);
+          lastCtrl[i] = ctrl[i];
+          if (err != 0) throw eeros::Fault(std::string("CAN send ctrl to node ") + std::to_string(nodes[i]) + " failed");
         }
       }
         
@@ -100,12 +100,12 @@ class CanSendFaulhaber : public Block {
   }
           
   /**
-   * Getter function for the control word input.
+   * Setter function for the control word.
    * 
-   * @return The input carrying the control word information
+   * @param ctrl The control word information for all drives
    */
-  virtual Input<Matrix<N,1,uint16_t>>& getInCtrl() {
-    return ctrl;
+  virtual void setCtrl(Matrix<N,1,uint16_t>& ctrl) {
+    this->ctrl = ctrl;
   }
 
   /**
@@ -159,10 +159,10 @@ class CanSendFaulhaber : public Block {
    * The scaling allows to transform this counter value into meaningful 
    * velocity information in rad/s or m/s.
    *
-   * @see run()
+   * @param scale The scaling factor for the velocity for all drives
    */
-  virtual void setVelScale(uint8_t node, double scale) {
-    velScale[node] = scale;
+  virtual void setVelScale(Matrix<N,1,double>& scale) {
+    velScale = scale;
   }
 
  private:
@@ -171,7 +171,7 @@ class CanSendFaulhaber : public Block {
   bool ipMode = false;
   Input<Matrix<N,1,double>> vel;
   Matrix<N,1,double> velScale;
-  Input<Matrix<N,1,uint16_t>> ctrl;
+  Matrix<N,1,uint16_t> ctrl;
   Matrix<N,1,uint16_t> lastCtrl;
   std::vector<uint8_t> nodes;
   std::vector<uint8_t> functionCodes;
