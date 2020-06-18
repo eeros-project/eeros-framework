@@ -124,6 +124,8 @@ endif()
  
 ## Compile with debug symbols
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+## Compile with all warnings
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
@@ -271,6 +273,9 @@ enable_testing()
 
 ## Source directories
 add_subdirectory(src)      # EEROS framework
-add_subdirectory(examples) # Examples
 add_subdirectory(tools)    # Tools
-add_subdirectory(test)     # Unit tests
+add_subdirectory(examples) # Examples
+if (USE_TESTS) 
+  message("compile unit tests")
+  add_subdirectory(test)     # Unit tests
+endif (USE_TESTS)
