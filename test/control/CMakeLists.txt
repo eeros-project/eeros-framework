@@ -3,6 +3,7 @@
 
 add_eeros_test_sources(Block.cpp)
 add_eeros_test_sources(Constant.cpp)
+add_eeros_test_sources(Delay.cpp)
 add_eeros_test_sources(DeMux.cpp)
 add_eeros_test_sources(Gain.cpp)
 add_eeros_test_sources(I.cpp)
