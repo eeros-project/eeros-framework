@@ -36,7 +36,6 @@ namespace control {
 
 template<typename Tout = double, typename Tgain = double, bool elementWise = false>
 class Gain : public Block1i1o<Tout> {
-
  public:
   /**
    * Constructs a default gain instance with a gain of 1.\n
@@ -78,7 +77,13 @@ class Gain : public Block1i1o<Tout> {
     gainDiff = 0;
   }
 
+  
+  /**
+  * Disabling use of copy constructor because the block should never be copied unintentionally.
+  */
+  Gain(const Gain& s) = delete; 
 
+  
   /**
    * Runs the amplification algorithm.
    *

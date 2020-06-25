@@ -110,15 +110,19 @@ namespace eeros {
 		private:
 			template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _clear() {
 				value = std::numeric_limits<int32_t>::min();
+        timestamp = 0;
 			}
 			template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type _clear() {
 				value = std::numeric_limits<double>::quiet_NaN();
+        timestamp = 0;
 			}
 			template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type _clear() {
 				value.fill(std::numeric_limits<int32_t>::min());
+        timestamp = 0;
 			}
 			template <typename S> typename std::enable_if<   !std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
 				value.fill(std::numeric_limits<double>::quiet_NaN());
+        timestamp = 0;
 			}
 			
 			static std::list<SignalInterface*> signalList;

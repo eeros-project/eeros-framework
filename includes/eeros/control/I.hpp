@@ -86,7 +86,7 @@ namespace eeros {
 		/********** Print functions **********/
 		template <typename T>
 		std::ostream& operator<<(std::ostream& os, I<T>& i) {
-			os << "Block integrator: '" << i.getName(); 
+			os << "Block integrator: '" << i.getName() << "'"; 
             return os;
 		}
 	};
