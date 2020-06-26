@@ -3,8 +3,7 @@
 using namespace eeros;
 
 PeriodicCounter::PeriodicCounter(double period, unsigned logger_category) :
-	reset_after(20), log(logger_category)
-{
+	reset_after(20), log(logger_category) {
 	setPeriod(period);
 	start = clk::now();
 	first = true;
@@ -29,30 +28,22 @@ void PeriodicCounter::tick() {
 }
 
 void PeriodicCounter::tock() {
+	time_point stop = clk::now();
+	double new_run = std::chrono::duration<double>(stop - start).count();
+	run.add(new_run);
+  
 	if (first) {
 		first = false;
 		return;
 	}
 
-	time_point stop = clk::now();
 	double new_period = std::chrono::duration<double>(start - last).count();
-	double new_run = std::chrono::duration<double>(stop - start).count();
 	double new_jitter = (new_period - counter_period);
 	
 	period.add(new_period);
-	run.add(new_run);
 	jitter.add(new_jitter);
 	
-	for (auto &func: monitors)
-		func(*this, log);
-
-/*	if (reset_counter <= 0) {
-		*this >> log.trace();
-		reset();
-	}
-	else {
-		reset_counter--;
-	}*/
+	for (auto &func: monitors) func(*this, log);
 }
 
 void PeriodicCounter::reset() {
