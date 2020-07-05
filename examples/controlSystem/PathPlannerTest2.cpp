@@ -2,9 +2,8 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/control/TimeDomain.hpp>
-#include <eeros/task/Periodic.hpp>
 #include <eeros/core/Executor.hpp>
-#include <eeros/control/PathPlannerConstAcc.hpp>
+#include <eeros/control/PathPlannerConstJerk.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/task/Lambda.hpp>
 
@@ -20,13 +19,14 @@ double period = 1;
 class ControlSystem {
  public:
   ControlSystem() : pp(1.0, 0.2, 0.2, period) {
-    pp.setName("ppca");
+    pp.setName("ppcj");
     pp.getPosOut().getSignal().setName("pp pos out");
     pp.getVelOut().getSignal().setName("pp vel out");
     pp.getAccOut().getSignal().setName("pp acc out");
+    pp.getJerkOut().getSignal().setName("pp jerk out");
   }
 
-  PathPlannerConstAcc<Matrix<2,1,double>> pp;
+  PathPlannerConstJerk<Matrix<2,1,double>> pp;
 };
 
 class SafetyPropertiesTest : public SafetyProperties {
@@ -42,13 +42,13 @@ int main() {
   StreamLogWriter w(std::cout);
   Logger::setDefaultWriter(&w);
   Logger log;
-  log.info() << "Pathplanner test 1 started...";
+  log.info() << "Pathplanner test 2 started...";
   
   ControlSystem cs;
   TimeDomain td("td", period, true);
   td.addBlock(cs.pp);
   Periodic p1("p1", period, td);
-  
+
   SafetyPropertiesTest sp;
   SafetySystem safetySys(sp, period);
     
@@ -57,16 +57,15 @@ int main() {
   Periodic p2("p2", period, l1);
   p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
     static int count = 0;
-    log.info() << cs.pp.getAccOut().getSignal().getValue() << "  " 
+    log.info() << cs.pp.getJerkOut().getSignal().getValue() << "  " 
+               << cs.pp.getAccOut().getSignal().getValue() << "  " 
                << cs.pp.getVelOut().getSignal().getValue() << "  " 
                << cs.pp.getPosOut().getSignal().getValue();
     if (count == 3) {
-      log.warn() << "start trajectory";
       Matrix<2,1,double> start{0, 10}, end{10, 20};
       cs.pp.move(start, end);
     }
     if (count == 23) {
-      log.warn() << "start trajectory";
       cs.pp.setStart({{{15, 30}, {0, 0}, {0, 0}}});
       cs.pp.move({{{5, 20}, {0, 0}, {0, 0}}});
     }
