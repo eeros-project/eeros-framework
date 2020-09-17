@@ -29,7 +29,7 @@ public:
 		digitalOut0("batteryPresentEchoOut0"),
 		
 		laserScanIn ("/rosNodeTalker/TestTopic4", 100, false),
-		laserScanOut("/rosExample/TestTopic23", 100),
+		laserScanOut("/rosExample/TestTopic23", "laser", 100),
 
 		debugOut0("debugNode/debugOut0"),
 		dt(ts),
