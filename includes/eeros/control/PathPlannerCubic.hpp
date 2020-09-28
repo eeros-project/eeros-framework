@@ -35,6 +35,10 @@ class PathPlannerCubic: public Block {
    * @param dt - sampling time
    */
   PathPlannerCubic(double dt) : posOut(this), velOut(this), accOut(this), jerkOut(this), dt(dt), interval(-dt) {
+    posOut.getSignal().clear();
+    velOut.getSignal().clear();
+    accOut.getSignal().clear();
+    jerkOut.getSignal().clear();
     prevPos = 0; prevVel = 0; prevAcc = 0;
   }
   

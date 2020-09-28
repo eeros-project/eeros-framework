@@ -44,7 +44,7 @@ int main() {
   StreamLogWriter w(std::cout);
   Logger::setDefaultWriter(&w);
   Logger log;
-  log.info() << "Pathplanner test 3 started...";
+  log.info() << "Pathplanner cubic splines test started...";
   
   ControlSystem cs;
   TimeDomain td("td", period, true);

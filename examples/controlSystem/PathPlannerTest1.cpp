@@ -15,7 +15,7 @@ using namespace eeros::control;
 using namespace eeros::task;
 using namespace eeros::math;
 
-double period = 1;
+double period = 0.1;
 
 class ControlSystem {
  public:
@@ -42,7 +42,7 @@ int main() {
   StreamLogWriter w(std::cout);
   Logger::setDefaultWriter(&w);
   Logger log;
-  log.info() << "Pathplanner test 1 started...";
+  log.info() << "Pathplanner constant acceleration started...";
   
   ControlSystem cs;
   TimeDomain td("td", period, true);
@@ -61,14 +61,18 @@ int main() {
                << cs.pp.getVelOut().getSignal().getValue() << "  " 
                << cs.pp.getPosOut().getSignal().getValue();
     if (count == 3) {
-      log.warn() << "start trajectory";
-      Matrix<2,1,double> start{0, 10}, end{10, 20};
+      Matrix<2,1,double> start{0, 0}, end{-5, 10};
+      log.warn() << "start trajectory from " << start << " to " << end;
       cs.pp.move(start, end);
     }
-    if (count == 23) {
-      log.warn() << "start trajectory";
-      cs.pp.setStart({{{15, 30}, {0, 0}, {0, 0}}});
-      cs.pp.move({{{5, 20}, {0, 0}, {0, 0}}});
+    if (count == 200) {
+      Matrix<2,1,double> start{15, -30}, end{5, 20};
+      log.warn() << "start trajectory from " << start << " to " << end;
+      cs.pp.setStart(start);
+      cs.pp.setMaxSpeed({3, 3});
+      cs.pp.setMaxAcc({0.5, 0.5});
+      cs.pp.setMaxDec({0.5, 0.5});
+      cs.pp.move(end);
     }
     count++;
   });

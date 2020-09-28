@@ -14,12 +14,13 @@ namespace eeros {
 namespace control {
 
 /**
- * This path planner with constant acceleration generates a trajectory as follows.
- * The trajectory leads from the start position to its end position. The acceleration is 
- * set to a positive constant value. The velocity starts from 0 and goes up to its maximum value
- * which can be chosen. After this maximum velocity is reached the acceleration is set to 0 and
- * the trajectory continues with constant velocity. Towards the end a constant deceleration
- * makes sure that the final position is reached with the velocity reaching 0. 
+ * This path planner with constant jerk generates a trajectory as follows.
+ * The trajectory leads from the start position to its end position. The jerk is 
+ * set to a positive constant value. The acceleration starts from 0 and goes up to its maximum value.
+ * The jerk is then set to a negative value until the acceleration reaches 0 again. 
+ * This causes the velocity to reach its maximum value which can be chosen. 
+ * Towards the end the procedure is repeated with a negative jerk followed by a positive jerk.
+ * This ensures that the final position is reached with the velocity reaching 0. 
  * 
  * @tparam T - output type (must be a composite type), 
  *             a trajectory in 3-dimensional space needs T = Matrix<3,1,double>, 
@@ -29,16 +30,17 @@ namespace control {
  */
 
 template<typename T>
-class PathPlannerConstJerk : public TrajectoryGenerator<T, 3> {
+class PathPlannerConstJerk : public TrajectoryGenerator<T, 4> {
   using E = typename T::value_type;
   
  public:
   /**
-   * Constructs a path planner with a trajectory where the acceleration is always constant. 
-   * The trajectory will start with an constant acceleration (will not be higher than accMax).
-   * As soon as velMax is reached, the acceleration will be 0 and the velocity will stay constant 
-   * (will not be higher than velmax). For the third part the trajectory will stop with a 
-   * constant deceleration (will not be higher decMax).
+   * Constructs a path planner with a trajectory where the jerk is constant. 
+   * The trajectory will start with an constant jerk (will not be higher than jerk).
+   * As soon as accMax is reached, the jerk will be negative and the acceleration will go back to 0.
+   * This causes the velocity to reach velMax. Towards the end the procedure is repeated with a 
+   * negative jerk followed by a positive jerk. This ensures that the final position is 
+   * reached with the velocity reaching 0.
    * The sampling time must be set to the time with which the timedomain containing this block will run.
    *
    * @param velMax - maximum velocity
@@ -46,8 +48,13 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 3> {
    * @param decMax - maximum deceleration
    * @param dt - sampling time
    */
-  PathPlannerConstJerk(T velMax, T accMax, T decMax, double dt) 
-      : finished(true), velMax(velMax), accMax(accMax), decMax(decMax), dt(dt) { }
+  PathPlannerConstJerk(T velMax, T jerk, double dt) 
+      : finished(true), velMax(velMax), jerk(jerk), dt(dt) {
+    posOut.getSignal().clear();
+    velOut.getSignal().clear();
+    accOut.getSignal().clear();
+    jerkOut.getSignal().clear();
+  }
   
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -71,47 +78,101 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 3> {
    */
   virtual void run() {
     std::lock_guard<std::mutex> lck(mtx);
-    std::array<T, 3> y = this->last;
+    std::array<T, 4> y = this->last;
     t += dt;
     
     if (!finished) {
       for (unsigned int i = 0; i < a1p.size(); i++) {
-        if (t >= 0 && t < dT1) {
-          y[0][i] = a1p[i] * pow(t, 2) + c1p[i];
-          y[1][i] = b1v[i] * t;
-          y[2][i] = c1a[i];
-        } else if (t >= dT1 && t < dT1 + dT2) {
-          y[0][i] = b2p[i] * t + c2p[i];
-          y[1][i] = c2v[i];
-          y[2][i] = 0;
-        } else if (t >= dT1 + dT2 && t <= dT1 + dT2 + dT3) {
-          y[0][i] = a3p[i] * pow(t, 2) + b3p[i] * t + c3p[i];
-          y[1][i] = b3v[i] * t + c3v[i];
-          y[2][i] = c3a[i];
-        } else if(t > dT1 + dT2 + dT3) {
-          finished = true;
-          y[0][i] = this->last[0][i];
-          y[1][i] = 0.0;
-          y[2][i] = 0.0;
+        switch (range) {
+          case 1:
+            if (t <= dT1) {
+              y[0][i] = a1p[i] * pow(t,3) + d1p[i];
+              y[1][i] = b1v[i] * pow(t,2);
+              y[2][i] = c1a[i] * t;
+              y[3][i] = d1j[i];
+            } 
+            if (fabs(t - dT1) < 1e-12 && i == a1p.size() - 1) {
+              range = 2;
+              t = 0;
+            }
+            break;
+          case 2:
+            if (t <= dT1) {
+              y[0][i] = a2p[i] * pow(t,3) + b2p[i] * pow(t,2) + c2p[i] * t + d2p[i];
+              y[1][i] = b2v[i] * pow(t,2) + c2v[i] * t + d2v[i];
+              y[2][i] = c2a[i] * t + d2a[i];
+              y[3][i] = d2j[i];
+            }
+            if (fabs(t - dT1) < 1e-12 && i == a1p.size() - 1) {
+              range = 3;
+              t = 0;
+            }
+            break;
+          case 3:
+            if (t <= dT2) {
+              y[0][i] = c3p[i] * t + d3p[i];
+              y[1][i] = d3v[i];
+              y[2][i] = 0;
+              y[3][i] = 0;
+            }
+            if (fabs(t - dT2) < 1e-12 && i == a1p.size() - 1) {
+              range = 4;
+              t = 0;
+            }
+            break;
+          case 4:
+            if (t <= dT1) {
+              y[0][i] = a4p[i] * pow(t,3) + c4p[i] * t + d4p[i];
+              y[1][i] = b4v[i] * pow(t,2) + d4v[i];
+              y[2][i] = c4a[i] * t;
+              y[3][i] = d4j[i];
+            } 
+            if (fabs(t - dT1) < 1e-12 && i == a1p.size() - 1) {
+              range = 5;
+              t = 0;
+            }
+            break;
+          case 5:
+            if (t <= dT1) {
+              y[0][i] = a5p[i] * pow(t,3) + b5p[i] * pow(t,2) + c5p[i] * t + d5p[i];
+              y[1][i] = b5v[i] * pow(t,2) + c5v[i] * t + d5v[i];
+              y[2][i] = c5a[i] * t + d5a[i];
+              y[3][i] = d5j[i];
+            }
+            if (fabs(t - dT1) < 1e-12 && i == a1p.size() - 1) {
+              range = 6;
+              t = 0;
+            }
+            break;
+          case 6:
+            finished = true;
+            y[0][i] = endPos[i];
+            y[1][i] = 0.0;
+            y[2][i] = 0.0;
+            y[3][i] = 0.0;
+            break;
         }
         // keep last position value
         this->last[0][i] = y[0][i];
         this->last[1][i] = y[1][i];
         this->last[2][i] = y[2][i];
+        this->last[3][i] = y[3][i];
       }
     }
 
     posOut.getSignal().setValue(y[0]);
     velOut.getSignal().setValue(y[1]);
     accOut.getSignal().setValue(y[2]);
+    jerkOut.getSignal().setValue(y[3]);
 
     timestamp_t time = System::getTimeNs(); 
     posOut.getSignal().setTimestamp(time);
     velOut.getSignal().setTimestamp(time);
     accOut.getSignal().setTimestamp(time);
+    jerkOut.getSignal().setTimestamp(time);
   }
   
-  using TrajectoryGenerator<T, 3>::move;
+  using TrajectoryGenerator<T, 4>::move;
   
   /**
    * Dispatches a new trajectory from start to end.
@@ -127,80 +188,101 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 3> {
    * @see setStart()
    * @see run()
    */
-  virtual bool move(std::array<T, 3> start, std::array<T, 3> end) {
+  virtual bool move(std::array<T, 4> start, std::array<T, 4> end) {
     if (!finished) return false;
-    T calcVelNorm, calcAccNorm, calcDecNorm;
-    E velNorm, accNorm, decNorm;
+    T calcVelNorm, calcJerkNorm;
+    E velNorm, jerkNorm;
     T distance = end[0] - start[0];
-    
+    endPos = end[0];
+   
     T zero; zero = 0;
     if (distance == zero) return false;
     
-    // Define speeds and accelerations
+    // normalize
     for (unsigned int i = 0; i < calcVelNorm.size(); i++) {
       calcVelNorm[i] = fabs(velMax[i] / distance[i]);
-      calcAccNorm[i] = fabs(accMax[i] / distance[i]);
-      calcDecNorm[i] = fabs(decMax[i] / distance[i]);
+      calcJerkNorm[i] = fabs(jerk[i] / distance[i]);
     }
     
-    // Init velNorm, accNorm, decNorm and find minimum
-    velNorm = calcVelNorm[0]; accNorm = calcAccNorm[0]; decNorm = calcDecNorm[0]; 
+    // find minimum
+    velNorm = calcVelNorm[0]; jerkNorm = calcJerkNorm[0]; 
     for (unsigned int i = 0; i < calcVelNorm.size(); i++) {
       if (calcVelNorm[i] < velNorm) velNorm = calcVelNorm[i];
-      if (calcAccNorm[i] < accNorm) accNorm = calcAccNorm[i];
-      if (calcDecNorm[i] < decNorm) decNorm = calcDecNorm[i];
+      if (calcJerkNorm[i] < jerkNorm) jerkNorm = calcJerkNorm[i];
     }
     
-    // Minimize velocity
-    E squareNormVel = sqrt(2 * (accNorm * decNorm) / (accNorm + decNorm));
-    if (velNorm > squareNormVel) velNorm = squareNormVel; 
+    // determine if maximum velocity can be reached, else limit it
+    E velNormMax = 1 / (2 * cbrt(1 / (2 * jerkNorm)));
+    if (velNorm > velNormMax) velNorm = velNormMax; 
     
-    // Calculate time intervals    
-    dT1 = velNorm / accNorm;
-    dT3 = velNorm / decNorm;
-    dT2 = 1 / velNorm - (dT1 + dT3) * 0.5;
+    // calculate time intervals    
+    dT1 = sqrt(velNorm / jerkNorm);
+    dT2 = 1 / velNorm - 4 * dT1 * 0.5;
     if (dT2 < 0) dT2 = 0;
     
-    // Adaptation to timestamps
+    // make time intervals multiple of sampling time
     dT1 = ceil(dT1 / dt) * dt;
     dT2 = ceil(dT2 / dt) * dt;
-    dT3 = ceil(dT3 / dt) * dt; 
+//    log.info() << "dT1 = " << dT1 << ", dT2 = " << dT2 << ", total time = " << (4 * dT1 + dT2);
     
-    // Adaptation of speed to new timestamps
-    velNorm = 1/((dT2 + (dT1 + dT3) * 0.5) *dt);
-    std::cout << dT1 << "   " << dT2 << "   " << dT3 << "   " << velNorm << "   " << std::endl;
+    // recalculate velocity with definitive time interval values
+    velNorm = 1 / (dT2 + 4 * dT1 * 0.5);
     
-    a1p = 0.5 * velNorm / dT1 * distance * dt;
-    c1p = start[0];
-    b1v = velNorm / dT1 * dt * distance * dt;
-    c1a = velNorm * dt / dT1 * distance * pow(dt, 2);
+    d1j = velNorm * distance / pow(dT1,2);
+    c1a = d1j;
+    b1v = d1j / 2;
+    a1p = d1j / 6;
+    d1p = start[0];
+
+    d2j = -d1j;
+    c2a = -d1j;
+    d2a = d1j * dT1;
+    b2v = -d1j / 2;
+    c2v = d1j * dT1;
+    d2v = d1j / 2 * pow(dT1,2);
+    a2p = -d1j / 6;
+    b2p = d1j / 2 * dT1;
+    c2p = d1j / 2 * pow(dT1,2);
+    d2p = d1j / 6 * pow(dT1,3) + d1p;
+
+    d3v = d1j * pow(dT1,2);
+    c3p = d1j * pow(dT1,2);
+    d3p = d1j * pow(dT1,3) + d1p;
+      
+    d4j = -d1j;
+    c4a = -d1j;
+    b4v = -d1j / 2;
+    d4v = d1j * pow(dT1,2);
+    a4p = -d1j / 6;
+    c4p = d1j * pow(dT1,2);
+    d4p = d1j * (pow(dT1,2) * dT2 + pow(dT1,3)) + d1p;
     
-    b2p = velNorm * dt * distance;
-    c2p = start[0] - 0.5 * velNorm * dT1 * dt * distance;
-    c2v = velNorm * distance * dt * dt;
-    c2a = 0; 
-    
-    a3p = (-1) * velNorm * 0.5 * dt / dT3 * distance;
-    b3p = velNorm * dt / dT3 * (dT1 + dT2 + dT3) * distance;
-    c3p = start[0] + (1 - velNorm * 0.5 * dt / dT3 * pow(dT1 + dT2 + dT3, 2)) * distance;
-    b3v = (-1) *velNorm * dt * distance / dT3 * dt;  
-    c3v = velNorm * (dT1 + dT2 + dT3) * distance * dt / dT3 * dt; 
-    c3a = (-1) * velNorm * dt / dT3 * distance * dt * dt;
+    d5j = d1j;
+    c5a = d1j;
+    d5a = -d1j * dT1;
+    b5v = d1j / 2;
+    c5v = -d1j * dT1;
+    d5v = d1j / 2 * pow(dT1,2);
+    a5p = d1j / 6;
+    b5p = -d1j / 2 * dT1;
+    c5p = d1j / 2 * pow(dT1,2);
+    d5p = d1j * (pow(dT1,2) * dT2 + 11.0 / 6 * pow(dT1,3)) + d1p;
     
     std::lock_guard<std::mutex> lck(mtx);
     finished = false;
+    range = 1;
     t = 0;  
     return true;
   }
   
-  using TrajectoryGenerator<T, 3>::setStart;
+  using TrajectoryGenerator<T, 4>::setStart;
 
   /**
    * Sets the start position and state of the higher derivatives (velocity, acceleration ...)
    * 
    * @param start - array containing start position and its higher derivatives
    */
-  virtual void setStart(std::array<T, 3> start) {
+  virtual void setStart(std::array<T, 4> start) {
     std::lock_guard<std::mutex> lck(mtx);
     this->last = start;
     this->finished = true;
@@ -209,23 +291,16 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 3> {
   /**
    * Sets the maximum value for the velocity. The maximum velocity during the steady phase of the trajectory.
    *
-   * @param vel - maximum velocity
+   * @param max - maximum velocity
    */
-  virtual void setMaxSpeed(T vel) {velMax = vel;}
+  virtual void setMaxVel(T max) {velMax = max;}
   
   /**
    * Sets the maximum value for the acceleration. The maximum acceleration is used for the start of the trajectory.
    *
-   * @param acc - maximum acceleration
+   * @param max - maximum acceleration
    */
-  virtual void setMaxAcc(T acc) {accMax = acc;}
-  
-  /**
-   * Sets the maximum value for the deceleration. The maximum deceleration is used for the end of the trajectory.
-   *
-   * @param dec - maximum deceleration
-   */
-  virtual void setMaxDec(T dec) {decMax = dec;}
+  virtual void setJerk(T val) {jerk = val;}
   
   /**
    * Getter function for the position output.
@@ -258,10 +333,22 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 3> {
  private:
   Output<T> posOut, velOut, accOut, jerkOut;
   bool finished;
-  T velMax, accMax, decMax, jerkMax;
-  double t, dt, dT1, dT2, dT3;
-  T a1p, c1p, b1v, c1a, b2p, c2p, c2v, c2a, a3p, b3p, c3p, b3v, c3v, c3a; 
+  int range;
+  T velMax, jerk;
+  double t, dt, dT1, dT2;
+  // naming of coefficients: a|b|c & 1|2|3 & a|v|p
+  // a|b|c|d : a for jerk, b for acc, c for vel, d for position
+  // 1|2|3|4|5 : one of the three parts on the time axis
+  // j|a|v|p : j for jerk, a for acc, v for vel, p for position
+  // e.g. a1p -> coeffizient for time intervall 1, used to multiply with t^2 resulting in the position
+  T a1p, d1p, b1v, c1a, d1j, 
+    a2p, b2p, c2p, d2p, b2v, c2v, d2v, c2a, d2a, d2j, 
+    c3p, d3p, d3v,
+    a4p, c4p, d4p, b4v, d4v, c4a, d4j,
+    a5p, b5p, c5p, d5p, b5v, c5v, d5v, c5a, d5a, d5j; 
+  T endPos;
   std::mutex mtx;
+  Logger log;
 };
 
 /**

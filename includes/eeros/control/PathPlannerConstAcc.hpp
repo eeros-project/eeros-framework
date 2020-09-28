@@ -37,17 +37,21 @@ class PathPlannerConstAcc : public TrajectoryGenerator<T, 3> {
    * Constructs a path planner with a trajectory where the acceleration is always constant. 
    * The trajectory will start with an constant acceleration (will not be higher than accMax).
    * As soon as velMax is reached, the acceleration will be 0 and the velocity will stay constant 
-   * (will not be higher than velmax). For the third part the trajectory will stop with a 
+   * (will not be higher than velMax). For the third part the trajectory will stop with a 
    * constant deceleration (will not be higher decMax).
    * The sampling time must be set to the time with which the timedomain containing this block will run.
    *
    * @param velMax - maximum velocity
-   * @param accMax - maximum acceleration
-   * @param decMax - maximum deceleration
+   * @param acc - maximum acceleration
+   * @param dec - maximum deceleration
    * @param dt - sampling time
    */
-  PathPlannerConstAcc(T velMax, T accMax, T decMax, double dt) 
-      : finished(true), velMax(velMax), accMax(accMax), decMax(decMax), dt(dt) { }
+  PathPlannerConstAcc(T velMax, T acc, T dec, double dt) 
+      : finished(true), velMax(velMax), acc(acc), dec(dec), dt(dt) { 
+    posOut.getSignal().clear();
+    velOut.getSignal().clear();
+    accOut.getSignal().clear();
+  }
   
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -76,23 +80,46 @@ class PathPlannerConstAcc : public TrajectoryGenerator<T, 3> {
     
     if (!finished) {
       for (unsigned int i = 0; i < a1p.size(); i++) {
-        if (t >= 0 && t < dT1) {
-          y[0][i] = a1p[i] * pow(t, 2) + c1p[i];
-          y[1][i] = b1v[i] * t;
-          y[2][i] = c1a[i];
-        } else if (t >= dT1 && t < dT1 + dT2) {
-          y[0][i] = b2p[i] * t + c2p[i];
-          y[1][i] = c2v[i];
-          y[2][i] = 0;
-        } else if (t >= dT1 + dT2 && t <= dT1 + dT2 + dT3) {
-          y[0][i] = a3p[i] * pow(t, 2) + b3p[i] * t + c3p[i];
-          y[1][i] = b3v[i] * t + c3v[i];
-          y[2][i] = c3a[i];
-        } else if(t > dT1 + dT2 + dT3) {
-          finished = true;
-          y[0][i] = this->last[0][i];
-          y[1][i] = 0.0;
-          y[2][i] = 0.0;
+        switch (range) {
+          case 1:
+            if (t <= dT1) {
+              y[0][i] = a1p[i] * pow(t, 2) + c1p[i];
+              y[1][i] = b1v[i] * t;
+              y[2][i] = c1a[i];
+            } 
+            if (fabs(t - dT1) < 1e-12 && i == a1p.size() - 1) {
+              range = 2;
+              t = 0;
+            }
+            break;
+          case 2:
+            if (t <= dT2) {
+              y[0][i] = b2p[i] * t + c2p[i];
+              y[1][i] = c2v[i];
+              y[2][i] = c2a[i];
+            }
+            if (fabs(t - dT2) < 1e-12 && i == a1p.size() - 1) {
+              range = 3;
+              t = 0;
+            }
+            break;
+          case 3:
+            if (t <= dT3) {
+              y[0][i] = a3p[i] * pow(t, 2) + b3p[i] * t + c3p[i];
+              y[1][i] = b3v[i] * t + c3v[i];
+              y[2][i] = c3a[i];
+            }
+            if (fabs(t - dT3) < 1e-12 && i == a1p.size() - 1) {
+              range = 4;
+              t = 0;
+            }
+            break;
+          case 4:
+            finished = true;
+            y[0][i] = endPos[i];
+            y[1][i] = 0.0;
+            y[2][i] = 0.0;
+            break;
         }
         // keep last position value
         this->last[0][i] = y[0][i];
@@ -132,18 +159,19 @@ class PathPlannerConstAcc : public TrajectoryGenerator<T, 3> {
     T calcVelNorm, calcAccNorm, calcDecNorm;
     E velNorm, accNorm, decNorm;
     T distance = end[0] - start[0];
+    endPos = end[0];
     
     T zero; zero = 0;
     if (distance == zero) return false;
     
-    // Define speeds and accelerations
+    // normalize 
     for (unsigned int i = 0; i < calcVelNorm.size(); i++) {
       calcVelNorm[i] = fabs(velMax[i] / distance[i]);
-      calcAccNorm[i] = fabs(accMax[i] / distance[i]);
-      calcDecNorm[i] = fabs(decMax[i] / distance[i]);
+      calcAccNorm[i] = fabs(acc[i] / distance[i]);
+      calcDecNorm[i] = fabs(dec[i] / distance[i]);
     }
     
-    // Init velNorm, accNorm, decNorm and find minimum
+    // find minimum
     velNorm = calcVelNorm[0]; accNorm = calcAccNorm[0]; decNorm = calcDecNorm[0]; 
     for (unsigned int i = 0; i < calcVelNorm.size(); i++) {
       if (calcVelNorm[i] < velNorm) velNorm = calcVelNorm[i];
@@ -151,43 +179,47 @@ class PathPlannerConstAcc : public TrajectoryGenerator<T, 3> {
       if (calcDecNorm[i] < decNorm) decNorm = calcDecNorm[i];
     }
     
-    // Minimize velocity
-    E squareNormVel = sqrt(2 * (accNorm * decNorm) / (accNorm + decNorm));
-    if (velNorm > squareNormVel) velNorm = squareNormVel; 
+    // determine if maximum velocity can be reached, else limit it
+    E velNormMax = sqrt(2 * (accNorm * decNorm) / (accNorm + decNorm));
+    if (velNorm > velNormMax) velNorm = velNormMax; 
     
-    // Calculate time intervals    
+    // calculate time intervals    
     dT1 = velNorm / accNorm;
     dT3 = velNorm / decNorm;
     dT2 = 1 / velNorm - (dT1 + dT3) * 0.5;
     if (dT2 < 0) dT2 = 0;
-    
-    // Adaptation to timestamps
+   
+    // make time intervals multiple of sampling time
     dT1 = ceil(dT1 / dt) * dt;
     dT2 = ceil(dT2 / dt) * dt;
     dT3 = ceil(dT3 / dt) * dt; 
+//     log.info() << "dT1 = " << dT1 << ", dT2 = " << dT2 << ", dT3 = " << dT3;
+  
+    // recalculate velocity with definitive time interval values
+    velNorm = 1 / ((dT2 + (dT1 + dT3) / 2));
+//     log.info() << "vel norm = " << velNorm;
     
-    // Adaptation of speed to new timestamps
-    velNorm = 1/((dT2 + (dT1 + dT3) * 0.5) *dt);
-    
-    a1p = 0.5 * velNorm / dT1 * distance * dt;
+    T vel = velNorm * distance;
+    c1a = vel / dT1;
+    b1v = c1a;
+    a1p = 0.5 * c1a;
     c1p = start[0];
-    b1v = velNorm / dT1 * dt * distance * dt;
-    c1a = velNorm * dt / dT1 * distance * pow(dt, 2);
-    
-    b2p = velNorm * dt * distance;
-    c2p = start[0] - 0.5 * velNorm * dT1 * dt * distance;
-    c2v = velNorm * distance * dt * dt;
+     
     c2a = 0; 
+    c2v = vel;
+    b2p = c2v;
+    c2p = a1p * pow(dT1,2) + c1p;
     
-    a3p = (-1) * velNorm * 0.5 * dt / dT3 * distance;
-    b3p = velNorm * dt / dT3 * (dT1 + dT2 + dT3) * distance;
-    c3p = start[0] + (1 - velNorm * 0.5 * dt / dT3 * pow(dT1 + dT2 + dT3, 2)) * distance;
-    b3v = (-1) *velNorm * dt * distance / dT3 * dt;  
-    c3v = velNorm * (dT1 + dT2 + dT3) * distance * dt / dT3 * dt; 
-    c3a = (-1) * velNorm * dt / dT3 * distance * dt * dt;
+    c3a = -vel / dT3;
+    b3v = c3a;  
+    c3v = vel; 
+    a3p = 0.5 * c3a;
+    b3p = c3v;
+    c3p = b2p * dT2 + c2p;
     
     std::lock_guard<std::mutex> lck(mtx);
     finished = false;
+    range = 1;
     t = 0;  
     return true;
   }
@@ -213,18 +245,18 @@ class PathPlannerConstAcc : public TrajectoryGenerator<T, 3> {
   virtual void setMaxSpeed(T vel) {velMax = vel;}
   
   /**
-   * Sets the maximum value for the acceleration. The maximum acceleration is used for the start of the trajectory.
+   * Sets the value for the acceleration. The acceleration is used for the start of the trajectory.
    *
-   * @param acc - maximum acceleration
+   * @param acc - acceleration
    */
-  virtual void setMaxAcc(T acc) {accMax = acc;}
+  virtual void setMaxAcc(T acc) {this->acc = acc;}
   
   /**
-   * Sets the maximum value for the deceleration. The maximum deceleration is used for the end of the trajectory.
+   * Sets the value for the deceleration. The deceleration is used for the end of the trajectory.
    *
-   * @param dec - maximum deceleration
+   * @param dec - deceleration
    */
-  virtual void setMaxDec(T dec) {decMax = dec;}
+  virtual void setMaxDec(T dec) {this->dec = dec;}
   
   /**
    * Getter function for the position output.
@@ -250,10 +282,18 @@ class PathPlannerConstAcc : public TrajectoryGenerator<T, 3> {
  private:
   Output<T> posOut, velOut, accOut;
   bool finished;
-  T velMax, accMax, decMax;
+  int range;
+  T velMax, acc, dec;
   double t, dt, dT1, dT2, dT3;
+  // naming of coefficients: a|b|c & 1|2|3 & a|v|p
+  // a|b|c : a for t*t factor, b for linear factor, c for constant
+  // 1|2|3 : one of the three parts on the time axis
+  // a|v|p : result will be a for acc, v for vel, p for position
+  // e.g. a1p -> coeffizient for time intervall 1, used to multiply with t^2 resulting in the position
   T a1p, c1p, b1v, c1a, b2p, c2p, c2v, c2a, a3p, b3p, c3p, b3v, c3v, c3a; 
+  T endPos;
   std::mutex mtx;
+  Logger log;
 };
 
 /**
