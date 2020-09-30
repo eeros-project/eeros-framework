@@ -40,7 +40,7 @@ namespace eeros {
 			eeros::logger::Logger log;	
 			unsigned int id;
 			bool stepping;
-			bool nextStep;
+			volatile bool nextStep;
 			SequencerUI* ui;
 		};
 	};	//namespace sequencer

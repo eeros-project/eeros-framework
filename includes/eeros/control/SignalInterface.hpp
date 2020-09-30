@@ -13,7 +13,7 @@ namespace eeros {
 		
 		class SignalInterface {
 		public:
-			
+      
 			virtual sigid_t getId() const = 0;
 			
 			virtual std::string getName() const = 0;

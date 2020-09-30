@@ -9,6 +9,7 @@
 namespace eeros {
 	namespace control {
 		namespace rosTools {
+      static ros::Time convertToRosTime(uint64_t timestampNs) __attribute__((unused));
 			static ros::Time convertToRosTime(uint64_t timestampNs) {
 				ros::Time t;
 				t.sec = static_cast<double>(timestampNs) / NS_PER_SEC;
@@ -16,7 +17,8 @@ namespace eeros {
 				return t;
 			}
 			
-			static void initNode(std::string name) {
+      static void initNode(std::string name) __attribute__((unused));
+      static void initNode(std::string name) {
 				char* args[] = {NULL};
 				int argc = sizeof(args)/sizeof(args[0]) - 1;
 				ros::init(argc, args, name);	// init ROS node and name it

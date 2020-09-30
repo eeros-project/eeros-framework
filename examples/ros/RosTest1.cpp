@@ -9,6 +9,7 @@
 #include <eeros/control/ros/RosPublisherSafetyLevel.hpp>
 #include <eeros/control/ros/RosSubscriberDoubleArray.hpp>
 #include <eeros/control/ros/RosSubscriberDouble.hpp>
+#include <eeros/control/ros/EerosRosTools.hpp>
 #include <ros/ros.h>
 #include <signal.h>
 
@@ -87,7 +88,6 @@ public:
 				privateContext->triggerEvent(se);
 			}
 		});
-
 	}
 
 	SafetyLevel slOne;
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
 	log.info() << "ROS Test1 started";
 
 	rosTools::initNode("eerosNode");
-	log.trace() << "ROS node initialized.";
+	log.trace() << "ROS node initialized";
 		
 	MyControlSystem controlSystem(dt);
 	MySafetyProperties safetyProperties(controlSystem);

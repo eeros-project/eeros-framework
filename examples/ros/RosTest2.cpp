@@ -20,9 +20,9 @@ class MyControlSystem {
 public:
 	MyControlSystem(double ts):
 		c1(0.5),
-		doubleOut("doubleOut"),
 		doubleIn("doubleIn"),
 		boolIn("boolIn"),
+		doubleOut("doubleOut"),
 		boolOut("boolOut"),
 		timedomain("Main time domain", ts, true) 
 	{
@@ -60,7 +60,7 @@ public:
 	}
 	
 	SafetyLevel slOff;
-	MyControlSystem cs;
+	MyControlSystem& cs;
 	Logger log;
 };
 

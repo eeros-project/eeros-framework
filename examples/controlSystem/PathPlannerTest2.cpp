@@ -2,9 +2,8 @@
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/control/TimeDomain.hpp>
-#include <eeros/task/Periodic.hpp>
 #include <eeros/core/Executor.hpp>
-#include <eeros/control/PathPlannerConstAcc.hpp>
+#include <eeros/control/PathPlannerConstJerk.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/task/Lambda.hpp>
 
@@ -19,14 +18,15 @@ double period = 0.1;
 
 class ControlSystem {
  public:
-  ControlSystem() : pp(1.0, 0.2, 0.2, period) {
-    pp.setName("ppca");
+  ControlSystem() : pp(50.0, 1.0, period) {
+    pp.setName("ppcj");
     pp.getPosOut().getSignal().setName("pp pos out");
     pp.getVelOut().getSignal().setName("pp vel out");
     pp.getAccOut().getSignal().setName("pp acc out");
+    pp.getJerkOut().getSignal().setName("pp jerk out");
   }
 
-  PathPlannerConstAcc<Matrix<2,1,double>> pp;
+  PathPlannerConstJerk<Matrix<2,1,double>> pp;
 };
 
 class SafetyPropertiesTest : public SafetyProperties {
@@ -42,13 +42,14 @@ int main() {
   StreamLogWriter w(std::cout);
   Logger::setDefaultWriter(&w);
   Logger log;
-  log.info() << "Pathplanner constant acceleration started...";
+//   w.show();
+  log.info() << "Pathplanner constant jerk started...";
   
   ControlSystem cs;
   TimeDomain td("td", period, true);
   td.addBlock(cs.pp);
   Periodic p1("p1", period, td);
-  
+
   SafetyPropertiesTest sp;
   SafetySystem safetySys(sp, period);
     
@@ -57,21 +58,21 @@ int main() {
   Periodic p2("p2", period, l1);
   p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
     static int count = 0;
-    log.info() << cs.pp.getAccOut().getSignal().getValue() << "  " 
+    log.info() << cs.pp.getJerkOut().getSignal().getValue() << "  " 
+               << cs.pp.getAccOut().getSignal().getValue() << "  " 
                << cs.pp.getVelOut().getSignal().getValue() << "  " 
                << cs.pp.getPosOut().getSignal().getValue();
-    if (count == 3) {
-      Matrix<2,1,double> start{0, 0}, end{-5, 10};
+    if (count == 1) {
+      Matrix<2,1,double> start{0, 0}, end{10, 20};
       log.warn() << "start trajectory from " << start << " to " << end;
-      cs.pp.move(start, end);
+      cs.pp.move(start, end); 
     }
-    if (count == 200) {
-      Matrix<2,1,double> start{15, -30}, end{5, 20};
+    if (count == 150) {
+      Matrix<2,1,double> start{15, 30}, end{-5, 20};
       log.warn() << "start trajectory from " << start << " to " << end;
       cs.pp.setStart(start);
-      cs.pp.setMaxSpeed({3, 3});
-      cs.pp.setMaxAcc({0.5, 0.5});
-      cs.pp.setMaxDec({0.5, 0.5});
+      cs.pp.setJerk(2.0);
+      cs.pp.setMaxVel(2.0);
       cs.pp.move(end);
     }
     count++;

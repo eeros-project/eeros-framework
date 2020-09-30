@@ -25,11 +25,10 @@ TEST(controlPathPlannerCubicTest, nan) {
 	EXPECT_TRUE(std::isnan(planner.getPosOut().getSignal().getValue()));
 }
 
-// Test initial positions
-TEST(controlPathPlannerCubicTest, init1) {
+// Test initial and end positions
+TEST(controlPathPlannerCubicTest, init) {
 	PathPlannerCubic planner(0.1);
 	planner.init("path1.txt");
-	planner.setInitPos(200);
 	planner.move(10, 200, 1000);
 	planner.run();
 	EXPECT_EQ(planner.getJerkOut().getSignal().getValue(), 0);
@@ -43,11 +42,10 @@ TEST(controlPathPlannerCubicTest, init1) {
 	EXPECT_TRUE(Utils::compareApprox(planner.getPosOut().getSignal().getValue(), 1200, 1e-10));
 }
 
-// Test initial positions
-TEST(controlPathPlannerCubicTest, init2) {
+// Test positions
+TEST(controlPathPlannerCubicTest, pos) {
 	PathPlannerCubic planner(0.08);
 	planner.init("path1.txt");
-	planner.setInitPos(200);
 	planner.move(200);
 	planner.run();
 	EXPECT_EQ(planner.getJerkOut().getSignal().getValue(), 0);
