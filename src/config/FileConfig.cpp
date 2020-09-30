@@ -27,7 +27,7 @@ bool FileConfig::save(const char *path) {
 	std::ofstream file(path);
 	if (file.fail()) return false;
 	for (auto p: properties ) {
-		int n = strlen(p.first);
+		int n = std::min(strlen(p.first), sizeof(buffer));
 		strncpy(buffer, p.first, n);
 		strcpy(&buffer[n], " = ");
 		n += 3;

@@ -99,7 +99,7 @@ class SeqDigital : public Sequence {
   SeqDigital(std::string name, Sequence* caller, MyControlSystem& cs) 
     : Sequence(name, caller, false), stepDigOut("step dig out", this, cs), wait("waiting time digital", this) { }
     int action() {
-      bool toggle;
+      bool toggle = false;
       while (Sequencer::running) {
         stepDigOut(toggle);
         wait(5);
@@ -118,7 +118,7 @@ class SeqAnalog : public Sequence {
   SeqAnalog(std::string name, Sequence* caller, MyControlSystem& cs) 
     : Sequence(name, caller, false), stepAnalogOut("step analog out", this, cs), wait("waiting time analog", this) { }
     int action() {
-      bool toggle;
+      bool toggle = false;
       while (Sequencer::running) {
         stepAnalogOut(toggle);
         wait(10);

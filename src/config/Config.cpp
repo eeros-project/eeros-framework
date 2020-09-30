@@ -21,7 +21,7 @@ void Config::add(const char *name, int &value) {
 	properties[name] = ConfigPropertyAccessor{
 		[&value] (const char *name, char *buffer, int size) -> int {
 			const char *v = std::to_string(value).c_str();
-			int n = strlen(v);
+			int n = std::min(strlen(v), sizeof buffer);
 			if (n > size) n = size;
 			strncpy(buffer, v, n);
 			return n;
@@ -41,8 +41,7 @@ void Config::add(const char *name, double &value) {
 	properties[name] = ConfigPropertyAccessor{
 		[&value] (const char *name, char *buffer, int size) -> int {
 			const char *v = std::to_string(value).c_str();
-			int n = strlen(v);
-			if (n > size) n = size;
+			int n = std::min(strlen(v), (size_t)size);
 			strncpy(buffer, v, n);
 			return n;
 		},
@@ -164,7 +163,7 @@ void Config::add(const char *name, std::string &value) {
 	properties[name] = ConfigPropertyAccessor{
 		[&value] (const char *name, char *buffer, int size) -> int {
 			const char *v = value.c_str();
-			int n = strlen(v);
+			int n = std::min(strlen(v), sizeof(buffer));
 			if (n > size) n = size;
 			strncpy(buffer, v, n);
 			return n;
