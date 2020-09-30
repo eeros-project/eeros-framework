@@ -9,14 +9,6 @@
 #include <eeros/core/Executor.hpp>
 
 
-namespace {
-	long gettid() {
-		return syscall(SYS_gettid);
-	}
-}
-
-
-
 using namespace eeros::task;
 
 
@@ -49,7 +41,7 @@ void Async::run_thread() {
 	logger::Logger log('A');
 
 	const auto pid = getpid();
-	const auto tid = gettid();
+	const auto tid = syscall(SYS_gettid);
 
 	Executor::prefault_stack();
 
