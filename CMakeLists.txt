@@ -166,6 +166,11 @@ link_directories(${libucl_BINARY_DIR})
 
 ###### libucl ######
 
+INSTALL(FILES ${LIBUCL_INCLUDE_DIR}/lua_ucl.h
+        FILES ${LIBUCL_INCLUDE_DIR}/ucl++.h
+        FILES ${LIBUCL_INCLUDE_DIR}/ucl.h
+        DESTINATION include)
+INSTALL(FILES ${LIBUCL_LINK_DIR}/libucl.a DESTINATION lib)
 
 ##########################
 # EtherCAT support
