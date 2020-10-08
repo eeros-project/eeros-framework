@@ -97,10 +97,8 @@ class TrajectoryGenerator : public Block {
    */
   virtual bool move(T start, T end) {
     std::array<T, N> s, e;
-    for(auto& i : e)
-      i = 0;
-    for(auto& i : s)
-      i = 0;
+    for(auto& i : e) i = 0; 
+    for(auto& i : s) i = 0;
     s[0] = start; e[0] = end;
     return move(s, e);
   }

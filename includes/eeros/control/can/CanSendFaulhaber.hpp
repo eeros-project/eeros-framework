@@ -47,7 +47,7 @@ class CanSendFaulhaber : public Block {
    */
   CanSendFaulhaber(int socket, std::initializer_list<uint8_t> node, std::initializer_list<uint8_t> functionCode)
       : socket(socket), nodes(node), functionCodes(functionCode), log('Y') {
-    for (int i = 0; i < node.size(); i++) {
+    for (size_t i = 0; i < node.size(); i++) {
       velScale[i] = 1;
     }
     lastCtrl = 0;

@@ -51,7 +51,7 @@ class CanReceiveFaulhaber: public Block {
    */
   CanReceiveFaulhaber(int socket, std::initializer_list<uint8_t> node, std::initializer_list<uint8_t> functionCode) 
       :  socket(socket), nodes(node), functionCodes(functionCode), log('C') {
-    for (int i = 0; i < node.size(); i++) {
+    for (size_t i = 0; i < node.size(); i++) {
       posScale[i] = 1;
       velScale[i] = 1;
     }
