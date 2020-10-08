@@ -1,6 +1,3 @@
-#include <eeros/control/Gain.hpp>
-#include <eeros/control/I.hpp>
-#include <eeros/control/Trace.hpp>
 #include <eeros/control/can/CanHandle.hpp>
 #include <eeros/control/can/CanReceiveFaulhaber.hpp>
 #include <eeros/control/can/CanSendFaulhaber.hpp>
