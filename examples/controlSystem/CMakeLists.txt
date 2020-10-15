@@ -1,12 +1,6 @@
 add_custom_command(OUTPUT copyControlSystemConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/examples/controlSystem/BlockTest2Config.json" "${EEROS_BINARY_DIR}/examples/controlSystem")
 add_custom_command(OUTPUT copyPathFile POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/examples/controlSystem/path.txt" "${EEROS_BINARY_DIR}/examples/controlSystem")
 
-add_executable(periodicExample1 PeriodicExample1.cpp)
-target_link_libraries(periodicExample1 eeros ${EEROS_LIBS})
-
-add_executable(periodicExample2 PeriodicExample2.cpp)
-target_link_libraries(periodicExample2 eeros ${EEROS_LIBS})
-
 add_executable(blockTest1 BlockTest1.cpp)
 target_link_libraries(blockTest1 eeros ${EEROS_LIBS})
 
