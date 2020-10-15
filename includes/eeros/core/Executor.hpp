@@ -29,7 +29,11 @@ namespace safety {
 };
 
 /**
- * The executor is responsible for running the time domains.
+ * The executor is responsible for running periodics, e.g. time domains.
+ * You have to set one periodic as the main task. From its period all the other periodics
+ * which are added to the executor are executed as harmonic tasks. 
+ * If the main task is not set, the executor will create a default main task with 
+ * a chosen period.
  *
  * @since v0.6
  */
@@ -37,8 +41,28 @@ class Executor : public Runnable {
  public:
   virtual ~Executor();
   static Executor& instance();
+  
+  /**
+   * Set the main task.
+   * 
+   * @param mainTask - periodic which will become the main task
+   */
   void setMainTask(task::Periodic &mainTask);
+
+  /**
+   * Set the main task.
+   * 
+   * @param mainTask - periodic which will become the main task
+   */
   void setMainTask(safety::SafetySystem &mainTask);
+  
+  /**
+   * If no main task is set, the executor will create a default main task with 
+   * a chosen period.
+   * 
+   * @param period - period of the default main task
+   */
+  void setExecutorPeriod(double period);
   task::Periodic* getMainTask();
   void add(task::Periodic &task);
   void add(control::TimeDomain &timedomain);

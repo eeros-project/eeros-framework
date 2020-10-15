@@ -128,6 +128,13 @@ void Executor::setMainTask(safety::SafetySystem &ss) {
   setMainTask(*task);
 }
 
+void Executor::setExecutorPeriod(double period) {
+  if (this->mainTask != nullptr)
+    throw std::runtime_error("set the executor period only in case you dont't have a main task");
+  task::Periodic *task = new task::Periodic("default main task", period, new task::Lambda(), true);
+  setMainTask(*task);
+}
+
 task::Periodic* Executor::getMainTask() {
   return mainTask;
 }
