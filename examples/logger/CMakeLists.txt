@@ -1,2 +1,2 @@
-add_executable(loggerTest1 LoggerTest1.cpp)
-target_link_libraries(loggerTest1 eeros ${EEROS_LIBS})
+add_executable(loggerTest LoggerTest.cpp)
+target_link_libraries(loggerTest eeros ${EEROS_LIBS})
