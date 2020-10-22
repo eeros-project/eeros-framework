@@ -18,13 +18,14 @@ double period = 0.01;
 
 class ControlSystem {
 public:
-	ControlSystem() : mouse("/dev/input/event5"), td("td1", period, true) {
+	ControlSystem() : mouse("/dev/input/event6", scale, min, max), td("td1", period, true) {
 		mouse.setName("mouse");
 		mouse.getOut().getSignal().setName("position");
 		mouse.getButtonOut().getSignal().setName("events");
 		td.addBlock(mouse);
 	}
 
+	Vector4 scale{0.0001, 0.0001, 0.001, 0.1}, min{-0.1}, max{0.2};
 	MouseInput mouse;
 	TimeDomain td;
 };
