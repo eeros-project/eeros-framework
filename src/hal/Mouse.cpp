@@ -10,37 +10,37 @@
 using namespace eeros::hal;
 
 Mouse::Mouse(std::string dev, int priority) : Thread(priority) {
-	open(dev.c_str());
-	left = new MouseDigIn("leftMouseButton", this);
-	middle = new MouseDigIn("middleMouseButton", this);
-	right = new MouseDigIn("rightMouseButton", this);
-	HAL& hal = HAL::instance();
-	hal.addInput(left);
-	hal.addInput(middle);
-	hal.addInput(right);
+  open(dev.c_str());
+  left = new MouseDigIn("leftMouseButton", this);
+  middle = new MouseDigIn("middleMouseButton", this);
+  right = new MouseDigIn("rightMouseButton", this);
+  HAL& hal = HAL::instance();
+  hal.addInput(left);
+  hal.addInput(middle);
+  hal.addInput(right);
 
-	current.button.left = 0;
-	current.button.middle = 0;
-	current.button.right = 0;
+  current.button.left = 0;
+  current.button.middle = 0;
+  current.button.right = 0;
 
-	current.axis.x = 0;
-	current.axis.y = 0;
-	current.axis.z = 0;
-	current.axis.r = 0;
+  current.axis.x = 0;
+  current.axis.y = 0;
+  current.axis.z = 0;
+  current.axis.r = 0;
 
-	last = current;
+  last = current;
 }
 
 Mouse::~Mouse() {
-	running = false; 
-	join(); 
-	close(); 
+  running = false; 
+  join(); 
+  close(); 
 }
 
 bool Mouse::open(const char* device) {
-	fd = ::open(device, O_RDONLY | O_NONBLOCK);
-	if (fd < 0) log.error() << "Mouse: could not open input device on " + std::string(device);
-	return fd;
+  fd = ::open(device, O_RDONLY | O_NONBLOCK);
+  if (fd < 0) log.error() << "Mouse: could not open input device on " + std::string(device);
+  return fd;
 }
 
 void Mouse::close() {
@@ -48,12 +48,12 @@ void Mouse::close() {
 }
 
 std::string Mouse::name() {
-	if (!fd) return "";
-	char name[128];
-	if (ioctl(fd, EVIOCGNAME (sizeof(name)), name)) {
-		name[127] = 0;
-		return name;
-	} else return "";
+  if (!fd) return "";
+  char name[128];
+  if (ioctl(fd, EVIOCGNAME (sizeof(name)), name)) {
+    name[127] = 0;
+    return name;
+  } else return "";
 }
 
 void Mouse::on_event(std::function<void(struct input_event)> action) {
@@ -70,36 +70,36 @@ void Mouse::on_axis(std::function<void(int, signed)> action) {
 
 
 void Mouse::run() {
-	running = true;
-	if (fd < 0) return;
-	struct input_event e;
-	while (running) {
-		ssize_t n = read(fd, &e, sizeof(struct input_event));
-		if (n > 0) {
-			if (e.type == EV_KEY) {
-				switch (e.code) {
-					case BTN_LEFT: current.button.left = e.value; break;
-					case BTN_MIDDLE: current.button.middle = e.value; break;
-					case BTN_RIGHT: current.button.right = e.value; break;
-					default: break;
-				}
+  running = true;
+  if (fd < 0) return;
+  struct input_event e;
+  while (running) {
+    ssize_t n = read(fd, &e, sizeof(struct input_event));
+    if (n > 0) {
+      if (e.type == EV_KEY) {
+        switch (e.code) {
+          case BTN_LEFT: current.button.left = e.value; break;
+          case BTN_MIDDLE: current.button.middle = e.value; break;
+          case BTN_RIGHT: current.button.right = e.value; break;
+          default: break;
+        }
 
-				if (button_action != nullptr) button_action(e.code, e.value);
-			} else if (e.type == EV_REL) {
-				switch (e.code) {
-					case REL_X: current.axis.x += e.value; break;
-					case REL_Y: current.axis.y += e.value; break;
-					case REL_WHEEL: current.axis.z += e.value; break;
-					case REL_HWHEEL: current.axis.r += e.value; break;
-					default: break;
-				}
+        if (button_action != nullptr) button_action(e.code, e.value);
+      } else if (e.type == EV_REL) {
+        switch (e.code) {
+          case REL_X: current.axis.x += e.value; break;
+          case REL_Y: current.axis.y += e.value; break;
+          case REL_WHEEL: current.axis.z += e.value; break;
+          case REL_HWHEEL: current.axis.r += e.value; break;
+          default: break;
+        }
 
-				if (axis_action != nullptr) axis_action(e.code, e.value);
-			}
+        if (axis_action != nullptr) axis_action(e.code, e.value);
+      }
 
-			if (event_action != nullptr) event_action(e);
+      if (event_action != nullptr) event_action(e);
 
-			last = current;
-		} else usleep(1000);
-	}
+      last = current;
+    } else usleep(100000);
+  }
 }
