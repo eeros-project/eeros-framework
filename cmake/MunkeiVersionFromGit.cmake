@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2016-2017 Theo Willows
 #           (c) 2019 A. Kunz - NTB Interstaatliche Hochschule für Technik Buchs Switzerland
+#           (c) 2020 A. Kunz - OST Ostschweizer Fachhochschule, Switzerland
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +60,7 @@ function( version_from_git )
 
   # Git describe
   execute_process(
-    COMMAND           "${GIT_EXECUTABLE}" describe --tags
+    COMMAND           "${GIT_EXECUTABLE}" describe --match 'v[0-9]*.[0-9]*.[0-9]*' --tags
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     RESULT_VARIABLE   git_result
     OUTPUT_VARIABLE   git_describe
@@ -75,7 +76,7 @@ function( version_from_git )
 
   # Get Git tag
   execute_process(
-    COMMAND           "${GIT_EXECUTABLE}" describe --tags --abbrev=0
+    COMMAND           "${GIT_EXECUTABLE}" describe --match 'v[0-9]*.[0-9]*.[0-9]*' --tags --abbrev=0
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     RESULT_VARIABLE   git_result
     OUTPUT_VARIABLE   git_tag
