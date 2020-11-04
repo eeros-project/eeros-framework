@@ -41,7 +41,7 @@ public:
             stepA(1);
             count++;
         }
-        seqB.waitAndTerminate();
+        seqB.wait();
         return 0;
     }
 private:
@@ -66,8 +66,8 @@ int main(int argc, char **argv) {
     
     auto& sequencer = Sequencer::instance();
     MainSequence mainSeq("Main Sequence", sequencer);
-    sequencer.addSequence(mainSeq);
-    mainSeq.start();
+//     sequencer.addSequence(mainSeq);
+    mainSeq();
     
     sequencer.wait();
     log.info() << "Simple Sequencer Example finished...";

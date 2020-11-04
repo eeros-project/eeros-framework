@@ -2,17 +2,31 @@
 #define ORG_EEROS_SEQUENCER_CONDITION_HPP_
 
 namespace eeros {
-	namespace sequencer {
+namespace sequencer {
 
-		class Condition {	
-		public:
-			Condition() { }
-			
-			// return state of condition
-			bool isTrue() {return validate();}
-			virtual bool validate() = 0;	// has to be overwritten
-		};
-	};	//namespace sequencer
-}; // namespace eeros
+/**
+ * A condition is checked by a \ref monitor. You can define your 
+ * own conditions by extending this class.
+ * 
+ * @since v1.0
+ */
+class Condition {
+  friend class Monitor;
+ public:
+  /**
+   * This is the function that is called by a \ref monitor when it
+   * checks the condition. This function has to be implemented in the derived class. 
+   * It must return true when the condition is met.
+   * 
+   * @return - return true if condition is met 
+   */
+  virtual bool validate() = 0;
+
+ private:
+  bool isTrue() {return validate();}
+};
+
+} // namespace sequencer
+} // namespace eeros
 
 #endif //ORG_EEROS_SEQUENCER_CONDITION_HPP_

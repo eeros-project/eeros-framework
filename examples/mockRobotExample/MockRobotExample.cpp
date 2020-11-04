@@ -43,8 +43,7 @@ int main(int argc, char **argv) {
 
 	auto& sequencer = Sequencer::instance();
 	MainSequence mainSeq("Main Sequence", sequencer, cs, ss, sp);
-	sequencer.addSequence(mainSeq);
-	mainSeq.start();
+	mainSeq();
 	
 	eeros::task::Lambda l1 ([&] () {log.warn() << "robot at " << cs.iX.getOut().getSignal().getValue() << "/" << cs.iY.getOut().getSignal().getValue();});
 	Periodic periodic("per1", 0.5, l1);
