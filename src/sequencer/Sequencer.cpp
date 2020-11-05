@@ -6,10 +6,12 @@
 namespace eeros {
 namespace sequencer {
   
-bool Sequencer::running = true;
+std::atomic<bool> Sequencer::running(true);
 int Sequencer::sequenceCount = 0;
 
-Sequencer::Sequencer() : log('B'), stepping(false), nextStep(false) { }
+Sequencer::Sequencer() : log('B'), stepping(false), nextStep(false) {
+  running = true;
+}
 
 Sequencer::~Sequencer() { }
 

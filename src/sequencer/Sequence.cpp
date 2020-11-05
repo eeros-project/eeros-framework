@@ -13,7 +13,7 @@ Sequence::Sequence(std::string name, Sequencer& seq) : Sequence(name, seq, nullp
 Sequence::Sequence(std::string name, BaseSequence* caller, bool blocking) : Sequence(name, caller->seq, caller, blocking) { }
 
 Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller, bool blocking) : BaseSequence(seq, caller, blocking) {
-  if (name == "") {
+  if (name.empty()) {
     throw Fault("all sequences must have a name");
   } else {
     for (Sequence *s : seq.getListOfAllSequences()) {
@@ -44,7 +44,7 @@ int Sequence::start() {
   int retVal = -1;
   resetTimeout();
   resetAbort();
-  Sequencer::running = true;
+//  Sequencer::running = true;
   if (blocking) {	// starts action() blocking
     log.info() << "create sequence '" << name << "' (blocking), caller sequence: '" << ((caller != nullptr)?caller->getName():"no caller") << "'";
     retVal = BaseSequence::action();

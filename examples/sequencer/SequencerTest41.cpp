@@ -9,40 +9,44 @@
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
-int count;
-
-class ExceptionSeq : public Sequence {
- public:
-  ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait E", this) { }
-  int action() {count = 0; wait(0.5); return 0;}
-  Wait wait;
-};
+int count = 0;
 
 class MyCondition : public Condition {
   bool validate() {return count > 2;}
 };
 
+class SequenceB : public Sequence {
+public:
+  SequenceB(std::string name, Sequencer& seq, Sequence* caller, Monitor& m) : Sequence(name, caller, false), stepB("step B", this), m(m) {
+    addMonitor(&m);
+  }
+  int action() {
+    for (int i = 0; i < 5; i++) stepB(1);
+    return 0;
+  }
+  Wait stepB;
+  Monitor& m;
+};
+
 class MainSequence : public Sequence {
  public:
-  MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", this), eSeq("exception sequence", this), m("myMonitor", this, cond, SequenceProp::resume, &eSeq) { 
-    setTimeoutTime(10.0);
-    setTimeoutBehavior(SequenceProp::abort);
+  MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), m("myMonitor", this, cond, SequenceProp::abort), seqB("seq B", seq, this, m), stepA("step A", this) { 
     addMonitor(&m);
   }
     
   int action() {
-    count = 0;
-    for (int i = 0; i < 10; i++) {
-      stepA(2);
+    seqB();
+    for (int i = 0; i < 5; i++) {
+      stepA(1);
       count++;
     }
+    seqB.wait();
     return 0;
   }
-
-  Wait stepA;
-  ExceptionSeq eSeq;
-  MyCondition cond;
   Monitor m;
+  SequenceB seqB;
+  Wait stepA;
+  MyCondition cond;
 };
 
 void signalHandler(int signum) {

@@ -6,6 +6,7 @@
 #include <eeros/sequencer/ConditionAbort.hpp>
 #include <eeros/sequencer/Monitor.hpp>
 #include <vector>
+#include <mutex>
 
 
 namespace eeros {
@@ -117,6 +118,7 @@ class BaseSequence {
   ConditionAbort conditionAbort;
   int pollingTime;  // in milliseconds for checkExitCondition monitors)
   Monitor* activeMonitor; // monitor, which fired and causes exception sequence to run
+  std::mutex mtx;
 };
 
 /**

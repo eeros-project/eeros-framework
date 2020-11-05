@@ -9,12 +9,14 @@ using namespace eeros::logger;
 
 class ExceptionSeq : public Sequence {
  public:
-  ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait", this) { }
+  ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait", this), caller(caller) { }
   int action() {
     wait(3);
+    caller->resetTimeout();
     return 0;
   }
   Wait wait;
+  Sequence* caller;
 };
 
 class MainSequence : public Sequence {

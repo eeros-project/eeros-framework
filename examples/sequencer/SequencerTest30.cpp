@@ -29,6 +29,7 @@ public:
     for (int i = 0; i < 3; i++) {
       stepA(1);
     }
+    seqB.wait();
     return 0;
   }
   SequenceB seqB;

@@ -89,7 +89,7 @@ public:
 		Sequence(name, seq), ss(ss), sp(sp),
 		homing("Homing Sequence", this, cs, ss, sp),  
 		upDown("UpDown Sequence", this, cs),
-		wait("Wait", this) { }
+		wait("wait", this) { }
 		
 	int action() {
 		while(Sequencer::running) {

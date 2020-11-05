@@ -59,4 +59,6 @@ target_link_libraries(sequencerTest36 eeros ${EEROS_LIBS})
 add_executable(sequencerTest40 SequencerTest40.cpp)
 target_link_libraries(sequencerTest40 eeros ${EEROS_LIBS})
 
+add_executable(sequencerTest41 SequencerTest41.cpp)
+target_link_libraries(sequencerTest41 eeros ${EEROS_LIBS})
 

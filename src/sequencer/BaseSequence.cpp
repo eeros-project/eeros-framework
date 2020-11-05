@@ -11,7 +11,7 @@ BaseSequence::BaseSequence(BaseSequence* caller, bool blocking) : BaseSequence(c
 BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking) 
     : seq(seq), caller(caller), blocking(blocking), state(SequenceState::idle), log('X'), 
       monitorTimeout("timeout", this, conditionTimeout, SequenceProp::abort), monitorAbort("abort", this, conditionAbort, SequenceProp::abort),
-      pollingTime(500) {
+      pollingTime(100) {
   if (caller != nullptr) {
     callerStack = caller->callerStack;
   }
@@ -24,20 +24,19 @@ BaseSequence::~BaseSequence() { }
 
 int BaseSequence::action() {
   int retVal = -1;
-//   auto& seq = Sequencer::instance();
-//   if (seq.stepping) {
-//     log.warn() << "wait for next step command";
-//     while (Sequencer::running && !seq.nextStep);
-//     seq.nextStep = false;
-//   }
-
-  while (!(state == SequenceState::terminated)) {
+  auto& seq = Sequencer::instance();
+  if (seq.stepping) {
+    log.warn() << "wait for next step command";
+    while (Sequencer::running && !seq.nextStep);
+    seq.nextStep = false;
+  }
+  std::lock_guard<std::mutex> lock(mtx);
+  while (state != SequenceState::terminated) {
     switch (state) {
       case SequenceState::idle: { // upon creation
         clearActiveMonitor();
         checkMonitors(); // check if this or a caller sequence is 'exceptionIsActive', set state accordingly
-        if (state == SequenceState::aborting || state == SequenceState::restarting) {}
-        else state = SequenceState::starting;
+        if (!(state == SequenceState::aborting || state == SequenceState::restarting)) state = SequenceState::starting;
         break;
       }
       case SequenceState::starting: { // started, before first run
@@ -133,7 +132,7 @@ BaseSequence* BaseSequence::checkMonitor(Monitor* m) {
       m->startExceptionSequence();  // start only if not yet in exception processing, blocking
       owner->inExcProcessing = false;
       switch (m->getBehavior()) {
-        case SequenceProp::resume: owner->state = SequenceState::running; break;
+        case SequenceProp::resume: owner->state = SequenceState::running; owner->monitorFired = false; break;
         case SequenceProp::abort: owner->state = SequenceState::aborting; break;
         case SequenceProp::restart: owner->state = SequenceState::restarting; break;
         default : break;

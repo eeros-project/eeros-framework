@@ -36,8 +36,18 @@ class Sequencer {
    */
   void wait();
   void abort();
+  
+  /**
+   * The sequencer can be put into single stepping mode. This can be useful for
+   * debugging purposes, E.g. upon entering a given sequence. 
+   */
   void singleStepping();
-  static bool running;
+  
+  /**
+   * State of the sequencer, set to true upon creation. Aborting the sequencer will 
+   * set this variable to false and will abort all registered sequences.
+   */
+  static std::atomic<bool> running;
 
  private:
   Sequencer();
@@ -47,9 +57,8 @@ class Sequencer {
   Sequence* mainSequence;
   std::vector<Sequence*> sequenceList;	// list of all sequences
   eeros::logger::Logger log;	
-  unsigned int id;
-  bool stepping;
-  volatile bool nextStep;
+  std::atomic<bool> stepping;
+  volatile std::atomic<bool> nextStep;
   SequencerUI ui;
   static int sequenceCount;
 };
