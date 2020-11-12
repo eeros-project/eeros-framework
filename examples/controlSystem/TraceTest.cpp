@@ -45,7 +45,7 @@ public:
 class SafetyPropertiesTest : public SafetyProperties {
 public:
 	SafetyPropertiesTest(ControlSystem& cs) : 
-		slOff("off"), slRunning("running"), seShutDown("switching off"), tw(cs.trace2, "/mnt/ramdisk/ctrlData1.txt") {
+		slOff("off"), slRunning("running"), seShutDown("switching off"), tw(cs.trace2, "/mnt/ramdisk/ctrlData1.txt"), log(logger::Logger::getLogger()) {
 		// Add levels 
 		addLevel(slOff);
 		addLevel(slRunning);
@@ -81,10 +81,9 @@ void signalHandler(int signum) {
 int main() {
 	signal(SIGINT, signalHandler);
 
-	StreamLogWriter w(std::cout, "/tmp/consoleOutput");
-	w.show(LogLevel::TRACE);
-	Logger::setDefaultWriter(&w);
-	Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger('M');
+  log.show();
 	
 	log.info() << "Trace test started...";
 	

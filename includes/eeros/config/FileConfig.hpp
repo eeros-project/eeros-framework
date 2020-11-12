@@ -42,7 +42,7 @@ class FileConfig : public Config {
       os << p.first << " = ";
       std::string val;
       p.second.set(p.first, val);
-      os << val << "\n\r";
+      os << val << std::endl;
       file << os.str();
     }
     return true;

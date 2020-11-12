@@ -23,10 +23,8 @@ int main(int argc, char **argv) {
   double dt = 0.2;
   signal(SIGINT, signalHandler);
   
-  StreamLogWriter w(std::cout);
-  Logger::setDefaultWriter(&w);
-  Logger log;
-//   w.show();
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger('M');
 
   log.info() << "CAN test start";
 

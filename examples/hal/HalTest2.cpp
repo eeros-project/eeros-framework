@@ -12,11 +12,8 @@ using namespace eeros::safety;
 using namespace eeros::sequencer;
 
 int main(int argc, char **argv){
-	// Create and initialize logger
-	StreamLogWriter w(std::cout);
-	Logger::setDefaultWriter(&w);
-	Logger log;
-	w.show();
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
 	
 	log.info() << "HAL test 2 started...";
   

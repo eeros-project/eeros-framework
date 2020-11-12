@@ -56,9 +56,8 @@ public:
 };
 
 int main() {
-	StreamLogWriter w(std::cout);
-	Logger::setDefaultWriter(&w);
-	Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
 	
 	log.info() << "XBox Test started...";
 	

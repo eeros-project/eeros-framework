@@ -8,7 +8,7 @@ namespace eeros {
 		SafetySystem* SafetySystem::instance = nullptr;
 		
 		SafetySystem::SafetySystem(SafetyProperties& safetyProperties, double period) :
-		log('S'),
+		log(logger::Logger::getLogger('S')),
 		currentLevel(nullptr),
 		privateContext(this),
 		period(period) {

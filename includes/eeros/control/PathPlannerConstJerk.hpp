@@ -3,12 +3,9 @@
 
 #include <eeros/control/Output.hpp>
 #include <eeros/control/TrajectoryGenerator.hpp>
-#include <eeros/logger/Logger.hpp>
 #include <eeros/core/System.hpp>
 #include <cmath>
 #include <mutex>
-
-using namespace eeros::logger;
 
 namespace eeros {
 namespace control {
@@ -348,7 +345,6 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 4> {
     a5p, b5p, c5p, d5p, b5v, c5v, d5v, c5a, d5a, d5j; 
   T endPos;
   std::mutex mtx;
-  Logger log;
 };
 
 /**

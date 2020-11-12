@@ -9,44 +9,60 @@
 using namespace eeros::sequencer;
 using namespace eeros::logger;
 
-int count = 0;
+int count;
+
+class CounterExceptionSeq : public Sequence {
+ public:
+  CounterExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait", this) { }
+  int action() {
+    count = 0; 
+    wait(0.5); 
+    return 0;
+  }
+  Wait wait;
+};
+
+class TimeoutExceptionSeq : public Sequence {
+ public:
+  TimeoutExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait", this) { }
+  int action() {
+    wait(0.5); 
+    caller->resetTimeout();
+    return 0;
+  }
+  Wait wait;
+};
 
 class MyCondition : public Condition {
   bool validate() {return count > 2;}
 };
 
-class SequenceB : public Sequence {
-public:
-  SequenceB(std::string name, Sequencer& seq, Sequence* caller, Monitor& m) : Sequence(name, caller, false), stepB("step B", this), m(m) {
-    addMonitor(&m);
-  }
-  int action() {
-    for (int i = 0; i < 5; i++) stepB(1);
-    return 0;
-  }
-  Wait stepB;
-  Monitor& m;
-};
-
 class MainSequence : public Sequence {
  public:
-  MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), m("myMonitor", this, cond, SequenceProp::abort), seqB("seq B", seq, this, m), stepA("step A", this) { 
+  MainSequence(std::string name, Sequencer& seq) 
+      : Sequence(name, seq), stepA("step A", this), 
+        eSeq1("counter exception sequence", this), eSeq2("timeout exception sequence", this),
+        m("myMonitor", this, cond, SequenceProp::resume, &eSeq1) { 
+    setTimeoutTime(10.0);
+    setTimeoutExceptionSequence(eSeq2);
+    setTimeoutBehavior(SequenceProp::resume);
     addMonitor(&m);
   }
     
   int action() {
-    seqB();
-    for (int i = 0; i < 5; i++) {
-      stepA(1);
+    count = 0;
+    for (int i = 0; i < 10; i++) {
+      stepA(2);
       count++;
     }
-    seqB.wait();
     return 0;
   }
-  Monitor m;
-  SequenceB seqB;
+
   Wait stepA;
+  CounterExceptionSeq eSeq1;
+  TimeoutExceptionSeq eSeq2;
   MyCondition cond;
+  Monitor m;
 };
 
 void signalHandler(int signum) {
@@ -55,10 +71,9 @@ void signalHandler(int signum) {
 
 int main(int argc, char **argv) {
   signal(SIGINT, signalHandler);
-  StreamLogWriter w(std::cout);
-//   w.show(LogLevel::TRACE);
-  Logger::setDefaultWriter(&w);
-  Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
+//   log.show();
   log.info() << "Sequencer example started...";
   
   auto& sequencer = Sequencer::instance();

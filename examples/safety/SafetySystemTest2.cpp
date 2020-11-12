@@ -68,10 +68,8 @@ class SafetyPropertiesTest : public SafetyProperties {
 };
 
 int main() {
-  StreamLogWriter w(std::cout);
-  Logger::setDefaultWriter(&w);
-  Logger log;
-  w.show();
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
   
   log.info() << "Safety System Example 2 started...";
   

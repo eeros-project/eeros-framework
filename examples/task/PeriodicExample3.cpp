@@ -15,12 +15,9 @@ using namespace eeros;
 
 int main() {
   const double dt = 1.0;
-  logger::StreamLogWriter w(std::cout);
-  Logger::setDefaultWriter(&w);
-  w.show();
-
-  Logger log('M');
-  Logger log2('T');
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger('M');
+  Logger log2 = Logger::getLogger('T');
 
   log.trace() << "harmonic tasks example 3";
 

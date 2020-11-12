@@ -56,11 +56,8 @@ int main(int argc, char *argv[]) {
 	}
 	
 	const double dt = 0.001;
-	eeros::logger::StreamLogWriter w(std::cout);
-	Logger::setDefaultWriter(&w);
-	w.show();
-
-	Logger log('M');
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger('M');
 
 	log.trace() << "measure periodic execution";
 	log.trace() << "eeros " << eeros::Version::string;

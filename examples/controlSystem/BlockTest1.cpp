@@ -11,10 +11,9 @@ using namespace eeros::control;
 using namespace eeros::math;
 
 int main() {
-	StreamLogWriter w(std::cout);
-	w.show(LogLevel::TRACE);
-	Logger log;
-	log.set(&w);
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
+// 	log.set(&w);
  
 	log.info() << "Block Test started";
 	

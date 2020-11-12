@@ -14,9 +14,9 @@ public:
   Wait wait;
 };
 
-class SequenceB : public Sequence {
+class SequenceS : public Sequence {
 public:
-  SequenceB(std::string name, Sequencer& seq, Sequence* caller) : Sequence(name, caller, false), stepB("step B", this) { }
+  SequenceS(std::string name, Sequencer& seq, Sequence* caller) : Sequence(name, caller, false), stepB("step B", this) { }
   int action() {
     for (int i = 0; i < 5; i++) stepB(1);
     return 0;
@@ -26,7 +26,7 @@ public:
 
 class MainSequence : public Sequence {
 public:
-  MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("seq B", seq, this), stepA("step A", this), eSeq("exception sequence", this) {
+  MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqS("seq S", seq, this), stepA("step A", this), eSeq("exception sequence", this) {
     setTimeoutTime(4.5);
     setTimeoutExceptionSequence(eSeq);
     setTimeoutBehavior(SequenceProp::abort);
@@ -36,13 +36,14 @@ public:
     for (int i = 0; i < 3; i++) {
       stepA(1);
     }
-    seqB();
+    seqS();
     for (int i = 0; i < 3; i++) {
       stepA(1);
     }
+    seqS.wait();
     return 0;
   }
-  SequenceB seqB;
+  SequenceS seqS;
   Wait stepA;
   ExceptionSeq eSeq;
 };
@@ -53,10 +54,8 @@ void signalHandler(int signum) {
 
 int main(int argc, char **argv) {
   signal(SIGINT, signalHandler);
-  StreamLogWriter w(std::cout);
-//   w.show(LogLevel::TRACE);
-  Logger::setDefaultWriter(&w);
-  Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
   log.info() << "Sequencer example started...";
   
   auto& sequencer = Sequencer::instance();

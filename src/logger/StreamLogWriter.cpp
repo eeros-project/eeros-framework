@@ -22,95 +22,72 @@
 
 using namespace eeros::logger;
 
-StreamLogWriter::StreamLogWriter(std::ostream& out) :
-	out(out),
-	visible_level(LogLevel::INFO),
-	enabled(false),
-	colored(true)
-{ }	// nothing to do
+StreamLogWriter::StreamLogWriter(std::ostream& out) : out(out), colored(true) {  }  // nothing to do
 
-StreamLogWriter::StreamLogWriter(std::ostream& out, std::string logFile) :
-	out(out),
-	visible_level(LogLevel::INFO),
-	enabled(false),
-	colored(true)
-{
-	time_t now = time(0);
-	struct tm  tstruct;
-	char       buf[80];
-	tstruct = *localtime(&now);
-	strftime(buf, sizeof(buf), ".%Y-%m-%d.%X", &tstruct);
-	fileOut.open(logFile + buf, std::ios::trunc);
+StreamLogWriter::StreamLogWriter(std::ostream& out, std::string logFile) : out(out), colored(true) {
+  time_t now = time(0);
+  struct tm  tstruct;
+  char       buf[80];
+  tstruct = *localtime(&now);
+  strftime(buf, sizeof(buf), ".%Y-%m-%d.%X", &tstruct);
+  fileOut.open(logFile + buf, std::ios::trunc);
 }
 
-StreamLogWriter::~StreamLogWriter() {
-	fileOut.close();
-}
+StreamLogWriter::~StreamLogWriter() {fileOut.close();}
 
 void StreamLogWriter::show(LogLevel level) { visible_level = level; }
 
 void StreamLogWriter::begin(std::ostringstream& os, LogLevel level, unsigned category) {
-	enabled = (level <= visible_level);
-	if (!enabled) return;
-	
- 	using namespace std;	
+  tm localTime;
+  std::chrono::system_clock::time_point tx = std::chrono::system_clock::now();
+  time_t now = std::chrono::system_clock::to_time_t(tx);
+  localtime_r(&now, &localTime);
+  const std::chrono::duration<double> tse = tx.time_since_epoch();
+  std::chrono::seconds::rep milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tse).count() % 1000;
+  os << std::setfill('0');
+  os << std::setw(4) << (1900 + localTime.tm_year) << '-' << std::setw(2) << (localTime.tm_mon + 1) << '-' << std::setw(2) << localTime.tm_mday;
+  os << ' ';
+  os << std::setw(2) << localTime.tm_hour << ':' << std::setw(2) << localTime.tm_min << ':' << std::setw(2) << localTime.tm_sec << ':' << std::setw(3) << milliseconds;
+  os << "  ";
 
-	tm localTime;
-    std::chrono::system_clock::time_point tx = std::chrono::system_clock::now();
-    time_t now = std::chrono::system_clock::to_time_t(tx);
-    localtime_r(&now, &localTime);
-    const std::chrono::duration<double> tse = tx.time_since_epoch();
-    std::chrono::seconds::rep milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tse).count() % 1000;
-	os << setfill('0');
-	os << setw(4) << (1900 + localTime.tm_year) << '-' << setw(2) << (localTime.tm_mon + 1) << '-' << setw(2) << localTime.tm_mday;
-	os << ' ';
-	os << setw(2) << localTime.tm_hour << ':' << setw(2) << localTime.tm_min << ':' << setw(2) << localTime.tm_sec << ':' << setw(3) << milliseconds;
-	os << "  ";
+  if (category == 0) os << ' ';
+  else {
+    if (category >= 'A' && category <= 'Z') os << (char)category;
+    else os << category;
+  }
+  os << ' ';
 
-	if (category == 0) os << ' ';
-	else {
-		if (category >= 'A' && category <= 'Z')	os << (char)category;
-		else os << category;
-	}
-	os << ' ';
+  if (colored) {
+    switch(level) {
+      case LogLevel::FATAL: os << COLOR_MAGENTA; break; // fatal
+      case LogLevel::ERROR: os << COLOR_RED; break; // error
+      case LogLevel::WARN: os << COLOR_YELLOW; break; // warning
+      case LogLevel::INFO: os << COLOR_CYAN; break; // info
+      case LogLevel::TRACE: os << COLOR_RESET; break; // trace
+      default: os << COLOR_RESET; break;
+    }
+  }
 
-	if (colored) {
-		switch(level) {
-			case LogLevel::FATAL: os << COLOR_MAGENTA; break; // fatal
-			case LogLevel::ERROR: os << COLOR_RED; break; // error
-			case LogLevel::WARN: os << COLOR_YELLOW; break; // warning
-			case LogLevel::INFO: os << COLOR_CYAN; break; // info
-			case LogLevel::TRACE: os << COLOR_RESET; break; // trace
-			default: os << COLOR_RESET; break;
-		}
-	}
-
-	switch(level) {
-		case LogLevel::FATAL: os << "F"; break; // fatal
-		case LogLevel::ERROR: os << "E"; break; // error
-		case LogLevel::WARN: os << "W"; break; // warning
-		case LogLevel::INFO: os << "I"; break; // info
-		case LogLevel::TRACE: os << "T"; break; // trace
-		default: os << 'T'; break;
-	}
-	os << ":  ";
+  switch(level) {
+    case LogLevel::FATAL: os << "F"; break; // fatal
+    case LogLevel::ERROR: os << "E"; break; // error
+    case LogLevel::WARN: os << "W"; break; // warning
+    case LogLevel::INFO: os << "I"; break; // info
+    case LogLevel::TRACE: os << "T"; break; // trace
+    default: os << 'T'; break;
+  }
+  os << ":  ";
 }
 
 void StreamLogWriter::end(std::ostringstream& os) {
-	if (!enabled) {
-		os.clear();
-		os.str("");
-		return;
-	}
-	if (colored) os << COLOR_RESET;
-	os << std::endl;
-	out << os.str();
-	fileOut << os.str();
-	fileOut.flush();
+  if (colored) os << COLOR_RESET;
+  os << std::endl;
+  out << os.str();
+  fileOut << os.str();
+  fileOut.flush();
 }
 
 
 void StreamLogWriter::endl(std::ostringstream& os) {
-	if (!enabled) return;
-	os << std::endl << "\t\t\t       ";
+  os << std::endl << "\t\t\t       ";
 }

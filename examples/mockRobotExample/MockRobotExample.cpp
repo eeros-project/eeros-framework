@@ -26,10 +26,8 @@ void signalHandler(int signum) {
 int main(int argc, char **argv) {
   signal(SIGINT, signalHandler);
   
-  StreamLogWriter w(std::cout);
-//   w.show(LogLevel::TRACE);
-  Logger::setDefaultWriter(&w);
-  Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
   
   log.info() << "Mock robot example started...";
   

@@ -6,8 +6,8 @@
 using namespace eeros;
 using namespace eeros::hal;
 
-HAL::HAL() : log('H')  { }
-HAL::HAL(const HAL&) : log('H') { }
+HAL::HAL() : log(logger::Logger::getLogger('H'))  { }
+HAL::HAL(const HAL&) : log(logger::Logger::getLogger('H')) { }
 
 HAL& HAL::instance() {
 	static HAL halInstance;

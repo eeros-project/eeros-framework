@@ -9,14 +9,20 @@ using namespace eeros::logger;
 
 class ExceptionSeq : public Sequence {
 public:
-  ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait", this) { }
-  int action() {wait(3); return 0;}
+  ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait", this), caller(caller) { }
+  int action() {
+    wait(3); 
+    caller->resetTimeout();
+    caller->setTimeoutTime(5);
+    return 0;
+  }
   Wait wait;
+  Sequence* caller;
 };
 
-class SequenceB : public Sequence {
+class SequenceS : public Sequence {
 public:
-  SequenceB(std::string name, Sequencer& seq, Sequence* caller) : Sequence(name, caller, false), stepB("step B", this), eSeq("exception sequence", this) {
+  SequenceS(std::string name, Sequencer& seq, Sequence* caller) : Sequence(name, caller, false), stepB("step B", this), eSeq("exception sequence", this) {
     setTimeoutTime(1.5);
     setTimeoutExceptionSequence(eSeq);
     setTimeoutBehavior(SequenceProp::resume);
@@ -31,19 +37,20 @@ public:
 
 class MainSequence : public Sequence {
 public:
-  MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqB("seq B", seq, this), stepA("step A", this) { }
+  MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), seqS("seq S", seq, this), stepA("step A", this) { }
     
   int action() {
     for (int i = 0; i < 3; i++) {
       stepA(1);
     }
-    seqB();
+    seqS();
     for (int i = 0; i < 3; i++) {
       stepA(1);
     }
+    seqS.wait();
     return 0;
   }
-  SequenceB seqB;
+  SequenceS seqS;
   Wait stepA;
 };
 
@@ -53,10 +60,8 @@ void signalHandler(int signum) {
 
 int main(int argc, char **argv) {
   signal(SIGINT, signalHandler);
-  StreamLogWriter w(std::cout);
-//   w.show(LogLevel::TRACE);
-  Logger::setDefaultWriter(&w);
-  Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger('M');
   log.info() << "Sequencer example started...";
   
   auto& sequencer = Sequencer::instance();

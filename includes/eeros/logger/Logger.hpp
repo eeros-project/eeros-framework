@@ -3,23 +3,17 @@
 
 #include <eeros/logger/LogEntry.hpp>
 #include <eeros/logger/LogWriter.hpp>
+#include <eeros/logger/StreamLogWriter.hpp>
 #include <sstream>
 #include <string>
-#include <iostream>
+#include <memory>
 
 namespace eeros {
 namespace logger {
 
-enum class LogLevel {FATAL, ERROR, WARN, INFO, TRACE};
-
 class Logger {
  public:
-  Logger(unsigned category = 0) : w(defaultWriter), category(category) { }
   virtual ~Logger() { }
-  
-  void set(LogWriter* writer) { w = writer; }
-  void set(LogWriter& writer) { w = &writer; }
-  LogWriter* get() { return w; }
   
   LogEntry fatal() { return LogEntry(w, LogLevel::FATAL, category); }
   LogEntry error() { return LogEntry(w, LogLevel::ERROR, category); }
@@ -27,11 +21,33 @@ class Logger {
   LogEntry info() { return LogEntry(w, LogLevel::INFO, category); }
   LogEntry trace() { return LogEntry(w, LogLevel::TRACE, category); }
   
-  static void setDefaultWriter(LogWriter* writer) { defaultWriter = writer; }
+  static Logger getLogger(unsigned category = 0) {
+    log.category = category;
+    return log;
+  }
+ 
+  static void setDefaultStreamLogger(std::ostream& os) {
+    log = makeLogger<StreamLogWriter>(os);
+  }
+  
+  static void setDefaultStreamLogger(std::ostream& os, std::string logFile) {
+    log = makeLogger<StreamLogWriter>(os, logFile);
+  }
+  
+  void show(LogLevel level = LogLevel::TRACE) {
+    w->visible_level = level;
+  }
+
  private:
-  LogWriter* w;
+  std::shared_ptr<LogWriter> w;
   unsigned category;
-  static LogWriter* defaultWriter;
+
+  Logger(std::shared_ptr<LogWriter>&& writer): w(writer) { }
+  template <typename ConcreteWriter, typename ... Args>
+  static Logger makeLogger(Args&& ... args) {
+    return Logger(std::make_shared<ConcreteWriter>(std::forward<Args>(args)...));
+  }
+  static Logger log;
 };
 
 }

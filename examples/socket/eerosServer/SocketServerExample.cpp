@@ -26,7 +26,7 @@ public:
 		c3(-28),
 		c4(-34.987),
 		socketA("", 9876, 0.1),	// server
-		log('C'),
+		log(Logger::getLogger('C')),
 		dt(dt),
 		timedomain("Main time domain", dt, true) {
 	
@@ -86,10 +86,8 @@ int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
 	double dt = 0.01;
 	
-	StreamLogWriter w(std::cout);
-	w.show(LogLevel::TRACE);
-	Logger::setDefaultWriter(&w);
-	Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
  
 	log.info() << "EEROS started, socket server";
 	

@@ -7,9 +7,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+using namespace eeros;
 using namespace eeros::hal;
 
-SpaceNavigator::SpaceNavigator(std::string dev, int priority) : Thread(priority) {
+SpaceNavigator::SpaceNavigator(std::string dev, int priority) : Thread(priority), log(logger::Logger::getLogger('N')) {
 		this->open(dev.c_str());
 		this->useRaw = (dev.find("raw") != std::string::npos);
 		button[0] = new SpaceNavigatorDigIn("SpaceNavButtonL", this);

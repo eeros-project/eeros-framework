@@ -4,6 +4,7 @@
 #include <eeros/core/Fault.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 #include <gtest/gtest.h>
+#include <iostream>
 
 using namespace eeros;
 using namespace eeros::control;
@@ -36,6 +37,8 @@ TEST(controlSignalCheckerTest, unconnected) {
 
 // Test limits
 TEST(controlSignalCheckerTest, limitsDouble) {
+  std::cout.setstate(std::ios_base::badbit);
+  logger::Logger::setDefaultStreamLogger(std::cout);
 	SignalChecker<> s1(0.5,1.0);
 	s1.setName("s1");
 	Constant<> c1(2.0);

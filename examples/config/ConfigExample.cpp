@@ -1,8 +1,10 @@
 #include <iostream>
 #include <array>
 #include <eeros/config/FileConfig.hpp>
+#include <eeros/logger/Logger.hpp>
 
 namespace {
+using namespace eeros::logger;
 
 class TestConfig : public eeros::config::FileConfig {
  public:
@@ -31,31 +33,33 @@ class TestConfig : public eeros::config::FileConfig {
 }
 
 int main(int argc, char **argv) {
-  std::cout << "Config demo started" << std::endl;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger('M');
+  log.info() << "Config demo started";
 
   TestConfig configFile("config.txt");	// choose an appropriate path
-  std::cout << "Config default: value1 = " << configFile.value1 << std::endl;
-  std::cout << "Config default: value2 = " << configFile.value2 << std::endl;
-  std::cout << "Config default: value3 = " << configFile.value3 << std::endl;
-  std::cout << "Config default: value4 = ";
-  for (auto &x: configFile.value4) std::cout << x << ", ";
-  std::cout << std::endl;
-  std::cout << "Config default: value5 = ";
-  for (auto &x: configFile.value5) std::cout << x << ", ";
-  std::cout << std::endl;
-  std::cout << "Config default: value6 = " << configFile.value6 << std::endl;
+  log.info() << "Config default: value1 = " << configFile.value1;
+  log.info() << "Config default: value2 = " << configFile.value2;
+  log.info() << "Config default: value3 = " << configFile.value3;
+  std::stringstream val;
+  for (auto &x: configFile.value4) val << x << ", ";
+  log.info() << "Config default: value4 = " << val.str();
+  val.str(std::string());
+  for (auto &x: configFile.value5) val << x << ", ";
+  log.info() << "Config default: value5 = " << val.str();
+  log.info() << "Config default: value6 = " << configFile.value6;
 
   configFile.load();
-  std::cout << "Config read from file: value1 = " << configFile.value1 << std::endl;
-  std::cout << "Config read from file: value2 = " << configFile.value2 << std::endl;
-  std::cout << "Config read from file: value3 = " << configFile.value3 << std::endl;
-  std::cout << "Config read from file: value4 = ";
-  for (auto &x: configFile.value4) std::cout << x << ", ";
-  std::cout << std::endl;
-  std::cout << "Config read from file: value5 = ";
-  for (auto &x: configFile.value5) std::cout << x << ", ";
-  std::cout << std::endl;
-  std::cout << "Config read from file: value6 = " << configFile.value6 << std::endl;
+  log.info() << "Config read from file: value1 = " << configFile.value1;
+  log.info() << "Config read from file: value2 = " << configFile.value2;
+  log.info() << "Config read from file: value3 = " << configFile.value3;
+  val.str(std::string());
+  for (auto &x: configFile.value4) val << x << ", ";
+  log.info() << "Config read from file: value4 = ";
+  val.str(std::string());
+  for (auto &x: configFile.value5) val << x << ", ";
+  log.info() << "Config read from file: value5 = ";
+  log.info() << "Config read from file: value6 = " << configFile.value6;
 
   configFile.value1 += 100;
   configFile.value2 = 3.5;

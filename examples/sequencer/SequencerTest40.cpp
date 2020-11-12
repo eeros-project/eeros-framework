@@ -13,8 +13,12 @@ int count;
 
 class ExceptionSeq : public Sequence {
  public:
-  ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait E", this) { }
-  int action() {count = 0; wait(0.5); return 0;}
+  ExceptionSeq(std::string name, Sequence* caller) : Sequence(name, caller, true), wait("wait", this) { }
+  int action() {
+    count = 0; 
+    wait(0.5); 
+    return 0;
+  }
   Wait wait;
 };
 
@@ -24,8 +28,11 @@ class MyCondition : public Condition {
 
 class MainSequence : public Sequence {
  public:
-  MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), stepA("step A", this), eSeq("exception sequence", this), m("myMonitor", this, cond, SequenceProp::resume, &eSeq) { 
+  MainSequence(std::string name, Sequencer& seq) 
+      : Sequence(name, seq), stepA("step A", this), eSeq("exception sequence", this), 
+        m("myMonitor", this, cond, SequenceProp::resume, &eSeq) { 
     setTimeoutTime(10.0);
+    setTimeoutExceptionSequence(eSeq);
     setTimeoutBehavior(SequenceProp::abort);
     addMonitor(&m);
   }
@@ -51,10 +58,8 @@ void signalHandler(int signum) {
 
 int main(int argc, char **argv) {
   signal(SIGINT, signalHandler);
-  StreamLogWriter w(std::cout);
-//   w.show(LogLevel::TRACE);
-  Logger::setDefaultWriter(&w);
-  Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
   log.info() << "Sequencer example started...";
   
   auto& sequencer = Sequencer::instance();

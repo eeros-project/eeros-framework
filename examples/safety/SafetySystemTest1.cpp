@@ -20,9 +20,8 @@ void signalHandler(int signum) {
 int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
 	
-	StreamLogWriter w(std::cout);
-	Logger::setDefaultWriter(&w);
-	Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
 	
 	log.info() << "Safety System Example started...";
 	

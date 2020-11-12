@@ -39,9 +39,8 @@ class SafetyPropertiesTest : public SafetyProperties {
 };
 
 int main() {
-  StreamLogWriter w(std::cout);
-  Logger::setDefaultWriter(&w);
-  Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
   log.info() << "Pathplanner constant acceleration started...";
   
   ControlSystem cs;

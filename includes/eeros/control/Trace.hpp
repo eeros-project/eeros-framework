@@ -102,7 +102,8 @@ std::ostream& operator<<(std::ostream& os, Trace<T>& trace) {
 template < typename T = double >
 class TraceWriter : public eeros::Thread {
 public:
-  explicit TraceWriter(Trace<T>& trace, std::string fileName, int priority = 5) : Thread(priority), trace(trace), name(fileName) { }
+  explicit TraceWriter(Trace<T>& trace, std::string fileName, int priority = 5) 
+      : Thread(priority), trace(trace), name(fileName), log(logger::Logger::getLogger()) { }
   ~TraceWriter() {running = false;}
   void write() {go = true;}
   
@@ -133,8 +134,8 @@ private:
     }
   }
   Trace<T>& trace;
-  eeros::logger::Logger log;
   std::string name;
+  logger::Logger log;
 };
 
 };

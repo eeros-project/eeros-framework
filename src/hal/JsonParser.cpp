@@ -15,11 +15,9 @@
 using namespace eeros;
 using namespace eeros::hal;
 
-JsonParser::JsonParser() :
-	log('H') { 
-}
+JsonParser::JsonParser() : log(logger::Logger::getLogger('J')) { }
 
-JsonParser::JsonParser(std::string filePath) : log('H') {
+JsonParser::JsonParser(std::string filePath) : log(logger::Logger::getLogger('J')) {
 	std::string err;
 	
 	if (filePath == "") throw eeros::Fault("no configuration file given");

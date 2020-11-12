@@ -90,9 +90,8 @@ SafetyPropertiesTest::SafetyPropertiesTest(ControlSystem& cs) :
 }
 
 int main(int argc, char **argv) {
-  StreamLogWriter w(std::cout);
-  Logger::setDefaultWriter(&w);
-  Logger log;
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
    
   log.info() << "Block Test 2 started...";
    

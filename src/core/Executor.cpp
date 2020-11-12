@@ -95,7 +95,9 @@ void createThread(Logger &log, task::Periodic &task, task::Periodic &baseTask, s
 }
 
 Executor::Executor() 
-    : period(0), mainTask(nullptr), syncWithEtherCatStackIsSet(false), syncWithRosTimeIsSet(false), syncWithRosTopicIsSet(false), log('E') { }
+    : period(0), mainTask(nullptr), syncWithEtherCatStackIsSet(false), 
+      syncWithRosTimeIsSet(false), syncWithRosTopicIsSet(false), 
+      log(logger::Logger::getLogger('E')) { }
 
 Executor::~Executor() { }
 

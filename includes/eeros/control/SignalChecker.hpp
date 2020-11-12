@@ -58,7 +58,8 @@ class SignalChecker : public Block1i<Tsig> {
       fired(false),
       safetySystem(nullptr),
       safetyEvent(nullptr),
-      activeLevel(nullptr) {}
+      activeLevel(nullptr),
+      log(logger::Logger::getLogger()) {}
 
 
   /**
