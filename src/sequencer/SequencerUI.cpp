@@ -6,7 +6,6 @@
 #include <arpa/inet.h> 		/* inet_ntoa() to format IP address */
 #include <string.h>
 #include <sys/socket.h>
-#include <iostream>
 #include <cstring>
 #include <signal.h>
 
@@ -16,17 +15,15 @@ namespace sequencer {
 
 void sigPipeHandler(int signum) {std::cout << "SIGPIPE received" << std::endl; }
 
-SequencerUI::SequencerUI() : log('U') {
+SequencerUI::SequencerUI() : log(logger::Logger::getLogger('U')) {
   this->port = 7799;
   this->period = 0.01;
   signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application
-  running = false;
+  running = true;
   fut = std::async(std::launch::async, &SequencerUI::run, this);
 }
   
-SequencerUI::~SequencerUI() {
-  running = false;
-}
+SequencerUI::~SequencerUI() {running = false;}
     
 bool SequencerUI::isRunning() {
   return running;
@@ -53,7 +50,6 @@ void SequencerUI::run() {
   struct sockaddr_in cliAddr;
   clilen = sizeof(cliAddr);
   
-  running = true;
   while (running) {
     fd_set fds;
     FD_ZERO (&fds);
@@ -109,6 +105,7 @@ void SequencerUI::run() {
     }
   }
   close(sockfd);
+  log.info() << "SequencerUI thread stopped";
 }
 
 } // namespace sequencer

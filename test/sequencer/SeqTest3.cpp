@@ -21,7 +21,7 @@ class Step1 : public Step {
 };
 
 class MyCondition : public Condition {
-  bool validate() {return count > 2;}
+  bool validate() {return count > 2 && count < 100;}
 };
 
 class ExceptionSeq : public Sequence {
@@ -81,7 +81,7 @@ TEST(seqTest3, condition) {
   mainSeq.m.setBehavior(SequenceProp::abort);
   mainSeq();
   sequencer.wait();
-  EXPECT_EQ(count, 103);
+  EXPECT_EQ(count, 105);
   EXPECT_EQ(eCount, 1);
   count = 0;
   eCount = 0;

@@ -9,7 +9,7 @@ namespace sequencer {
 std::atomic<bool> Sequencer::running(true);
 int Sequencer::sequenceCount = 0;
 
-Sequencer::Sequencer() : log('B'), stepping(false), nextStep(false) {
+Sequencer::Sequencer() : log(logger::Logger::getLogger('R')), stepping(false), nextStep(false) {
   running = true;
 }
 

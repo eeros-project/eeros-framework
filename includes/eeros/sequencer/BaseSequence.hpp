@@ -58,7 +58,21 @@ class BaseSequence {
    */  
   virtual ~BaseSequence();
   
+  /** 
+   * Before a sequence or step can run, its precondition must be checked. The sequence
+   * or step will run only in case that this check returns true.
+   * 
+   * @return - true if condition is met
+   */
   virtual bool checkPreCondition();
+
+  /** 
+   * A sequence or step will execute its action and subsequenctly wait for the 
+   * exit condition to become true. It will block as long as the check for the 
+   * exit condition returns false.
+   * 
+   * @return - true if condition is met
+   */
   virtual bool checkExitCondition();
   
   void setName(std::string name);

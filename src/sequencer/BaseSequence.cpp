@@ -9,10 +9,10 @@ namespace sequencer {
 BaseSequence::BaseSequence(BaseSequence* caller, bool blocking) : BaseSequence(caller->seq, caller, blocking) { }
 
 BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking) 
-    : seq(seq), caller(caller), blocking(blocking), state(SequenceState::idle), log('X'), 
+    : seq(seq), caller(caller), blocking(blocking), state(SequenceState::idle), log(logger::Logger::getLogger('X')), 
       monitorTimeout("timeout", this, conditionTimeout, SequenceProp::abort), monitorAbort("abort", this, conditionAbort, SequenceProp::abort),
       pollingTime(100) {
-  if (caller != nullptr) {
+  if (caller != nullptr && blocking) {  // monitors work on all callees of this sequence as long as they are blocking
     callerStack = caller->callerStack;
   }
   callerStack.insert(callerStack.begin(), this); // add this sequence at the front
@@ -132,6 +132,8 @@ BaseSequence* BaseSequence::checkMonitor(Monitor* m) {
       m->startExceptionSequence();  // start only if not yet in exception processing, blocking
       owner->inExcProcessing = false;
       switch (m->getBehavior()) {
+        // resetting monitorFired is tricky, it should happen in case of abort and restart only after all 
+        // callees of the owner have aborted, else it will trigger when this callees abort
         case SequenceProp::resume: owner->state = SequenceState::running; owner->monitorFired = false; break;
         case SequenceProp::abort: owner->state = SequenceState::aborting; break;
         case SequenceProp::restart: owner->state = SequenceState::restarting; break;

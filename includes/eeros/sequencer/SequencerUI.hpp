@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_SEQUENCER_SEQUENCERUI_HPP_
 #define ORG_EEROS_SEQUENCER_SEQUENCERUI_HPP_
 
-#include <eeros/core/Thread.hpp>
+#include <eeros/logger/Logger.hpp>
 #include <future>
 
 namespace eeros {
@@ -26,7 +26,7 @@ class SequencerUI {
   int sockfd;
   int newsockfd;
   std::future<void> fut;
-  eeros::logger::Logger log;  
+  logger::Logger log;  
 };
 
 } // namespace sequencer

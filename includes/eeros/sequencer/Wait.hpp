@@ -7,7 +7,7 @@ namespace eeros {
 namespace sequencer {
 
 /**
- * This is a special step which simply wait for a given time.
+ * This is a special \ref step which simply wait for a given time.
  * 
  * @since v1.0
  */
