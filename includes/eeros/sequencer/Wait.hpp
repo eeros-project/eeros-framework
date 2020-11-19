@@ -7,7 +7,7 @@ namespace eeros {
 namespace sequencer {
 
 /**
- * This is a special \ref step which simply wait for a given time.
+ * This is a special \ref Step which simply wait for a given time.
  * 
  * @since v1.0
  */
@@ -27,11 +27,6 @@ public:
    */
   Wait(const Wait& s) = delete; 
 
-  /**
-   * Destructor
-   */  
-  virtual ~Wait() { };
-  
   /**
    * Operator for function calls. Sets the waiting time and starts waiting.
    * 

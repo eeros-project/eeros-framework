@@ -18,20 +18,21 @@ double period = 0.1;
 
 class ControlSystem {
  public:
-  ControlSystem() : pp(50.0, 1.0, period) {
+  ControlSystem() : pp(50.0, 1.0, period), td("td", period, true) {
     pp.setName("ppcj");
     pp.getPosOut().getSignal().setName("pp pos out");
     pp.getVelOut().getSignal().setName("pp vel out");
     pp.getAccOut().getSignal().setName("pp acc out");
     pp.getJerkOut().getSignal().setName("pp jerk out");
+    td.addBlock(pp);
   }
-
   PathPlannerConstJerk<Matrix<2,1,double>> pp;
+  TimeDomain td;
 };
 
-class SafetyPropertiesTest : public SafetyProperties {
+class PPSafetyProperties : public SafetyProperties {
  public:
-  SafetyPropertiesTest() : slState1("state 1") {
+  PPSafetyProperties() : slState1("state 1") {
     addLevel(slState1);
     setEntryLevel(slState1);	
   };
@@ -44,12 +45,9 @@ int main() {
   log.info() << "Pathplanner constant jerk started...";
   
   ControlSystem cs;
-  TimeDomain td("td", period, true);
-  td.addBlock(cs.pp);
-  Periodic p1("p1", period, td);
-
-  SafetyPropertiesTest sp;
-  SafetySystem safetySys(sp, period);
+  Periodic p1("p1", period, cs.td);
+  PPSafetyProperties sp;
+  SafetySystem ss(sp, period);
     
   // create periodic function for logging
   Lambda l1 ([&] () { });
@@ -77,7 +75,7 @@ int main() {
   });
   
   auto& executor = Executor::instance();
-  executor.setMainTask(safetySys);
+  executor.setMainTask(ss);
   p1.after.push_back(p2); // make sure that logging happens after running of path planner
   executor.add(p1);
   executor.run();

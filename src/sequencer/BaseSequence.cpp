@@ -20,8 +20,6 @@ BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking)
   addMonitor(&monitorAbort);	// default monitor
 }
 
-BaseSequence::~BaseSequence() { }
-
 int BaseSequence::action() {
   int retVal = -1;
   auto& seq = Sequencer::instance();
@@ -129,7 +127,9 @@ BaseSequence* BaseSequence::checkMonitor(Monitor* m) {
       owner->monitorFired = true;
       owner->activeMonitor = m;
       owner->inExcProcessing = true;
-      m->startExceptionSequence();  // start only if not yet in exception processing, blocking
+      if (m->exceptionSequence != nullptr) {
+        m->exceptionSequence->start(); // start only if not yet in exception processing, blocking
+      }
       owner->inExcProcessing = false;
       switch (m->getBehavior()) {
         // resetting monitorFired is tricky, it should happen in case of abort and restart only after all 

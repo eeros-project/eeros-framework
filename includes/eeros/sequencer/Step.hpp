@@ -7,7 +7,7 @@ namespace eeros {
 namespace sequencer {
 
 /**
- * A \ref sequence comprises of several steps. A step is a single action.
+ * A \ref Sequence comprises of several steps. A step is a single action.
  * To define your own step you have to extend this class and implement
  * your own \ref action method. You can also choose with which parameters
  * your step should be called.
@@ -30,11 +30,6 @@ class Step : public BaseSequence {
    */
   Step(const Step& s) = delete; 
 
-  /**
-   * Destructor
-   */  
-  virtual ~Step() { };
-  
   /**
    * Operator for function calls. If you do not override this operator in a derived class, 
    * the step can be called without any parameter and will start upon calling.\n

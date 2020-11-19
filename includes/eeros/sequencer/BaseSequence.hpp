@@ -26,7 +26,7 @@ enum class SequenceState {
 };
 
 /**
- * This is the base class for all \ref sequences and \ref steps.
+ * This is the base class for all \ref Sequence and \ref Step.
  * It defines the common basic functionalities.
  * 
  * @since v1.0
@@ -35,6 +35,7 @@ class BaseSequence {
   friend class Monitor;
   friend class Sequencer;
   friend class Sequence;
+  
  public:
   /**
    * Constructs a base sequence instance.
@@ -53,11 +54,6 @@ class BaseSequence {
    */
   BaseSequence(BaseSequence* caller, bool blocking);
 
-  /**
-   * Destructor
-   */  
-  virtual ~BaseSequence();
-  
   /** 
    * Before a sequence or step can run, its precondition must be checked. The sequence
    * or step will run only in case that this check returns true.
@@ -75,23 +71,78 @@ class BaseSequence {
    */
   virtual bool checkExitCondition();
   
+  /**
+   * Sets the name of the sequence.
+   * 
+   * @param name - name of the sequence
+   */
   void setName(std::string name);
+  
+  /**
+   * Returns the name of the sequence.
+   * 
+   * @return - name of the sequence
+   */
   std::string getName() const;
-  /* 
+  
+  /** 
    * Every sequence gets a id upon creation.
+   * 
+   * @param id - id of the sequence
    */
   void setId(int id);
-  int getId() const;		// steps allways have id=-99
   
+  /**
+   * Returns the id of the sequence.
+   * 
+   * @return - id of the sequence
+   */
+  int getId() const;
+  
+  /**
+   * The function \ref checkExitCondition() periodically checks for the exit 
+   * condition to become true. In between checks the thread will wait for 
+   * polling time in ms.
+   * 
+   * @param timeInMilliseconds - polling time in ms
+   */
   void setPollingTime(int timeInMilliseconds);
   
-  // Monitors
+  /**
+   * Adds a \ref Monitor to this sequence or step.
+   * 
+   * @param monitor - Monitor
+   */
   void addMonitor(Monitor* monitor);
   
-  // Timeout
-  void setTimeoutTime(double timeoutInSec);		// in seconds. For this sequence
+  /**
+   * Sets the timeout of the timeout monitor. Each sequence owns such a timeout 
+   * \ref Monitor.
+   * 
+   * @param timeoutInSec - timeout time in s
+   */
+  void setTimeoutTime(double timeoutInSec);
+  
+  /**
+   * Reset the timeout of the timeout monitor. Each sequence owns such a timeout 
+   * \ref Monitor.
+   */
   void resetTimeout();
+
+  /**
+   * Sets the behavior of the timeout monitor. Each sequence owns such a timeout 
+   * \ref Monitor. The behavior can be one of the following: \ref SequenceProp.
+   * 
+   * @param behavior - SequenceProp
+   */
   void setTimeoutBehavior(SequenceProp behavior);	
+
+  /**
+   * Sets an exception sequence for the timeout monitor. Each sequence owns such a timeout 
+   * \ref Monitor. The exception sequence will be executed when the monitor fires.
+   * 
+   * @param sequence - exception sequence
+   */
   void setTimeoutExceptionSequence(BaseSequence& sequence);
   
   /**

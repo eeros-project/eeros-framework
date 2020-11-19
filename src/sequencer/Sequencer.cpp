@@ -13,8 +13,6 @@ Sequencer::Sequencer() : log(logger::Logger::getLogger('R')), stepping(false), n
   running = true;
 }
 
-Sequencer::~Sequencer() { }
-
 Sequencer& Sequencer::instance() {
   static Sequencer seq;
   return seq;

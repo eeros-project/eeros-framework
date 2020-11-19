@@ -9,12 +9,6 @@ Monitor::Monitor(std::string name, BaseSequence* owner, Condition& condition, Se
 
 Monitor::~Monitor() { }
 
-void Monitor::startExceptionSequence() {
-  if (exceptionSequence != nullptr) {
-    exceptionSequence->start();
-  }
-}
-
 void Monitor::setBehavior(SequenceProp behavior) {
   this->behavior = behavior;
 }

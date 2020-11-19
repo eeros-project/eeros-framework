@@ -9,14 +9,17 @@ namespace sequencer {
 class BaseSequence;
 class Condition;
 
+/**
+ * Sequence properties, actions to be taken when a monitor fires.
+ */
 enum class SequenceProp {
-  resume,				// continue (only exception sequence is called, if available)
+  resume, /// continue (only exception sequence is called, if available)
   abort,				// abort the owner sequence or step of this monitor
   restart				// restart the owner sequence or step of this monitor
 };
 
 /**
- * A monitor checks its associated \ref condition whenever its owning \ref sequence or \ref step
+ * A monitor checks its associated \ref Condition whenever its owning \ref Sequence or \ref Step
  * runs. When a monitor fires it will cause its exception sequence to run (if defined). Subsequently 
  * it will return to its owning sequence. It could simply resume this sequence, which means that it will continue
  * where it was interrupted by the monitor. It could abort the rest of the sequence or it could restart the whole 
@@ -78,13 +81,12 @@ class Monitor {
   BaseSequence* getOwner() const;
   
  protected:
-  bool checkCondition();
-  void startExceptionSequence();
-  BaseSequence* owner;	// every monitor has an owner, sequence property of monitor determines what owner does
-  BaseSequence* exceptionSequence;
-  Condition& condition;
-  SequenceProp behavior;
-  std::string name;
+  bool checkCondition();  ///< checks the condition
+  BaseSequence* owner;  ///< every monitor has an owner, sequence property of monitor determines what owner does
+  BaseSequence* exceptionSequence;  ///< associated exception sequence
+  Condition& condition;  ///< condition which will fire this monitor
+  SequenceProp behavior;  ///< behavior of monitor, either abort, resume or restart
+  std::string name;  ///< sequence name
 };
 
 /********** Print functions **********/

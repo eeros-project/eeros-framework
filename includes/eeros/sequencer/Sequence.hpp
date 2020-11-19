@@ -11,7 +11,7 @@ namespace sequencer {
 class Sequencer;
 
 /**
- * A \ref sequence comprises of several steps defined in its action function.
+ * A \ref Sequence comprises of several steps defined in its action function.
  * To define your own sequence you have to extend this class and implement
  * your own \ref action method. You can also choose with which parameters
  * your sequence should be called.
@@ -30,7 +30,7 @@ class Sequence : public BaseSequence {
    * @see Sequence(std::string name, BaseSequence* caller, bool blocking)
    *
    * @param name - name of the step
-   * @param caller - calling sequence
+   * @param seq - sequencer which handles this sequence
    */
   Sequence(std::string name, Sequencer& seq);	// only for mainSequence
 
@@ -51,11 +51,6 @@ class Sequence : public BaseSequence {
    * Disabling use of copy constructor because a sequence should never be copied unintentionally.
    */
   Sequence(const Sequence& s) = delete; 
-  
-  /**
-   * Destructor
-   */  
-  virtual ~Sequence() { }
   
   /**
    * Operator for function calls. If you do not override this operator in a derived class, 

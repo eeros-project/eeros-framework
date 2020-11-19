@@ -26,8 +26,9 @@ void signalHandler(int signum) {
 int main(int argc, char **argv) {
   signal(SIGINT, signalHandler);
   
-  Logger::setDefaultStreamLogger(std::cout);
-  Logger log = Logger::getLogger();
+  Logger::setDefaultStreamLogger(std::cout, "/tmp/mock");
+  Logger log = Logger::getLogger('M');
+//   log.show();
   
   log.info() << "Mock robot example started...";
   
@@ -43,7 +44,7 @@ int main(int argc, char **argv) {
   MainSequence mainSeq("Main Sequence", sequencer, cs, ss, sp);
   mainSeq();
   
-  eeros::task::Lambda l1 ([&] () {log.warn() << "robot at " << cs.iX.getOut().getSignal().getValue() << "/" << cs.iY.getOut().getSignal().getValue();});
+  eeros::task::Lambda l1 ([&] () {log.warn() << "robot at " << cs.sw.getOut().getSignal().getValue();});
   Periodic periodic("per1", 0.5, l1);
   executor.add(periodic);
   executor.run();

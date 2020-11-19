@@ -13,7 +13,7 @@ class Sequence;
 class SequencerUI;
 
 /**
- * The sequencer keeps a list of all \ref sequences. It allows to abort all running sequences
+ * The sequencer keeps a list of all \ref Sequence. It allows to abort all running sequences
  * and can wait for all sequences to finish running. Further it is possible to do single stepping
  * of sequences with the aid of a simple user interface.
  * 
@@ -25,11 +25,7 @@ class Sequencer {
   friend class SequencerUI;
   
  public:
-  /**
-   * Destructor
-   */  
-  virtual ~Sequencer();
-  
+
   /**
    * Returns a sequencer instance. When first called it will initially create such an instance.
    * Subsequent calls will return this initial instance.

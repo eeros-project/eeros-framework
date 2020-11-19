@@ -30,7 +30,7 @@ class PeripheralOutput : public Block1i<T> {
     systemOutput->set(val);
     systemOutput->setTimestampSignalIn(this->in.getSignal().getTimestamp());
     if (isSafe) throw NaNOutputFault("NaN written to output '" + 
-                                     this->getName() + "', set to safe level is safe level is defined");
+                                     this->getName() + "', set to safe level if safe level is defined");
   }
             
   virtual T getValue () {

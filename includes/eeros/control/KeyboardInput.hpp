@@ -12,31 +12,32 @@ using namespace eeros::math;
 using namespace eeros::hal;
 
 namespace eeros {
-	namespace control {
+namespace control {
 
-		class KeyboardInput: public Block1o<Vector4> {
-		public:
-			KeyboardInput(int priority = 5);
-			virtual ~KeyboardInput();
+class KeyboardInput: public Block1o<Vector4> {
+ public:
+  KeyboardInput(int priority = 20);
+  virtual ~KeyboardInput();
 
-			Output<Vector<5,bool>>& getIsHomed();
-			Output<bool>& getEsc();
-			Output<bool>& getEmergency();
-			Output<bool>& getReset();
-			Output<bool>& getStart();
-			Output<bool>& getStop();
-			virtual void run();
-			
-		protected:
-			Keyboard k;
-			Output<Vector<5,bool>> isHomed;
-			Output<bool> esc;
-			Output<bool> emergency;
-			Output<bool> reset;
-			Output<bool> start;
-			Output<bool> stop;
-		};
-	};
+  Output<Vector<5,bool>>& getIsHomed();
+  Output<bool>& getEsc();
+  Output<bool>& getEmergency();
+  Output<bool>& getReset();
+  Output<bool>& getStart();
+  Output<bool>& getStop();
+  virtual void run();
+  
+ protected:
+  Keyboard k;
+  Output<Vector<5,bool>> isHomed;
+  Output<bool> esc;
+  Output<bool> emergency;
+  Output<bool> reset;
+  Output<bool> start;
+  Output<bool> stop;
 };
+
+}
+}
 
 #endif /* ORG_EEROS_CONTROL_KEYBOARDINPUT_HPP_ */

@@ -28,9 +28,9 @@ class ControlSystem {
   SignalChecker<> checker;
 };
 
-class SafetyPropertiesTest : public SafetyProperties {
+class TestSafetyProperties : public SafetyProperties {
  public:
-  SafetyPropertiesTest(ControlSystem& cs, double ts) 
+  TestSafetyProperties(ControlSystem& cs, double ts) 
       : cs(cs),
         seStartRampingUp("start ramping up"),
         seReset("reset"),
@@ -71,14 +71,14 @@ int main() {
   Logger::setDefaultStreamLogger(std::cout);
   Logger log = Logger::getLogger();
   
-  log.info() << "Safety System Example 2 started...";
+  log.info() << "System test 3 started...";
   
   // Create and initialize safety system
   double period = 0.01;
   ControlSystem cs;
-  SafetyPropertiesTest sp(cs, period);
-  SafetySystem safetySys(sp, period);
-  cs.checker.registerSafetyEvent(safetySys, sp.seReset);
+  TestSafetyProperties sp(cs, period);
+  SafetySystem ss(sp, period);
+  cs.checker.registerSafetyEvent(ss, sp.seReset);
   cs.checker.setActiveLevel(sp.slRampingUp);
   
   TimeDomain td("td1", 0.5, true);
@@ -93,7 +93,7 @@ int main() {
   
   // Create and run executor
   auto& executor = eeros::Executor::instance();
-  executor.setMainTask(safetySys);
+  executor.setMainTask(ss);
   executor.add(periodic);
   executor.run();
   

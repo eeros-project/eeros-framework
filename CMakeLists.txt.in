@@ -5,7 +5,7 @@ project(libucl-download NONE)
 include(ExternalProject)
 ExternalProject_Add(libucl
   GIT_REPOSITORY    https://github.com/eeros-project/libucl.git
-  GIT_TAG           d951a3b57d9111cd8bf5870ced3c673c928ba062
+  GIT_TAG           e9c9bb6b1c9f01d95bf73386e69c46ac91d7a556
   SOURCE_DIR        "${EEROS_BINARY_DIR}/libucl-src"
   BINARY_DIR        "${EEROS_BINARY_DIR}/libucl-build"
   CONFIGURE_COMMAND ""

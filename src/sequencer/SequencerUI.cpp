@@ -25,10 +25,6 @@ SequencerUI::SequencerUI() : log(logger::Logger::getLogger('U')) {
   
 SequencerUI::~SequencerUI() {running = false;}
     
-bool SequencerUI::isRunning() {
-  return running;
-}
-  
 void SequencerUI::run() {	
   log.info() << "SequencerUI thread started";
   struct sockaddr_in servAddr;

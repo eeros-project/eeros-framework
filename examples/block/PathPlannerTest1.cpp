@@ -4,7 +4,7 @@
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/task/Periodic.hpp>
 #include <eeros/core/Executor.hpp>
-#include <eeros/control/PathPlannerCubic.hpp>
+#include <eeros/control/PathPlannerConstAcc.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/task/Lambda.hpp>
 
@@ -15,25 +15,24 @@ using namespace eeros::control;
 using namespace eeros::task;
 using namespace eeros::math;
 
-double period = 0.01;
+double period = 0.1;
 
 class ControlSystem {
  public:
-  ControlSystem() : pp(period) {
-    pp.setName("ppcubic");
+  ControlSystem() : pp(1.0, 0.2, 0.2, period), td("td", period, true) {
+    pp.setName("ppca");
     pp.getPosOut().getSignal().setName("pp pos out");
     pp.getVelOut().getSignal().setName("pp vel out");
     pp.getAccOut().getSignal().setName("pp acc out");
-    pp.getJerkOut().getSignal().setName("pp jerk out");
-    pp.init("path.txt");
+    td.addBlock(pp);
   }
-
-  PathPlannerCubic pp;
+  PathPlannerConstAcc<Matrix<2,1,double>> pp;
+  TimeDomain td;
 };
 
-class SafetyPropertiesTest : public SafetyProperties {
+class PPSafetyProperties : public SafetyProperties {
  public:
-  SafetyPropertiesTest() : slState1("state 1") {
+  PPSafetyProperties() : slState1("state 1") {
     addLevel(slState1);
     setEntryLevel(slState1);	
   };
@@ -41,42 +40,42 @@ class SafetyPropertiesTest : public SafetyProperties {
 };
 
 int main() {
-//   StreamLogWriter w(std::cout);
   Logger::setDefaultStreamLogger(std::cout);
   Logger log = Logger::getLogger();
-  log.info() << "Pathplanner cubic splines test started...";
+  log.info() << "Pathplanner constant acceleration started...";
   
   ControlSystem cs;
-  TimeDomain td("td", period, true);
-  td.addBlock(cs.pp);
-  Periodic p1("p1", period, td);
-
-  SafetyPropertiesTest sp;
-  SafetySystem safetySys(sp, period);
+  Periodic p1("p1", period, cs.td);
+  PPSafetyProperties sp;
+  SafetySystem ss(sp, period);
     
   // create periodic function for logging
   Lambda l1 ([&] () { });
   Periodic p2("p2", period, l1);
   p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
     static int count = 0;
-    log.info() << cs.pp.getJerkOut().getSignal().getTimestamp() << "  "
-               << cs.pp.getJerkOut().getSignal().getValue() << "  " 
-               << cs.pp.getAccOut().getSignal().getValue() << "  " 
+    log.info() << cs.pp.getAccOut().getSignal().getValue() << "  " 
                << cs.pp.getVelOut().getSignal().getValue() << "  " 
                << cs.pp.getPosOut().getSignal().getValue();
     if (count == 3) {
-      log.warn() << "start trajectory";
-      cs.pp.move(0);
+      Matrix<2,1,double> start{0, 0}, end{-5, 10};
+      log.warn() << "start trajectory from " << start << " to " << end;
+      cs.pp.move(start, end);
     }
-    if (count == 150) {
-      log.warn() << "start trajectory";
-      cs.pp.move(3, 10, 20);
+    if (count == 200) {
+      Matrix<2,1,double> start{15, -30}, end{5, 20};
+      log.warn() << "start trajectory from " << start << " to " << end;
+      cs.pp.setStart(start);
+      cs.pp.setMaxSpeed({3, 3});
+      cs.pp.setMaxAcc({0.5, 0.5});
+      cs.pp.setMaxDec({0.5, 0.5});
+      cs.pp.move(end);
     }
     count++;
   });
   
   auto& executor = Executor::instance();
-  executor.setMainTask(safetySys);
+  executor.setMainTask(ss);
   p1.after.push_back(p2); // make sure that logging happens after running of path planner
   executor.add(p1);
   executor.run();

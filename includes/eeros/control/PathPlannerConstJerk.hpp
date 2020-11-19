@@ -41,8 +41,7 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 4> {
    * The sampling time must be set to the time with which the timedomain containing this block will run.
    *
    * @param velMax - maximum velocity
-   * @param accMax - maximum acceleration
-   * @param decMax - maximum deceleration
+   * @param jerk - constant jerk
    * @param dt - sampling time
    */
   PathPlannerConstJerk(T velMax, T jerk, double dt) 
@@ -293,9 +292,9 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 4> {
   virtual void setMaxVel(T max) {velMax = max;}
   
   /**
-   * Sets the maximum value for the acceleration. The maximum acceleration is used for the start of the trajectory.
+   * Sets the value for the jerk. This value is held constant.
    *
-   * @param max - maximum acceleration
+   * @param val - constant jerk
    */
   virtual void setJerk(T val) {jerk = val;}
   

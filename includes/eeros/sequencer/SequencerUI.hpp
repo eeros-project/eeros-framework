@@ -9,14 +9,28 @@ namespace sequencer {
     
 void sigPipeHandler(int signum);
 
+/**
+ * The \ref Sequencer can be remotely controlled by this simple user interface.
+ * This utility opens a network connection and controls then running of the registered 
+ * sequences in the sequencer. Sequences can be stopped, single stepped or continued.
+ * 
+ * @since v1.0
+ */
+
 class SequencerUI {
  public:
+   
+  /**
+   * Creates and handles a socket connection to a user interface for the sequencer. 
+   * Runs in its own thread.
+   */
   SequencerUI();
   
+  /**
+   * Destructor, stops the thread.
+   */
   virtual ~SequencerUI();
-  
-  virtual bool isRunning();
-  
+   
  private:
   virtual void run();
   bool running;

@@ -5,11 +5,11 @@
 
 namespace eeros {
 namespace logger {
+  
 enum class LogLevel;
 
 class Writer {
- public:
-  virtual ~Writer() { }
+ protected:
   virtual void begin(std::ostringstream& os, LogLevel level, unsigned category) = 0;
   virtual void end(std::ostringstream& os) = 0;
 };
