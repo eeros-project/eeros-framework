@@ -1,3 +1,3 @@
 #include <eeros/logger/Logger.hpp>
 
-eeros::logger::LogWriter* eeros::logger::Logger::defaultWriter = nullptr;
+eeros::logger::Logger eeros::logger::Logger::log = getLogger(0);

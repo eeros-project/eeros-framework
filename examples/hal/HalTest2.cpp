@@ -12,11 +12,8 @@ using namespace eeros::safety;
 using namespace eeros::sequencer;
 
 int main(int argc, char **argv){
-	// Create and initialize logger
-	StreamLogWriter w(std::cout);
-	Logger::setDefaultWriter(&w);
-	Logger log;
-	w.show();
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
 	
 	log.info() << "HAL test 2 started...";
   
@@ -36,8 +33,7 @@ int main(int argc, char **argv){
 	// Sequencer
 	auto& sequencer = Sequencer::instance();
 	MyMainSequence mainSequence(sequencer, cs);
-	sequencer.addSequence(mainSequence);
-	mainSequence.start();
+	mainSequence();
 
 	// Set executor and run
 	auto &executor = Executor::instance();

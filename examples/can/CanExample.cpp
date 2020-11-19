@@ -23,10 +23,8 @@ int main(int argc, char **argv) {
   double dt = 0.2;
   signal(SIGINT, signalHandler);
   
-  StreamLogWriter w(std::cout);
-  Logger::setDefaultWriter(&w);
-  Logger log;
-//   w.show();
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger('M');
 
   log.info() << "CAN test start";
 
@@ -35,13 +33,13 @@ int main(int argc, char **argv) {
   SafetySystem ss(sp, dt);
   auto& sequencer = Sequencer::instance();
   MainSequence mainSeq("Main Sequence", sequencer, cs, ss, sp);
-  sequencer.addSequence(mainSeq);
-  mainSeq.start();
+  mainSeq();
     
   auto& executor = Executor::instance();
   executor.setMainTask(ss);
   executor.run();
 
+  sequencer.wait();
   log.info() << "CAN test end";	
   return 0;
 }

@@ -1,4 +1,4 @@
-#include <eeros/logger/SysLogWriter.hpp>
+// #include <eeros/logger/SysLogWriter.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/math/Matrix.hpp>
@@ -12,14 +12,13 @@ using namespace eeros::math;
 using namespace eeros::safety;
 
 int main() {
-  // Create and initialize logger
-  StreamLogWriter w(std::cout, "/tmp/log");
+  Logger::setDefaultStreamLogger(std::cout, "/tmp/log");
 //  SysLogWriter w("LoggerTest1");
-  Logger::setDefaultWriter(&w);
-  Logger log;
-  w.show(LogLevel::TRACE);
+//   Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
+  log.show();
 
-  log.info() << "Logger Test 1 started...";
+  log.info() << "Logger Test started...";
   log.info() << "eeros " << Version::string;
     
   log.trace() << "This is a debug message...";
@@ -53,5 +52,5 @@ int main() {
   SafetyEvent event("test event");
   log.info() << "Safety event: " << event;
   
-  log.info() << "Logger Test 1 finished...";
+  log.info() << "Logger Test finished...";
 }

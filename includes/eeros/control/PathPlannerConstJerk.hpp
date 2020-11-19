@@ -3,12 +3,9 @@
 
 #include <eeros/control/Output.hpp>
 #include <eeros/control/TrajectoryGenerator.hpp>
-#include <eeros/logger/Logger.hpp>
 #include <eeros/core/System.hpp>
 #include <cmath>
 #include <mutex>
-
-using namespace eeros::logger;
 
 namespace eeros {
 namespace control {
@@ -44,8 +41,7 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 4> {
    * The sampling time must be set to the time with which the timedomain containing this block will run.
    *
    * @param velMax - maximum velocity
-   * @param accMax - maximum acceleration
-   * @param decMax - maximum deceleration
+   * @param jerk - constant jerk
    * @param dt - sampling time
    */
   PathPlannerConstJerk(T velMax, T jerk, double dt) 
@@ -296,9 +292,9 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 4> {
   virtual void setMaxVel(T max) {velMax = max;}
   
   /**
-   * Sets the maximum value for the acceleration. The maximum acceleration is used for the start of the trajectory.
+   * Sets the value for the jerk. This value is held constant.
    *
-   * @param max - maximum acceleration
+   * @param val - constant jerk
    */
   virtual void setJerk(T val) {jerk = val;}
   
@@ -348,7 +344,6 @@ class PathPlannerConstJerk : public TrajectoryGenerator<T, 4> {
     a5p, b5p, c5p, d5p, b5v, c5v, d5v, c5a, d5a, d5j; 
   T endPos;
   std::mutex mtx;
-  Logger log;
 };
 
 /**

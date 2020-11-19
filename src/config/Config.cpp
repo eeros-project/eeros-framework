@@ -109,7 +109,7 @@ void Config::add(const std::string name, std::string &value) {
       val = value;
     },
     [&value] (const std::string name, const std::string val) -> void {
-      if (value.size() > 0) value = val.substr(1,val.size() - 1);
+      if (val.size() > 0) value = val.substr(1,val.size() - 1);
       else value = "";
     }
   };
