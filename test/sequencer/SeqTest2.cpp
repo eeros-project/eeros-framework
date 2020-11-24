@@ -19,21 +19,12 @@ class Step1 : public Step {
   int count = 0;
 };
 
-// class Step2 : public Step {
-//  public:
-//   Step2(std::string name, BaseSequence* caller) : Step(name, caller) { }
-//   bool checkPreCondition() {return count == 10);
-//   int action() {count++; return count;}
-//   int count = 0;
-// };
-
 class MainSequence : public Sequence {
  public:
   MainSequence(std::string name, Sequencer& seq) : Sequence(name, seq), step("step", this) { }
-    
   int action() {
     int count = 0;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 50; i++) {
       count = step();
       if (count == 3) kill(getpid(), SIGINT);
     }
