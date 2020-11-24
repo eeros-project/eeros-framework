@@ -111,8 +111,6 @@ Executor& Executor::instance() {
 void Executor::syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack) {
   syncWithEtherCatStackIsSet = true;
   this->etherCATStack = etherCATStack;
-  cv = etherCATStack->getConditionalVariable();
-  m = etherCATStack->getMutex();
 }
 #endif
 
@@ -176,7 +174,7 @@ void Executor::stop() {
   auto &instance = Executor::instance();
     (void)instance;
 #ifdef USE_ETHERCAT
-  if(instance.etherCATStack) instance.cv->notify_one();
+  if(instance.etherCATStack) instance.etherCATStack->newDataAvailable.close();
 #endif
 }
 
@@ -264,10 +262,7 @@ void Executor::run() {
     useDefaultExecutor = false;
     
     while (running) {
-      std::unique_lock<std::mutex> lk(*m);
-      cv->wait(lk);
-      lk.unlock();
-
+      etherCATStack->newDataAvailable.receive();
       counter.tick();
       taskList.run();
       if (mainTask != nullptr)
