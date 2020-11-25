@@ -90,7 +90,7 @@ TEST(controlTransitionSimpleTest, vector) {
 	t1.outBlock.run();
 	EXPECT_EQ(t1.outBlock.getOut().getSignal().getValue()[0], 0);
 	for (int i = 0; i < 5; i++) {
-		EXPECT_TRUE(t1.outBlock.getOut().getSignal().getTimestamp(), start + i * (end - start) / 5, 20));
+		EXPECT_TRUE(Utils::compareApprox(t1.outBlock.getOut().getSignal().getTimestamp(), start + i * (end - start) / 5, 20));
 		EXPECT_TRUE(Utils::compareApprox(t1.outBlock.getOut().getSignal().getValue()[0], i * 0.2, 0.001));
 		EXPECT_TRUE(Utils::compareApprox(t1.outBlock.getOut().getSignal().getValue()[1], i * 0.4, 0.001));
 		t1.outBlock.run();
