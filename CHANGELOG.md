@@ -4,8 +4,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Unreleased
-(v1.2.0 targeted for 2020-03-31) ([GitHub compare v1.1.0...master](https://github.com/eeros-project/eeros-framework/compare/v1.1.0...master))
+## v1.2.0
+(2020-11-25) ([GitHub compare v1.1.0...v1.2.0](https://github.com/eeros-project/eeros-framework/compare/v1.1.0...v1.2.0))
+
+### Added Features
+* Add support for CANopen
+* Remove compiler warnings
+* Compile unit tests conditionally
+* Add delay block
+* Protect against unintentional copying of blocks
+* Improve runtime measurement
+* Revise path planners
+* Add initial state for integrator block
+* Improve integration of libucl library
+* Add scaling to mouse input block
+* Revise sequencer and sequences
+* Rename and rearrange examples
+* Revise logger
 
 
 ## v1.1.0
