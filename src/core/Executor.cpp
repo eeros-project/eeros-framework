@@ -22,6 +22,8 @@
 #include <ros/callback_queue.h>
 #endif
 
+#define USE_ETHERCAT
+
 volatile bool running = true;
 
 using namespace eeros;
@@ -262,7 +264,11 @@ void Executor::run() {
     useDefaultExecutor = false;
     
     while (running) {
-      etherCATStack->newDataAvailable.receive();
+      try {
+        etherCATStack->newDataAvailable.receive();
+      } catch (Channel<bool, 1>::ClosedException &ce) {
+        return; //stop if signaled by ethercat stack
+      }
       counter.tick();
       taskList.run();
       if (mainTask != nullptr)

@@ -9,6 +9,7 @@
 #include <eeros/task/Periodic.hpp>
 #include <eeros/logger/Logger.hpp>
 
+#define USE_ETHERCAT
 #ifdef USE_ETHERCAT
 #include <EcMasterlibMain.hpp>
 #endif
