@@ -273,10 +273,14 @@ enable_testing()
 
 
 ## Add subdirectories
-add_subdirectory(src)      # EEROS framework
-add_subdirectory(tools)    # Tools
-add_subdirectory(examples) # Examples
-if (USE_TESTS) 
-  message("compile unit tests")
-  add_subdirectory(test)     # Unit tests
-endif (USE_TESTS)
+add_subdirectory(src) # EEROS framework
+
+if(NOT LIB_ONLY_BUILD)
+  add_subdirectory(tools)
+  add_subdirectory(examples)
+endif(NOT LIB_ONLY_BUILD)
+
+if(USE_TESTS)
+  add_subdirectory(test)
+endif(USE_TESTS)
+
