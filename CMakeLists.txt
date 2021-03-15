@@ -4,15 +4,27 @@ project(EEROS)
 
 
 
+## Load CMake modules library
+include(cmake/CMakeModulesLibLoader.cmake)
+load_cmake_modules_lib()
+
+include("${CMAKE_MODULES_LIB_PATH}/CMakeModulesLib.cmake")
+logger_on()
+checkout_cmake_modules_lib_version(f025df9)
+
+
+
 ## Fetch the version information from git tag
-include(cmake/MunkeiVersionFromGit.cmake)
-version_from_git()
+include("${CMAKE_MODULES_LIB_PATH}/VersioningHelpers.cmake")
+setLibraryVersion()
 
 set(EEROS_VERSION_MAJOR ${VERSION_MAJOR})
 set(EEROS_VERSION_MINOR ${VERSION_MINOR})
 set(EEROS_VERSION_PATCH ${VERSION_PATCH})
 set(EEROS_VERSION_TWEAK ${VERSION_TWEAK})
 set(EEROS_VERSION ${EEROS_VERSION_MAJOR}.${EEROS_VERSION_MINOR}.${EEROS_VERSION_PATCH}.${EEROS_VERSION_TWEAK})
+
+log("Going to build EEROS v${EEROS_VERSION}")
 
 
 
