@@ -13,7 +13,7 @@ function(load_cmake_modules_lib)
   endif()
 
 
-  if(NOT LIB_CMAKE_MODULES_EXISTS)
+  if(NOT LIB_CMAKE_MODULES_CLONED)
     set(LIB_CMAKE_MODULES_URL https://github.com/andreaskunz/cmake-modules.git CACHE STRING "The path to the origin of the cmake-modules library")
 
     execute_process(COMMAND ${GIT_EXECUTABLE} clone ${LIB_CMAKE_MODULES_URL}
@@ -24,9 +24,10 @@ function(load_cmake_modules_lib)
       message(FATAL_ERROR "failed command: git clone ${LIB_CMAKE_MODULES_URL}\n ${LIB_CMAKE_MODULES_CLONE_OUTPUT}")
     endif()
 
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/cmake-modules")
+    set(LIB_CMAKE_MODULES_ROOT_PATH "${CMAKE_BINARY_DIR}/cmake-modules" CACHE PATH "Root directory path of the CMake modules library" FORCE)
+    list(APPEND CMAKE_MODULE_PATH ${LIB_CMAKE_MODULES_ROOT_PATH})
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} CACHE PATH "List of directories specifying a search path for CMake modules to be loaded" FORCE)
-    set(LIB_CMAKE_MODULES_EXISTS TRUE CACHE BOOL "TRUE if the cmake-modules library was cloned successfully")
+    set(LIB_CMAKE_MODULES_CLONED TRUE CACHE BOOL "TRUE if the cmake-modules library was cloned successfully")
   endif()
 endfunction()
 
