@@ -3,19 +3,25 @@ cmake_minimum_required(VERSION 3.10)
 project(EEROS)
 
 
+## Load CMake modules library at specified version
+set(LOAD_CMAKE_MODULES_LIB TRUE CACHE BOOL "TRUE if the cmake-modules library should be loaded.")
 
-## Load CMake modules library
-include(cmake/CMakeModulesLibLoader.cmake)
-load_cmake_modules_lib()
+if(LOAD_CMAKE_MODULES_LIB)
+  include(cmake/CMakeModulesLibLoader.cmake)
+  load_cmake_modules_lib()
+endif()
 
-include("${CMAKE_MODULES_LIB_PATH}/CMakeModulesLib.cmake")
+include(CMakeModulesLib)
 logger_on()
-checkout_cmake_modules_lib_version(f025df9)
+
+if(LOAD_CMAKE_MODULES_LIB)
+  checkout_cmake_modules_lib_version(ffb338b)
+endif()
 
 
 
 ## Fetch the version information from git tag
-include("${CMAKE_MODULES_LIB_PATH}/VersioningHelpers.cmake")
+include(VersioningHelpers)
 setLibraryVersion()
 
 set(EEROS_VERSION_MAJOR ${VERSION_MAJOR})
