@@ -15,7 +15,7 @@ include(CMakeModulesLib)
 logger_on()
 
 if(LOAD_CMAKE_MODULES_LIB)
-  checkout_cmake_modules_lib_version(ffb338b)
+  checkout_cmake_modules_lib_version(848e09a)
 endif()
 
 
