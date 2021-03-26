@@ -22,6 +22,7 @@ class KalmanFilterCorrection;
  * 
  * u -----------------------> physical system ------------------------------> y
  *     |                                                              |
+ *     |                                                              |
  *     |   ---------------------> D ---------------------             |
  *     |  |                                              |            |
  *     |  |                                              | +          | -
@@ -170,6 +171,9 @@ public:
         return out.getOut(index);
     }
 
+    /**
+     * Predict current system state
+     */
     void prediction()
     {
         std::lock_guard<std::mutex> lock(mtx);
@@ -180,6 +184,9 @@ public:
         P = Ad * P * Ad.transpose() + GdQGdT;
     }
 
+    /**
+     * Correct current system state
+     */
     void correction()
     {
         std::lock_guard<std::mutex> lock(mtx);
