@@ -90,10 +90,7 @@ public:
         : Ad(Ad), Bd(Bd), C(C), Gd(Gd), Q(Q), R(R), predict(this), correct(this)
     {
         this->D.zero();
-        eeros::math::Vector<Nr_Of_States> x;
-        x.zero();
-        this->x.getSignal().setValue(x);
-        this->out.getIn().connect(this->x);
+        this->x.zero();
         this->P.eye();
         this->eye.eye();
         this->GdQGdT = Gd * Q * Gd.transpose();
@@ -118,10 +115,7 @@ public:
                  eeros::math::Matrix<Nr_Of_Outputs, Nr_Of_Outputs> R)
         : Ad(Ad), Bd(Bd), C(C), D(D), Gd(Gd), Q(Q), R(R), predict(this), correct(this)
     {
-        eeros::math::Vector<Nr_Of_States> x;
-        x.zero();
-        this->x.getSignal().setValue(x);
-        this->out.getIn().connect(this->x);
+        this->x.zero();
         this->P.eye();
         this->eye.eye();
         this->GdQGdT = Gd * Q * Gd.transpose();
@@ -148,10 +142,8 @@ public:
                  eeros::math::Matrix<Nr_Of_Outputs, Nr_Of_Outputs> R,
                  eeros::math::Matrix<Nr_Of_States, Nr_Of_States> P,
                  eeros::math::Vector<Nr_Of_States> x)
-        : Ad(Ad), Bd(Bd), C(C), D(D), Gd(Gd), Q(Q), R(R), P(P), predict(this), correct(this)
+        : Ad(Ad), Bd(Bd), C(C), D(D), Gd(Gd), Q(Q), R(R), P(P), x(x), predict(this), correct(this)
     {
-        this->x.getSignal().setValue(x);
-        this->out.getIn().connect(this->x);
         this->eye.eye();
         this->GdQGdT = Gd * Q * Gd.transpose();
     }
@@ -166,7 +158,7 @@ public:
         return y.getIn(index);
     }
 
-    eeros::control::Output<double> &getX_hat(uint8_t index)
+    eeros::control::Output<double> &getX(uint8_t index)
     {
         return out.getOut(index);
     }
@@ -178,8 +170,9 @@ public:
     {
         std::lock_guard<std::mutex> lock(mtx);
         u.run();
-        x.getSignal().setValue(Ad * x.getSignal().getValue() + Bd * u.getOut().getSignal().getValue());
-        x.getSignal().setTimestamp(eeros::System::getTimeNs());
+        x = Ad * x + Bd * u.getOut().getSignal().getValue();
+        out.getIn().getSignal().setValue(x);
+        out.getIn().getSignal().setTimestamp(eeros::System::getTimeNs());
         out.run();
         P = Ad * P * Ad.transpose() + GdQGdT;
     }
@@ -192,6 +185,8 @@ public:
         std::lock_guard<std::mutex> lock(mtx);
         if (first)
         {
+            out.getIn().getSignal().setValue(x);
+            out.getIn().getSignal().setTimestamp(eeros::System::getTimeNs());
             out.run();
             first = false;
         }
@@ -201,9 +196,10 @@ public:
             u.run();
             CPCTR = (C * P * C.transpose() + R);
             K = P * C.transpose() * !CPCTR;
-            dy = y.getOut().getSignal().getValue() - C * x.getSignal().getValue() - D * u.getOut().getSignal().getValue();
-            x.getSignal().setValue(x.getSignal().getValue() + K * dy);
-            x.getSignal().setTimestamp(eeros::System::getTimeNs());
+            dy = y.getOut().getSignal().getValue() - C * x - D * u.getOut().getSignal().getValue();
+            x = x + K * dy;
+            out.getIn().getSignal().setValue(x);
+            out.getIn().getSignal().setTimestamp(eeros::System::getTimeNs());
             out.run();
             P = (eye - K * C) * P;
         }
@@ -214,7 +210,7 @@ public:
 
 protected:
     std::mutex mtx;
-    eeros::control::Output<eeros::math::Vector<Nr_Of_States>> x;
+    eeros::math::Vector<Nr_Of_States> x;
     eeros::math::Vector<Nr_Of_Outputs> dy;
     eeros::control::Mux<Nr_Of_Outputs> y;
     eeros::control::Mux<Nr_Of_Inputs> u;
