@@ -160,7 +160,7 @@ public:
 
     eeros::control::Output<double> &getX(uint8_t index)
     {
-        return out.getOut(index);
+        return out[index];
     }
 
     /**
@@ -171,9 +171,11 @@ public:
         std::lock_guard<std::mutex> lock(mtx);
         u.run();
         x = Ad * x + Bd * u.getOut().getSignal().getValue();
-        out.getIn().getSignal().setValue(x);
-        out.getIn().getSignal().setTimestamp(eeros::System::getTimeNs());
-        out.run();
+        for (uint8_t i = 0; i < Nr_Of_States; i++)
+        {
+            out[i].getSignal().setValue(x[i]);
+            out[i].getSignal().setTimestamp(eeros::System::getTimeNs());
+        }
         P = Ad * P * Ad.transpose() + GdQGdT;
     }
 
@@ -185,9 +187,11 @@ public:
         std::lock_guard<std::mutex> lock(mtx);
         if (first)
         {
-            out.getIn().getSignal().setValue(x);
-            out.getIn().getSignal().setTimestamp(eeros::System::getTimeNs());
-            out.run();
+            for (uint8_t i = 0; i < Nr_Of_States; i++)
+            {
+                out[i].getSignal().setValue(x[i]);
+                out[i].getSignal().setTimestamp(eeros::System::getTimeNs());
+            }
             first = false;
         }
         else
@@ -198,9 +202,11 @@ public:
             K = P * C.transpose() * !CPCTR;
             dy = y.getOut().getSignal().getValue() - C * x - D * u.getOut().getSignal().getValue();
             x = x + K * dy;
-            out.getIn().getSignal().setValue(x);
-            out.getIn().getSignal().setTimestamp(eeros::System::getTimeNs());
-            out.run();
+            for (uint8_t i = 0; i < Nr_Of_States; i++)
+            {
+                out[i].getSignal().setValue(x[i]);
+                out[i].getSignal().setTimestamp(eeros::System::getTimeNs());
+            }
             P = (eye - K * C) * P;
         }
     }
@@ -214,7 +220,7 @@ protected:
     eeros::math::Vector<Nr_Of_Outputs> dy;
     eeros::control::Mux<Nr_Of_Outputs> y;
     eeros::control::Mux<Nr_Of_Inputs> u;
-    eeros::control::DeMux<Nr_Of_States> out;
+    eeros::control::Output<double> out[Nr_Of_States];
     eeros::math::Matrix<Nr_Of_States, Nr_Of_States> Ad, P, eye, GdQGdT;
     eeros::math::Matrix<Nr_Of_States, Nr_Of_Inputs> Bd;
     eeros::math::Matrix<Nr_Of_States, Nr_Of_Outputs> K;
@@ -259,3 +265,4 @@ private:
 };
 
 #endif // ORG_EEROS_CONTROL_KALMANFILTER_HPP_
+
