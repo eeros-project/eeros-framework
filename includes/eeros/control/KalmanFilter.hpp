@@ -7,7 +7,7 @@
 #include <eeros/control/Output.hpp>
 #include <eeros/control/Mux.hpp>
 #include <eeros/control/DeMux.hpp>
-#include "IndexOutOfBoundsFault.hpp"
+#include <eeros/control/IndexOutOfBoundsFault.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <mutex>
 
