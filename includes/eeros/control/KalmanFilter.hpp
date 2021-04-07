@@ -7,12 +7,25 @@
 #include <eeros/control/Output.hpp>
 #include <eeros/control/Mux.hpp>
 #include <eeros/control/DeMux.hpp>
+#include "IndexOutOfBoundsFault.hpp"
 #include <eeros/math/Matrix.hpp>
 #include <mutex>
 
+/**
+ * Helper class to separate prediction and correction of the kalman filter.
+ * This class is used to periodically run the prediction in a timedomain.
+ * 
+ * @param owner - pointer to the owner class
+ */
 template <uint8_t Nr_Of_Inputs, uint8_t Nr_Of_Outputs, uint8_t Nr_Of_States, uint8_t Nr_Of_Random_Variables>
 class KalmanFilterPrediction;
 
+/**
+ * Helper class to separate prediction and correction of the kalman filter.
+ * This class is used to periodically run the correction in a timedomain.
+ * 
+ * @param owner - pointer to the owner class
+ */
 template <uint8_t Nr_Of_Inputs, uint8_t Nr_Of_Outputs, uint8_t Nr_Of_States, uint8_t Nr_Of_Random_Variables>
 class KalmanFilterCorrection;
 
@@ -68,11 +81,14 @@ class KalmanFilterCorrection;
  * @since v1.2
  */
 template <uint8_t Nr_Of_Inputs, uint8_t Nr_Of_Outputs, uint8_t Nr_Of_States, uint8_t Nr_Of_Random_Variables>
-class KalmanFilter
+class KalmanFilter : public eeros::control::Block
 {
 public:
     /**
-     * Constructs a kalman filter instance.
+     * Constructs a kalman filter instance by providing the matrices Ad, Bd, C, Gd, Q and R.
+     * The matrix D is set to 0 (no feed forward path).
+     * The initial state of the system x is set to 0.
+     * The initial covariance of the estimation error is set to 0.
      *
      * @param Ad - time discrete system matrix
      * @param Bd - time discrete input matrix
@@ -96,7 +112,9 @@ public:
         this->GdQGdT = Gd * Q * Gd.transpose();
     }
     /**
-     * Constructs a kalman filter instance.
+     * Constructs a kalman filter instance by providing the matrices Ad, Bd, C, D, Gd, Q and R.
+     * The initial state of the system x is set to 0.
+     * The initial covariance of the estimation error is set to 0.
      *
      * @param Ad - time discrete system matrix
      * @param Bd - time discrete input matrix
@@ -121,7 +139,7 @@ public:
         this->GdQGdT = Gd * Q * Gd.transpose();
     }
     /**
-     * Constructs a kalman filter instance.
+     * Constructs a kalman filter instance by providing the matrices Ad, Bd, C, D, Gd, Q, R and P and the vector x.
      *
      * @param Ad - time discrete system matrix
      * @param Bd - time discrete input matrix
@@ -130,7 +148,7 @@ public:
      * @param Gd - time discrete kovariance matrix of the system disturbance
      * @param Q - variance of the system noise
      * @param R - variance of the process noise
-     * @param P - initial kovariance of the estimation error
+     * @param P - initial covariance of the estimation error
      * @param x - initial state of the system
      */
     KalmanFilter(eeros::math::Matrix<Nr_Of_States, Nr_Of_States> Ad,
@@ -148,18 +166,48 @@ public:
         this->GdQGdT = Gd * Q * Gd.transpose();
     }
 
+    /**
+     * Get vector element with index index of system input vector u.
+     * 
+     * @param index - element index
+     */
     eeros::control::Input<double> &getU(uint8_t index)
     {
+        if (index < 0 || index >= Nr_Of_Inputs)
+        {
+            throw eeros::control::IndexOutOfBoundsFault("Trying to get inexistent element of system input vector u in Block " +
+                                                        this->getName() + ".");
+        }
         return u.getIn(index);
     }
 
+    /**
+     * Get vector element with index index of system output vector y.
+     * 
+     * @param index - element index
+     */
     eeros::control::Input<double> &getY(uint8_t index)
     {
+        if (index < 0 || index >= Nr_Of_Outputs)
+        {
+            throw eeros::control::IndexOutOfBoundsFault("Trying to get inexistent element of system output vector y in Block " +
+                                                        this->getName() + ".");
+        }
         return y.getIn(index);
     }
 
+    /**
+     * Get vector element with index index of system state vector x.
+     * 
+     * @param index - element index
+     */
     eeros::control::Output<double> &getX(uint8_t index)
     {
+        if (index < 0 || index >= Nr_Of_States)
+        {
+            throw eeros::control::IndexOutOfBoundsFault("Trying to get inexistent element of system state vector x in Block " +
+                                                        this->getName() + ".");
+        }
         return out[index];
     }
 
@@ -230,6 +278,14 @@ protected:
     eeros::math::Matrix<Nr_Of_Random_Variables, Nr_Of_Random_Variables> Q;
     eeros::math::Matrix<Nr_Of_Outputs, Nr_Of_Outputs> R, CPCTR;
     bool first = true;
+
+private:
+    /**
+     * This method is required because the klass inherits from eeros::control::Block,
+     * which inherits from eeros::Runnable.
+     * This run method does not do anything. Use the run methods of the helper classes instead.
+     */
+    void run(){};
 };
 
 template <uint8_t Nr_Of_Inputs, uint8_t Nr_Of_Outputs, uint8_t Nr_Of_States, uint8_t Nr_Of_Random_Variables>
@@ -265,4 +321,3 @@ private:
 };
 
 #endif // ORG_EEROS_CONTROL_KALMANFILTER_HPP_
-
