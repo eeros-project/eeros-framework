@@ -10,6 +10,7 @@ add_eeros_test_sources(I.cpp)
 add_eeros_test_sources(MAFilter.cpp)
 add_eeros_test_sources(MedianFilter.cpp)
 add_eeros_test_sources(Mul.cpp)
+add_eeros_test_sources(Mux.cpp)
 add_eeros_test_sources(PathPlannerCubic.cpp)
 add_eeros_test_sources(PathPlannerConstAcc.cpp)
 add_eeros_test_sources(PathPlannerConstJerk.cpp)
@@ -23,7 +24,7 @@ add_eeros_test_sources(Transition.cpp)
 
 # Blocks, old, delete when replaced by new tests
 add_subdirectory(d)
-add_subdirectory(mux)
+# add_subdirectory(mux)
 add_subdirectory(saturation)
 # add_subdirectory(constant)
 

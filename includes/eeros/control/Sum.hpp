@@ -38,8 +38,8 @@ class Sum : public Block1o<T> {
   Sum(const Sum& s) = delete; 
 
   /**
-  * Runs the sum block.
-  */
+   * Runs the sum block.
+   */
   virtual void run() {
     T sum; sum = 0; // TODO works only with primitive types or eeros::math::Matrix -> make specialization and use fill() for compatibility with std::array;
     if (first) {
@@ -62,21 +62,21 @@ class Sum : public Block1o<T> {
   }
   
   /**
-  * Getter function for the input with a given index.
-  * 
-  * @param index - index of input
-  * @return The input with this index
-  */
+   * Getter function for the input with a given index.
+   * 
+   * @param index - index of input
+   * @return The input with this index
+   */
   virtual Input<T>& getIn(uint8_t index) {
     if (index >= N) throw eeros::Fault("index too big in sum block '" + this->getName() + "'");
     return in[index];
   }
   
   /**
-  * Allows to negate an input meaning the its signal is subtracted from the other input signals.
-  * 
-  * @param index - index of input
-  */
+   * Allows to negate an input meaning the its signal is subtracted from the other input signals.
+   * 
+   * @param index - index of input
+   */
   virtual void negateInput(uint8_t index) {
     if (index >= N) throw eeros::Fault("index too big in sum block '" + this->getName() + "'");
     negated[index] = true;

@@ -6,22 +6,37 @@
 #include <eeros/control/Signal.hpp>
 
 namespace eeros {
-	namespace control {
+namespace control {
+        
+/**
+ * Base class for all blocks with one input.
+ * 
+ * @tparam T - input type (double - default type)
+ * @since v0.4
+ */
 
-		template < typename T = double >
-		class Block1i : public Block {
-		public:
-			Block1i() : in(this) { }
-			
-			virtual Input<T>& getIn() {
-				return in;
-			}
-		
-		protected:
-			Input<T> in;
-		};
+template < typename T = double >
+class Block1i : public Block {
+ public:
+  /**
+   * Constructs an block with one input.
+   */
+  Block1i() : in(this) { }
 
-	};
+  /**
+   * Gets the input of the block.
+   * 
+   * @return input
+   */
+  virtual Input<T>& getIn() {
+    return in;
+  }
+
+ protected:
+  Input<T> in;
 };
+
+}
+}
 
 #endif /* ORG_EEROS_CONTROL_BLOCK1I_HPP_ */

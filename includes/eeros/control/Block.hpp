@@ -16,17 +16,17 @@ namespace control {
 class Block : public Runnable {
  public:
   /**
-  * Sets the name of the block.
-  * 
-  * @tparam name - name of the block
-  */
+   * Sets the name of the block.
+   * 
+   * @tparam name - name of the block
+   */
   virtual void setName(std::string name);
 
   /**
-  * Gets the name of the block.
-  * 
-  * @return name
-  */
+   * Gets the name of the block.
+   * 
+   * @return name
+   */
   virtual std::string getName() const;
   
  private:

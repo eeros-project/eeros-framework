@@ -5,27 +5,56 @@
 #include <eeros/control/Block.hpp>
 
 namespace eeros {
-	namespace control {
+namespace control {
 
-		template < typename T = double >
-		class Output {
-		public:
-			Output() : owner(nullptr) { }
-			Output(Block* owner) : owner(owner) { }
-			
-			virtual Signal<T>& getSignal() {
-				return signal;
-			}
-			
-			virtual void setOwner(Block* block) {
-				owner = block;
-			}
-			
-		private:
-			Signal<T> signal;
-			Block* owner;
-		};
-	};
+/**
+ * Blocks can have inputs and outputs. This is the output class.
+ * An output carries a signal. One or several inputs of other blocks
+ * can be connected to this output.
+ * 
+ * @tparam T - signal type (double - default type)
+ * @since v0.4
+ */
+
+template < typename T = double >
+class Output {
+ public:
+  /**
+   * Constructs an output instance.
+   */
+  Output() : owner(nullptr) { }
+
+  /**
+   * Constructs an output instance.
+   *
+   * @param owner - the block which owns this output
+   */
+  Output(Block* owner) : owner(owner) { }
+
+  /**
+   * Returns the signal which is carried by this output.
+   * 
+   * @return signal 
+   */
+  virtual Signal<T>& getSignal() {
+    return signal;
+  }
+
+  /**
+   * Every input is owned by a block. Sets the owner of this input.
+   * 
+   * @param block - owner of this input
+   */
+  virtual void setOwner(Block* block) {
+    owner = block;
+  }
+
+ private:
+  Signal<T> signal;
+  Block* owner;
 };
+
+}
+}
 
 #endif /* ORG_EEROS_CONTROL_OUTPUT_HPP_ */
