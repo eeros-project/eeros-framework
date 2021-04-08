@@ -24,6 +24,8 @@ class SocketData: public Block1i1o<SigInType, SigOutType> { };
  * When one of the two partners stops, the connection is broken. It is automatically re-
  * establed as soon as both are running again.
  * 
+ * @tparam SigInType - type of the input signal (double - default type)
+ * @tparam SigOutType - type of the output signal (double - default type)
  * @since v1.0
  */
 
@@ -33,14 +35,14 @@ class SocketData<SigInType, SigOutType,
       : public Block1i1o<SigInType, SigOutType> {
  public:
    
-   /**
-    * Creates a SocketData block. This block can be configured either as server or client.
-    * 
-    * @param serverIP - IP number of the server, if left empty, block acts as a client
-    * @param port - port number, server and client must be opened on the same port number
-    * @param period - period in s which the thread polls the connection
-    * @param timeout - connection timeout time in s 
-    */
+  /**
+   * Creates a SocketData block. This block can be configured either as server or client.
+   * 
+   * @param serverIP - IP number of the server, if left empty, block acts as a client
+   * @param port - port number, server and client must be opened on the same port number
+   * @param period - period in s which the thread polls the connection
+   * @param timeout - connection timeout time in s 
+   */
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
     bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
     bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
@@ -51,8 +53,20 @@ class SocketData<SigInType, SigOutType,
       client = new SocketClient<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(serverIP, port, period, timeout);;
   }
   
+  /**
+   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   */
+  SocketData(const SocketData& s) = delete; 
+
+  /**
+   * Destructs the block, stops the server or client.
+   */
   virtual ~SocketData() {if (isServer) server->stop(); else client->stop();}
         
+  /**
+   * Runs the transceiving algorithm.
+   *
+   */
   virtual void run() {
     // receive
     SigOutType output; 
@@ -123,10 +137,10 @@ public:
     SigOutType output; 
     if (isServer) {
       std::array<SigOutValueType, sizeof(SigOutType) / sizeof(SigOutValueType)>& getData = server->getReceiveBuffer();
-      for (int i = 0; i < bufOutLen; i++) output(i) = getData[i];
+      for (uint32_t i = 0; i < bufOutLen; i++) output(i) = getData[i];
     } else {
       std::array<SigOutValueType, sizeof(SigOutType) / sizeof(SigOutValueType)>& getData = client->getReceiveBuffer();
-      for (int i = 0; i < bufOutLen; i++) output(i) = getData[i];
+      for (uint32_t i = 0; i < bufOutLen; i++) output(i) = getData[i];
     }
     
     // send
@@ -196,7 +210,7 @@ public:
     
     // send
     if (this->in.isConnected()) {
-      for(int i = 0; i < bufInLen; i++) sendData[i] = this->in.getSignal().getValue()(i);
+      for(uint32_t i = 0; i < bufInLen; i++) sendData[i] = this->in.getSignal().getValue()(i);
       if (isServer) server->setSendBuffer(sendData);
       else client->setSendBuffer(sendData);
     }
@@ -314,7 +328,7 @@ public:
   virtual void run() {
     // send
     if (this->in.isConnected()) {
-      for(int i = 0; i < bufInLen; i++) sendData[i] = this->in.getSignal().getValue()(i);
+      for(uint32_t i = 0; i < bufInLen; i++) sendData[i] = this->in.getSignal().getValue()(i);
       if (isServer) server->setSendBuffer(sendData);
       else client->setSendBuffer(sendData);
     }
@@ -358,10 +372,10 @@ public:
     SigOutType output; 
     if (isServer) {
       std::array<SigOutValueType, sizeof(SigOutType) / sizeof(SigOutValueType)>& getData = server->getReceiveBuffer();
-      for (int i = 0; i < bufOutLen; i++) output(i) = getData[i];
+      for (uint32_t i = 0; i < bufOutLen; i++) output(i) = getData[i];
     } else {
       std::array<SigOutValueType, sizeof(SigOutType) / sizeof(SigOutValueType)>& getData = client->getReceiveBuffer();
-      for (int i = 0; i < bufOutLen; i++) output(i) = getData[i];
+      for (uint32_t i = 0; i < bufOutLen; i++) output(i) = getData[i];
     }
             
     this->out.getSignal().setValue(output);

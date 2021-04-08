@@ -170,7 +170,8 @@ class SocketClient : public eeros::Thread {
 template < uint32_t BufInLen, typename inT >
 class SocketClient<BufInLen, inT, 0, std::nullptr_t> : public eeros::Thread {
 public:	
-  SocketClient(std::string serverIP, uint16_t port, double period = 0.01) {
+  SocketClient(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0, int priority = 5) 
+      : Thread(priority) {
     this->port = port;
     this->period = period;
     this->serverIP = serverIP;
@@ -233,7 +234,7 @@ private:
       
         // write
         std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
-        for(int i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
+        for(uint32_t i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
 //  						log.trace() << "try to write " << b_write[0];
         int n = write(sockfd, b_write, BufInLen * sizeof(inT));
         if (n < 0) {
@@ -252,7 +253,7 @@ private:
     auto p = send_ptr.load();
     if (p == &send1) return send2;
     else if (p == &send2) return send3;
-    else if (p == &send3) return send1;
+    else return send1;
   }
   
   void flip(){
