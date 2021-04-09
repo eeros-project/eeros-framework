@@ -38,6 +38,11 @@ void TimeDomain::run() {
 			safetySystem->triggerEvent(*safetyEvent);
 			safetySystem->log.error() << e.what();
 		} else throw eeros::Fault(std::string(e.what()) + ", time domain cannot trigger safety event");
+	} catch (IndexOutOfBoundsFault const& e) {
+		if(safetySystem != nullptr && safetyEvent != nullptr) {
+			safetySystem->triggerEvent(*safetyEvent);
+			safetySystem->log.error() << e.what();
+		} else throw eeros::Fault(std::string(e.what()) + ", time domain cannot trigger safety event");
 	}
 }
 
