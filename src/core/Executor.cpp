@@ -22,8 +22,6 @@
 #include <ros/callback_queue.h>
 #endif
 
-#define USE_ETHERCAT
-
 volatile bool running = true;
 
 using namespace eeros;
@@ -110,7 +108,7 @@ Executor& Executor::instance() {
 
 
 #ifdef USE_ETHERCAT
-void Executor::syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack) {
+void Executor::syncWithEtherCATSTack(ecmasterlib::EtherCATStack* etherCATStack) {
   syncWithEtherCatStackIsSet = true;
   this->etherCATStack = etherCATStack;
 }
@@ -176,7 +174,7 @@ void Executor::stop() {
   auto &instance = Executor::instance();
     (void)instance;
 #ifdef USE_ETHERCAT
-  if(instance.etherCATStack) instance.etherCATStack->newDataAvailable.close();
+  if(instance.etherCATStack) instance.etherCATStack->stop();
 #endif
 }
 
@@ -264,11 +262,7 @@ void Executor::run() {
     useDefaultExecutor = false;
     
     while (running) {
-      try {
-        etherCATStack->newDataAvailable.receive();
-      } catch (Channel<bool, 1>::ClosedException &ce) {
-        return; //stop if signaled by ethercat stack
-      }
+      etherCATStack->sync();
       counter.tick();
       taskList.run();
       if (mainTask != nullptr)
