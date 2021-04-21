@@ -22,7 +22,11 @@ class MouseInput: public Block1o<Vector4> {
  public:
   MouseInput(std::string dev, int priority = 20);
   MouseInput(std::string dev, Vector4 scale, Vector4 min, Vector4 max, int priority = 20);
-  virtual ~MouseInput();
+  
+  /**
+   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   */
+  MouseInput(const MouseInput& s) = delete; 
 
   Output<Matrix<3,1,bool>>& getButtonOut();
   virtual void run();

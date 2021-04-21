@@ -1,40 +1,92 @@
 #ifndef ORG_EEROS_CONTROL_KEYBOARDINPUT_HPP_
 #define ORG_EEROS_CONTROL_KEYBOARDINPUT_HPP_
 
-#include <string>
-#include <thread>
-#include <eeros/control/Block1o.hpp>
+#include <eeros/control/Block.hpp>
+#include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
 #include <eeros/hal/Keyboard.hpp>
-#include <eeros/math/Matrix.hpp>
+#include <eeros/hal/KeyboardDigIn.hpp>
+#include <eeros/hal/KeyList.hpp>
+#include <eeros/control/IndexOutOfBoundsFault.hpp>
 
-using namespace eeros::math;
 using namespace eeros::hal;
 
 namespace eeros {
 namespace control {
 
-class KeyboardInput: public Block1o<Vector4> {
+/**
+ * This block serves to read the keys from a keyboard. The state
+ * of the keys are delivered as signals with values of type bool.
+ *
+ * @tparam N - number of input keys
+ *
+ * @since v0.6v
+ */
+template < uint8_t N >
+class KeyboardInput: public Block {
  public:
-  KeyboardInput(int priority = 20);
-  virtual ~KeyboardInput();
+  /**
+   * Constructs a block which reads several keys on a keyboard.
+   * 
+   * @param asciiCode - ascii code of the key
+   * @param name - name of the key
+   * @param priority - priority of the associated thread
+   */
+  KeyboardInput(std::vector<char> asciiCode, std::vector<std::string> name, int priority = 20) : k(priority) {
+    auto& list = KeyList::instance();
+    list.addKeys(asciiCode, name);
+    HAL& hal = HAL::instance();
+    for (uint8_t i = 0; i < list.nofKeys; i++) {
+      Input<bool>* in = new KeyboardDigIn(list, list.key[i]);
+      hal.addInput(in);
+    }
+  }
+  
+  /**
+  * Disabling use of copy constructor because the block should never be copied unintentionally.
+  */
+  KeyboardInput(const KeyboardInput& s) = delete; 
 
-  Output<Vector<5,bool>>& getIsHomed();
-  Output<bool>& getEsc();
-  Output<bool>& getEmergency();
-  Output<bool>& getReset();
-  Output<bool>& getStart();
-  Output<bool>& getStop();
-  virtual void run();
+  /**
+   * Runs the block.
+   */
+  virtual void run() {
+    uint64_t time = eeros::System::getTimeNs();
+    auto& list = KeyList::instance();
+    for (uint8_t i = 0; i < list.nofKeys; i++) {
+      out[i].getSignal().setValue(list.state[i]);
+      out[i].getSignal().setTimestamp(time);
+    }
+  }
+  
+  /**
+   * Getter function for the output with a given index.
+   * 
+   * @param index - index of output
+   * @return the output with this index
+   */
+  virtual Output<bool>& getOut(uint8_t index) {
+    auto& list = KeyList::instance();
+    if (index < 0 || index >= list.nofKeys) 
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of output in Block " + this->getName());  
+    return out[index];
+  }
+  
+  /**
+   * Reset the state of a key. This must be done manually after having consumed the state.
+   * 
+   * @param index - index of output
+   */
+  virtual void reset(uint8_t index) {
+    auto& list = KeyList::instance();
+    if (index < 0 || index >= list.nofKeys) 
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of output in Block " + this->getName());  
+    list.state[index] = false;
+  }
   
  protected:
   Keyboard k;
-  Output<Vector<5,bool>> isHomed;
-  Output<bool> esc;
-  Output<bool> emergency;
-  Output<bool> reset;
-  Output<bool> start;
-  Output<bool> stop;
+  Output<bool> out[N];
 };
 
 }

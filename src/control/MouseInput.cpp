@@ -27,8 +27,6 @@ MouseInput::MouseInput(std::string dev, Vector4 scale, Vector4 min, Vector4 max,
   first = true;
 }
 
-MouseInput::~MouseInput() { }
-
 void MouseInput::run() {
   if (first) {
     x = axisScale_x * -mouse.current.axis.y;

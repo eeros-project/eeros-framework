@@ -15,32 +15,34 @@ using namespace eeros::control;
 using namespace eeros::task;
 using namespace eeros::safety;
 
-double period = 0.01;
+double period = 0.1;
 
 class ControlSystem {
  public:
-  ControlSystem() : keyboard(), td("td", period, true) {
+  ControlSystem() : keyboard({'a','b','c'}, {"start", "stop", "home"}), td("td", period, true) {
     keyboard.setName("keyboard");
-    keyboard.getOut().getSignal().setName("position");
-    keyboard.getEsc().getSignal().setName("esc event");
+    keyboard.getOut(0).getSignal().setName("start");
+    keyboard.getOut(1).getSignal().setName("stop");
+    keyboard.getOut(2).getSignal().setName("home");
     td.addBlock(keyboard);
     Executor::instance().add(td);
   }
-  KeyboardInput keyboard;
+  KeyboardInput<3> keyboard;
   TimeDomain td;
 };
 
 class TestSafetyProperties : public SafetyProperties {
  public:
   TestSafetyProperties() : slFirst("first level"), slSecond("second level"), seGoUp("go to second level"), seGoDown("go to first level") {
-    Input<bool>* in1 = HAL::instance().getLogicInput("escKeyboardButton", false);
-    criticalInputs = { in1 };
+    Input<bool>* start = HAL::instance().getLogicInput("start", false);
+    Input<bool>* stop = HAL::instance().getLogicInput("stop", false);
+    criticalInputs = { start, stop };
 
     addLevel(slFirst);
     addLevel(slSecond);
     
-    slFirst.setInputActions({ check(in1, false, seGoUp) });
-    slSecond.setInputActions({ check(in1, true, seGoDown) });
+    slFirst.setInputActions({ check(start, false, seGoUp), ignore(stop) });
+    slSecond.setInputActions({ ignore(start), check(stop, false, seGoDown) });
     
     slFirst.addEvent(seGoUp, slSecond, kPrivateEvent);
     slSecond.addEvent(seGoDown, slFirst, kPrivateEvent);
@@ -70,8 +72,12 @@ int main() {
   Lambda l1 ([&] () { });
   Periodic periodic("per1", 1, l1);
   periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
-    log.info() << cs.keyboard.getEsc().getSignal();
-    log.info() << cs.keyboard.getOut().getSignal();
+    log.info() << cs.keyboard.getOut(0).getSignal();
+    cs.keyboard.reset(0);
+    log.info() << cs.keyboard.getOut(1).getSignal();
+    cs.keyboard.reset(1);
+    log.info() << cs.keyboard.getOut(2).getSignal();
+    cs.keyboard.reset(2);
   });
     
   // Create and run executor

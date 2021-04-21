@@ -4,8 +4,6 @@ using namespace eeros::control;
 
 KeyboardInput::KeyboardInput(int priority) : k(priority), isHomed(this), esc(this), emergency(this), reset(this), start(this), stop(this) { }
 
-KeyboardInput::~KeyboardInput() { }
-
 void KeyboardInput::run() {
 	uint64_t time = eeros::System::getTimeNs();
 	out.getSignal().setTimestamp(time);

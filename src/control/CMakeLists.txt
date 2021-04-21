@@ -9,5 +9,5 @@ add_eeros_sources(
     IndexOutOfBoundsFault.cpp)
 
 if(LINUX)
-	add_eeros_sources(XBoxInput.cpp MouseInput.cpp KeyboardInput.cpp SpaceNavigatorInput.cpp)
+	add_eeros_sources(XBoxInput.cpp MouseInput.cpp SpaceNavigatorInput.cpp)
 endif()

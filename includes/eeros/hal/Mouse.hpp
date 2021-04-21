@@ -28,7 +28,8 @@ struct MouseState {
 };
 
 /**
- * This class is part of the hardware abstraction layer. It is used by a \ref eeros::control::MouseInput class. 
+ * This class is part of the hardware abstraction layer. 
+ * It is used by \ref eeros::control::MouseInput and \ref eeros::hal::MouseDigIn class. 
  * Do not use it directly.
  *
  * @since v0.6
