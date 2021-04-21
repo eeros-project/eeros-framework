@@ -95,7 +95,7 @@ class PathPlannerConstAcc : public TrajectoryGenerator<T, 3> {
               y[1][i] = c2v[i];
               y[2][i] = c2a[i];
             }
-            if (fabs(t - dT2) < 1e-12 && i == a1p.size() - 1) {
+            if (dT2 < 1e-12 || (fabs(t - dT2) < 1e-12 && i == a1p.size() - 1)) {
               range = 3;
               t = 0;
             }
