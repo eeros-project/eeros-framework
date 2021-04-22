@@ -89,19 +89,43 @@ class SocketData<SigInType, SigOutType,
     this->out.getSignal().setTimestamp(time);
   }
   
+  /**
+   * A socket data block continously tries to get data from the block it is 
+   * connected to. This other block might temporarily stop sending data. 
+   * With this function you can query if new data has arrived. It will 
+   * return true, if the block has received new data. In order to set the
+   * flag to false, you have to use the \ref resetNew() function.
+   * @see resetNew()
+   * 
+   * return true, if new data has arrived
+   */
   virtual bool isNew() {
     if (isServer) return server->newData; else return client->newData;
   }
 
+  /**
+   * Use this function to reset the new data flag back to false.
+   */
   virtual void resetNew() {
     if (isServer) server->newData = false; else client->newData = false;
   }
   
+  /**
+   * A socket data block continously tries to establish a connection to
+   * its associated socket data block. Use this function to query if such a 
+   * connection has been made.
+   * 
+   * @return true, if connected
+   */
   virtual bool isConnected() {
     if (isServer) return server->isConnected();
     else return client->isConnected();
   }
   
+  /*
+   * Friend operator overload to give the operator overload outside
+   * the class access to the private fields.
+   */
   template <typename X, typename Y>
   friend std::ostream& operator<<(std::ostream& os, SocketData<X,Y>& s);
 

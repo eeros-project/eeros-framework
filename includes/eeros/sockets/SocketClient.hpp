@@ -2,7 +2,6 @@
 #define ORG_EEROS_SOCKET_CLIENT_HPP_
 
 #include <eeros/core/Thread.hpp>
-#include <atomic>
 #include <array>
 #include <unistd.h>
 #include <netdb.h> 
@@ -14,6 +13,7 @@
 #include <iostream>
 #include <cstring>
 #include <signal.h>
+#include <mutex>
 
 namespace eeros {
 namespace sockets {
@@ -22,10 +22,8 @@ template < uint32_t BufInLen, typename inT, uint32_t BufOutLen, typename outT >
 class SocketClient : public eeros::Thread {
  public:
   SocketClient(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0, int priority = 5) 
-      : Thread(priority), serverIP(serverIP), port(port), period(period), timeout(timeout), read1({0}), read2({0}), read3({0}) {
+      : Thread(priority), serverIP(serverIP), port(port), period(period), timeout(timeout) {
     signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application
-    read_ptr.store(&read1);
-    send_ptr.store(&send1);		
     running = false;
     connected = false;
   }
@@ -47,17 +45,15 @@ class SocketClient : public eeros::Thread {
   }
   
   virtual std::array<outT, BufOutLen>& getReceiveBuffer() {
-    return *read_ptr.load();
+    std::lock_guard<std::mutex> lock(mtx);
+    return rxBuf;
   }
   
   virtual void setSendBuffer(std::array<inT, BufInLen>& data) {
-    auto p = send_ptr.load();
-    if (p == &send1) send1 = data;
-    else if (p == &send2) send2 = data;
-    else if (p == &send3) send3 = data;
+    std::lock_guard<std::mutex> lock(mtx);
+    txBuf = data;
   }
 
-  outT readbuffer;
   bool newData = false;
   
  private:
@@ -92,8 +88,9 @@ class SocketClient : public eeros::Thread {
         std::this_thread::sleep_until(next_cycle);
         
         // write
-        std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
-        for(uint32_t i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
+        std::unique_lock<std::mutex> wlck(mtx);
+        for(uint32_t i = 0; i < BufInLen; i++) b_write[i] = txBuf[i]; 
+        wlck.unlock();
         int n = write(sockfd, b_write, BufInLen * sizeof(inT));
         if (n < 0) {
           log.trace() << "error = " << std::strerror(errno);
@@ -117,38 +114,17 @@ class SocketClient : public eeros::Thread {
           ptr += n;
           count -= n;
         }
-        std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
-        for(uint32_t i = 0; i < BufOutLen; i++) readValue[i] = b_read[i];
+        std::unique_lock<std::mutex> rlck(mtx);
+        for(uint32_t i = 0; i < BufOutLen; i++) rxBuf[i] = b_read[i];
+        rlck.unlock();
         newData = true;
-        flip();
         next_cycle += seconds(period);
       }
       close(sockfd);
       // if disconnected clear receive buffer
-      std::array<outT, BufOutLen> &readValue = getNextReceiveBuffer();
-      for(uint32_t i = 0; i < BufOutLen; i++) readValue[i] = 0;
+      for(uint32_t i = 0; i < BufOutLen; i++) rxBuf[i] = 0;
       newData = true;
-      flip();
     }
-  }
-  
-  std::array<outT, BufOutLen>& getNextReceiveBuffer() {
-    auto p = read_ptr.load();
-    if (p == &read1) return read2;
-    else if (p == &read2) return read3;
-    else return read1;
-  }
-  
-  std::array<inT, BufInLen>& getNextSendBuffer() {
-    auto p = send_ptr.load();
-    if (p == &send1) return send2;
-    else if (p == &send2) return send3;
-    else return send1;
-  }
-  
-  void flip() {
-    read_ptr.store(&getNextReceiveBuffer());
-    send_ptr.store(&getNextSendBuffer());
   }
   
   bool running;
@@ -159,11 +135,9 @@ class SocketClient : public eeros::Thread {
   struct hostent *server;
   int sockfd;
   bool connected;
-  
-  std::array<outT, BufOutLen> read1, read2, read3;
-  std::array<inT, BufInLen> send1, send2, send3;
-  std::atomic< std::array<outT, BufOutLen>* > read_ptr;
-  std::atomic< std::array<inT, BufInLen>* > send_ptr;
+  std::mutex mtx;
+  std::array<outT, BufOutLen> rxBuf;
+  std::array<inT, BufInLen> txBuf;
 };
 
 // specialization used when server doesn't receive data from its client
@@ -176,7 +150,6 @@ public:
     this->period = period;
     this->serverIP = serverIP;
     signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application
-    send_ptr.store(&send1);
     running = false;
     connected = false;
   }
@@ -198,13 +171,11 @@ public:
   }
   
   virtual void setSendBuffer(std::array<inT, BufInLen>& data) {
-    auto p = send_ptr.load();
-    if (p == &send1) send1 = data;
-    else if (p == &send2) send2 = data;
-    else if (p == &send3) send3 = data;
+    std::lock_guard<std::mutex> lock(mtx);
+    txBuf = data;
   }
 
-private:
+ private:
   virtual void run() {	
     log.info() << "SocketClient thread started";
     running = true;
@@ -233,31 +204,18 @@ private:
         std::this_thread::sleep_until(next_cycle);
       
         // write
-        std::array<inT, BufInLen> &sendValue = getNextSendBuffer();
-        for(uint32_t i = 0; i < BufInLen; i++) b_write[i] = sendValue[i]; 
-//  						log.trace() << "try to write " << b_write[0];
+        std::unique_lock<std::mutex> wlck(mtx);
+        for(uint32_t i = 0; i < BufInLen; i++) b_write[i] = txBuf[i]; 
         int n = write(sockfd, b_write, BufInLen * sizeof(inT));
+        wlck.unlock();
         if (n < 0) {
           log.trace() << "error = " << std::strerror(errno);
           connected = false;
-        }	
-    
-        flip();
+        }
         next_cycle += seconds(period);
       }
       close(sockfd);
     }
-  }
-  
-  std::array<inT, BufInLen>& getNextSendBuffer() {
-    auto p = send_ptr.load();
-    if (p == &send1) return send2;
-    else if (p == &send2) return send3;
-    else return send1;
-  }
-  
-  void flip(){
-    send_ptr.store(&getNextSendBuffer());
   }
   
   bool running;
@@ -267,12 +225,11 @@ private:
   struct hostent *server;
   int sockfd;
   bool connected;
-  
-  std::array<inT, BufInLen> send1, send2, send3;
-  std::atomic< std::array<inT, BufInLen>* > send_ptr;
+  std::mutex mtx;
+  std::array<inT, BufInLen> txBuf;
 };
 
-};
-};
+}
+}
 
 #endif // ORG_EEROS_SOCKET_CLIENT_HPP_

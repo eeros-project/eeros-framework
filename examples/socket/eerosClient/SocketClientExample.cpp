@@ -32,9 +32,9 @@ class ControlSystem {
     
     socketA.getOut().getSignal().setName("socketRead");
     socketA.getIn().connect(c1.getOut());
-//  socketA.getIn().connect(c2.getOut());
-//  socketA.getIn().connect(c3.getOut());
-//  socketA.getIn().connect(c4.getOut());
+//     socketA.getIn().connect(c2.getOut());
+//     socketA.getIn().connect(c3.getOut());
+//     socketA.getIn().connect(c4.getOut());
     timedomain.addBlock(c1);
     timedomain.addBlock(c2);
     timedomain.addBlock(c3);
@@ -49,14 +49,14 @@ class ControlSystem {
   Constant<int> c3;
   Constant<Matrix<3,1,int>> c4;
   SocketData<Matrix<6,1,double>, Vector4> socketA;	// send Matrix<6,1,double>, receive Vector4, connect to c1
-// SocketData<Matrix<3,1,int>, Vector4> socketA;		// send Matrix<3,1,double>, receive Vector4, connect to c4
-// SocketData<double, Vector4> socketA;			// send double, receive Vector4, connect to c2
-// SocketData<int, Vector4> socketA;			// send int, receive Vector4, connect to c3
-// SocketData<std::nullptr_t, Vector4> socketA;		// send nothing, receive Vector4, no connection
-// SocketData<Matrix<6,1,double>, double> socketA;		// send Matrix<6,1,double>, receive double, connect to c1
-// SocketData<Matrix<6,1,double>, int> socketA;		// send Matrix<6,1,double>, receive int, connect to c1
-// SocketData<Matrix<6,1,double>, std::nullptr_t> socketA;	// send Matrix<6,1,double>, receive nothing, connect to c1
-// SocketData<int, std::nullptr_t> socketA;		// send int, receive nothing, connect to c3
+//   SocketData<Matrix<3,1,int>, Vector4> socketA;		// send Matrix<3,1,int>, receive Vector4, connect to c4
+//   SocketData<double, Vector4> socketA;			// send double, receive Vector4, connect to c2
+//   SocketData<int, Vector4> socketA;			// send int, receive Vector4, connect to c3
+//   SocketData<std::nullptr_t, Vector4> socketA;		// send nothing, receive Vector4, no connection
+//   SocketData<Matrix<6,1,double>, double> socketA;		// send Matrix<6,1,double>, receive double, connect to c1
+//   SocketData<Matrix<6,1,double>, int> socketA;		// send Matrix<6,1,double>, receive int, connect to c1
+//   SocketData<Matrix<6,1,double>, std::nullptr_t> socketA;	// send Matrix<6,1,double>, receive nothing, connect to c1
+//   SocketData<int, std::nullptr_t> socketA;		// send int, receive nothing, connect to c3
     
  private:
   Logger log;
@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
   Periodic periodic("per1", 1.0, l1);
   periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
     log.info() << cs.socketA.getOut().getSignal();
-    cs.c1.setValue(cs.c1.getOut().getSignal().getValue() + (0.1));
+    cs.c1.setValue(cs.c1.getOut().getSignal().getValue() + 3);
   });
    
   auto& executor = Executor::instance();
