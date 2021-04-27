@@ -33,9 +33,9 @@ class ControlSystem {
   TimeDomain td;
 };
 
-class MySafetyProperties : public SafetyProperties {
+class MouseTestSafetyProperties : public SafetyProperties {
 public:
-  MySafetyProperties() : slFirst("first level"), slSecond("second level"), seGoUp("go to second level"), seGoDown("go to first level") {
+  MouseTestSafetyProperties() : slFirst("first level"), slSecond("second level"), seGoUp("go to second level"), seGoDown("go to first level") {
     Input<bool>* in1 = HAL::instance().getLogicInput("middleMouseButton", false);
     criticalInputs = { in1 };
 
@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
   log.info() << "Mouse test started ...";
   
   ControlSystem cs;
-  MySafetyProperties sp;
+  MouseTestSafetyProperties sp;
   SafetySystem ss(sp, period);
     
   Lambda l1 ([&] () { });
