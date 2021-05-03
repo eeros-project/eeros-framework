@@ -142,11 +142,17 @@ task::Periodic* Executor::getMainTask() {
 }
 
 void Executor::add(task::Periodic &task) {
+  for(auto& t: tasks) {
+    if (&task.getTask() == &t.getTask()) log.error() << "periodic '" << task.getName() << "' is added twice to the executor";
+  }
   tasks.push_back(task);
 }
 
-void Executor::add(control::TimeDomain &timedomain) {
-  task::Periodic task(timedomain.getName().c_str(), timedomain.getPeriod(), timedomain, timedomain.getRealtime());
+void Executor::add(control::TimeDomain &td) {
+  task::Periodic task(td.getName(), td.getPeriod(), td, td.getRealtime());
+  for(auto& t: tasks) {
+    if (&td == &t.getTask()) log.error() << "periodic of time domain '" << td.getName() << "' is added twice to the executor";
+  }
   tasks.push_back(task);
 }
 
