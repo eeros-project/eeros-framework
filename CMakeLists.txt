@@ -8,14 +8,16 @@ set(LOAD_CMAKE_MODULES_LIB TRUE CACHE BOOL "TRUE if the cmake-modules library sh
 
 if(LOAD_CMAKE_MODULES_LIB)
   include(cmake/CMakeModulesLibLoader.cmake)
-  load_cmake_modules_lib()
+  load_cmake_modules_lib(https://github.com/eeros-project/cmake-modules.git)
 endif()
 
 include(CMakeModulesLib)
-logger_on()
+if(CMAKE_BUILD_TYPE MATCHES "Debug|DEBUG")
+  logger_on()
+endif()
 
 if(LOAD_CMAKE_MODULES_LIB)
-  checkout_cmake_modules_lib_version(848e09a)
+  checkout_cmake_modules_lib_version(a50add2)
 endif()
 
 
