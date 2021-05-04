@@ -1,17 +1,30 @@
-#################################################
-#### Main CMake file for the EEROS Framework ####
-#################################################
+cmake_minimum_required(VERSION 3.10)
 
-## Check cmake version, we need 2.8 or newer
-cmake_minimum_required(VERSION 2.8)
-
-## EEROS Robotic Framework
 project(EEROS)
 
 
-## Fetch the version information from git
-include(cmake/MunkeiVersionFromGit.cmake)
-version_from_git()
+## Load CMake modules library at specified version
+set(LOAD_CMAKE_MODULES_LIB TRUE CACHE BOOL "TRUE if the cmake-modules library should be loaded.")
+
+if(LOAD_CMAKE_MODULES_LIB)
+  include(cmake/CMakeModulesLibLoader.cmake)
+  load_cmake_modules_lib(https://github.com/eeros-project/cmake-modules.git)
+endif()
+
+include(CMakeModulesLib)
+if(CMAKE_BUILD_TYPE MATCHES "Debug|DEBUG")
+  logger_on()
+endif()
+
+if(LOAD_CMAKE_MODULES_LIB)
+  checkout_cmake_modules_lib_version(a50add2)
+endif()
+
+
+
+## Fetch the version information from git tag
+include(VersioningHelpers)
+setLibraryVersion()
 
 set(EEROS_VERSION_MAJOR ${VERSION_MAJOR})
 set(EEROS_VERSION_MINOR ${VERSION_MINOR})
@@ -19,15 +32,22 @@ set(EEROS_VERSION_PATCH ${VERSION_PATCH})
 set(EEROS_VERSION_TWEAK ${VERSION_TWEAK})
 set(EEROS_VERSION ${EEROS_VERSION_MAJOR}.${EEROS_VERSION_MINOR}.${EEROS_VERSION_PATCH}.${EEROS_VERSION_TWEAK})
 
+log("Going to build EEROS v${EEROS_VERSION}")
 
-## Additional include and link directories
+
+
+## Add additional include and link directories
 include_directories(${ADDITIONAL_INCLUDE_DIRS})
 link_directories(${ADDITIONAL_LINK_DIRS})
 
-## Install directive for the header files
+
+
+## Install all eeros header files
 INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
 
-## Install CMake configuration file
+
+
+## Create and install CMake package configuration and package version files
 set(INCLUDE_INSTALL_DIR "include/")
 set(LIBUCL_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/libucl-src/include")
 set(LIB_INSTALL_DIR lib/)
@@ -54,10 +74,8 @@ install(
 		${LIB_INSTALL_DIR}/EEROS/cmake)
 
 
-## Load CMake modules
-include(CheckCXXCompilerFlag)
 
-# Check environment
+## Check environment
 if(WIN32 AND NOT CYGWIN)
 	set(WINDOWS TRUE) # Windows (native)
 elseif(UNIX)
@@ -107,7 +125,10 @@ else()
 	 message(WARNING "Unknown operating system!")
 endif()
 
+
+
 ## Check and set C++ compiler flags
+include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
@@ -120,14 +141,13 @@ elseif(COMPILER_SUPPORTS_CXX0X)
 else()
 	message(SEND_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler!")
 endif()
- 
- 
-## Compile with debug symbols
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-## Compile with all warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g") # Compile with debug symbols
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall") # Compile with all warnings
 
 
+
+## Use ncurses library if available
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 if(LIBCURSES)
 	message(STATUS "-> libcurses available")
@@ -138,10 +158,9 @@ if(LINUX)
 	set(EXTERNAL_LIBS ${EXTERNAL_LIBS} -lrt)
 endif()
 
-##########################
-# load and add libucl
-##########################
-# Download and unpack googletest at configure time
+
+
+## download and builds libucl
 configure_file(CMakeLists.txt.in ${EEROS_BINARY_DIR}/libucl-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
   RESULT_VARIABLE result
@@ -156,31 +175,21 @@ if(result)
   message(FATAL_ERROR "Build step for libucl failed: ${result}")
 endif()
 
-# Add libucl directly to our build. This defines
-# the libucl target.
+# Add libucl directly to our build. This defines the libucl target.
 add_subdirectory(${EEROS_BINARY_DIR}/libucl-src
                  ${EEROS_BINARY_DIR}/libucl-build)
 
 include_directories("${libucl_SOURCE_DIR}/include")
 link_directories(${libucl_BINARY_DIR})
 
-###### libucl ######
 
-# INSTALL(FILES ${LIBUCL_INCLUDE_DIR}/ucl++.h
-#         FILES ${LIBUCL_INCLUDE_DIR}/ucl.h
-#         DESTINATION include)
-# INSTALL(FILES ${LIBUCL_LINK_DIR}/libucl.a DESTINATION lib)
 
-##########################
-# EtherCAT support
-##########################
-## Find package ecmasterlib
+## Use Find package ecmasterlib (EtherCAT) if found
 message(STATUS "")
 message(STATUS "EtherCAT")
 message(STATUS "**********************************")
 find_package(ecmasterlib QUIET)
-#if (ECMASTERLIB_LIB_DIR)	# check if ecmasterlib is installed
-#if (USE_ETHERCAT)	# check if ecmasterlib should be used
+
 if (ECMASTERLIB_LIB_DIR AND USE_ETHERCAT)
 	message(STATUS "--> EtherCAT will be used")
 	include_directories("${ECMASTERLIB_INCLUDE_DIR}")
@@ -204,9 +213,8 @@ endif (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
 message(STATUS "")
 
 
-##########################
-# CAN support
-##########################
+
+## Use CAN if instructed
 if(USE_CAN)
 	message(STATUS "")
 	message(STATUS "Use canopenlib")
@@ -218,9 +226,8 @@ if(USE_CAN)
 endif()
 
 
-##########################
-# ROS support
-##########################
+
+## Use ROS if found and instructed
 message(STATUS "ROS")
 message(STATUS "**********************************")
 message( STATUS "ROS_ROOT: " $ENV{ROS_ROOT} )
@@ -253,15 +260,19 @@ endif (NOT roslib_FOUND AND NOT USE_ROS)
 message(STATUS "")
 
 
-## Config include file
+
+## Configure and install config header file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
 
-## Special settings for different IDEs
+
+
+## Set special variable for eclipse IDE
 set(CMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT ON)
 
 
-## Doxygen documentation target (make doc)
+
+## Configure Doxygen documentation target (make doc)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 	configure_file(doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
@@ -270,16 +281,26 @@ if(DOXYGEN_FOUND)
 		COMMENT "Generating API documentation with Doxygen" VERBATIM )
 endif(DOXYGEN_FOUND)
 
+
+
+## Set EEROS libraries
 set(EEROS_LIBS ${CMAKE_DL_LIBS} ucl pthread)
+
+
 
 ## Enable CTest
 enable_testing()
 
-## Source directories
-add_subdirectory(src)      # EEROS framework
-add_subdirectory(tools)    # Tools
-add_subdirectory(examples) # Examples
-if (USE_TESTS) 
-  message("compile unit tests")
-  add_subdirectory(test)     # Unit tests
-endif (USE_TESTS)
+
+## Add subdirectories
+add_subdirectory(src) # EEROS framework
+
+if(NOT LIB_ONLY_BUILD)
+  add_subdirectory(tools)
+  add_subdirectory(examples)
+endif(NOT LIB_ONLY_BUILD)
+
+if(USE_TESTS)
+  add_subdirectory(test)
+endif(USE_TESTS)
+
