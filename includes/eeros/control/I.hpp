@@ -120,7 +120,6 @@ class I: public Block1i1o<T> {
   friend std::ostream &operator<<(std::ostream &os, I<X> &i);
 
  protected:
-//  eeros::logger::Logger log;
   bool first;
   bool enabled;
   Signal<T> prev;
