@@ -6,8 +6,6 @@
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/control/Constant.hpp>
 #include <eeros/core/Executor.hpp>
-#include <eeros/control/ros/EerosRosTools.hpp>
-#include <ros/ros.h>
 #include <signal.h>
 
 using namespace eeros;
@@ -16,9 +14,9 @@ using namespace eeros::hal;
 using namespace eeros::safety;
 using namespace eeros::control;
 
-class MyControlSystem {
+class ControlSystem {
  public:
-  MyControlSystem(double ts)
+  ControlSystem(double ts)
       : c1(0.5),
         doubleIn("doubleIn"),
         boolIn("boolIn"),
@@ -35,7 +33,6 @@ class MyControlSystem {
     
     eeros::Executor::instance().add(timedomain);
   }
-  virtual ~MyControlSystem() { }
 
   Constant<> c1;
   PeripheralInput<double> doubleIn;
@@ -45,9 +42,9 @@ class MyControlSystem {
   TimeDomain timedomain;
 };
 
-class MySafetyProperties : public SafetyProperties {
+class ROSTestSafetyProperties : public SafetyProperties {
 public:
-  MySafetyProperties(MyControlSystem& cs) : slOff("off"), cs(cs), log(Logger::getLogger()) {
+  ROSTestSafetyProperties(ControlSystem& cs) : slOff("off"), cs(cs), log(Logger::getLogger()) {
     addLevel(slOff);
     setEntryLevel(slOff);
     slOff.setLevelAction([&](SafetyContext* privateContext) {
@@ -59,7 +56,7 @@ public:
   }
   
   SafetyLevel slOff;
-  MyControlSystem& cs;
+  ControlSystem& cs;
   Logger log;
 };
 
@@ -77,8 +74,8 @@ int main(int argc, char **argv) {
   HAL& hal = HAL::instance();
   hal.readConfigFromFile(&argc, argv);
 
-  MyControlSystem controlSystem(dt);
-  MySafetyProperties safetyProperties(controlSystem);
+  ControlSystem controlSystem(dt);
+  ROSTestSafetyProperties safetyProperties(controlSystem);
   eeros::safety::SafetySystem safetySystem(safetyProperties, dt);
   
   signal(SIGINT, signalHandler);	

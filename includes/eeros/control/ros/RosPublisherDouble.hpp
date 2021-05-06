@@ -6,21 +6,45 @@
 #include <std_msgs/Float64.h>
 
 namespace eeros {
-	namespace control {
+namespace control {
 
-		class RosPublisherDouble : public RosPublisher<std_msgs::Float64::Type, double> {
-			typedef std_msgs::Float64::Type TRosMsg;
-		public:
-			RosPublisherDouble (const std::string& topic, const uint32_t queueSize=1000) :
-				RosPublisher<TRosMsg, double>(topic, queueSize) { }
-			
-			void setRosMsg(TRosMsg& msg) {
-				msg.data = in.getSignal().getValue();
-// 				msg.header.stamp.sec = eeros::System::getTime();
-// 				msg.header.stamp.nsec = eeros::System::getTimeNs() % static_cast<uint64_t>(1e9);
-			}
-		};
-	};
+/**
+ * This block allows to publish a single input signal of type double and
+ * publishes it as a ROS message type std_msgs::Float64::Type.
+ * 
+ * @since v1.0
+ */
+class RosPublisherDouble : public RosPublisher<std_msgs::Float64::Type, double> {
+  typedef std_msgs::Float64::Type TRosMsg;
+ 
+ public:
+  /**
+   * Creates an instance of a publisher block which publishes a input signal 
+   * of type double as a ROS message of type std_msgs::Float64::Type.
+   * 
+   * @param topic - name of the topic
+   * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
+   */ 
+  RosPublisherDouble (const std::string& topic, const uint32_t queueSize=1000) 
+      : RosPublisher<TRosMsg, double>(topic, queueSize) { }
+  
+  /**
+   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   */
+  RosPublisherDouble(const RosPublisherDouble& other) = delete;
+
+  /**
+   * Sets the message to be published by this block.
+   * 
+   * @param msg - message content
+   */
+  virtual void setRosMsg(TRosMsg& msg) {
+    msg.data = in.getSignal().getValue();
+  }
+  
 };
+
+}
+}
 
 #endif /* ORG_EEROS_CONTROL_ROSPUBLISHER_DOUBLE_HPP_ */

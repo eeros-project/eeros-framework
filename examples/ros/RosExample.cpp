@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
   
   Logger::setDefaultStreamLogger(std::cout);
   Logger log = Logger::getLogger('M');
-  log.info() << "ROS Test 2 started";
+  log.info() << "ROS example started";
 
   HAL& hal = HAL::instance();
   hal.readConfigFromFile(&argc, argv);
@@ -56,6 +56,6 @@ int main(int argc, char **argv) {
 // 	executor.syncWithRosTopic(&syncCallbackQueue);	// sync with gazebo simulation
   executor.run();
 
-  log.info() << "ROS Test2 end";	
+  log.info() << "ROS example end";	
   return 0;
 }

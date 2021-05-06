@@ -20,9 +20,9 @@ using namespace eeros::math;
 using namespace eeros::logger;
 using namespace eeros::hal;
 
-class MyControlSystem {
+class ControlSystem {
 public:
-  MyControlSystem(double dt)
+  ControlSystem(double dt)
       : c1({2.4, 0, 4.443, 23.6, -11.2, 1.3, 0.003}),
         c2(0.5),
         vectorOut("/test/vector"),
@@ -42,7 +42,6 @@ public:
     timedomain.addBlock(doubleIn);
     Executor::instance().add(timedomain);
   }
-  virtual ~MyControlSystem() { }
   
   typedef Matrix<7, 1, double> Vector7;
   Constant<Vector7> c1;
@@ -55,9 +54,9 @@ public:
   TimeDomain timedomain;
 };
 
-class MySafetyProperties : public SafetyProperties {
+class ROSTestSafetyProperties : public SafetyProperties {
  public:
-  MySafetyProperties(MyControlSystem& cs) : slOne("one"), slTwo("two"), se("change"), log(Logger::getLogger()) {
+  ROSTestSafetyProperties(ControlSystem& cs) : slOne("one"), slTwo("two"), se("change"), log(Logger::getLogger()) {
     addLevel(slOne);
     addLevel(slTwo);
     slOne.addEvent(se, slTwo, kPrivateEvent);
@@ -107,11 +106,10 @@ int main(int argc, char **argv) {
   Logger log = Logger::getLogger();
   log.info() << "ROS Test1 started";
 
-  rosTools::initNode("eerosNode");
-  log.trace() << "ROS node initialized";
-    
-  MyControlSystem controlSystem(dt);
-  MySafetyProperties safetyProperties(controlSystem);
+  if (rosTools::initNode("eerosNode")) log.info() << "ROS node initialized";
+     
+  ControlSystem controlSystem(dt);
+  ROSTestSafetyProperties safetyProperties(controlSystem);
   SafetySystem safetySystem(safetyProperties, dt);
   controlSystem.slOut.setSafetySystem(safetySystem);
   
