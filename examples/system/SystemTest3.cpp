@@ -6,6 +6,7 @@
 #include <eeros/control/Constant.hpp>
 #include <eeros/control/I.hpp>
 #include <eeros/control/SignalChecker.hpp>
+#include <eeros/task/Lambda.hpp>
 
 using namespace eeros;
 using namespace eeros::hal;
@@ -16,16 +17,21 @@ using namespace eeros::task;
 
 class ControlSystem {
  public:
-  ControlSystem() : c(0.5), checker(0, 5) {
+  ControlSystem() : c(0.5), checker(0, 5), td("td1", 0.5, true) {
     i.getOut().getSignal().setName("integrator output");
     i.getIn().connect(c.getOut());
     checker.setName("check integrator level");
     checker.getIn().connect(i.getOut());
+    td.addBlock(c);
+    td.addBlock(i);
+    td.addBlock(checker);
+    Executor::instance().add(td);
   }
 
   Constant<> c;
   I<> i;
   SignalChecker<> checker;
+  TimeDomain td;
 };
 
 class TestSafetyProperties : public SafetyProperties {
@@ -37,11 +43,11 @@ class TestSafetyProperties : public SafetyProperties {
         slStart("start"),
         slRampingUp("ramping up") {   
     
-    // ############ Add levels ############
+    // levels
     addLevel(slStart);
     addLevel(slRampingUp);
     
-    // ############ Add events to the levels ############
+    // Add events to the levels
     slStart.addEvent(seStartRampingUp, slRampingUp, kPrivateEvent);
     slRampingUp.addEvent(seReset, slStart, kPublicEvent);
 
@@ -73,7 +79,6 @@ int main() {
   
   log.info() << "System test 3 started...";
   
-  // Create and initialize safety system
   double period = 0.01;
   ControlSystem cs;
   TestSafetyProperties sp(cs, period);
@@ -81,15 +86,11 @@ int main() {
   cs.checker.registerSafetyEvent(ss, sp.seReset);
   cs.checker.setActiveLevel(sp.slRampingUp);
   
-  TimeDomain td("td1", 0.5, true);
-  Periodic periodic("per1", 0.5, td);
+  Lambda l2 ([&] () { });
+  Periodic periodic("p2", 0.5, l2);
   periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
     log.info() << cs.i.getOut().getSignal();
   });
-  
-  td.addBlock(cs.c);
-  td.addBlock(cs.i);
-  td.addBlock(cs.checker);
   
   // Create and run executor
   auto& executor = eeros::Executor::instance();

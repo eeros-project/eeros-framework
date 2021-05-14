@@ -16,43 +16,42 @@ using namespace eeros::logger;
 
 class TestSafetyProperties : public SafetyProperties {
 public:
-  TestSafetyProperties()  : 
-    seStartInitializing("start initializing"),
-    seInitializingDone("initialization done"),
-    seStartRunning("start running"),
-    seShutDown("start shutting down"),
-    seStopRunning("stop running"),
-    seSwitchingOff("switching off"),
-    slOff("off"),
-    slShuttingDown("shutting down"),
-    slIinitializing("initializing"),
-    slInitialized("initialized"),
-    slRunning("running")
-    { 
+  TestSafetyProperties() 
+      : seStartInitializing("start initializing"),
+        seInitializingDone("initialization done"),
+        seStartRunning("start running"),
+        seShutDown("start shutting down"),
+        seStopRunning("stop running"),
+        seSwitchingOff("switching off"),
+        slOff("off"),
+        slShuttingDown("shutting down"),
+        slIinitializing("initializing"),
+        slInitialized("initialized"),
+        slRunning("running") { 
 
     HAL& hal = HAL::instance();
 
-    // ############ Define critical outputs ############
+    // Define critical outputs
     out = hal.getLogicOutput("out");
     criticalOutputs = { out };
 
-    // ############ Define critical inputs ############
+    // Define critical inputs
     in = hal.getLogicInput("in");
     criticalInputs = { in };
     
-    // ############ Get test in and outputs ############ 
+    // Get test in and outputs
     outTest = hal.getLogicOutput("outTest");
     outTest->set(false);
     inTest = hal.getLogicInput("inTest");
     
-    // ############ Add levels ############
+    // Add levels
     addLevel(slOff);
     addLevel(slShuttingDown);
     addLevel(slIinitializing);
     addLevel(slInitialized);
     addLevel(slRunning);
     
-    // ############ Add events to the levels ############
+    // Add events to the levels
     slOff.addEvent(seStartInitializing, slIinitializing, kPublicEvent);
     slShuttingDown.addEvent(seSwitchingOff, slOff, kPrivateEvent);
     slIinitializing.addEvent(seInitializingDone, slInitialized, kPublicEvent);
@@ -60,14 +59,14 @@ public:
     slRunning.addEvent(seStopRunning, slInitialized, kPrivateEvent);
     addEventToLevelAndAbove(slIinitializing, seShutDown, slShuttingDown, kPublicEvent);
 
-    // ############ Define input states and events for all levels ############
+    // Define input states and events for all levels
     slOff.setInputActions({ ignore(in) });
     slShuttingDown.setInputActions({ ignore(in) });
     slIinitializing.setInputActions({ ignore(in) });
     slInitialized.setInputActions({ check(in, false, seStartRunning) });
     slRunning.setInputActions({ check(in, true, seStopRunning) });
 
-    // ############ Define output states and events for all levels ############
+    // Define output states and events for all levels
     slOff.setOutputActions({ set(out, false) });
     slShuttingDown.setOutputActions({ set(out, false) });
     slIinitializing.setOutputActions({ set(out, false) });
@@ -151,8 +150,8 @@ int main(int argc, char **argv) {
     static int count = 0;
     if (count++ == 5) ss.triggerEvent(sp.seInitializingDone);
   });
-  eeros::task::Periodic t1("t1", period, l1);
-  executor.add(t1);
+  eeros::task::Periodic p1("p1", period, l1);
+  executor.add(p1);
   executor.run();
 
   log.info() << "Test finished...";
