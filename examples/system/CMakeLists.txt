@@ -20,6 +20,10 @@ add_executable(systemTest3 SystemTest3.cpp)
 target_link_libraries(systemTest3 eeros ${EEROS_LIBS})
 list(APPEND targets systemTest3)
 
+add_executable(subSystemTest SubSystemTest.cpp)
+target_link_libraries(subSystemTest eeros ${EEROS_LIBS})
+list(APPEND targets subSystemTest)
+
 add_executable(mockRobotExample MockRobotExample.cpp)
 target_link_libraries(mockRobotExample eeros ${EEROS_LIBS})
 list(APPEND targets mockRobotExample)
