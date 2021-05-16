@@ -17,7 +17,7 @@ using namespace eeros::task;
 
 class ControlSystem {
  public:
-  ControlSystem() : c(0.5), checker(0, 5), td("td1", 0.5, true) {
+  ControlSystem() : c(0.5), checker(-0.001, 5), td("td1", 0.5, true) {
     i.getOut().getSignal().setName("integrator output");
     i.getIn().connect(c.getOut());
     checker.setName("check integrator level");
@@ -53,12 +53,10 @@ class TestSafetyProperties : public SafetyProperties {
 
     // Define and add level functions
     slStart.setLevelAction([&,ts](SafetyContext* privateContext) {
-      cs.i.disable();
       cs.i.setInitCondition(0);
       if(slStart.getNofActivations() * ts > 3) {
         privateContext->triggerEvent(seStartRampingUp);
         cs.checker.reset();
-        cs.i.enable();
       }
     });
 
@@ -85,6 +83,7 @@ int main() {
   SafetySystem ss(sp, period);
   cs.checker.registerSafetyEvent(ss, sp.seReset);
   cs.checker.setActiveLevel(sp.slRampingUp);
+  cs.i.setActiveLevel(ss, sp.slRampingUp);
   
   Lambda l2 ([&] () { });
   Periodic periodic("p2", 0.5, l2);

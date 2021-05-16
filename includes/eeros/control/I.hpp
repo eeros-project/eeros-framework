@@ -3,7 +3,10 @@
 
 #include <eeros/control/Block1i1o.hpp>
 #include <eeros/logger/Logger.hpp>
+#include <eeros/safety/SafetyLevel.hpp>
+#include <eeros/safety/SafetySystem.hpp>
 #include <cmath>
+#include <mutex>
 
 namespace eeros {
 namespace control {
@@ -14,6 +17,10 @@ namespace control {
  * integrates and keeps its actual state. An integrator must have its
  * initial state set to a defined level. Further, the block allows to
  * set an upper and lower limit to allow for anti windup.
+ * Enabling and disabling an integrator block can happen through functions
+ * enable() or disable() or it can depend on the current safety level.
+ * If the current safety level is equal or greater than a preset level,
+ * the integrator will be enabled.
  *
  * @tparam T - output type (double - default type)
  * @since v0.6
@@ -24,7 +31,10 @@ class I: public Block1i1o<T> {
   /**
    * Constructs an integrator instance.\n
    */
-  I() : first(true), enabled(false) {prev.clear(); clearLimits(); }
+  I() : first(true), enabled(false), safetySystem(nullptr), activeLevel(nullptr) {
+    prev.clear(); 
+    clearLimits();
+  }
  
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -40,10 +50,12 @@ class I: public Block1i1o<T> {
    * @see enable()
    * @see disable()
    */
-  virtual void run() {
+  virtual void run() override {
+    std::lock_guard<std::mutex> lock(mtx);
+    if (activeLevel != nullptr)
+      enabled =  safetySystem->getCurrentLevel() >= *activeLevel;
     double tin = this->in.getSignal().getTimestamp() / 1000000000.0;
     double tprev = this->prev.getTimestamp() / 1000000000.0;
-    
     double dt;
     if (first) {
       dt = 0; 
@@ -112,6 +124,19 @@ class I: public Block1i1o<T> {
     if (val < lower) prev.setValue(lower);
   }
 
+  /**
+   * Sets the active safety level on this integrator. The integrator will only run 
+   * if the current safety level is equal or greater than the level set with this function.
+   *
+   * @param ss - safety system
+   * @param level - SafetyLevel
+   */
+  virtual void setActiveLevel(safety::SafetySystem& ss, safety::SafetyLevel &level) {
+    std::lock_guard<std::mutex> lock(mtx);
+    safetySystem = &ss;
+    activeLevel = &level;
+  }
+
   /*
    * Friend operator overload to give the operator overload outside
    * the class access to the private fields.
@@ -124,6 +149,10 @@ class I: public Block1i1o<T> {
   bool enabled;
   Signal<T> prev;
   T upperLimit, lowerLimit;
+  safety::SafetySystem *safetySystem;
+  safety::SafetyLevel *activeLevel;
+  std::mutex mtx{};
+  
  private:
   virtual void clearLimits() {
     _clear<T>();

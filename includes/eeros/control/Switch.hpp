@@ -5,16 +5,17 @@
 #include <eeros/control/Input.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetySystem.hpp>
+#include <eeros/logger/Logger.hpp>
 #include <mutex>
 
 namespace eeros {
 namespace control {
-using namespace safety;
 
 /**
  * A switch allows to select a signal from severel inputs to be routed to the output.
  * If a signal at a chosen input is close to a predefined value, the switch can automatically switch 
- * to a predefined position and a safety event can be triggered.
+ * to a predefined position and a safety event can be triggered. The switch can be made to switch
+ * only if the current safety level is greater or the same as the active level set on this switch.
  * Two or more switches can be combined. This mechanism allows to switch them simultaneously.
  * 
  * @tparam N - number of inputs
@@ -28,18 +29,21 @@ class Switch : public Block1o<T> {
  public:
 
   /**
-  * Constructs a switch instance with the switch initialized to position 0.\n
-  */
-  Switch() : currentInput(0) {
-    for(uint8_t i = 0; i < N; i++) in[i].setOwner(this);
-  }
+   * Constructs a switch instance with the switch initialized to position 0.\n
+   */
+  Switch() : Switch(0) { }
 
   /**
-  * Constructs a Switch instance with the switch initialized to a given position.\n
-  * 
-  * @param initInputIndex - switch is initially set to this position
-  */
-  Switch(uint8_t initInputIndex) : currentInput(initInputIndex) {
+   * Constructs a Switch instance with the switch initialized to a given position.\n
+   * 
+   * @param initInputIndex - switch is initially set to this position
+   */
+  Switch(uint8_t initInputIndex) 
+      : currentInput(initInputIndex),
+        safetySystem(nullptr),
+        safetyEvent(nullptr),
+        activeLevel(nullptr),
+        log(logger::Logger::getLogger()) {
     for(uint8_t i = 0; i < N; i++) in[i].setOwner(this);
   }
 
@@ -51,16 +55,22 @@ class Switch : public Block1o<T> {
   /**
   * Runs the switch block.
   */
-  virtual void run() {
+  virtual void run() override {
+    std::lock_guard<std::mutex> lock(mtx);
     auto val = this->in[currentInput].getSignal().getValue();
     if (armed && !switched) {
       if (val < (switchLevel + delta) && val > (switchLevel - delta)) {
-        switchToInput(nextInput);
-        for(Switch* i : c) i->switchToInput(nextInput);
-        switched = true;
-        armed = false;
-        if(safetySystem != nullptr && safetyEvent != nullptr) {
-          safetySystem->triggerEvent(*safetyEvent);
+        if (activeLevel == nullptr ||
+           (activeLevel != nullptr && safetySystem->getCurrentLevel() >= *activeLevel)
+           ) {
+          log.warn() << "Switch \'" + this->getName() + "\' switches!";
+          switchToInput(nextInput);
+          for(Switch* i : c) i->switchToInput(nextInput);
+          switched = true;
+          armed = false;
+          if (safetySystem != nullptr && safetyEvent != nullptr) {
+            safetySystem->triggerEvent(*safetyEvent);
+          }
         }
       }
     }
@@ -110,9 +120,24 @@ class Switch : public Block1o<T> {
   * @param ss - safety system
   * @param e - safety event
   */
-  virtual void registerSafetyEvent(SafetySystem& ss, SafetyEvent& e) {
+  virtual void registerSafetyEvent(safety::SafetySystem& ss, safety::SafetyEvent& e) {
     safetySystem = &ss;
     safetyEvent = &e;
+  }
+
+  /**
+   * Sets the active safety level on this switch. The switch will automatically
+   * switch if a switching condition is set and the current safety level is equal 
+   * or greater than the level set with this function.
+   * @see setCondition()
+   *
+   * @param ss - safety system
+   * @param level - SafetyLevel
+   */
+  virtual void setActiveLevel(safety::SafetySystem& ss, safety::SafetyLevel &level) {
+    std::lock_guard<std::mutex> lock(mtx);
+    safetySystem = &ss;
+    activeLevel = &level;
   }
 
   /**
@@ -164,15 +189,18 @@ class Switch : public Block1o<T> {
     s.switchToInput(currentInput);
   }
 
-protected:
+ protected:
   Input<T> in[N];
   uint8_t currentInput, nextInput;
   T switchLevel, delta;
   bool armed = false;
   bool switched = false;
-  SafetySystem* safetySystem = nullptr;
-  SafetyEvent* safetyEvent = nullptr;
+  safety::SafetySystem* safetySystem;
+  safety::SafetyEvent* safetyEvent;
+  safety::SafetyLevel *activeLevel;
   std::vector<Switch*> c;
+  eeros::logger::Logger log;
+  std::mutex mtx{};
 };
 
 /********** Print functions **********/

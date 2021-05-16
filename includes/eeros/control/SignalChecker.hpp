@@ -27,7 +27,7 @@ namespace control {
  * SignalChecker is a class template with two type and one non-type
  * template arguments.
  * The two type template arguments specify the types which are used for the
- * signal type and the limit type when the class template is instanciated.
+ * signal type and the limit type when the class template is instantiated.
  * The non-type template argument enables the usage of the norm() method
  * on the signal type. If set to true, the return value of the norm() method
  * is limit checked. This is for example useful with the class Matrix when
@@ -52,15 +52,14 @@ class SignalChecker : public Block1i<Tsig> {
    * @param lowerLimit - initial lower limit value
    * @param upperLimit - initial upper limit value
    */
-  SignalChecker(Tlim lowerLimit, Tlim upperLimit) :
-      lowerLimit(lowerLimit),
-      upperLimit(upperLimit),
-      fired(false),
-      safetySystem(nullptr),
-      safetyEvent(nullptr),
-      activeLevel(nullptr),
-      log(logger::Logger::getLogger()) {}
-
+  SignalChecker(Tlim lowerLimit, Tlim upperLimit) 
+      : lowerLimit(lowerLimit),
+        upperLimit(upperLimit),
+        fired(false),
+        safetySystem(nullptr),
+        safetyEvent(nullptr),
+        activeLevel(nullptr),
+        log(logger::Logger::getLogger()) {}
 
   /**
    * Runs the checker algorithm.
@@ -150,7 +149,7 @@ class SignalChecker : public Block1i<Tsig> {
   safety::SafetySystem *safetySystem;
   safety::SafetyEvent *safetyEvent;
   safety::SafetyLevel *activeLevel;
-  eeros::logger::Logger log{};
+  eeros::logger::Logger log;
   std::mutex mtx{};
 
 
