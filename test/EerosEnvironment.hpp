@@ -5,19 +5,19 @@
 #include <gtest/gtest.h>
 
 namespace eeros {
-	namespace test {
-		
-		class EerosEnvironment : public  testing::Environment {
-		public:
-			virtual void SetUp();
-			virtual void TearDown();
-			
-		private:
-			int* envArgc;
-			char** envArgv;
-		};
+namespace test {
 
-	};
+class EerosEnvironment : public  testing::Environment {
+ public:
+  virtual void SetUp();
+  virtual void TearDown();
+  
+ private:
+  int* envArgc;
+  char** envArgv;
 };
+
+}
+}
 
 #endif /* ORG_EEROS_TEST_ENVIRONMENT_HPP_ */

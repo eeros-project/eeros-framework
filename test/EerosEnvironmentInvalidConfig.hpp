@@ -5,18 +5,15 @@
 #include <gtest/gtest.h>
 
 namespace eeros {
-	namespace test {
-		
-		class EerosEnvironmentInvalidConfig : public  testing::Environment {
-		public:
-			virtual void SetUp();
-			virtual void TearDown();
-			
-		private:
-			
-		};
+namespace test {
 
-	};
+class EerosEnvironmentInvalidConfig : public  testing::Environment {
+ public:
+  virtual void SetUp();
+  virtual void TearDown();
 };
+
+}
+}
 
 #endif /* ORG_EEROS_TEST_ENVIRONMENT_INVALID_CONFIG_HPP_ */

@@ -15,7 +15,8 @@ namespace control {
 
 /**
  * A signal checker block is used to check if a signal is between a lower
- * and upper limit. If it exceeds the limits, a safety event is triggered.
+ * and upper limit. It can also check whether a signal is out off this range.
+ * If it exceeds the limits, a safety event is triggered.
  * The safety event is triggered only if a safety event is registered and the
  * current safety level is greater or the same as the active level set on this
  * signal checker.
@@ -51,15 +52,17 @@ class SignalChecker : public Block1i<Tsig> {
    *
    * @param lowerLimit - initial lower limit value
    * @param upperLimit - initial upper limit value
+   * @param offRange - checks that the signal is lower than the lower limit or greater than the upper limit
    */
-  SignalChecker(Tlim lowerLimit, Tlim upperLimit) 
+  SignalChecker(Tlim lowerLimit, Tlim upperLimit, bool offRange = false) 
       : lowerLimit(lowerLimit),
         upperLimit(upperLimit),
         fired(false),
         safetySystem(nullptr),
         safetyEvent(nullptr),
         activeLevel(nullptr),
-        log(logger::Logger::getLogger()) {}
+        log(logger::Logger::getLogger()), 
+        offRange(offRange) {}
 
   /**
    * Runs the checker algorithm.
@@ -82,14 +85,28 @@ class SignalChecker : public Block1i<Tsig> {
 
     auto val = this->in.getSignal().getValue();
     if (!fired) {
-      if (limitsExceeded<bool>(val)) {
-        if (safetySystem != nullptr && safetyEvent != nullptr) {
-          if (activeLevel == nullptr ||
-           (activeLevel != nullptr && safetySystem->getCurrentLevel() >= *activeLevel)
-           ) {
-            log.warn() << "Signal checker \'" + this->getName() + "\' fires!";
-            safetySystem->triggerEvent(*safetyEvent);
-            fired = true;
+      if (offRange) {
+        if (withinLimits<bool>(val)) {
+          if (safetySystem != nullptr && safetyEvent != nullptr) {
+            if (activeLevel == nullptr ||
+            (activeLevel != nullptr && safetySystem->getCurrentLevel() >= *activeLevel)
+            ) {
+              log.warn() << "Signal checker \'" + this->getName() + "\' fires!";
+              safetySystem->triggerEvent(*safetyEvent);
+              fired = true;
+            }
+          }
+        }
+      } else {
+        if (limitsExceeded<bool>(val)) {
+          if (safetySystem != nullptr && safetyEvent != nullptr) {
+            if (activeLevel == nullptr ||
+            (activeLevel != nullptr && safetySystem->getCurrentLevel() >= *activeLevel)
+            ) {
+              log.warn() << "Signal checker \'" + this->getName() + "\' fires!";
+              safetySystem->triggerEvent(*safetyEvent);
+              fired = true;
+            }
           }
         }
       }
@@ -151,7 +168,7 @@ class SignalChecker : public Block1i<Tsig> {
   safety::SafetyLevel *activeLevel;
   eeros::logger::Logger log;
   std::mutex mtx{};
-
+  bool offRange;
 
  private:
   template<typename S>
@@ -159,12 +176,23 @@ class SignalChecker : public Block1i<Tsig> {
     return !(value > lowerLimit && value < upperLimit);
   }
 
-
   template<typename S>
   typename std::enable_if<checkNorm, S>::type limitsExceeded(Tsig value) {
     return !(value.norm() > lowerLimit && value.norm() < upperLimit);
   }
+
+  template<typename S>
+  typename std::enable_if<!checkNorm, S>::type withinLimits(Tsig value) {
+    return (value > lowerLimit && value < upperLimit);
+  }
+
+  template<typename S>
+  typename std::enable_if<checkNorm, S>::type withinLimits(Tsig value) {
+    return (value.norm() > lowerLimit && value.norm() < upperLimit);
+  }
+
 };
+
 }
 }
 
