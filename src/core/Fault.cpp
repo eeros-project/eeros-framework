@@ -9,5 +9,5 @@ Fault::Fault(std::string m) : message(m) { }
 Fault::~Fault() throw() { }
 
 const char* Fault::what() const throw() {
-	return message.c_str();
+  return message.c_str();
 }

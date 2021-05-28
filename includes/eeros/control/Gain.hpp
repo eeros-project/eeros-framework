@@ -79,8 +79,8 @@ class Gain : public Block1i1o<Tout> {
 
   
   /**
-  * Disabling use of copy constructor because the block should never be copied unintentionally.
-  */
+   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   */
   Gain(const Gain& s) = delete; 
 
   

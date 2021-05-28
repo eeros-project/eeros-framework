@@ -11,14 +11,38 @@
 namespace eeros {
 namespace control {
 
+/**
+ * A peripheral output block delivers a signal to an output. This
+ * output must be defined by the hardware configuration file.
+ * 
+ * @tparam T - output type, must be bool or double (double - default type)
+ *
+ * @since v0.4
+ */
+
 template < typename T = double >
 class PeripheralOutput : public Block1i<T> {
  public:
+  /**
+   * Constructs a peripheral output instance with a name defined in the 
+   * hardware configuration file.
+   *
+   * @param id - name of the input
+   * @param exclusive - if true, no other output can claim this output signal
+   */
   PeripheralOutput(std::string id, bool exclusive = true) : hal(hal::HAL::instance()) {
     systemOutput = dynamic_cast<hal::Output<T>*>(hal.getOutput(id, exclusive));
     if(systemOutput == nullptr) throw Fault("Peripheral output '" + id + "' not found!");
   }
             
+  /**
+   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   */
+  PeripheralOutput(const PeripheralOutput& s) = delete; 
+
+  /**
+   * Delivers the signal to the output.
+   */
   virtual void run() {
     std::lock_guard<std::mutex> lock(mtx);
     val = this->in.getSignal().getValue();
@@ -33,11 +57,24 @@ class PeripheralOutput : public Block1i<T> {
                                      this->getName() + "', set to safe level if safe level is defined");
   }
             
+  /**
+   * Getter function for the signal value which the block delivers to its output.
+   * 
+   * @return - signal value
+   */
   virtual T getValue () {
     std::lock_guard<std::mutex> lock(mtx);
     return val;
   }
             
+  /**
+   * Calls a feature function. This function allows to configure hardware specific features defined
+   * in the hardware wrapper library.
+   *
+   * @tparam ArgTypesOut - type of the arguments
+   * @param featureName - name of the feature function
+   * @param args - argument list of variable size
+   */
   template<typename ... ArgTypesOut>
   void callOutputFeature(std::string featureName, ArgTypesOut... args){
     hal.callOutputFeature(systemOutput, featureName, args...);
