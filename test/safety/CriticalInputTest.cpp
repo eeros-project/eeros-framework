@@ -5,6 +5,7 @@
 #include <eeros/control/PeripheralInput.hpp>
 #include <eeros/control/Constant.hpp>
 #include <eeros/core/Fault.hpp>
+#include <eeros/hal/HAL.hpp>
 #include <gtest/gtest.h>
 #include <Utils.hpp>
 
@@ -99,6 +100,8 @@ TEST(safetyCriticalTest, digitalInput) {
   pi0.run();
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl1);
   EXPECT_EQ(pi0.getOut().getSignal().getValue(), true);
+  HAL::instance().releaseOutput("io1"); // release for further hal tests
+  HAL::instance().releaseInput("ioIn");
 }
 
 class SafetyPropertiesTestc2 : public SafetyProperties {
@@ -271,4 +274,8 @@ TEST(safetyCriticalTest, analogInputOffRange) {
   pi0.run();
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl1);
   EXPECT_TRUE(Utils::compareApprox(pi.getOut().getSignal().getValue(), 1.0, 0.01));
+  HAL::instance().releaseOutput("aOut0");
+  HAL::instance().releaseOutput("aOut1");
+  HAL::instance().releaseInput("aIn0");
+  HAL::instance().releaseInput("aIn1");
 }
