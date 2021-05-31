@@ -81,6 +81,7 @@ class Sum : public Blockio<2,1,T> {
    * @param val - initial state
    */
   virtual void setInitCondition(uint8_t index, T val) {
+    if (index >= N) throw eeros::Fault("Trying to get inexistent element of input vector in block '" + this->getName() + "'");
     init[index] = true;
     initVal[index] = val;
   }
