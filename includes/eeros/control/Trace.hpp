@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
-#include <eeros/control/Block1i.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/core/Thread.hpp>
 #include <eeros/logger/Logger.hpp>
 
@@ -15,7 +15,7 @@ namespace eeros {
 namespace control {
 
 template < typename T = double >
-class Trace : public Block1i<T> {
+class Trace : public Blockio<1,0,T> {
  public:
   Trace(uint32_t bufLen) : maxBufLen(bufLen) {
     buf = new T[bufLen];

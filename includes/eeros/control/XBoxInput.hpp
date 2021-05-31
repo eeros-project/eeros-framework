@@ -3,7 +3,7 @@
 
 #include <string>
 #include <thread>
-#include <eeros/control/Block1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/core/System.hpp>
 #include <eeros/hal/XBox.hpp>
 #include <eeros/math/Matrix.hpp>
@@ -14,7 +14,7 @@ using namespace eeros::hal;
 namespace eeros {
 	namespace control {
 
-		class XBoxInput: public Block1o<Matrix<XBOX_AXIS_COUNT>> {
+		class XBoxInput: public Blockio<0,1,Matrix<XBOX_AXIS_COUNT>> {
 		public:
 			XBoxInput(std::string dev, int priority = 20);
 			virtual ~XBoxInput();

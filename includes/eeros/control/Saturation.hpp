@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_SATURATION_HPP_
 #define ORG_EEROS_CONTROL_SATURATION_HPP_
 
-#include <eeros/control/Block1i1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <type_traits>
 
@@ -13,7 +13,7 @@ namespace eeros {
 		
 		// Non arithmetic types (container types like std::vector or eeros::math::Matrix)
 		template<typename T>
-		class Saturation<T, typename std::enable_if<!std::is_arithmetic<T>::value >::type> : public Block1i1o<T> {
+		class Saturation<T, typename std::enable_if<!std::is_arithmetic<T>::value >::type> : public Blockio<1,1,T> {
 			
 		public:
 			Saturation() : enabled(false) {
@@ -65,7 +65,7 @@ namespace eeros {
 		
 		// Arithmetic types
 		template<typename T>
-		class Saturation<T, typename std::enable_if<std::is_arithmetic<T>::value >::type> : public Block1i1o<T> {
+		class Saturation<T, typename std::enable_if<std::is_arithmetic<T>::value >::type> : public Blockio<1,1,T> {
 			
 		public:
 			Saturation() : enabled(false) {

@@ -34,8 +34,8 @@ class ControlSystem {
 class TestSafetyProperties : public SafetyProperties {
  public:
   TestSafetyProperties() : slFirst("first level"), slSecond("second level"), seGoUp("go to second level"), seGoDown("go to first level") {
-    Input<bool>* start = HAL::instance().getLogicInput("start", false);
-    Input<bool>* stop = HAL::instance().getLogicInput("stop", false);
+    auto* start = HAL::instance().getLogicInput("start", false);
+    auto* stop = HAL::instance().getLogicInput("stop", false);
     criticalInputs = { start, stop };
 
     addLevel(slFirst);

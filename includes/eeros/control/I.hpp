@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_I_HPP_
 #define ORG_EEROS_CONTROL_I_HPP_
 
-#include <eeros/control/Block1i1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetySystem.hpp>
@@ -26,7 +26,7 @@ namespace control {
  * @since v0.6
  */
 template < typename T = double >
-class I: public Block1i1o<T> {
+class I: public Blockio<1,1,T> {
  public:
   /**
    * Constructs an integrator instance.\n

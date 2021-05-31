@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_MOUSEINPUT_HPP_
 #define ORG_EEROS_CONTROL_MOUSEINPUT_HPP_
 
-#include <eeros/control/Block1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/hal/Mouse.hpp>
 
@@ -18,7 +18,7 @@ namespace control {
  *
  * @since v0.6
  */
-class MouseInput: public Block1o<Vector4> {
+class MouseInput: public Blockio<0,1,Vector4> {
  public:
   MouseInput(std::string dev, int priority = 20);
   MouseInput(std::string dev, Vector4 scale, Vector4 min, Vector4 max, int priority = 20);

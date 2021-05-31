@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_D_HPP_
 #define ORG_EEROS_CONTROL_D_HPP_
 
-#include <eeros/control/Block1i1o.hpp>
+#include <eeros/control/Blockio.hpp>
 
 namespace eeros {
 namespace control {
@@ -13,13 +13,12 @@ namespace control {
  * @since v1.0
  */
 template < typename T = double >
-class D: public Block1i1o<T> {
+class D: public Blockio<1,1,T> {
  public:
   /**
    * Constructs an differentiator instance.
    */
   D() {
-    this->out.getSignal().clear();
     prev.clear();
   }
   

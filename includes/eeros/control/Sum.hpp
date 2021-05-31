@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_SUM_HPP_
 #define ORG_EEROS_CONTROL_SUM_HPP_
 
-#include <eeros/control/Block1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/control/Input.hpp>
 
 namespace eeros {
@@ -18,7 +18,7 @@ namespace control {
  */
 
 template < uint8_t N = 2, typename T = double >
-class Sum : public Block1o<T> {
+class Sum : public Blockio<2,1,T> {
  public:
 
   /**
@@ -27,7 +27,6 @@ class Sum : public Block1o<T> {
   Sum() : first(true) {
     for(uint8_t i = 0; i < N; i++) {
       negated[i] = false;
-      in[i].setOwner(this);
       init[i] = false;
     }
   }
@@ -46,30 +45,19 @@ class Sum : public Block1o<T> {
       for (uint8_t i = 0; i < N; i++) {
         T val;
         if (init[i]) val = initVal[i];
-        else val = in[i].getSignal().getValue();
+        else val = this->in[i].getSignal().getValue();
         if (negated[i]) sum -= val;
         else sum += val;
       }
       first = false;
     } else {
       for (uint8_t i = 0; i < N; i++) {
-        if (negated[i]) sum -= in[i].getSignal().getValue();
-        else sum += in[i].getSignal().getValue();
+        if (negated[i]) sum -= this->in[i].getSignal().getValue();
+        else sum += this->in[i].getSignal().getValue();
       }
     }
     this->out.getSignal().setValue(sum);
-    this->out.getSignal().setTimestamp(in[0].getSignal().getTimestamp());
-  }
-  
-  /**
-   * Getter function for the input with a given index.
-   * 
-   * @param index - index of input
-   * @return The input with this index
-   */
-  virtual Input<T>& getIn(uint8_t index) {
-    if (index >= N) throw eeros::Fault("index too big in sum block '" + this->getName() + "'");
-    return in[index];
+    this->out.getSignal().setTimestamp(this->in[0].getSignal().getTimestamp());
   }
   
   /**
@@ -78,7 +66,7 @@ class Sum : public Block1o<T> {
    * @param index - index of input
    */
   virtual void negateInput(uint8_t index) {
-    if (index >= N) throw eeros::Fault("index too big in sum block '" + this->getName() + "'");
+    if (index >= N) throw eeros::Fault("Trying to get inexistent element of input vector in block '" + this->getName() + "'");
     negated[index] = true;
   }
   
@@ -99,7 +87,6 @@ class Sum : public Block1o<T> {
 
 
  private:
-  Input<T> in[N];
   bool negated[N];
   bool first;
   bool init[N];
@@ -117,7 +104,7 @@ std::ostream& operator<<(std::ostream& os, Sum<N,T>& sum) {
   return os;
 }
 
-};
-};
+}
+}
 
 #endif /* ORG_EEROS_CONTROL_SUM_HPP_ */

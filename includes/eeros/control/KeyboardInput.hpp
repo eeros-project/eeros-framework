@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_KEYBOARDINPUT_HPP_
 #define ORG_EEROS_CONTROL_KEYBOARDINPUT_HPP_
 
-#include <eeros/control/Block.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
 #include <eeros/hal/Keyboard.hpp>
@@ -23,7 +23,7 @@ namespace control {
  * @since v0.6v
  */
 template < uint8_t N >
-class KeyboardInput: public Block {
+class KeyboardInput: public Blockio<0,N,bool> {
  public:
   /**
    * Constructs a block which reads several keys on a keyboard.
@@ -37,7 +37,7 @@ class KeyboardInput: public Block {
     list.addKeys(asciiCode, name);
     HAL& hal = HAL::instance();
     for (uint8_t i = 0; i < list.nofKeys; i++) {
-      Input<bool>* in = new KeyboardDigIn(list, list.key[i]);
+      hal::Input<bool>* in = new KeyboardDigIn(list, list.key[i]);
       hal.addInput(in);
     }
   }
@@ -54,8 +54,8 @@ class KeyboardInput: public Block {
     uint64_t time = eeros::System::getTimeNs();
     auto& list = KeyList::instance();
     for (uint8_t i = 0; i < list.nofKeys; i++) {
-      out[i].getSignal().setValue(list.state[i]);
-      out[i].getSignal().setTimestamp(time);
+      this->out[i].getSignal().setValue(list.state[i]);
+      this->out[i].getSignal().setTimestamp(time);
     }
   }
   
@@ -69,7 +69,7 @@ class KeyboardInput: public Block {
     auto& list = KeyList::instance();
     if (index < 0 || index >= list.nofKeys) 
       throw IndexOutOfBoundsFault("Trying to get inexistent element of output in Block " + this->getName());  
-    return out[index];
+    return this->out[index];
   }
   
   /**
@@ -86,7 +86,6 @@ class KeyboardInput: public Block {
   
  protected:
   Keyboard k;
-  Output<bool> out[N];
 };
 
 }

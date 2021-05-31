@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <mutex>
-#include <eeros/control/Block1i.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/hal/HAL.hpp>
 #include <eeros/core/Fault.hpp>
 #include <eeros/control/NaNOutputFault.hpp>
@@ -21,7 +21,7 @@ namespace control {
  */
 
 template < typename T = double >
-class PeripheralOutput : public Block1i<T> {
+class PeripheralOutput : public Blockio<1,0,T> {
  public:
   /**
    * Constructs a peripheral output instance with a name defined in the 

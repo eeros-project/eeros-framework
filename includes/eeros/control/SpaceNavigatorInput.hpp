@@ -3,7 +3,7 @@
 
 #include <string>
 #include <thread>
-#include <eeros/control/Block1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/core/System.hpp>
 #include <eeros/hal/SpaceNavigator.hpp>
 #include <eeros/math/Matrix.hpp>
@@ -14,7 +14,7 @@ using namespace eeros::hal;
 namespace eeros {
 	namespace control {
 
-		class SpaceNavigatorInput : public Block1o<Matrix<SPACENAVIGATOR_AXIS_COUNT>> {
+		class SpaceNavigatorInput : public Blockio<0,1,Matrix<SPACENAVIGATOR_AXIS_COUNT>> {
 		public:
 			SpaceNavigatorInput(std::string dev, int priority = 5);
 			virtual ~SpaceNavigatorInput();

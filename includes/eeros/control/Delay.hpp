@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_DELAY_HPP_
 #define ORG_EEROS_CONTROL_DELAY_HPP_
 
-#include <eeros/control/Block1i1o.hpp>
+#include <eeros/control/Blockio.hpp>
 
 namespace eeros {
 namespace control {
@@ -17,7 +17,7 @@ namespace control {
  */
 
 template < typename T = double >
-class Delay : public Block1i1o<T> {
+class Delay : public Blockio<1,1,T> {
  public:
   /**
    * Constructs a delay block instance with a given delay in s.\n

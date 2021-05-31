@@ -5,6 +5,7 @@
 #include <eeros/control/Step.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/control/Sum.hpp>
+#include <eeros/control/Blockio.hpp>
 
 using namespace eeros::logger;
 using namespace eeros::control;
@@ -22,6 +23,18 @@ int main() {
   c1.getOut().getSignal().setName("signal 1");
   c1.run();
   log.info() << c1 << ": output = " << c1.getOut().getSignal();
+  
+  Blockio<1,1> gen([&](){
+    gen.getOut().getSignal().setValue(gen.getIn().getSignal().getValue() * 2);
+    gen.getOut().getSignal().setTimestamp(gen.getIn().getSignal().getTimestamp());
+  });
+  gen.setName("generic block");
+  gen.getIn().connect(c1.getOut());
+  gen.getIn().connect(c1.getOut());
+  gen.run();
+  log.info() << gen << ": output = " << gen.getOut().getSignal();
+//   log.info() <<  ": output = " << gen.getOut().getSignal();
+  
   
   Vector3 v1{3,4,5};
   log.info() << v1;

@@ -3,7 +3,7 @@
 
 #include <type_traits>
 #include <mutex>
-#include <eeros/control/Block1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/core/System.hpp>
 
 namespace eeros {
@@ -19,7 +19,7 @@ namespace control {
  */
 
 template < typename T = double >
-class Constant : public Block1o<T> {
+class Constant : public Blockio<0,1,T> {
  public:
   /**
    * Constructs a default constant instance with a value of nan (floating point types) or

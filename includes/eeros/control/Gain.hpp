@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_GAIN_HPP_
 #define ORG_EEROS_CONTROL_GAIN_HPP_
 
-#include <eeros/control/Block1i1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <type_traits>
 #include <memory>
 #include <mutex>
@@ -35,7 +35,7 @@ namespace control {
  */
 
 template<typename Tout = double, typename Tgain = double, bool elementWise = false>
-class Gain : public Block1i1o<Tout> {
+class Gain : public Blockio<1,1,Tout> {
  public:
   /**
    * Constructs a default gain instance with a gain of 1.\n

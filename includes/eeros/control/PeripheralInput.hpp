@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_PERIPHERALINPUT_HPP
 #define ORG_EEROS_CONTROL_PERIPHERALINPUT_HPP
 
-#include <eeros/control/Block1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/hal/HAL.hpp>
 #include <eeros/core/Fault.hpp>
 
@@ -18,7 +18,7 @@ namespace control {
  */
 
 template < typename T = double >
-class PeripheralInput : public Block1o<T> {
+class PeripheralInput : public Blockio<0,1,T> {
  public:
   /**
    * Constructs a peripheral input instance with a name defined in the 

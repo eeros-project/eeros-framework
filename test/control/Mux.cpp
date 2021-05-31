@@ -40,7 +40,7 @@ TEST(controlMuxTest, input) {
     m.getIn(2);
     FAIL();
   } catch(eeros::Fault const & err) {
-    EXPECT_EQ(err.what(), std::string("Trying to get inexistent input in block 'mux'"));
+    EXPECT_EQ(err.what(), std::string("Trying to get inexistent element of input vector in block 'mux'"));
   }
 }
 

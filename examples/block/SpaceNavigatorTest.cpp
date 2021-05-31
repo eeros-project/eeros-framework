@@ -33,7 +33,7 @@ class ControlSystem {
 class TestSafetyProperties : public SafetyProperties {
 public:
   TestSafetyProperties() : slFirst("first level"), slSecond("second level"), seGoUp("go to second level"), seGoDown("go to first level") {
-    Input<bool>* in1 = HAL::instance().getLogicInput("SpaceNavButtonL", false);
+    auto* in1 = HAL::instance().getLogicInput("SpaceNavButtonL", false);
     criticalInputs = { in1 };
 
     addLevel(slFirst);

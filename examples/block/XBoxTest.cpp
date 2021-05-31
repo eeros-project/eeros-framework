@@ -31,7 +31,7 @@ class ControlSystem {
 class MySafetyProperties : public SafetyProperties {
 public:
   MySafetyProperties() : slFirst("first level"), slSecond("second level"), seGoUp("go to second level"), seGoDown("go to first level") {
-    Input<bool>* in1 = HAL::instance().getLogicInput("XBoxButtonX", false);
+    auto* in1 = HAL::instance().getLogicInput("XBoxButtonX", false);
     criticalInputs = { in1 };
 
     addLevel(slFirst);

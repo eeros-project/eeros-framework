@@ -41,7 +41,7 @@ TEST(controlDeMuxTest, output) {
     dm.getOut(2);
     FAIL();
   } catch(eeros::Fault const & err) {
-    EXPECT_EQ(err.what(), std::string("Trying to get inexistent output in block 'demux'"));
+    EXPECT_EQ(err.what(), std::string("Trying to get inexistent element of output vector in block 'demux'"));
   }
 }
 

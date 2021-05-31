@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_STEP_HPP_
 #define ORG_EEROS_CONTROL_STEP_HPP_
 
-#include <eeros/control/Block1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/core/System.hpp>
 
 namespace eeros {
@@ -18,7 +18,7 @@ namespace control {
  */
 
 template < typename T = double >
-class Step : public Block1o<T> {
+class Step : public Blockio<0,1,T> {
  public:
    
   /**

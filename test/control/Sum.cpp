@@ -61,7 +61,7 @@ TEST(controlSumTest, index) {
 		s1.getIn(2).connect(c1.getOut());
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("index too big in sum block 's1'"));
+		EXPECT_EQ(err.what(), std::string("Trying to get inexistent element of input vector in block 's1'"));
 	}
 	
 	s1.negateInput(0);
@@ -70,7 +70,7 @@ TEST(controlSumTest, index) {
 		s1.negateInput(2);
 		FAIL();
 	} catch(eeros::Fault const & err) {
-		EXPECT_EQ(err.what(), std::string("index too big in sum block 's1'"));
+		EXPECT_EQ(err.what(), std::string("Trying to get inexistent element of input vector in block 's1'"));
 	}
 }
 

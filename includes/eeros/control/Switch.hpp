@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_SWITCH_HPP_
 #define ORG_EEROS_CONTROL_SWITCH_HPP_
 
-#include <eeros/control/Block1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/control/Input.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetySystem.hpp>
@@ -25,7 +25,7 @@ namespace control {
  */
 
 template < uint8_t N = 2, typename T = double >
-class Switch : public Block1o<T> {
+class Switch : public Blockio<N,1,T> {
  public:
 
   /**
@@ -43,9 +43,7 @@ class Switch : public Block1o<T> {
         safetySystem(nullptr),
         safetyEvent(nullptr),
         activeLevel(nullptr),
-        log(logger::Logger::getLogger()) {
-    for(uint8_t i = 0; i < N; i++) in[i].setOwner(this);
-  }
+        log(logger::Logger::getLogger()) { }
 
   /**
   * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -78,16 +76,6 @@ class Switch : public Block1o<T> {
     this->out.getSignal().setTimestamp(this->in[currentInput].getSignal().getTimestamp());
   }
                   
-  /**
-  * Getter function for the input with a given index.
-  * 
-  * @param index - index of input
-  * @return The input with this index
-  */
-  virtual Input<T>& getIn(uint8_t index) {
-    return in[index];
-  }
-                                          
   /**
   * Changes the switch position.
   * 
@@ -190,7 +178,6 @@ class Switch : public Block1o<T> {
   }
 
  protected:
-  Input<T> in[N];
   uint8_t currentInput, nextInput;
   T switchLevel, delta;
   bool armed = false;
@@ -210,7 +197,7 @@ std::ostream& operator<<(std::ostream& os, Switch<N,T>& sw) {
   return os;
 }
 
-};
-};
+}
+}
 
 #endif /* ORG_EEROS_CONTROL_SWITCH_HPP_ */
