@@ -36,8 +36,10 @@ class ControlSystem {
     tdFast.addBlock(t1.outBlock);
     tdFast.addBlock(t2.inBlock);
     tdSlow.addBlock(t2.outBlock);
-    Executor::instance().add(tdFast);
-    Executor::instance().add(tdSlow);
+    Periodic periodicFast("perFast", period, tdFast);
+    Periodic periodicSlow("perSlow", 100*period, tdSlow);
+    periodicFast.after.push_back(periodicSlow);
+    Executor::instance().add(periodicFast);
   }
   TimeDomain tdFast, tdSlow;
   Constant<> c1;
@@ -69,7 +71,7 @@ int main() {
   Lambda l1 ([&] () { });
   Periodic periodic("per1", 0.5, l1);
   periodic.monitors.push_back([&](PeriodicCounter &pc, Logger &log){
-    log.info() << cs.t1.outBlock.getOut().getSignal() << "   " << cs.t2.outBlock.getOut().getSignal();
+    log.info() << cs.i1.getOut().getSignal() << "  " << cs.t1.outBlock.getOut().getSignal() << "   " << cs.t2.outBlock.getOut().getSignal();
   });
 
   // Create and run executor
