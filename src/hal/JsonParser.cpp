@@ -2,6 +2,7 @@
 #include <eeros/core/Fault.hpp>
 #include <regex>
 #include <cmath>
+#include <limits>
 #include <dlfcn.h>
 #include <eeros/hal/Output.hpp>
 #include <eeros/hal/Input.hpp>
