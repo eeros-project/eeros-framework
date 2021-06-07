@@ -4,6 +4,7 @@
 #include <cmath>
 #include <map>
 #include <functional>
+#include <string>
 
 namespace eeros {
 namespace config {

@@ -2,6 +2,7 @@
 #define ORG_EEROS_SEQUENCER_SEQUENCER_HPP_
 #include <eeros/sequencer/SequencerUI.hpp>
 #include <eeros/logger/Logger.hpp>
+#include <thread>
 #include <vector>
 #include <atomic>
 #include <memory>

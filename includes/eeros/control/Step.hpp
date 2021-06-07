@@ -40,7 +40,7 @@ class Step : public Blockio<0,1,T> {
    * @param delayTime - delay time
    */
   Step(T initValue, T stepHeight, double delayTime) : initValue(initValue), stepHeight(stepHeight), delayTime(delayTime) {
-    first = true;
+   reset();
   }
 
   /**
