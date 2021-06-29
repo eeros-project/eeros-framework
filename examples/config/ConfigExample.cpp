@@ -55,10 +55,10 @@ int main(int argc, char **argv) {
   log.info() << "Config read from file: value3 = " << configFile.value3;
   val.str(std::string());
   for (auto &x: configFile.value4) val << x << ", ";
-  log.info() << "Config read from file: value4 = ";
+  log.info() << "Config read from file: value4 = " << val.str();
   val.str(std::string());
   for (auto &x: configFile.value5) val << x << ", ";
-  log.info() << "Config read from file: value5 = ";
+  log.info() << "Config read from file: value5 = " << val.str();
   log.info() << "Config read from file: value6 = " << configFile.value6;
 
   configFile.value1 += 100;
