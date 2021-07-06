@@ -10,7 +10,7 @@
 #include <eeros/logger/Logger.hpp>
 
 #ifdef USE_ETHERCAT
-#include <EtherCATStack.hpp>
+#include <EcMasterlibMain.hpp>
 #endif
 
 #ifdef USE_ROS
@@ -91,7 +91,7 @@ class Executor : public Runnable {
   static constexpr int basePriority = 49;
   PeriodicCounter counter;
 #ifdef USE_ETHERCAT
-  void syncWithEtherCATSTack(ecmasterlib::EtherCATStack* etherCATStack);
+  void syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack);
 #endif
 #ifdef USE_ROS
   void syncWithRosTime();
@@ -110,7 +110,7 @@ class Executor : public Runnable {
   bool syncWithRosTopicIsSet;
   logger::Logger log;
 #ifdef USE_ETHERCAT
-  ecmasterlib::EtherCATStack* etherCATStack;
+  ecmasterlib::EcMasterlibMain* etherCATStack;
 #endif
 };
 

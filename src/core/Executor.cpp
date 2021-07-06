@@ -108,7 +108,7 @@ Executor& Executor::instance() {
 
 
 #ifdef USE_ETHERCAT
-void Executor::syncWithEtherCATSTack(ecmasterlib::EtherCATStack* etherCATStack) {
+void Executor::syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack) {
   syncWithEtherCatStackIsSet = true;
   this->etherCATStack = etherCATStack;
 }
