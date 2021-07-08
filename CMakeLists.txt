@@ -51,7 +51,7 @@ INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include
 set(INCLUDE_INSTALL_DIR "include/")
 set(LIBUCL_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/libucl-src/include")
 set(LIB_INSTALL_DIR lib/)
-set(LIBUCL_LINK_DIR "${CMAKE_CURRENT_BINARY_DIR}/libucl-build/")
+set(LIBUCL_LINK_DIR "${CMAKE_CURRENT_BINARY_DIR}/libucl-build")
 
 include(CMakePackageConfigHelpers)
 
