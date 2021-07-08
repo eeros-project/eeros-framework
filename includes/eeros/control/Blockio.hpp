@@ -22,12 +22,12 @@ namespace control {
  * a simple algorithm, e.g. adding a offset and scale to a signal.
  * 
  * Define such a block with an example algorithm as follows:
- * GenericBlock<2,1,Vector2,Vector2> gen([&]() {
- *   auto val = (gen.getIn(0).getSignal().getValue() + 0.5) * 2;
+ * Blockio<2,1,Vector2,Vector2> block([&]() {
+ *   auto val = (block.getIn(0).getSignal().getValue() + 0.5) * 2;
  *   val[0] *= -1.0;
- *   val += gen.getIn(1).getSignal().getValue() + 1.0;
- *   gen.getOut().getSignal().setValue(val);
- *   gen.getOut().getSignal().setTimestamp(gen.getIn(0).getSignal().getTimestamp());
+ *   val += block.getIn(1).getSignal().getValue() + 1.0;
+ *   block.getOut().getSignal().setValue(val);
+ *   block.getOut().getSignal().setTimestamp(gen.getIn(0).getSignal().getTimestamp());
  * });
 * 
  * @tparam N - number of inputs

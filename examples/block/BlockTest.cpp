@@ -31,10 +31,9 @@ int main() {
   gen.setName("generic block");
   gen.getIn().connect(c1.getOut());
   gen.getIn().connect(c1.getOut());
+  gen.getOut().getSignal().setName("output");
   gen.run();
   log.info() << gen << ": output = " << gen.getOut().getSignal();
-//   log.info() <<  ": output = " << gen.getOut().getSignal();
-  
   
   Vector3 v1{3,4,5};
   log.info() << v1;
