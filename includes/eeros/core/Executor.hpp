@@ -111,8 +111,6 @@ class Executor : public Runnable {
   logger::Logger log;
 #ifdef USE_ETHERCAT
   ecmasterlib::EcMasterlibMain* etherCATStack;
-  std::mutex* m;
-  std::condition_variable* cv;
 #endif
 };
 
