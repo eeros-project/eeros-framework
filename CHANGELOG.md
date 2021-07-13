@@ -4,8 +4,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Unreleased
-(v1.3.0 targeted for 2021-03-31) ([GitHub compare v1.2.0...master](https://github.com/eeros-project/eeros-framework/compare/v1.2.0...master))
+## v1.3.0
+(2021-07-13) ([GitHub compare v1.2.0...v1.3.0](https://github.com/eeros-project/eeros-framework/compare/v1.2.0...v1.3.0))
+
+### Added Features
+* Improve readability of CMake files
+* Add CMake modules lib loader
+* Add library only build option
+* Raise cmake to version 3.10 including all wrapper libraries
+* Add install targets for examples
+* New Kalman filter block
+* Template spezialization in SocketData block improved
+* SocketData block has no more three stage buffer delay
+* Keyboard input block overhauled
+* Error in path planner fixed
+* Add check to disable timedomains wrongly added twice
+* Fix error in D block when subsequent timestamps are equal
+* ROS blocks only run when rosmaster is present
+* Add new block for generic algorithms
+* Add new input class for subsystems
+* Add feature to integrator block
+* Add off range check for critical inputs and signal checker
+* Adjust executor to triggering from EtherCAT
 
 
 ## v1.2.0
