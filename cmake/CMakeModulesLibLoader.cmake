@@ -24,7 +24,7 @@
 #  limitations under the License.
 # 
 #
-#  v0.1.1
+#  v0.1.2
 #
 
 
@@ -59,9 +59,11 @@ function(load_cmake_modules_lib)
     endif()
 
     set(LIB_CMAKE_MODULES_ROOT_PATH "${CMAKE_BINARY_DIR}/cmake-modules" CACHE PATH "Root directory path of the CMake modules library" FORCE)
-    list(APPEND CMAKE_MODULE_PATH ${LIB_CMAKE_MODULES_ROOT_PATH})
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} CACHE PATH "List of directories specifying a search path for CMake modules to be loaded" FORCE)
-    set(LIB_CMAKE_MODULES_CLONED TRUE CACHE BOOL "TRUE if the cmake-modules library was cloned successfully")
+    set(CMAKE_MODULE_PATH_TMP ${CMAKE_MODULE_PATH})
+    list(APPEND CMAKE_MODULE_PATH_TMP ${LIB_CMAKE_MODULES_ROOT_PATH})
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH_TMP} CACHE PATH "List of directories specifying a search path for CMake modules to be loaded" FORCE)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH_TMP} PARENT_SCOPE) # necessary if was set in directory scope already.
+    set(LIB_CMAKE_MODULES_CLONED TRUE CACHE BOOL "TRUE if the cmake-modules library was cloned successfully" FORCE)
   endif()
 endfunction()
 
