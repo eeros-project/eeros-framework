@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_MEDIANFILTER_HPP_
 #define ORG_EEROS_CONTROL_MEDIANFILTER_HPP_
 
-#include <eeros/control/Block1i1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <algorithm>
 #include <type_traits>
 #include <cmath>
@@ -35,7 +35,7 @@ namespace eeros {
 		 */
 
 		template <size_t N, typename Tval = double>
-		class MedianFilter : public Block1i1o<Tval> {
+		class MedianFilter : public Blockio<1,1,Tval> {
 
 		public:
 			/**

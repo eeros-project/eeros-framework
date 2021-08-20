@@ -213,7 +213,6 @@ endif (NOT ECMASTERLIB_LIB_DIR AND NOT USE_ETHERCAT)
 message(STATUS "")
 
 
-
 ## Use CAN if instructed
 if(USE_CAN)
 	message(STATUS "")
@@ -225,6 +224,18 @@ if(USE_CAN)
 	link_directories(${canopenlib_DIR})
 endif()
 
+
+## Use SBG IMU Library if instructed
+if(USE_SBG)
+	message(STATUS "")
+	message(STATUS "Use sbgellipse")
+	message(STATUS "**********************************")
+
+	find_package(sbgECom QUIET)
+	include_directories(${sbgECom_INCLUDE_DIR})
+	link_directories(${sbgECom_DIR})
+endif()
+      
 
 
 ## Use ROS if found and instructed

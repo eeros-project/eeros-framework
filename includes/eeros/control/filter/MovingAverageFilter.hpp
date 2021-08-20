@@ -1,7 +1,7 @@
-#ifndef ORG_EEROS_CONTROL_MAFILTER_HPP_
-#define ORG_EEROS_CONTROL_MAFILTER_HPP_
+#ifndef ORG_EEROS_CONTROL_MOVINGAVERAGEFILTER_HPP_
+#define ORG_EEROS_CONTROL_MOVINGAVERAGEFILTER_HPP_
 
-#include <eeros/control/Block1i1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <type_traits>
 #include <ostream>
 
@@ -10,7 +10,7 @@ namespace eeros {
 	namespace control {
 
 		/**
-		 * A moving average filter (MAFilter) block is used to filter an input signal. 
+		 * A moving average filter block is used to filter an input signal. 
 		 * The output signal value depends linearly on the current and various past
 		 * input signal values.
 		 * This is achieved by multiplying the current and the past values with
@@ -22,7 +22,7 @@ namespace eeros {
 		 *
 		 * Outp = c[0]*prev[0] + c[1]*prev[1]   + ... +  c[N]*Inp
 		 * 
-		 * MAFilter is a class template with two type and one non-type template arguments.
+		 * MovingAverageFilter is a class template with two type and one non-type template arguments.
 		 * The two type template arguments specify the types which are used for the 
 		 * values and the coefficients when the class template is instanciated.
 		 * The non-type template argument specifies the number of coefficients and the
@@ -36,14 +36,14 @@ namespace eeros {
 		 */
 
 		template <size_t N, typename Tval = double, typename Tcoeff = Tval>
-		class MAFilter : public Block1i1o<Tval> {
+		class MovingAverageFilter : public Blockio<1,1,Tval> {
 
 		public:
 			/**
-			 * Constructs a MAFilter instance with the coefficients coeff.\n
+			 * Constructs a MovingAverageFilter instance with the coefficients coeff.\n
 			 * @param coeff - coefficients
 			 */
-			explicit MAFilter(Tcoeff (& coeff)[N]) : coefficients{coeff} {
+			explicit MovingAverageFilter(Tcoeff coeff[]) /*(& coeff)[N]) */: coefficients{coeff} {
 				zeroInitPreviousValues<Tval>();
 			}
 
@@ -64,7 +64,7 @@ namespace eeros {
 			 * @see disable()
 			 */
 			virtual void run() {
-				 Tval actualValue = this->in.getSignal().getValue();
+				Tval actualValue = this->in.getSignal().getValue();
 				Tval result = coefficients[N-1] * actualValue;
 
 				for(size_t i = 0; i < N-1; i++) {
@@ -113,7 +113,7 @@ namespace eeros {
 			 * the class access to the private fields.
 			 */
 			template <size_t No, typename ValT, typename CoeffT>
-			friend std::ostream& operator<<(std::ostream& os, MAFilter<No,ValT,CoeffT>& filter);
+			friend std::ostream& operator<<(std::ostream& os, MovingAverageFilter<No,ValT,CoeffT>& filter);
 
 
 		protected:
@@ -140,12 +140,12 @@ namespace eeros {
 
 		/**
 		 * Operator overload (<<) to enable an easy way to print the state of a
-		 * MAFilter instance to an output stream.
+		 * MovingAverageFilter instance to an output stream.
 		 * Does not print a newline control character.
 		 */
 		template <size_t N, typename Tval, typename Tcoeff>
-		std::ostream& operator<<(std::ostream& os, MAFilter<N,Tval,Tcoeff>& filter) {
-			os << "Block MAFilter: '" << filter.getName() << "' is enabled=";
+		std::ostream& operator<<(std::ostream& os, MovingAverageFilter<N,Tval,Tcoeff>& filter) {
+			os << "Block MovingAverageFilter: '" << filter.getName() << "' is enabled=";
 			os << filter.enabled << ", ";
 
 			os << "coefficients:[" << filter.coefficients[0];
@@ -164,4 +164,4 @@ namespace eeros {
 	};
 };
 
-#endif /* ORG_EEROS_CONTROL_MAFILTER_HPP_ */
+#endif /* ORG_EEROS_CONTROL_MOVINGAVERAGEFILTER_HPP_ */
