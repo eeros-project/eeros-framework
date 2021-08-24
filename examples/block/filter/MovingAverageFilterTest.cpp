@@ -20,8 +20,9 @@ double period = 0.1;
 class ControlSystem {
  public:
   ControlSystem() : 
+  coeff_arr({1.0, 2.0}),
+  moving_avg(coeff_arr),
   setVal(0),
-//   moving_avg({1.0}),
   td("td", period, true) 
   {
 	moving_avg.getIn().connect(setVal.getOut());
@@ -30,9 +31,9 @@ class ControlSystem {
 	td.addBlock(setVal);
 	td.addBlock(moving_avg);
   }
-  double test = {1.0, 2.0, 3.0};
+  double coeff_arr[2];
+  MovingAverageFilter<2> moving_avg;
   Constant<double> setVal;
-  MovingAverageFilter<3,double,double> moving_avg(test);
   TimeDomain td;
 };
 
@@ -61,8 +62,8 @@ int main() {
   p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
     static int count = 0;
     log.info() << count << " -> " 
-			   << cs.setVal.getOut().getSignal().getValue() << "  " ;
-//                << cs.moving_avg.getOut().getSignal().getValue();
+			   << cs.setVal.getOut().getSignal().getValue() << "  "
+               << cs.moving_avg.getOut().getSignal().getValue();
     if (count == 0) {
 		cs.setVal.setValue(0.0);
     }

@@ -43,7 +43,7 @@ namespace eeros {
 			 * Constructs a MovingAverageFilter instance with the coefficients coeff.\n
 			 * @param coeff - coefficients
 			 */
-			explicit MovingAverageFilter(Tcoeff coeff[]) /*(& coeff)[N]) */: coefficients{coeff} {
+			explicit MovingAverageFilter(const Tcoeff (& coeff)[N]) : coefficients{coeff} {
 				zeroInitPreviousValues<Tval>();
 			}
 
@@ -117,7 +117,7 @@ namespace eeros {
 
 
 		protected:
-			Tcoeff * coefficients;
+			const Tcoeff * coefficients;
 			Tval previousValues[N]{};
 			bool enabled{true};
 
