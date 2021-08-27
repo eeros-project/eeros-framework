@@ -105,8 +105,8 @@ namespace hal {
 			*/
 			virtual void run();
 			
-			bool started = false;
-			bool running = false;
+			volatile bool started = false;
+			volatile bool running = false;
 			
 			int slaveId;
 			modbus_t *ctx;

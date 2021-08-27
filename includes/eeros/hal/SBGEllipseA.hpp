@@ -48,8 +48,8 @@ namespace hal {
 		private:
 			eeros::logger::Logger log;
 			virtual void run();
-			bool started = false;
-			bool running = false;
+			volatile bool started = false;
+			volatile bool running = false;
 			
 			bool enable_fast_data;
 			SbgEComHandle			comHandle;

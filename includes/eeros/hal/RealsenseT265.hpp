@@ -59,8 +59,8 @@ namespace hal {
 		* 
 		*/
 		virtual void run();
-		bool started;
-		bool running;
+		volatile bool started;
+		volatile bool running;
 		
 		rs2::pipeline pipe;  // Declare RealSense pipeline, encapsulating the actual device and sensors
 		rs2::config cfg;     // Create a configuration for configuring the pipeline with a non default profile

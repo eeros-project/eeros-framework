@@ -194,8 +194,8 @@ namespace hal {
 		}
 	}
 	
-	bool running = false;
-	bool starting = true;
+	volatile bool running = false;
+	volatile bool starting = true;
 	bool first = true;
 	bool data_valid = false;
 	bool markers_in_range = false;
