@@ -20,7 +20,7 @@ double period = 0.1;
 class ControlSystem {
  public:
   ControlSystem() : 
-  coeff_arr({1.0, 2.0}),
+  coeff_arr({1.0, 1.0}),
   moving_avg(coeff_arr),
   setVal(0),
   td("td", period, true) 
@@ -49,7 +49,7 @@ class PPSafetyProperties : public SafetyProperties {
 int main() {
   Logger::setDefaultStreamLogger(std::cout);
   Logger log = Logger::getLogger();
-  log.info() << "Pathplanner constant acceleration started...";
+  log.info() << "MovingAverageFilter test started...";
   
   ControlSystem cs;
   Periodic p1("p1", period, cs.td);

@@ -48,7 +48,7 @@ class PPSafetyProperties : public SafetyProperties {
 int main() {
   Logger::setDefaultStreamLogger(std::cout);
   Logger log = Logger::getLogger();
-  log.info() << "Pathplanner constant acceleration started...";
+  log.info() << "LowPassFilter test started...";
   
   ControlSystem cs;
   Periodic p1("p1", period, cs.td);

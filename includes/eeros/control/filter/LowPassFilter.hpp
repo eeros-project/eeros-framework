@@ -7,6 +7,26 @@
 namespace eeros {
 namespace control {
 	
+	/**
+	* A low pass filter block is used to filter an input signal. 
+	* The output signal value depends on the current and the past
+	* input signal values, according to this equation:
+	* valOut = valin*alpha + valprev*(1-alpha) 
+	* 
+	* LowPassFilter is a class template with one type template argument.
+	* The type template argument specifies the type which is used for the 
+	* values when the class template is instantiated.
+	* 
+	* If the LowPassFilter is used with matrices (Matrix, Vector), the filter algorithm
+	* will consider all values in the matrice and will not separate them.
+	* For example a 3-tuple of a Vector3 instance will be kept together during processing
+	* in the LowPassFilter.\n
+	* 
+	* @tparam T - value type (double - default type)
+	* 
+	* @since TODO
+	*/
+	
 	template<typename T = double>
 	class LowPassFilter : public eeros::control::Blockio<1,1,T>
 	{
@@ -40,8 +60,13 @@ namespace control {
 			T valin = sig.getValue();
 			T valprev = prev.getValue();
 			
+			if (first) {
+				valprev = valin;
+				first = false;
+			}
+			
 			if(enabled) {
-				valOut = valin*alpha+ valprev*(1-alpha); 
+				valOut = valin*alpha + valprev*(1-alpha); 
 			}
 			else {
 				valOut = valin;
@@ -77,6 +102,9 @@ namespace control {
 
 	private:
 		double alpha{1.0};
+		
+	protected:
+		bool first{true};
 		bool enabled{true};
 		Signal<T> prev;
 		T valOut;
