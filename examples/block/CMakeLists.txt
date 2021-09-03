@@ -42,6 +42,10 @@ add_executable(pathPlannerTest3 PathPlannerTest3.cpp copyPathFile)
 target_link_libraries(pathPlannerTest3 eeros ${EEROS_LIBS})
 list(APPEND targets pathPlannerTest3)
 
+add_executable(rateLimiterTest RateLimiterTest.cpp)
+target_link_libraries(rateLimiterTest eeros ${EEROS_LIBS})
+list(APPEND targets rateLimiterTest)
+
 add_subdirectory(filter)
 
 if(INSTALL_EXAMPLES)
