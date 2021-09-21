@@ -20,8 +20,8 @@ double period = 0.1;
 class ControlSystem {
  public:
   ControlSystem() : 
-  setVal(0), //{0, 0}), 
-  test_block(-3.1415, 3.1415),
+  setVal({0, 0}), 
+  test_block({0.0, -3.1415}, {6.28, 3.1415}),
   td("td", period, true)  
   {
 	test_block.getIn().connect(setVal.getOut());
@@ -29,10 +29,10 @@ class ControlSystem {
 	td.addBlock(setVal);
 	td.addBlock(test_block);
   }
-  Constant<double> setVal;
-  WrapAround<double> test_block;
-//   Constant<eeros::math::Vector2> setVal;
-//   WrapAround<eeros::math::Vector2> test_block;
+//   Constant<double> setVal;
+//   WrapAround<double> test_block;
+  Constant<eeros::math::Vector2> setVal;
+  WrapAround<eeros::math::Vector2, eeros::math::Vector2> test_block;
   
   TimeDomain td;
 };
@@ -60,11 +60,11 @@ int main() {
   Lambda l1 ([&] () { });
   Periodic p2("p2", period, l1);
   p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
-	cs.setVal.setValue(cs.setVal.getValue() + 0.2);
+// 	cs.setVal.setValue(cs.setVal.getValue() + 0.2);
     
-//     eeros::math::Vector2 actVal = cs.setVal.getValue();
-// 	eeros::math::Vector2 incr = {0.2, 0.2};
-// 	cs.setVal.setValue(actVal + incr);
+    eeros::math::Vector2 actVal = cs.setVal.getValue();
+	eeros::math::Vector2 incr = {0.2, 0.2};
+	cs.setVal.setValue(actVal + incr);
 	
     log.info() << cs.setVal.getOut().getSignal().getValue() << "  "
                << cs.test_block.getOut().getSignal().getValue();
