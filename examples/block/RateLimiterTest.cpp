@@ -20,7 +20,7 @@ double period = 0.1;
 class ControlSystem {
  public:
   ControlSystem() : 
-  setVal(0), 
+  setVal({0, 1}), 
   rate_limiter(-0.5, 0.5),
   td("td", period, true)  
   {
@@ -30,8 +30,11 @@ class ControlSystem {
 	td.addBlock(setVal);
 	td.addBlock(rate_limiter);
   }
-  RateLimiter<double, double, true> rate_limiter;
-  Constant<double> setVal;
+//   Constant<double> setVal;
+//   RateLimiter<double, double, true> rate_limiter;
+
+  Constant<eeros::math::Vector2> setVal;
+  RateLimiter<eeros::math::Vector2, double, true> rate_limiter;
   TimeDomain td;
 };
 

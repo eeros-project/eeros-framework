@@ -83,43 +83,7 @@ namespace control {
 			
 			if(enabled) {
 				double dt = tin - tprev;
-				Trate rate;
-				
-				if(std::is_same<double, Tout>::value){
-					rate = (inVal-outPrev.getValue())/dt;
-					
-					if(rate > rising_slew_rate) {
-						outVal = dt * rising_slew_rate + outPrev.getValue();
-					}
-					else if(rate < falling_slew_rate) {
-						outVal = dt * falling_slew_rate + outPrev.getValue();
-					}
-				
-				}
-// 				else {
-// 					for(unsigned int i = 0; i < inVal.size(); i++) {
-// 						rate[i] = (inVal[i]-outPrev.getValue()[i])/dt;
-// 						
-// 						if(!elementWise) {
-// 							if(rate[i] > rising_slew_rate) {
-// 								outVal[i] = dt * rising_slew_rate + outPrev.getValue()[i];
-// 							}
-// 							else if(rate[i] < falling_slew_rate) {
-// 								outVal[i] = dt * falling_slew_rate + outPrev.getValue()[i];
-// 							}
-// 						}
-// 						else {
-// 							if(rate[i] > rising_slew_rate[i]) {
-// 								outVal[i] = dt * rising_slew_rate[i] + outPrev.getValue()[i];
-// 							}
-// 							else if(rate[i] < falling_slew_rate[i]) {
-// 								outVal[i] = dt * falling_slew_rate[i] + outPrev.getValue()[i];
-// 							}
-// 						}
-// 					}
-// 				}
-				
-				// this->out.getSignal().setValue(calculateResults<Tout>(this->in.getSignal().getValue()));
+				outVal = calculateResult<Tout>(inVal, dt);
 			}
 			outPrev.setValue(outVal);
 			outPrev.setTimestamp(this->in.getSignal().getTimestamp());
@@ -162,16 +126,96 @@ namespace control {
 	private:
 		Signal<Tout> outPrev;
 		
-// 		template<typename S>
-// 		typename std::enable_if<!elementWise, S>::type calculateRateOutput(S value) {
-// 			return gain * value;
-// 		}
-// 
-// 
-// 		template<typename S>
-// 		typename std::enable_if<elementWise, S>::type calculateResults(S value) {
-// 			return value.multiplyElementWise(gain);
-// 		}
+		template <typename S> 
+		typename std::enable_if<std::is_integral<S>::value, S>::type calculateResult(S inValue, double dt) {
+			Trate rate = (inValue-outPrev.getValue())/dt;
+			Tout outVal;
+			
+			if(rate > rising_slew_rate) {
+				outVal = dt * rising_slew_rate + outPrev.getValue();
+			}
+			else if(rate < falling_slew_rate) {
+				outVal = dt * falling_slew_rate + outPrev.getValue();
+			}
+			else
+				outVal = inValue;
+			
+			return outVal;
+		}
+		
+		template <typename S> 
+		typename std::enable_if<std::is_floating_point<S>::value, S>::type calculateResult(S inValue, double dt) {
+			Trate rate = (inValue-outPrev.getValue())/dt;
+			Tout outVal;
+			
+			if(rate > rising_slew_rate) {
+				outVal = dt * rising_slew_rate + outPrev.getValue();
+			}
+			else if(rate < falling_slew_rate) {
+				outVal = dt * falling_slew_rate + outPrev.getValue();
+			}
+			else
+				outVal = inValue;
+			
+			return outVal;
+		}
+		template <typename S> 
+		typename std::enable_if<std::is_compound<S>::value && std::is_integral<typename S::value_type>::value, S>::type calculateResult(S inValue, double dt) {
+			for(unsigned int i = 0; i < inValue.size(); i++) {
+				Trate rate[i] = (inValue[i]-outPrev.getValue()[i])/dt;
+				Tout outVal;
+				
+				if(!elementWise) {
+					if(rate[i] > rising_slew_rate) {
+						outVal[i] = dt * rising_slew_rate + outPrev.getValue()[i];
+					}
+					else if(rate[i] < falling_slew_rate) {
+						outVal[i] = dt * falling_slew_rate + outPrev.getValue()[i];
+					}
+					else
+						outVal = inValue;
+				}
+				else {
+					if(rate[i] > rising_slew_rate[i]) {
+						outVal[i] = dt * rising_slew_rate[i] + outPrev.getValue()[i];
+					}
+					else if(rate[i] < falling_slew_rate[i]) {
+						outVal[i] = dt * falling_slew_rate[i] + outPrev.getValue()[i];
+					}
+					else
+						outVal = inValue;
+				}
+			}
+		}
+		template <typename S> 
+		typename std::enable_if<std::is_compound<S>::value && std::is_floating_point<typename S::value_type>::value, S>::type calculateResult(S inValue, double dt) {
+			Trate[N];
+			for(unsigned int i = 0; i < inValue.size(); i++) {
+				Trate rate[i] = (inValue[i]); //-outPrev.getValue()(i))/dt;
+				Tout outVal;
+				
+				if(!elementWise) {
+					if(rate[i] > rising_slew_rate) {
+						outVal[i] = dt * rising_slew_rate + outPrev.getValue()[i];
+					}
+					else if(rate[i] < falling_slew_rate) {
+						outVal[i] = dt * falling_slew_rate + outPrev.getValue()[i];
+					}
+					else
+						outVal = inValue;
+				}
+				else {
+					if(rate[i] > rising_slew_rate[i]) {
+						outVal[i] = dt * rising_slew_rate[i] + outPrev.getValue()[i];
+					}
+					else if(rate[i] < falling_slew_rate[i]) {
+						outVal[i] = dt * falling_slew_rate[i] + outPrev.getValue()[i];
+					}
+					else
+						outVal = inValue;
+				}
+			}
+		}
 		
 	protected:
 		Trate falling_slew_rate, rising_slew_rate;

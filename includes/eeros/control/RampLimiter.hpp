@@ -122,6 +122,18 @@ namespace control {
 		double old_val = 0;
 		double start = 0;
 		
+// 		template<typename S>
+// 		typename std::enable_if<!elementWise, S>::type calculateResults(S value) {
+// 			return gain * value;
+// 		}
+// 
+// 
+// 		template<typename S>
+// 		typename std::enable_if<elementWise, S>::type calculateResults(S value) {
+// 			return value.multiplyElementWise(gain);
+// 		}
+
+		
 	protected:
 		bool first{true};
 		bool enabled{false};
