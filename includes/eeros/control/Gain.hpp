@@ -128,6 +128,19 @@ class Gain : public Blockio<1,1,Tout> {
     if (gain < minGain) {
       gain = minGain;
     }
+    
+    if(rootCurve){
+// 		if (fabs(input) > switch_point_xy){
+// 			if(input >= 0) 
+// 				x_out =   sqrt(2*gainP_max_acc_xy*(fabs(input)-switch_point_xy/2));
+// 			else 
+// 				x_out = - sqrt(2*gainP_max_acc_xy*(fabs(input)-switch_point_xy/2));
+// 		}
+// 		else {
+// 			x_out = gain_P_xy * input;
+// 			set_lim_value(0, false);
+// 		}
+	}
 
     if (enabled) {
       this->out.getSignal().setValue(calculateResults<Tout>(this->in.getSignal().getValue()));
@@ -258,6 +271,7 @@ class Gain : public Blockio<1,1,Tout> {
   Tgain gainDiff;
   bool enabled{true};
   bool smoothChange{false};
+  bool rootCurve{false};
   std::mutex mtx;
 
 

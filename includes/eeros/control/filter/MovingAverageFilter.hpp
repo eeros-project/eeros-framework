@@ -119,6 +119,7 @@ namespace eeros {
 		protected:
 			const Tcoeff * coefficients;
 			Tval previousValues[N]{};
+// 			Tval actualValue;
 			bool enabled{true};
 
 
@@ -135,6 +136,18 @@ namespace eeros {
 					previousValues[i].zero();
 				  }
 			}
+			
+// 			template <typename S>
+// 			typename std::enable_if<!std::is_compound<S>::value>::type initResult() {
+// 				return coefficients[N-1] * actualValue;
+// 			}
+// 			
+// 			template <typename S>
+// 			typename std::enable_if<!std::is_compound<S>::value>::type setResult() {
+// 				return 
+// 			}
+			
+			
 		};
 
 

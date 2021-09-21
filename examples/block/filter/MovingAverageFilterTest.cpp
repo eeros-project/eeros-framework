@@ -20,7 +20,7 @@ double period = 0.1;
 class ControlSystem {
  public:
   ControlSystem() : 
-  coeff_arr({1.0, 1.0}),
+  coeff_arr({1.0, 1.0, 2.0}),
   moving_avg(coeff_arr),
   setVal(0),
   td("td", period, true) 
@@ -31,9 +31,11 @@ class ControlSystem {
 	td.addBlock(setVal);
 	td.addBlock(moving_avg);
   }
-  double coeff_arr[2];
-  MovingAverageFilter<2> moving_avg;
+  
+  double coeff_arr[3];
+  MovingAverageFilter<3> moving_avg;
   Constant<double> setVal;
+  
   TimeDomain td;
 };
 

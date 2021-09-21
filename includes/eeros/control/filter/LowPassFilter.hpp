@@ -38,7 +38,7 @@ namespace control {
 		* @see LowPassFilter(Tout alpha)
 		* @param alpha - weight of input in the filter (value between 0 and 1)
 		*/
-		LowPassFilter(T alpha) : alpha(alpha) { 
+		LowPassFilter(double alpha) : alpha(alpha) { 
 			prev.clear();
 		}
 			

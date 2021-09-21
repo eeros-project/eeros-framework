@@ -21,7 +21,7 @@ double alpha = 0.2;
 class ControlSystem {
  public:
   ControlSystem() : 
-  setVal(0),
+  setVal(1.0), //{1, 1}),
   lowpass(alpha),
   td("td", period, true) 
   {
@@ -31,6 +31,8 @@ class ControlSystem {
 	td.addBlock(setVal);
 	td.addBlock(lowpass);
   }
+//   Constant<eeros::math::Vector2> setVal;
+//   LowPassFilter<eeros::math::Vector2> lowpass;
   Constant<double> setVal;
   LowPassFilter<double> lowpass;
   TimeDomain td;
@@ -64,7 +66,7 @@ int main() {
 			   << cs.setVal.getOut().getSignal().getValue() << "  " 
                << cs.lowpass.getOut().getSignal().getValue();
     if (count == 0) {
-		cs.setVal.setValue(0.0);
+		cs.setVal.setValue(0.0);  
     }
     if (count == 50) {
 		cs.setVal.setValue(1.0);

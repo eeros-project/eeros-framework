@@ -20,7 +20,7 @@ double period = 0.1;
 class ControlSystem {
  public:
   ControlSystem() : 
-  setVal(0),
+  setVal({0.0, 1.0, 2.0}),
   td("td", period, true) 
   {
 	median.getIn().connect(setVal.getOut());
@@ -29,8 +29,10 @@ class ControlSystem {
 	td.addBlock(setVal);
 	td.addBlock(median);
   }
-  Constant<double> setVal;
-  MedianFilter<10,double> median;
+//   Constant<double> setVal;
+//   MedianFilter<10,double> median;
+  Constant<eeros::math::Vector3> setVal;
+  MedianFilter<10,eeros::math::Vector3> median;
   TimeDomain td;
 };
 
