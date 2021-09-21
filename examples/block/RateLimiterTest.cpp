@@ -20,8 +20,8 @@ double period = 0.1;
 class ControlSystem {
  public:
   ControlSystem() : 
-  setVal({0, 1}), 
-  rate_limiter(-0.5, 0.5),
+  setVal({0, 0}), 
+  rate_limiter({-1.0, -0.5}, {0.5, 1.0}),
   td("td", period, true)  
   {
 	rate_limiter.getIn().connect(setVal.getOut());
@@ -30,11 +30,19 @@ class ControlSystem {
 	td.addBlock(setVal);
 	td.addBlock(rate_limiter);
   }
+  
+    // Test 1: input double, slew rates double
 //   Constant<double> setVal;
 //   RateLimiter<double, double, true> rate_limiter;
 
+    // Test 2: input Vector, slew rates double
+//   Constant<eeros::math::Vector2> setVal;
+//   RateLimiter<eeros::math::Vector2, double> rate_limiter;
+  
+  // Test 3: input Vector, slew rates Vector
   Constant<eeros::math::Vector2> setVal;
-  RateLimiter<eeros::math::Vector2, double, true> rate_limiter;
+  RateLimiter<eeros::math::Vector2, eeros::math::Vector2> rate_limiter;
+  
   TimeDomain td;
 };
 
@@ -69,7 +77,7 @@ int main() {
 		cs.setVal.setValue(0.0);
     }
     if (count == 10) {
-		cs.setVal.setValue(1.0);
+		cs.setVal.setValue(2.0);
     }
     if (count == 50) {
 		cs.setVal.setValue(-1.0);

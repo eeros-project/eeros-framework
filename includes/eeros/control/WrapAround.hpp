@@ -18,7 +18,7 @@ namespace control {
 * @since xxx
 */
 	
-	template<typename Tout = eeros::math::Vector2>
+	template<typename Tout = double>
 	class WrapAround : public eeros::control::Blockio<1,1,Tout>
 	{
 		public:
@@ -46,19 +46,21 @@ namespace control {
 				Tout outVal = inVal;
 				
 				if(enabled) {
-					for(int i=0; i<inVal.size(); i++) {
-						double delta = fabs(this->minVal) + fabs(this->maxVal);
-						
-						double num = inVal[i] - this->minVal;
-						double den = delta;
-						double tquot = floor(num/den);
-						outVal[i] = num - tquot * den;
-						
-						if(outVal[i]<0) {
-							outVal[i] = outVal[i] + delta;
-						}
-						outVal[i] = outVal[i] + this->minVal; 
-					}
+                    outVal = calculateResult<Tout>(inVal);
+                    
+// 					for(int i=0; i<inVal.size(); i++) {
+// 						double delta = fabs(this->minVal) + fabs(this->maxVal);
+// 						
+// 						double num = inVal[i] - this->minVal;
+// 						double den = delta;
+// 						double tquot = floor(num/den);
+// 						outVal[i] = num - tquot * den;
+// 						
+// 						if(outVal[i]<0) {
+// 							outVal[i] = outVal[i] + delta;
+// 						}
+// 						outVal[i] = outVal[i] + this->minVal; 
+// 					}
 				}
 					
 				this->out.getSignal().setValue(outVal);
@@ -95,7 +97,45 @@ namespace control {
 				this->minVal = minVal;
 				this->maxVal = maxVal;
 			}
+        
+        private:
+            template <typename S> 
+            typename std::enable_if<std::is_arithmetic<S>::value, S>::type calculateResult(S inValue) {
+                Tout outVal;
+                double delta = fabs(this->minVal) + fabs(this->maxVal);
+                    
+                double num = inValue - this->minVal;
+                double den = delta;
+                double tquot = floor(num/den);
+                outVal = num - tquot * den;
+                
+                if(outVal<0) {
+                    outVal = outVal + delta;
+                }
+                outVal = outVal + this->minVal; 
+                
+                return outVal;
+            }
 
+            template <typename S> 
+            typename std::enable_if<std::is_compound<S>::value, S>::type calculateResult(S inValue) {
+                Tout outVal;
+                for(int i=0; i<inValue.size(); i++) {
+                    double delta = fabs(this->minVal) + fabs(this->maxVal);
+                    
+                    double num = inValue[i] - this->minVal;
+                    double den = delta;
+                    double tquot = floor(num/den);
+                    outVal[i] = num - tquot * den;
+                    
+                    if(outVal[i]<0) {
+                        outVal[i] = outVal[i] + delta;
+                    }
+                    outVal[i] = outVal[i] + this->minVal; 
+                }
+                return outVal;
+            }
+            
 		protected:
 			bool enabled{true};
 			std::mutex mtx;

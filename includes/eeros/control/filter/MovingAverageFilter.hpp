@@ -136,19 +136,7 @@ namespace eeros {
 					previousValues[i].zero();
 				  }
 			}
-			
-// 			template <typename S>
-// 			typename std::enable_if<!std::is_compound<S>::value>::type initResult() {
-// 				return coefficients[N-1] * actualValue;
-// 			}
-// 			
-// 			template <typename S>
-// 			typename std::enable_if<!std::is_compound<S>::value>::type setResult() {
-// 				return 
-// 			}
-			
-			
-		};
+        };
 
 
 		/**

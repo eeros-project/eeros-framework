@@ -34,7 +34,7 @@ namespace control {
  * @since xxx
  */
 		
-	template<typename Tout = double, typename Trate = double, bool elementWise = false>
+	template<typename Tout = double, typename Trate = double>
 	class RateLimiter : public Blockio<1,1,Tout> 
 	{
 	public:
@@ -83,15 +83,7 @@ namespace control {
 			
 			if(enabled) {
 				double dt = tin - tprev;
-//                 Trate rate = (inVal-outPrev.getValue())/dt;
 				outVal = calculateResult<Tout>(inVal, dt);
-                            
-//                 if(rate > rising_slew_rate) {
-//                     outVal = dt * rising_slew_rate + outPrev.getValue();
-//                 }
-//                 else if(rate < falling_slew_rate) {
-//                     outVal = dt * falling_slew_rate + outPrev.getValue();
-//                 }
 			}
 			
 			outPrev.setValue(outVal);
@@ -138,16 +130,12 @@ namespace control {
 		template <typename S> 
 		typename std::enable_if<std::is_arithmetic<S>::value, S>::type calculateResult(S inValue, double dt) {
 			Tout outVal;
-            
             Trate rate = (inValue-outPrev.getValue())/dt;
-// 			double dt = tin - tprev;
-			
-			if(rate > rising_slew_rate) {
+            
+            if(rate > rising_slew_rate) 
 				outVal = dt * rising_slew_rate + outPrev.getValue();
-			}
-			else if(rate < falling_slew_rate) {
+			else if(rate < falling_slew_rate) 
 				outVal = dt * falling_slew_rate + outPrev.getValue();
-			}
 			else
 				outVal = inValue;
 			
@@ -155,39 +143,36 @@ namespace control {
 		}
 
 		template <typename S> 
-		typename std::enable_if<std::is_compound<S>::value && !elementWise, S>::type calculateResult(S inValue, double dt) {
+		typename std::enable_if<std::is_compound<S>::value && std::is_arithmetic<Trate>::value, S>::type calculateResult(S inValue, double dt) {
+            std::cout << " NOT element wise" << std::endl;
+            Tout outVal;
 			for(unsigned int i = 0; i < inValue.size(); i++) {
                 double rate = (inValue[i]-outPrev.getValue()[i])/dt;
-				Tout outVal;
                 
-                Trate rising_rate = rising_slew_rate;
-                Trate falling_rate = falling_slew_rate;
-				
-                if(rate > rising_slew_rate) {
+                if(rate > rising_slew_rate)
                     outVal[i] = dt * rising_slew_rate + outPrev.getValue()[i];
-                }
-                else if(rate < falling_slew_rate) {
+                else if(rate < falling_slew_rate) 
                     outVal[i] = dt * falling_slew_rate + outPrev.getValue()[i];
-                }
                 else
-                    outVal = inValue;
+                    outVal[i] = inValue[i];
             }
+            return outVal;
         }
         template <typename S> 
-		typename std::enable_if<std::is_compound<S>::value && elementWise, S>::type calculateResult(S inValue, double dt) {
-// 			for(unsigned int i = 0; i < inValue.size(); i++) {
-// 				}
-// 				else {
-// 					if(rate > rising_slew_rate[i]) {
-// 						outVal[i] = dt * rising_slew_rate[i] + outPrev.getValue()[i];
-// 					}
-// 					else if(rate < falling_slew_rate[i]) {
-// 						outVal[i] = dt * falling_slew_rate[i] + outPrev.getValue()[i];
-// 					}
-// 					else
-// 						outVal = inValue;
-// 				}
-// 			}
+		typename std::enable_if<std::is_compound<S>::value && std::is_compound<Trate>::value, S>::type calculateResult(S inValue, double dt) {
+            std::cout << " element wise" << std::endl;
+            Tout outVal;
+			for(unsigned int i = 0; i < inValue.size(); i++) {
+                double rate = (inValue[i]-outPrev.getValue()[i])/dt;
+                
+                if(rate > rising_slew_rate[i]) 
+                    outVal[i] = dt * rising_slew_rate[i] + outPrev.getValue()[i];
+                else if(rate < falling_slew_rate[i]) 
+                    outVal[i] = dt * falling_slew_rate[i] + outPrev.getValue()[i];
+                else
+                    outVal[i] = inValue[i];
+			}
+			return outVal;
 		}
 
 	protected:
