@@ -162,58 +162,57 @@ namespace control {
 		template <typename S> 
 		typename std::enable_if<std::is_compound<S>::value && std::is_integral<typename S::value_type>::value, S>::type calculateResult(S inValue, double dt) {
 			for(unsigned int i = 0; i < inValue.size(); i++) {
-				Trate rate[i] = (inValue[i]-outPrev.getValue()[i])/dt;
+                double rate = (inValue[i]-outPrev.getValue()[i])/dt;
 				Tout outVal;
 				
-				if(!elementWise) {
-					if(rate[i] > rising_slew_rate) {
+// 				if(!elementWise) {
+					if(rate > rising_slew_rate) {
 						outVal[i] = dt * rising_slew_rate + outPrev.getValue()[i];
 					}
-					else if(rate[i] < falling_slew_rate) {
+					else if(rate < falling_slew_rate) {
 						outVal[i] = dt * falling_slew_rate + outPrev.getValue()[i];
 					}
 					else
 						outVal = inValue;
-				}
-				else {
-					if(rate[i] > rising_slew_rate[i]) {
-						outVal[i] = dt * rising_slew_rate[i] + outPrev.getValue()[i];
-					}
-					else if(rate[i] < falling_slew_rate[i]) {
-						outVal[i] = dt * falling_slew_rate[i] + outPrev.getValue()[i];
-					}
-					else
-						outVal = inValue;
-				}
+// 				}
+// 				else {
+// 					if(rate > rising_slew_rate[i]) {
+// 						outVal[i] = dt * rising_slew_rate[i] + outPrev.getValue()[i];
+// 					}
+// 					else if(rate < falling_slew_rate[i]) {
+// 						outVal[i] = dt * falling_slew_rate[i] + outPrev.getValue()[i];
+// 					}
+// 					else
+// 						outVal = inValue;
+// 				}
 			}
 		}
 		template <typename S> 
-		typename std::enable_if<std::is_compound<S>::value && std::is_floating_point<typename S::value_type>::value, S>::type calculateResult(S inValue, double dt) {
-			Trate[N];
+		typename std::enable_if<std::is_compound<S>::value && std::is_floating_point<typename S::value_type>::value, S>::type calculateResult(S inValue, double dt) { 
 			for(unsigned int i = 0; i < inValue.size(); i++) {
-				Trate rate[i] = (inValue[i]); //-outPrev.getValue()(i))/dt;
+				double rate = (inValue[i]-outPrev.getValue()(i))/dt;
 				Tout outVal;
 				
-				if(!elementWise) {
-					if(rate[i] > rising_slew_rate) {
+// 				if(!elementWise) {
+					if(rate > rising_slew_rate) {
 						outVal[i] = dt * rising_slew_rate + outPrev.getValue()[i];
 					}
-					else if(rate[i] < falling_slew_rate) {
+					else if(rate < falling_slew_rate) {
 						outVal[i] = dt * falling_slew_rate + outPrev.getValue()[i];
 					}
 					else
 						outVal = inValue;
-				}
-				else {
-					if(rate[i] > rising_slew_rate[i]) {
-						outVal[i] = dt * rising_slew_rate[i] + outPrev.getValue()[i];
-					}
-					else if(rate[i] < falling_slew_rate[i]) {
-						outVal[i] = dt * falling_slew_rate[i] + outPrev.getValue()[i];
-					}
-					else
-						outVal = inValue;
-				}
+// 				}
+// 				else {
+// 					if(rate > rising_slew_rate[i]) {
+// 						outVal[i] = dt * rising_slew_rate[i] + outPrev.getValue()[i];
+// 					}
+// 					else if(rate < falling_slew_rate[i]) {
+// 						outVal[i] = dt * falling_slew_rate[i] + outPrev.getValue()[i];
+// 					}
+// 					else
+// 						outVal = inValue;
+// 				}
 			}
 		}
 		
