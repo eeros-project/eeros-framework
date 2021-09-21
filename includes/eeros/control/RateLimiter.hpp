@@ -83,8 +83,17 @@ namespace control {
 			
 			if(enabled) {
 				double dt = tin - tprev;
+//                 Trate rate = (inVal-outPrev.getValue())/dt;
 				outVal = calculateResult<Tout>(inVal, dt);
+                            
+//                 if(rate > rising_slew_rate) {
+//                     outVal = dt * rising_slew_rate + outPrev.getValue();
+//                 }
+//                 else if(rate < falling_slew_rate) {
+//                     outVal = dt * falling_slew_rate + outPrev.getValue();
+//                 }
 			}
+			
 			outPrev.setValue(outVal);
 			outPrev.setTimestamp(this->in.getSignal().getTimestamp());
 			
@@ -127,9 +136,11 @@ namespace control {
 		Signal<Tout> outPrev;
 		
 		template <typename S> 
-		typename std::enable_if<std::is_integral<S>::value, S>::type calculateResult(S inValue, double dt) {
-			Trate rate = (inValue-outPrev.getValue())/dt;
+		typename std::enable_if<std::is_arithmetic<S>::value, S>::type calculateResult(S inValue, double dt) {
 			Tout outVal;
+            
+            Trate rate = (inValue-outPrev.getValue())/dt;
+// 			double dt = tin - tprev;
 			
 			if(rate > rising_slew_rate) {
 				outVal = dt * rising_slew_rate + outPrev.getValue();
@@ -142,38 +153,29 @@ namespace control {
 			
 			return outVal;
 		}
-		
+
 		template <typename S> 
-		typename std::enable_if<std::is_floating_point<S>::value, S>::type calculateResult(S inValue, double dt) {
-			Trate rate = (inValue-outPrev.getValue())/dt;
-			Tout outVal;
-			
-			if(rate > rising_slew_rate) {
-				outVal = dt * rising_slew_rate + outPrev.getValue();
-			}
-			else if(rate < falling_slew_rate) {
-				outVal = dt * falling_slew_rate + outPrev.getValue();
-			}
-			else
-				outVal = inValue;
-			
-			return outVal;
-		}
-		template <typename S> 
-		typename std::enable_if<std::is_compound<S>::value && std::is_integral<typename S::value_type>::value, S>::type calculateResult(S inValue, double dt) {
+		typename std::enable_if<std::is_compound<S>::value && !elementWise, S>::type calculateResult(S inValue, double dt) {
 			for(unsigned int i = 0; i < inValue.size(); i++) {
                 double rate = (inValue[i]-outPrev.getValue()[i])/dt;
 				Tout outVal;
+                
+                Trate rising_rate = rising_slew_rate;
+                Trate falling_rate = falling_slew_rate;
 				
-// 				if(!elementWise) {
-					if(rate > rising_slew_rate) {
-						outVal[i] = dt * rising_slew_rate + outPrev.getValue()[i];
-					}
-					else if(rate < falling_slew_rate) {
-						outVal[i] = dt * falling_slew_rate + outPrev.getValue()[i];
-					}
-					else
-						outVal = inValue;
+                if(rate > rising_slew_rate) {
+                    outVal[i] = dt * rising_slew_rate + outPrev.getValue()[i];
+                }
+                else if(rate < falling_slew_rate) {
+                    outVal[i] = dt * falling_slew_rate + outPrev.getValue()[i];
+                }
+                else
+                    outVal = inValue;
+            }
+        }
+        template <typename S> 
+		typename std::enable_if<std::is_compound<S>::value && elementWise, S>::type calculateResult(S inValue, double dt) {
+// 			for(unsigned int i = 0; i < inValue.size(); i++) {
 // 				}
 // 				else {
 // 					if(rate > rising_slew_rate[i]) {
@@ -185,37 +187,9 @@ namespace control {
 // 					else
 // 						outVal = inValue;
 // 				}
-			}
+// 			}
 		}
-		template <typename S> 
-		typename std::enable_if<std::is_compound<S>::value && std::is_floating_point<typename S::value_type>::value, S>::type calculateResult(S inValue, double dt) { 
-			for(unsigned int i = 0; i < inValue.size(); i++) {
-				double rate = (inValue[i]-outPrev.getValue()(i))/dt;
-				Tout outVal;
-				
-// 				if(!elementWise) {
-					if(rate > rising_slew_rate) {
-						outVal[i] = dt * rising_slew_rate + outPrev.getValue()[i];
-					}
-					else if(rate < falling_slew_rate) {
-						outVal[i] = dt * falling_slew_rate + outPrev.getValue()[i];
-					}
-					else
-						outVal = inValue;
-// 				}
-// 				else {
-// 					if(rate > rising_slew_rate[i]) {
-// 						outVal[i] = dt * rising_slew_rate[i] + outPrev.getValue()[i];
-// 					}
-// 					else if(rate < falling_slew_rate[i]) {
-// 						outVal[i] = dt * falling_slew_rate[i] + outPrev.getValue()[i];
-// 					}
-// 					else
-// 						outVal = inValue;
-// 				}
-			}
-		}
-		
+
 	protected:
 		Trate falling_slew_rate, rising_slew_rate;
 		bool enabled{false};
