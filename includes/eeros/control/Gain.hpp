@@ -270,8 +270,14 @@ class Gain : public Blockio<1,1,Tout> {
 
   template<typename S>
   typename std::enable_if<elementWise, S>::type calculateResults(S value) {
+    static_assert(std::is_compound<S>::value, "A gain block with element wise amplification must use matrices!");
     return value.multiplyElementWise(gain);
   }
+  
+//   template<typename S>
+//   typename std::enable_if<elementWise && std::is_arithmetic<S>::value, S>::type calculateResults(S value) {
+//     static_assert(false, "aaaaaaaaaaa");
+//   }
 
 
   template<typename S>
