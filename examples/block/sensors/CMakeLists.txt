@@ -1,20 +1,11 @@
-# set(CMAKE_PREFIX_PATH pathTo/canopenlib/install/)
-# 
-# find_package(canopenlib)
-# 
-# include_directories(${canopenlib_INCLUDE_DIR})
-# link_directories(${canopenlib_DIR})
-# 
-# add_executable(main main.cpp)
-# target_link_libraries(main canopenlib)
+set(targets "")
 
+# if (sbgecomlib_FOUND)
+    add_executable(sbg_test SBGEllipseATest.cpp)
+    target_link_libraries(sbg_test eeros ${EEROS_LIBS} sbgECom)
+    list(APPEND targets sbg_test)
 
-if (canopenlib_FOUND )
-	add_executable(canExample CanExample.cpp)
-	target_link_libraries(canExample eeros canopenlib ${EEROS_LIBS})
-
-  if(INSTALL_EXAMPLES)
-    install(TARGETS canExample RUNTIME DESTINATION examples/can)
-  endif()
-endif()
-
+    if(INSTALL_EXAMPLES)
+    install(TARGETS ${targets} RUNTIME DESTINATION examples/block/sensors)
+    endif()
+# endif()
