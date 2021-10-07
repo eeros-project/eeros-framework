@@ -11,9 +11,9 @@ namespace eeros {
 namespace control {
 
 /**
- * This block reads a Elmo drive over EtherCAT and outputs the position,
- * velocity and torque values onto three output signals. All values must be scaled 
- * in order to get meaningful physical entities.
+ * This block reads input signals for position, velocity and torque and sends
+ * them over EtherCAT to an Elmo drive. All values must be scaled from physical 
+ * entities to fit into the transmit frame of EtherCAT.
  *
  * @since v1.3
  */
@@ -22,15 +22,15 @@ class ElmoOutput : public Blockio<0,0,double,double> {
   
  public:
   /**
-   * Constructs a EtherCAT receive block instance which receives its output 
-   * signals from a Elmo drive.
+   * Constructs an EtherCAT transmit block instance which sends its input 
+   * signals to an Elmo drive.
    *
    * @param iface - reference to Elmo drive
    */
-  ElmoInput(ecmasterlib::device::Elmo& iface) : iface(iface) { }
+  ElmoOutput(ecmasterlib::device::Elmo& iface) : iface(iface) { }
           
   /**
-   * Puts the drive inputs onto the output signals.
+   * Puts the signal inputs to the Elmo drive.
    */
   virtual void run() {
     using Mode = ecmasterlib::device::Elmo::Mode;
