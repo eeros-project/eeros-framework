@@ -53,7 +53,7 @@ int main() {
   Lambda l1 ([&] () { });
   Periodic p2("p2", period, l1);
   p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
-    // TODO
+    log.info() << cs.sbg_imu.getOut().getSignal().getValue();
   });
   
   auto& executor = Executor::instance();
