@@ -7,7 +7,7 @@
 #include <eeros/control/Output.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/math/Matrix.hpp>
-#include <eeors/hal/SBGEllipseA.hpp>
+#include <eeros/hal/SBGEllipseA.hpp>
 
 using namespace eeros::hal;
 using namespace eeros::logger;
@@ -26,7 +26,8 @@ namespace control {
 		* @param dev - string with device name (USB)
 		* @param priority - execution priority or SBGEllipseA thread, to get sensors data
 		*/
-		SBGEllipseAInput(std::string dev, int priority = 5);
+		SBGEllipseAInput(std::string dev, int priority = 5) : 
+		sbg(dev, priority), log(Logger::getLogger()) {};
 
 		/**
 		* Disabling use of copy constructor because the block should never be copied unintentionally.

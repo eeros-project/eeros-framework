@@ -46,11 +46,13 @@ add_executable(rateLimiterTest RateLimiterTest.cpp)
 target_link_libraries(rateLimiterTest eeros ${EEROS_LIBS})
 list(APPEND targets rateLimiterTest)
 
+
 add_executable(wrapAroundTest WrapAroundTest.cpp)
 target_link_libraries(wrapAroundTest eeros ${EEROS_LIBS})
 list(APPEND targets wrapAroundTest)
 
 add_subdirectory(filter)
+add_subdirectory(sensors)
 
 if(INSTALL_EXAMPLES)
   install(TARGETS ${targets} RUNTIME DESTINATION examples/block)

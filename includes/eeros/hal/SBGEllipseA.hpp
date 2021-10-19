@@ -7,7 +7,7 @@
 #include <eeros/core/Thread.hpp>
 #include <eeros/math/Matrix.hpp>
 
-#include <sbgEComLib.h> // ??
+#include <sbgEComLib.h>
 
 namespace eeros {
 namespace hal {
