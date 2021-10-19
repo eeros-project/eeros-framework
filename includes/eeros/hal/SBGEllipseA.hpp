@@ -47,7 +47,12 @@ namespace hal {
 			static uint32_t count, count0, countEuler, countQuat, countImu;
 		private:
 			eeros::logger::Logger log;
+			
+			/**
+			* Main run method. Gets sensor measurements \n
+			*/
 			virtual void run();
+			
 			volatile bool started = false;
 			volatile bool running = false;
 			

@@ -38,41 +38,72 @@ namespace hal {
 		pixy.changeProg("color_connected_components");
 		starting = false;
 	}
-
+	
+	/**
+	* Destructs a Thread to get PixyCam sensors data \n
+	*/
 	virtual ~PixyCam() { 
 		pixy.setLamp(0, 0);;
 		running = false; 
 		join(); 
 	}
 
+	/**
+	* Returns the position of the camera, with respect to the middle of the markers pattern, with lowpass filter
+	*/
 	virtual eeros::math::Vector3 getPos() {
 		return output;
 	}
+	/**
+	* Returns the position of the camera, with respect to the middle of the markers pattern 
+	*/
 	virtual eeros::math::Vector3 getPos_raw() {
 		return output_raw;
 	}
 	
+	/**
+	* Returns the position of the detected dots on the markers pattern in pixels 
+	*/
 	virtual eeros::math::Matrix<nr_dots,2,double> getDots() {
 		return pos;
 	}
 
+	/**
+	* Returns the height of the camera to the markers pattern
+	*/
 	virtual double getHeight() {
 		return height;
 	}
 	
+	/**
+	* Returns true if data are valid, i.e. if all markers are within the field of view of the camera
+	*/
 	virtual double isDataValid() {
 		return data_valid;
 	}
 	
+	/**
+	* Returns the nu,ber of markers detected by the camera
+	*/
 	virtual int getNofBlocks() {
 		return nofBlocks;
 	}
 
+	/**
+	* Sets the lamp of the camera
+	* @param white: white light on if true
+	* @param rgb: rgb light on if true
+	*/
 	virtual void setLamp(bool white, bool rgb) {
 		pixy.setLamp(white, rgb);
 	}
 
 	private:
+		
+	/**
+	* Gets sensor data and outputs position of the camera with respect to the middle of the markers pattern. 
+	* Returns data raw, as well as filtered by a lowpass filter. 
+	*/
 	virtual void run() {
 		while (starting); 
 		running = true;

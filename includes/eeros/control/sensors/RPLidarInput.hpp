@@ -6,9 +6,11 @@
 #include <eeros/math/Matrix.hpp>
 #include <eeros/hal/RPLidar.hpp> 
 
+#define LASER_COUNT_MAX 380
+
 namespace eeros {
 namespace control {
-	class RPLidarInput : public eeros::control::Blockio<0,2,eeros::math::Matrix<laser_count_max,1>>
+	class RPLidarInput : public eeros::control::Blockio<0,2,eeros::math::Matrix<LASER_COUNT_MAX,1>>
 	{        
         public:
 			/**
