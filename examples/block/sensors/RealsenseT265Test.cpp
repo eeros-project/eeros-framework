@@ -13,6 +13,7 @@ using namespace eeros;
 using namespace eeros::safety;
 using namespace eeros::control;
 using namespace eeros::logger;
+using namespace eeros::task;
 
 double period = 0.01;
 

@@ -2,19 +2,27 @@
 #include <unistd.h>
 #include <signal.h>
 #include <eeros/logger/Logger.hpp>
-#include <eeros/safety/SafetySystem.hpp>
-#include <eeros/control/TimeDomain.hpp>
-#include <eeros/task/Periodic.hpp>
 #include <eeros/core/Executor.hpp>
+#include <eeros/logger/Logger.hpp>
+#include <eeros/logger/StreamLogWriter.hpp>
+#include <eeros/control/TimeDomain.hpp>
+#include <eeros/safety/SafetySystem.hpp>
+#include <eeros/task/Periodic.hpp>
 #include <eeros/task/Lambda.hpp>
-#include <eeros/control/sensors/RPLidarInput.hpp>
+#include <eeros/control/drives/ODriveInput_USB.hpp>
 
 using namespace eeros;
 using namespace eeros::safety;
 using namespace eeros::control;
 using namespace eeros::logger;
-using namespace eeros::task;
 
+double period = 0.01;
+
+void signalHandler(int signum){
+	SafetySystem::exitHandler();
+}
+
+int main() {
 double period = 0.01;
 
 void signalHandler(int signum){
@@ -24,13 +32,13 @@ void signalHandler(int signum){
 class ControlSystem {
  public:
   ControlSystem() : 
-  lidar("/dev/ttyUSB1"),
-  td("td", period, true) 
+	odrive_input(0x208c397d4d4d, 4096, 20, true), 
+	td("td", period, true) 
   {
-	td.addBlock(lidar);
+	td.addBlock(odrive_input);
   }
     
-  RPLidarInput lidar;
+  ODriveInput_USB odrive_input;
   TimeDomain td;
 };
 
@@ -46,7 +54,8 @@ class PPSafetyProperties : public SafetyProperties {
 int main() {
 	Logger::setDefaultStreamLogger(std::cout);
 	Logger log = Logger::getLogger();
-	log.info() << "Program started - Read out RP Lidar sensors data";
+	log.show(LogLevel::TRACE);
+	log.info() << "Program started - Read out Baumer sensors data";
 	
 	ControlSystem cs;
 	Periodic p1("p1", period, cs.td);
@@ -57,7 +66,9 @@ int main() {
 	Lambda l1 ([&] () { });
 	Periodic p2("p2", period, l1);
 	p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
-		log.info() << cs.lidar.getOut().getSignal().getValue();
+		log.info() << cs.odrive.getOut().getSignal().getValue() << ", " << 
+		cs.distSens2.getOut().getSignal().getValue() << ", " << 
+		cs.distSens3.getOut().getSignal().getValue() ;
 	});
 	
 	auto& executor = Executor::instance();
@@ -69,6 +80,4 @@ int main() {
 	log.info() << "Program finished...";
 	return 0;
 }
-
-
 

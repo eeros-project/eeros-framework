@@ -13,6 +13,7 @@ using namespace eeros;
 using namespace eeros::safety;
 using namespace eeros::control;
 using namespace eeros::logger;
+using namespace eeros::task;
 
 double period = 0.01;
 
@@ -23,6 +24,9 @@ void signalHandler(int signum){
 class ControlSystem {
  public:
   ControlSystem() : 
+  distSens1("192.168.0.252", 502, 1, 5),
+  distSens2("192.168.0.253", 502, 1, 5),
+  distSens3("192.168.0.254", 502, 1, 5),
   td("td", period, true) 
   {
 	td.addBlock(distSens1);

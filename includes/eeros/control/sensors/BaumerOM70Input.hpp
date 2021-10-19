@@ -41,7 +41,7 @@ namespace control {
 		virtual void run();
         
 	protected:        
-        eeros::hal::OM70 om70;
+        eeros::hal::BaumerOM70 om70;
         eeros::logger::Logger log;
 	};
 };

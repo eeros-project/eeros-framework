@@ -6,7 +6,6 @@
 #include <eeros/logger/Logger.hpp>
 #include <eeros/core/Thread.hpp>
 #include <eeros/math/Matrix.hpp>
-#include "../constants.hpp"
 #include "../external/libmodbus-3.1.6/src/modbus.h"    
 
 #include <eeros/core/PeriodicCounter.hpp>

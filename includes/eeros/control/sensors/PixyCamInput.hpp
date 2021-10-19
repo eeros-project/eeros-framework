@@ -1,14 +1,15 @@
 #ifndef ORG_EEROS_CONTROL_PIXYCAM_INPUT_HPP_
 #define ORG_EEROS_CONTROL_PIXYCAM_INPUT_HPP_
 
-#include <eeros/control/Blockio.hpp>
+#include <eeros/control/Block.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/hal/PixyCam.hpp>
 
 
-namespace slingload {
+namespace eeros {
+namespace control {
 
 class PixyCamInput : public eeros::control::Block {
  public:
@@ -65,6 +66,7 @@ class PixyCamInput : public eeros::control::Block {
   eeros::control::Output<bool> out_valid;
 };
 
+}
 }
 
 #endif /* ORG_EEROS_CONTROL_PIXYCAM_INPUT_HPP_ */

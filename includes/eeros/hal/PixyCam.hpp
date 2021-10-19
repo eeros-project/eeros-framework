@@ -7,6 +7,8 @@
 #include "pixy/libpixyusb2.h"
 #include <unistd.h>
 
+#define nr_dots 4
+
 using namespace eeros::logger;
 
 namespace eeros {
