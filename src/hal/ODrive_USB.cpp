@@ -2,6 +2,7 @@
 #include <eeros/core/Fault.hpp>
 #include <eeros/hal/ODrive_USB.hpp>
 #include <eeros/hal/constants_odrive.hpp>
+#include <eeros/math/Matrix.hpp>
 
 #include <iostream>
 #include <errno.h>
@@ -26,6 +27,8 @@
 using namespace eeros;
 using namespace eeros::logger;
 using namespace eeros::math;
+using namespace eeros::hal;
+using namespace odrive;
 
 ODrive_USB::ODrive_USB(uint64_t odrive_serialnr, float enc_ticks, int priority, bool first_drive) : 
 odrive_serialnr(odrive_serialnr),
@@ -36,7 +39,7 @@ log(Logger::getLogger('P'))  {
 	
 	// initializations
 	libusbContext = NULL;
-    ep = new ODriveEP();
+    ep = new odrive::ODriveEP();
 
 	int res = init(odrive_serialnr);
 	if (res != 0) {
@@ -451,11 +454,11 @@ void ODrive_USB::run() {
 	}
 }
 
-double ODrive_USB::get_encoder_vel(int motor){
+double ODrive_USB::get_encoder_vel(int motor, int turns_per_rev){
 	if(motor == 0)
-		return (encoder_vel0/turns_per_rad);
+		return (encoder_vel0/turns_per_rev);
 	else if(motor == 1)
-		return (encoder_vel1/turns_per_rad);
+		return (encoder_vel1/turns_per_rev);
 	else {
 		log.error() << "Wrong motor ID. Encoder speed not valid";
 		return 0;
@@ -484,8 +487,8 @@ double ODrive_USB::get_current_measured(int motor){
 	}
 }
 
-void ODrive_USB::set_ref_vel(int motor, float speed_rad){
-	float speed_counts = turns_per_rad * speed_rad;
+void ODrive_USB::set_ref_vel(int motor, float speed_rad, int turns_per_rev){
+	float speed_counts = turns_per_rev * speed_rad;
 	
 	if(motor == 0)      ref_vel0 = speed_counts;
 	else if(motor == 1) ref_vel1 = speed_counts;

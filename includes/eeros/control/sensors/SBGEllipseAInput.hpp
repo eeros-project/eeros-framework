@@ -26,8 +26,7 @@ namespace control {
 		* @param dev - string with device name (USB)
 		* @param priority - execution priority or SBGEllipseA thread, to get sensors data
 		*/
-		SBGEllipseAInput(std::string dev, int priority = 5) : 
-		sbg(dev, priority), log(Logger::getLogger()) {};
+		SBGEllipseAInput(std::string dev, int priority = 5);
 
 		/**
 		* Disabling use of copy constructor because the block should never be copied unintentionally.

@@ -35,7 +35,7 @@ set(EEROS_VERSION ${EEROS_VERSION_MAJOR}.${EEROS_VERSION_MINOR}.${EEROS_VERSION_
 log("Going to build EEROS v${EEROS_VERSION}")
 
 
-
+message(STATUS "Test ${ADDITIONAL_INCLUDE_DIRS}")
 ## Add additional include and link directories
 include_directories(${ADDITIONAL_INCLUDE_DIRS})
 link_directories(${ADDITIONAL_LINK_DIRS})
@@ -224,17 +224,21 @@ if(USE_CAN)
 	link_directories(${canopenlib_DIR})
 endif()
 
+# find_package(libusb-1.0 REQUIRED)
+# include_directories(${LIBUSB1_INCLUDE_DIRS})
+# link_directories(${LIBUSB1_LIBRARIES})
 
-## Use SBG IMU Library if instructed
-if(USE_SBG)
-	message(STATUS "")
-	message(STATUS "Use sbgellipse")
-	message(STATUS "**********************************")
 
-	find_package(sbgECom QUIET)
-	include_directories(${sbgECom_INCLUDE_DIR})
-	link_directories(${sbgECom_DIR})
-endif()
+# ## Use SBG IMU Library if instructed
+# if(USE_SBG)
+# 	message(STATUS "")
+# 	message(STATUS "Use sbgellipse")
+# 	message(STATUS "**********************************")
+# 
+# 	find_package(sbgECom QUIET)
+# # 	include_directories(${sbgECom_INCLUDE_DIR})
+# 	link_directories(${sbgECom_DIR})
+# endif()
       
 
 
@@ -295,7 +299,7 @@ endif(DOXYGEN_FOUND)
 
 
 ## Set EEROS libraries
-set(EEROS_LIBS ${CMAKE_DL_LIBS} ucl pthread)
+set(EEROS_LIBS ${CMAKE_DL_LIBS} ucl pthread usb-1.0 odrive jsoncpp rplidar_sdk sbgECom modbus ) # realsense? )
 
 
 

@@ -58,7 +58,7 @@ int main() {
 	Lambda l1 ([&] () { });
 	Periodic p2("p2", period, l1);
 	p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
-		log.info() << cs.rs_cam.getOut().getSignal().getValue();
+		log.info() << cs.rs_cam.getOut_velocity().getSignal().getValue();
 	});
 	
 	auto& executor = Executor::instance();

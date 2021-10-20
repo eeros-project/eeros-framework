@@ -19,7 +19,7 @@ RPLidar::RPLidar(std::string dev, int priority) :
 Thread(priority),
 log(Logger::getLogger('P')) {
     // TODO check if used
-    buffer_size = laser_count_max;
+    buffer_size = LASER_COUNT_MAX;
     
     // Create driver instance
     laser_drv = RPlidarDriver::CreateDriver(DRIVER_TYPE_SERIALPORT);
@@ -94,15 +94,15 @@ float RPLidar::get_scan_frequency(){
     return frequency;
 }
 
-LaserVector RPLidar::get_angles(){
+eeros::math::Matrix<LASER_COUNT_MAX,1> RPLidar::get_angles(){
     return laser_angles;
 }
 
-LaserVector RPLidar::get_ranges(){
+eeros::math::Matrix<LASER_COUNT_MAX,1> RPLidar::get_ranges(){
     return laser_ranges;
 }
 
-LaserVector RPLidar::get_intensities(){
+eeros::math::Matrix<LASER_COUNT_MAX,1> RPLidar::get_intensities(){
     return laser_intensities;
 }
 
@@ -113,7 +113,7 @@ void RPLidar::run() {
     while (running) {
         u_result ans;
         
-        rplidar_response_measurement_node_hq_t nodes[laser_count_max];
+        rplidar_response_measurement_node_hq_t nodes[LASER_COUNT_MAX];
         size_t count = _countof(nodes);
 
         // fetech extactly one 0-360 degrees' scan
@@ -149,11 +149,11 @@ void RPLidar::run() {
                 
                 laser_intensities[pos] = (float) (nodes[pos].quality >> 2);
                 
-                laser_angles[pos] = (nodes[pos].angle_z_q14 * 90.f / 16384.f) * deg2rad;
+                laser_angles[pos] = (nodes[pos].angle_z_q14 * 90.f / 16384.f) * 3.1415926535/180;
             }
 			
             // Set to infinite all elements of the fixed-sized vector for control system
-            for (int pos = (int)count; pos < laser_count_max; ++pos) {  
+            for (int pos = (int)count; pos < LASER_COUNT_MAX; ++pos) {  
 				laser_ranges[pos] = std::numeric_limits<float>::infinity();
                 laser_intensities[pos] = std::numeric_limits<float>::infinity();
                 laser_angles[pos] = std::numeric_limits<float>::infinity();

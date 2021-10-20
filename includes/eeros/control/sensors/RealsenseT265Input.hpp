@@ -78,7 +78,7 @@ namespace control {
         eeros::control::Output<eeros::math::Vector3> out_translation, out_velocity, out_acceleration, out_angular_velocity, out_angular_acceleration;
         eeros::control::Output<eeros::math::Vector4> out_quaternion;
         
-		RS_T265 t265;
+		eeros::hal::RealsenseT265 t265;
         eeros::PeriodicCounter pc;
 	};
 };

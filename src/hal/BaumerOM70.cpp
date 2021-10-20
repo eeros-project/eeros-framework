@@ -4,16 +4,15 @@
 #include <thread>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
-// #include <libmodbus-3.1.6/src/modbus-tcp.h>
 #include "../external/libmodbus-3.1.6/src/modbus-tcp.h"
 
 #include <bits/stdc++.h> // TODO delete after clock test
 
 #include <eeros/hal/BaumerOM70.hpp>
-// #include "../constants.hpp"
 
 using namespace eeros::logger;
 using namespace eeros::math;
+using namespace eeros::hal;
 
 
 BaumerOM70::BaumerOM70(std::string dev, int port, int slave_id, int priority) : 

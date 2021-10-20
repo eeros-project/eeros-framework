@@ -57,7 +57,8 @@ int main() {
 	Lambda l1 ([&] () { });
 	Periodic p2("p2", period, l1);
 	p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
-		log.info() << cs.lidar.getOut().getSignal().getValue();
+		log.info()  << cs.lidar.getOut(0).getSignal().getValue() << ", " 
+					<< cs.lidar.getOut(1).getSignal().getValue();
 	});
 	
 	auto& executor = Executor::instance();

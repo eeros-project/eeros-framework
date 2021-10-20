@@ -1,7 +1,5 @@
-// #include <libmodbus-3.1.6/src/modbus-tcp.h>
-// #include <libmodbus-3.1.6/src/modbus.h>
-#include "../../external/libmodbus-3.1.6/src/modbus-tcp.h"
-#include "../../external/libmodbus-3.1.6/src/modbus.h"
+#include <libmodbus-3.1.6/src/modbus-tcp.h>
+#include <libmodbus-3.1.6/src/modbus.h>
 #include <iostream>
 #include <sstream>
 #include <string.h>

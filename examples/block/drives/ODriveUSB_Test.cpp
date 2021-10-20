@@ -15,14 +15,8 @@ using namespace eeros;
 using namespace eeros::safety;
 using namespace eeros::control;
 using namespace eeros::logger;
+using namespace eeros::task;
 
-double period = 0.01;
-
-void signalHandler(int signum){
-	SafetySystem::exitHandler();
-}
-
-int main() {
 double period = 0.01;
 
 void signalHandler(int signum){
@@ -66,9 +60,7 @@ int main() {
 	Lambda l1 ([&] () { });
 	Periodic p2("p2", period, l1);
 	p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
-		log.info() << cs.odrive.getOut().getSignal().getValue() << ", " << 
-		cs.distSens2.getOut().getSignal().getValue() << ", " << 
-		cs.distSens3.getOut().getSignal().getValue() ;
+		log.info() << cs.odrive_input.getVelActOut().getSignal().getValue() ;
 	});
 	
 	auto& executor = Executor::instance();

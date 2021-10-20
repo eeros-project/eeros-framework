@@ -17,6 +17,6 @@ void RPLidarInput::run()
 	
 	// Set output timestamp
     uint64_t ts = eeros::System::getTimeNs();
-	this->out.getSignal().setTimestamp(ts);
+	this->out[0].getSignal().setTimestamp(ts);
 }
 

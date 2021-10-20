@@ -6,7 +6,9 @@
 #include <eeros/logger/Logger.hpp>
 #include <eeros/core/Thread.hpp>
 #include <eeros/math/Matrix.hpp>
-#include <rplidar_sdk/rplidar.h>
+#include <rplidar_sdk/sdk/sdk/include/rplidar.h>
+
+#define LASER_COUNT_MAX 380
 
 using namespace rp::standalone::rplidar;
 
@@ -48,21 +50,21 @@ namespace hal {
 		* 
 		* @return laser_angles
 		*/
-		eeros::math::Vector<laser_count_max,double> get_angles();  // TODO richtige Groesse angeben
+		eeros::math::Vector<LASER_COUNT_MAX,double> get_angles();  // TODO richtige Groesse angeben
 		
 		/**
 		* Gets range measurements
 		* 
 		* @return laser_ranges
 		*/
-		eeros::math::Vector<laser_count_max,double> get_ranges();
+		eeros::math::Vector<LASER_COUNT_MAX,double> get_ranges();
 		
 		/**
 		* Gets range intensities
 		* 
 		* @return laser_intensities
 		*/
-		eeros::math::Vector<laser_count_max,double> get_intensities();
+		eeros::math::Vector<LASER_COUNT_MAX,double> get_intensities();
 		
 		RPlidarDriver * laser_drv;
 		RplidarScanMode scan_mode;
@@ -79,10 +81,10 @@ namespace hal {
 		volatile bool started;
 		volatile bool running;
 		
-		static const laser_count_max = 1000; // TODO right number, depending on resolution
+// 		static const laser_count_max = LASER_COUNT_MAX; // TODO right number, depending on resolution
 			
 		eeros::logger::Logger log;
-		eeros::math::Vector<laser_count_max,double> laser_angles, laser_ranges, laser_intensities; 
+		eeros::math::Vector<LASER_COUNT_MAX,double> laser_angles, laser_ranges, laser_intensities; 
 	};
 };
 }

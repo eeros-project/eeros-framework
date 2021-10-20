@@ -1,17 +1,18 @@
 #ifndef ORG_EEROS_CONTROL_ODRIVEINPUT_USB_HPP
 #define ORG_EEROS_CONTROL_ODRIVEINPUT_USB_HPP
 
-#include <eeros/control/Blockio.hpp>
+#include <eeros/control/Block.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/control/Input.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/hal/ODrive_USB.hpp>
 #include <eeros/core/PeriodicCounter.hpp>
 
+using namespace eeros::math;
 
 namespace eeros {
 namespace control {
-	class ODriveInput_USB: public eeros::control::Blockio<1,3,eeros::math::Vector2> {
+	class ODriveInput_USB: public eeros::control::Block {
 
 	public:
 		/**
@@ -36,12 +37,12 @@ namespace control {
 			// 	counter.tick();
 				
 			// Set speed
-			odrive.set_ref_vel(0, velRefIn.getSignal().getValue()(0)); // rad/s
-			odrive.set_ref_vel(1, velRefIn.getSignal().getValue()(1)); // rad/s
+			odrive.set_ref_vel(0, velRefIn.getSignal().getValue()(0), 1/6.28); // rad/s
+			odrive.set_ref_vel(1, velRefIn.getSignal().getValue()(1), 1/6.28); // rad/s
 			
 			// Output data Value
-			double vel0 = odrive.get_encoder_vel(0); // rad/s
-			double vel1 = odrive.get_encoder_vel(1); // rad/s
+			double vel0 = odrive.get_encoder_vel(0, 1/6.28); // rad/s
+			double vel1 = odrive.get_encoder_vel(1, 1/6.28); // rad/s
 			Vector2 vel; vel << vel0, vel1;
 			velActOut.getSignal().setValue(vel);
 			
@@ -113,25 +114,25 @@ namespace control {
 		/**
 		* Disables drives
 		*/
-		virtual bool ODriveInput_USB::is_odrive_emergency() {
+		virtual bool is_odrive_emergency() {
 			return odrive.is_endstop_active();
 		}
 		/**
 		* Returns true, if odrive is calibrated
 		*/
-		virtual bool ODriveInput_USB::is_odrive_calibrated() {
+		virtual bool is_odrive_calibrated() {
 			return odrive.is_calibrated();
 		}
 		/**
 		* Starts odrive calibration procedure
 		*/
-		virtual void ODriveInput_USB::do_odrive_calibration() {
+		virtual void do_odrive_calibration() {
 			odrive.do_start_calibration();
 		}
 		
 	private:
 		std::thread* t;
-		ODrive_USB odrive;
+		eeros::hal::ODrive_USB odrive;
 
 	protected:
 		eeros::PeriodicCounter counter;

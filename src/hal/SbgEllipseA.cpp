@@ -73,7 +73,7 @@ enable_fast_data(false)
     errorCode = sbgEComCmdSettingsAction(&comHandle, SBG_ECOM_SAVE_SETTINGS);
 
     // Set callbacks
-    errorCode = sbgEComSetReceiveLogCallback(&comHandle, SbgEllipseA::onLogReceived, NULL); // -> see: sbgECom.c
+    errorCode = sbgEComSetReceiveLogCallback(&comHandle, onLogReceived, NULL); // -> see: sbgECom.c
     
     // Start 
 	started = true;
@@ -140,7 +140,7 @@ void SBGEllipseA::run() {
     }
 }
 
-SBGEllipseA SBGEllipseA::onLogReceived(SbgEComHandle *pHandle, SbgEComClass msgClass, SbgEComMsgId msg, 
+SbgErrorCode SBGEllipseA::onLogReceived(SbgEComHandle *pHandle, SbgEComClass msgClass, SbgEComMsgId msg, 
                                         const SbgBinaryLogData *pLogData, void *pUserArg)
 {  
 //     std::cout << "msg class " << (int)msgClass << std::endl;

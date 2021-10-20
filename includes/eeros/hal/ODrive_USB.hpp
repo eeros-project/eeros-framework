@@ -22,8 +22,7 @@
 #include <eeros/logger/Logger.hpp>
 #include <eeros/core/Thread.hpp>
 
-#include "../external/odrive_ost/include/odrive/odriveEP.hpp"
-#include "../constants.hpp"
+#include <odrive_ost/include/odrive/odriveEP.hpp>
 
 namespace eeros {
 namespace hal {
@@ -54,9 +53,9 @@ namespace hal {
 			int getJson();
 			float encoderTicksPerRad;
 			
-			double get_encoder_vel(int motor);
+			double get_encoder_vel(int motor, int turns_per_rev);
 			void set_(int motor);
-			void set_ref_vel(int motor, float speed_rad);
+			void set_ref_vel(int motor, float speed_rad, int turns_per_rev);
 			void enable_drives();
 			void disable_drives();
 			void do_start_calibration();

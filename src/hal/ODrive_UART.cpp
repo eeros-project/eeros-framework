@@ -1,6 +1,8 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/core/Fault.hpp>
 #include <eeros/hal/ODrive_UART.hpp>
+#include <eeros/math/Matrix.hpp>
+
 
 #include <iostream>
 #include <errno.h>

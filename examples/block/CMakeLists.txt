@@ -53,6 +53,7 @@ list(APPEND targets wrapAroundTest)
 
 add_subdirectory(filter)
 add_subdirectory(sensors)
+add_subdirectory(drives)
 
 if(INSTALL_EXAMPLES)
   install(TARGETS ${targets} RUNTIME DESTINATION examples/block)

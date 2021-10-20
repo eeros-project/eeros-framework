@@ -12,11 +12,11 @@ log(Logger::getLogger())
 {}
 
 void SBGEllipseAInput::run() {
-	euler_out.getSignal().setValue(SbgEllipseA::data_euler);
-    quaternion_out.getSignal().setValue(SbgEllipseA::data_quat);
-    acc_out.getSignal().setValue(SbgEllipseA::data_acc);
-    gyro_out.getSignal().setValue(SbgEllipseA::data_gyro);
-	timestamp_out.getSignal().setValue(SbgEllipseA::timestamp_euler);
+	euler_out.getSignal().setValue(SBGEllipseA::data_euler);
+    quaternion_out.getSignal().setValue(SBGEllipseA::data_quat);
+    acc_out.getSignal().setValue(SBGEllipseA::data_acc);
+    gyro_out.getSignal().setValue(SBGEllipseA::data_gyro);
+	timestamp_out.getSignal().setValue(SBGEllipseA::timestamp_euler);
         
     // Timestamps
     uint64_t ts = eeros::System::getTimeNs();

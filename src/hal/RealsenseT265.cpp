@@ -4,13 +4,11 @@
 #include <cstring>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
-
 #include <eeros/hal/RealsenseT265.hpp>
-#include "../constants.hpp"
 
 using namespace eeros::logger;
 using namespace eeros::math;
-using namespace slingload;
+using namespace eeros::hal;
 
 
 RealsenseT265::RealsenseT265(std::string dev, int priority) : 

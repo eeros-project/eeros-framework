@@ -40,7 +40,7 @@ namespace control {
             
         private:                     
             eeros::hal::RPLidar rplidar;
-			static const laser_count_max = 1000; // TODO right number, depending on resolution
+// 			static const laser_count_max = LASER_COUNT_MAX; // TODO right number, depending on resolution
     };
 };
 }
