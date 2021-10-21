@@ -21,7 +21,8 @@ namespace control {
 			* @param dev - string with device name
 			* @param priority - execution priority or RPLidar thread, to get sensors data
 			*/
-            RPLidarInput(std::string dev, int priority = 5);
+            RPLidarInput(std::string dev, int priority = 5) : 
+			rplidar(dev, priority) {}
             
 			/**
 			* Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -36,8 +37,16 @@ namespace control {
 			* output[1] = ranges
 			* output timestamp = system time
 			*/
-            virtual void run();
-            
+            virtual void run() {
+				// Set output data
+				this->out[0].getSignal().setValue(rplidar.get_angles());
+				this->out[1].getSignal().setValue(rplidar.get_ranges());
+				
+				// Set output timestamp
+				uint64_t ts = eeros::System::getTimeNs();
+				this->out[0].getSignal().setTimestamp(ts);
+			}
+				
         private:                     
             eeros::hal::RPLidar rplidar;
 // 			static const laser_count_max = LASER_COUNT_MAX; // TODO right number, depending on resolution

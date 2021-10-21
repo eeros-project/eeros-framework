@@ -35,7 +35,6 @@ set(EEROS_VERSION ${EEROS_VERSION_MAJOR}.${EEROS_VERSION_MINOR}.${EEROS_VERSION_
 log("Going to build EEROS v${EEROS_VERSION}")
 
 
-message(STATUS "Test ${ADDITIONAL_INCLUDE_DIRS}")
 ## Add additional include and link directories
 include_directories(${ADDITIONAL_INCLUDE_DIRS})
 link_directories(${ADDITIONAL_LINK_DIRS})
@@ -182,8 +181,6 @@ add_subdirectory(${EEROS_BINARY_DIR}/libucl-src
 include_directories("${libucl_SOURCE_DIR}/include")
 link_directories(${libucl_BINARY_DIR})
 
-
-
 ## Use Find package ecmasterlib (EtherCAT) if found
 message(STATUS "")
 message(STATUS "EtherCAT")
@@ -223,24 +220,6 @@ if(USE_CAN)
 	include_directories(${canopenlib_INCLUDE_DIR})
 	link_directories(${canopenlib_DIR})
 endif()
-
-# find_package(libusb-1.0 REQUIRED)
-# include_directories(${LIBUSB1_INCLUDE_DIRS})
-# link_directories(${LIBUSB1_LIBRARIES})
-
-
-# ## Use SBG IMU Library if instructed
-# if(USE_SBG)
-# 	message(STATUS "")
-# 	message(STATUS "Use sbgellipse")
-# 	message(STATUS "**********************************")
-# 
-# 	find_package(sbgECom QUIET)
-# # 	include_directories(${sbgECom_INCLUDE_DIR})
-# 	link_directories(${sbgECom_DIR})
-# endif()
-      
-
 
 ## Use ROS if found and instructed
 message(STATUS "ROS")
@@ -297,11 +276,11 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 
 
-
 ## Set EEROS libraries
-set(EEROS_LIBS ${CMAKE_DL_LIBS} ucl pthread usb-1.0 odrive jsoncpp rplidar_sdk sbgECom modbus ) # realsense? )
+set(EEROS_LIBS ${CMAKE_DL_LIBS} ucl pthread)
 
-
+#rplidar_sdk sbgECom) # usb-1.0 jsoncpp rplidar_sdk sbgECom odrive) # modbus ) # realsense? )
+set(EXTERNAL_LIBS ${EXTERNAL_LIBS})
 
 ## Enable CTest
 enable_testing()

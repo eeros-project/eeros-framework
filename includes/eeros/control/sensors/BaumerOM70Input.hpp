@@ -8,7 +8,6 @@
 #include <eeros/math/Matrix.hpp>
 #include <eeros/hal/BaumerOM70.hpp>
 
-
 using namespace eeros::math;
 using namespace eeros::hal;
 using namespace eeros::logger;
@@ -28,7 +27,10 @@ namespace control {
 		* @param slave - sensor slave number (modbus interface)
 		* @param priority - execution priority or BaumerOM70 thread, to get sensors data
 		*/
-		BaumerOM70Input(std::string dev, int port, int slave, int priority = 5);
+		BaumerOM70Input(std::string dev, int port, int slave_id, int priority = 5) : 
+		om70(dev, port, slave_id, priority),
+		log(Logger::getLogger()) 
+		{ }
 		
 		/**
 		* Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -38,7 +40,10 @@ namespace control {
 		/**
 		* Gets input data from Baumer OM70 Thread and outputs them
 		*/
-		virtual void run();
+		virtual void run() {
+			this->out.getSignal().setValue(om70.get_distance());
+			this->out.getSignal().setTimestamp(eeros::System::getTimeNs());
+		}
         
 	protected:        
         eeros::hal::BaumerOM70 om70;
@@ -46,7 +51,6 @@ namespace control {
 	};
 };
 }
-
 
 #endif /* ORG_EEROS_CONTROL_BAUMEROM70_INPUT_HPP */
 

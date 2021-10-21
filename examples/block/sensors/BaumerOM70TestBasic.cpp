@@ -1,5 +1,5 @@
-#include <libmodbus-3.1.6/src/modbus-tcp.h>
-#include <libmodbus-3.1.6/src/modbus.h>
+#include "../external/libmodbus-3.1.6/src/modbus-tcp.h"  
+#include "../external/libmodbus-3.1.6/src/modbus.h"  
 #include <iostream>
 #include <sstream>
 #include <string.h>
@@ -7,7 +7,6 @@
 #include <bits/stdc++.h> 
 
 using namespace std;
-
 
 modbus_t *ctx;
 uint16_t tab_reg[64];

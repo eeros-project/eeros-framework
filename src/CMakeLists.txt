@@ -41,7 +41,8 @@ link_directories(${EEROS_BINARY_DIR}/src/config)
 
 add_library(eeros SHARED ${EEROS_SRCS})
 
-target_link_libraries(eeros ${EXTERNAL_LIBS})
+target_link_libraries(eeros ${EXTERNAL_LIBS}) 
+
 
 set_target_properties(eeros PROPERTIES
 			VERSION ${EEROS_VERSION})
