@@ -108,11 +108,7 @@ namespace hal {
 			static eeros::math::Vector4 data_quat;
 			static eeros::math::Vector3 data_acc;
 			static eeros::math::Vector3 data_gyro;
-			static uint32_t timestamp_euler;
-			static uint32_t timestamp_quat;
-			static uint32_t timestamp_acc;
-			static uint32_t timestamp_gyro;
-			
+			static uint32_t timestamp_euler, timestamp_quat, timestamp_acc, timestamp_gyro;
 			static uint32_t count, count0, countEuler, countQuat, countImu;
 		
 		private:

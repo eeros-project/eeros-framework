@@ -12,7 +12,6 @@
 using namespace eeros::hal;
 using namespace eeros::logger;
 
-
 namespace eeros {
 namespace control {
 
@@ -40,11 +39,11 @@ namespace control {
 		* Gets input data from SBGEllipseA Thread and outputs them
 		*/
 		virtual void run(){
-			euler_out.getSignal().setValue(SBGEllipseA::data_euler);
-			quaternion_out.getSignal().setValue(SBGEllipseA::data_quat);
-			acc_out.getSignal().setValue(SBGEllipseA::data_acc);
-			gyro_out.getSignal().setValue(SBGEllipseA::data_gyro);
-			timestamp_out.getSignal().setValue(SBGEllipseA::timestamp_euler);
+// 			euler_out.getSignal().setValue(SBGEllipseA::data_euler);
+// 			quaternion_out.getSignal().setValue(SBGEllipseA::data_quat);
+// 			acc_out.getSignal().setValue(SBGEllipseA::data_acc);
+// 			gyro_out.getSignal().setValue(SBGEllipseA::data_gyro);
+// 			timestamp_out.getSignal().setValue(SBGEllipseA::timestamp_euler);
 				
 			// Timestamps
 			uint64_t ts = eeros::System::getTimeNs();
