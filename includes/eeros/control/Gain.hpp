@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <memory>
 #include <mutex>
+#include <math.h>
 
 
 namespace eeros {
@@ -130,8 +131,15 @@ class Gain : public Blockio<1,1,Tout> {
     }
 
     if (enabled) {
-      this->out.getSignal().setValue(calculateResults<Tout>(this->in.getSignal().getValue()));
-    } else {
+        
+        if(rootCurve){
+            this->out.getSignal().setValue(calculateResultsWithRootCurve<Tout>(this->in.getSignal().getValue()));
+        } 
+        else {
+            this->out.getSignal().setValue(calculateResults<Tout>(this->in.getSignal().getValue()));
+        }
+    } 
+    else {
       this->out.getSignal().setValue(this->in.getSignal().getValue());
     }
 
@@ -184,6 +192,23 @@ class Gain : public Blockio<1,1,Tout> {
    */
   virtual void enableSmoothChange(bool enable) {
     smoothChange = enable;
+  }
+  
+  /**
+   * Enables or disables a root curve profile for the gain
+   *
+   * If enabled, run() will calculate and apply a root curve profile to the gain.
+   *
+   * Does not enable or disable the gain. This is done by calling enable() and disable() respectively.
+   *
+   * @param enable - enables or disables the root curve option
+   *
+   * @see run()
+   * @see enable()
+   * @see disable()
+   */
+  virtual void enableRootCurve(bool enable) {
+      rootCurve = enable;
   }
 
 
@@ -241,6 +266,16 @@ class Gain : public Blockio<1,1,Tout> {
     this->gainDiff = gainDiff;
   }
 
+  /**
+   * Sets the root curve option parameters.
+   *
+   * @param gainDiff - gain differential
+   */
+  virtual void setRootCurveParams(Tgain rootCurveMaxGain, Tgain rootCurveSwitchPoint) {
+    std::lock_guard<std::mutex> lock(mtx);
+    this->rootCurveMaxGain = rootCurveMaxGain;
+    this->rootCurveSwitchPoint = rootCurveSwitchPoint;
+  }
 
   /*
    * Friend operator overload to give the operator overload outside
@@ -256,12 +291,68 @@ class Gain : public Blockio<1,1,Tout> {
   Tgain minGain;
   Tgain targetGain;
   Tgain gainDiff;
+  
   bool enabled{true};
   bool smoothChange{false};
+  bool rootCurve{false};
+  
+  Tgain rootCurveMaxGain;
+  Tgain rootCurveSwitchPoint;
+  
   std::mutex mtx;
 
 
  private:
+  template<typename S>
+  typename std::enable_if<std::is_arithmetic<S>::value, S>::type calculateResultsWithRootCurve(S value) {
+        Tout outVal;
+		if (fabs(value) > rootCurveSwitchPoint){
+			if(value >= 0) 
+				outVal =   sqrt(2*rootCurveMaxGain*(fabs(value)-rootCurveSwitchPoint/2));
+			else 
+				outVal = - sqrt(2*rootCurveMaxGain*(fabs(value)-rootCurveSwitchPoint/2));
+		}
+		else {
+			outVal = gain * value;
+		}
+		return outVal;
+  }
+  
+  template<typename S>
+  typename std::enable_if<std::is_compound<S>::value && !elementWise, S>::type calculateResultsWithRootCurve(S value) {
+        Tout outVal;
+		for(unsigned int i = 0; i < value.size(); i++) {
+            if (fabs(value[i]) > rootCurveSwitchPoint){
+                if(value[i] >= 0) 
+                    outVal[i] =   sqrt(2*rootCurveMaxGain*(fabs(value[i])-rootCurveSwitchPoint/2));
+                else 
+                    outVal[i] = - sqrt(2*rootCurveMaxGain*(fabs(value[i])-rootCurveSwitchPoint/2));
+            }
+            else {
+                outVal[i] = gain * value[i];
+            }
+        }
+		return outVal;
+  }
+
+  template<typename S>
+  typename std::enable_if<std::is_compound<S>::value && elementWise, S>::type calculateResultsWithRootCurve(S value) {
+        Tout outVal;
+		for(unsigned int i = 0; i < value.size(); i++) {
+            if (fabs(value[i]) > rootCurveSwitchPoint[i]){
+                if(value[i] >= 0) 
+                    outVal[i] =   sqrt(2*rootCurveMaxGain[i]*(fabs(value[i])-rootCurveSwitchPoint[i]/2));
+                else 
+                    outVal[i] = - sqrt(2*rootCurveMaxGain[i]*(fabs(value[i])-rootCurveSwitchPoint[i]/2));
+            }
+            else {
+                outVal[i] = gain[i] * value[i];
+            }
+        }
+		return outVal;
+  }
+
+     
   template<typename S>
   typename std::enable_if<!elementWise, S>::type calculateResults(S value) {
     return gain * value;

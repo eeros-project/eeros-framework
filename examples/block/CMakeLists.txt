@@ -42,6 +42,18 @@ add_executable(pathPlannerTest3 PathPlannerTest3.cpp copyPathFile)
 target_link_libraries(pathPlannerTest3 eeros ${EEROS_LIBS})
 list(APPEND targets pathPlannerTest3)
 
+add_executable(rateLimiterTest RateLimiterTest.cpp)
+target_link_libraries(rateLimiterTest eeros ${EEROS_LIBS})
+list(APPEND targets rateLimiterTest)
+
+
+add_executable(wrapAroundTest WrapAroundTest.cpp)
+target_link_libraries(wrapAroundTest eeros ${EEROS_LIBS})
+list(APPEND targets wrapAroundTest)
+
+add_subdirectory(filter)
+add_subdirectory(sensors)
+add_subdirectory(drives)
 
 if(INSTALL_EXAMPLES)
   install(TARGETS ${targets} RUNTIME DESTINATION examples/block)
