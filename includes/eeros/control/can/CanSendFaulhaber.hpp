@@ -46,7 +46,7 @@ class CanSendFaulhaber : public Block {
    * @param functionCode - vector with function codes of all PDO's to be received
    */
   CanSendFaulhaber(int socket, std::initializer_list<uint8_t> node, std::initializer_list<uint8_t> functionCode)
-      : socket(socket), nodes(node), functionCodes(functionCode), log('Y') {
+      : socket(socket), nodes(node), functionCodes(functionCode), log(Logger::getLogger('Y')) {
     for (size_t i = 0; i < node.size(); i++) {
       velScale[i] = 1;
     }

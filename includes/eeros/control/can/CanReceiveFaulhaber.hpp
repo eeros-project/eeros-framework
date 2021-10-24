@@ -50,7 +50,7 @@ class CanReceiveFaulhaber: public Block {
    * @param functionCode - vector with function codes of all PDO's to be received
    */
   CanReceiveFaulhaber(int socket, std::initializer_list<uint8_t> node, std::initializer_list<uint8_t> functionCode) 
-      :  socket(socket), nodes(node), functionCodes(functionCode), log('C') {
+      :  socket(socket), nodes(node), functionCodes(functionCode), log(Logger::getLogger('C')) {
     for (size_t i = 0; i < node.size(); i++) {
       posScale[i] = 1;
       velScale[i] = 1;

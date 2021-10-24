@@ -181,7 +181,7 @@ class InitSequence : public Sequence {
 class MoveSequence : public Sequence {
  public:
   MoveSequence(std::string name, Sequence* caller, ControlSystem& cs, SafetySystem& ss, MySafetyProperties& sp) 
-      : Sequence(name, caller, true), cs(cs), ss(ss), sp(sp), wait("Wait", this) { }
+      : Sequence(name, caller, true), cs(cs), ss(ss), sp(sp), wait("Wait", this), log(Logger::getLogger()) { }
         
   int action() {
     while(Sequencer::running  && ss.getCurrentLevel() == sp.slMoving) {
