@@ -21,7 +21,7 @@ namespace control {
  * @since v1.3
  */
 
-class BaumerOM70Input: public eeros::control::Blockio<0,1,double> {
+class BaumerOM70Input: public Blockio<0,1,double> {
  public:
   /**
    * Constructs an input block to get data from baumer OM70 sensor. Output is a laser distance \n

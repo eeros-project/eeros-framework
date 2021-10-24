@@ -1,56 +1,62 @@
 #ifndef ORG_EEROS_CONTROL_PIXYCAM_INPUT_HPP_
 #define ORG_EEROS_CONTROL_PIXYCAM_INPUT_HPP_
 
-#include <eeros/control/Block.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/hal/PixyCam.hpp>
 
+using namespace eeros::hal;
+using namespace eeros::math;
+using namespace eeros::control;
 
 namespace eeros {
 namespace control {
 
-class PixyCamInput : public eeros::control::Block {
- public:
-  PixyCamInput(std::string dev, int priority = 5) : p(dev, priority) {
-  }
+/**
+ * This block reads a Pixy2 camera.
+ *
+ * @since v1.3
+ */
+
+class PixyCamInput : public Blockio<0,1,Vector3> {
+public:
+  PixyCamInput(std::string dev, int priority = 5) : p(dev, priority) { }
   
-  virtual eeros::control::Output<eeros::math::Vector3>& getOut(){
-	  return out;
+  virtual Output<Vector3>& getOutRaw() {
+    return outRaw;
   }
-  virtual eeros::control::Output<eeros::math::Vector3>& getOut_raw(){
-	  return out_raw;
+  virtual Output<Matrix<nrDots,2,double>>& getOutDots() {
+    return outDots;
   }
-  virtual eeros::control::Output<eeros::math::Matrix<nr_dots,2,double>>& getOut_dots(){
-	  return out_dots;
+  virtual Output<double>& getOutHeight() {
+    return outHeight;
   }
-  virtual eeros::control::Output<double>& getOut_height(){
-	  return out_height;
-  }
-  virtual eeros::control::Output<bool>& getOut_isValid(){
-	  return out_valid;
+  virtual Output<bool>& getOutIsValid() {
+    return outValid;
   }
 
   virtual void run() {
     out.getSignal().setValue(p.getPos());
-    out.getSignal().setTimestamp(eeros::System::getTimeNs());
-	
-    out_raw.getSignal().setValue(p.getPos_raw());
-    out_raw.getSignal().setTimestamp(eeros::System::getTimeNs());
-	
-    out_dots.getSignal().setValue(p.getDots());
-    out_dots.getSignal().setTimestamp(eeros::System::getTimeNs());
-	
-    out_height.getSignal().setValue(p.getHeight());
-    out_height.getSignal().setTimestamp(eeros::System::getTimeNs());
-	
-    out_valid.getSignal().setValue(p.isDataValid());
-    out_valid.getSignal().setTimestamp(eeros::System::getTimeNs());
+    auto t = eeros::System::getTimeNs();
+    out.getSignal().setTimestamp(t);
+  
+    outRaw.getSignal().setValue(p.getPosRaw());
+    outRaw.getSignal().setTimestamp(t);
+  
+    outDots.getSignal().setValue(p.getDots());
+    outDots.getSignal().setTimestamp(t);
+  
+    outHeight.getSignal().setValue(p.getHeight());
+    outHeight.getSignal().setTimestamp(t);
+  
+    outValid.getSignal().setValue(p.isDataValid());
+    outValid.getSignal().setTimestamp(t);
   }
 
   virtual void setLamp(bool white, bool rgb) {
-    p.setLamp(white, rgb);;
+    p.setLamp(white, rgb);
   }
 
   virtual int getNofBlocks() {
@@ -58,15 +64,15 @@ class PixyCamInput : public eeros::control::Block {
   }
 
  protected:
-  eeros::hal::PixyCam p;
-  eeros::control::Output<eeros::math::Vector3> out;
-  eeros::control::Output<eeros::math::Vector3> out_raw;
-  eeros::control::Output<eeros::math::Matrix<nr_dots,2,double>> out_dots;
-  eeros::control::Output<double> out_height;
-  eeros::control::Output<bool> out_valid;
+  PixyCam p;
+  Output<Vector3> outRaw;
+  Output<Matrix<nrDots,2,double>> outDots;
+  Output<double> outHeight;
+  Output<bool> outValid;
 };
 
 }
 }
 
 #endif /* ORG_EEROS_CONTROL_PIXYCAM_INPUT_HPP_ */
+
