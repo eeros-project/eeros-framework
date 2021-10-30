@@ -91,29 +91,7 @@ TEST(controlLPFilterTest, vectorLPFilter) {
 TEST(controlLPFilterTest, printLPFilter) {
   LowPassFilter<> lp1{0.5};
   lp1.setName("my1stLPFilter");
-  
-  Constant<> c1{1.0};
-  lp1.getIn().connect(c1.getOut());
-  
-  c1.run();
-  lp1.run();
-  
-  c1.setValue(2.0);
-  c1.run();
-  lp1.run();
-  
-  c1.setValue(3.0);
-  c1.run();
-  lp1.run();
-  
-  c1.setValue(4.0);
-  c1.run();
-  lp1.run();
-  
-  c1.setValue(3.14159);
-  c1.run();
-  lp1.run();
-  
+    
   std::stringstream sstream{};
   sstream << lp1;
   std::string str1 = "Block LowPassFilter: 'my1stLPFilter' is enabled=1, alpha=0.5";

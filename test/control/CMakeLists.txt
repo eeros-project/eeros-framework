@@ -22,6 +22,7 @@ add_eeros_test_sources(Step.cpp)
 add_eeros_test_sources(Sum.cpp)
 add_eeros_test_sources(Switch.cpp)
 add_eeros_test_sources(Transition.cpp)
+add_eeros_test_sources(WrapAround.cpp)
 
 
 # Blocks, old, delete when replaced by new tests
