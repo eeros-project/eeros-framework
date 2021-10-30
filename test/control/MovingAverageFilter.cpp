@@ -1,4 +1,4 @@
-#include <eeros/control/MAFilter.hpp>
+#include <eeros/control/filter/MovingAverageFilter.hpp>
 #include <eeros/control/Constant.hpp>
 #include <eeros/math/Matrix.hpp>
 
@@ -11,28 +11,28 @@ using namespace eeros;
 using namespace eeros::control;
 
 
-TEST(MAFilterUnitTest, templateInstantiations) {
+TEST(controlMAFilterTest, templateInstantiations) {
   double dcoeffs[] = {0.5, 0.5};
-  MAFilter<2> f1{dcoeffs};
+  MovingAverageFilter<2> f1{dcoeffs};
 
   double d5coeffs[] = {0.2, 0.2, 0.2, 0.2, 0.2};
-  MAFilter<5> f2{d5coeffs};
+  MovingAverageFilter<5> f2{d5coeffs};
   
   float fcoeffs[] = {0.1, 0.1};
-  MAFilter<2,int,float> f3{fcoeffs};
+  MovingAverageFilter<2,int,float> f3{fcoeffs};
   
   int icoeffs[] = {1, 1}; 
-  MAFilter<2,int> f4{icoeffs};
+  MovingAverageFilter<2,int> f4{icoeffs};
   
   using namespace math; 
-  MAFilter<2,Matrix<2,2>, double> f5{dcoeffs};
+  MovingAverageFilter<2,Matrix<2,2>, double> f5{dcoeffs};
   EXPECT_TRUE(true); // they would fail at compile time.
 }
 
 
-TEST(MAFilterUnitTest, doubleMAFilter) {
+TEST(controlMAFilterTest, doubleMAFilter) {
   double coeffs[] = {0.5, 0.5};
-  MAFilter<2> ma{coeffs};
+  MovingAverageFilter<2> ma{coeffs};
   
   Constant<> c1{2};
   c1.run();
@@ -53,9 +53,9 @@ TEST(MAFilterUnitTest, doubleMAFilter) {
 }
 
 
-TEST(MAFilterUnitTest, enableDisable) {
+TEST(controlMAFilterTest, enableDisable) {
   double coeffs[] = {0.5, 0.5};
-  MAFilter<2> ma{coeffs};
+  MovingAverageFilter<2> ma{coeffs};
   
   Constant<> c1{5};
   c1.run();
@@ -78,11 +78,11 @@ TEST(MAFilterUnitTest, enableDisable) {
 }
 
 
-TEST(MAFilterUnitTest, vectorMAFilter) {
+TEST(controlMAFilterTest, vectorMAFilter) {
   using namespace math;
   
   double coeffs[] = {0.1, 0.2, 0.3, 0.4};
-  MAFilter<4, Vector3, double> ma{coeffs};
+  MovingAverageFilter<4, Vector3, double> ma{coeffs};
   
   Vector3 vec3{};
   vec3 << 1, 2, 3;
@@ -114,9 +114,9 @@ TEST(MAFilterUnitTest, vectorMAFilter) {
 }
 
 
-TEST(MAFilterUnitTest, printMAFilter) {
+TEST(controlMAFilterTest, printMAFilter) {
   double coeffs[] = {0.2, 0.2, 0.2, 0.2, 0.2};
-  MAFilter<5> f1{coeffs};
+  MovingAverageFilter<5> f1{coeffs};
   f1.setName("my1stMAFilter");
   
   Constant<> c1{1.0};
@@ -143,7 +143,7 @@ TEST(MAFilterUnitTest, printMAFilter) {
   
   std::stringstream sstream{};
   sstream << f1;
-  std::string str1 = "Block MAFilter: 'my1stMAFilter' is enabled=1, coefficients:[0.2,0.2,0.2,0.2,0.2], previousValues:[1,2,3,4,3.14159]";
+  std::string str1 = "Block MovingAverageFilter: 'my1stMAFilter' is enabled=1, coefficients:[0.2,0.2,0.2,0.2,0.2], previousValues:[1,2,3,4,3.14159]";
   std::string str2 = sstream.str();
   EXPECT_STREQ (str1.c_str(), str2.c_str());
 }

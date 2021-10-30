@@ -1,4 +1,4 @@
-#include <eeros/control/MedianFilter.hpp>
+#include <eeros/control/filter/MedianFilter.hpp>
 #include <eeros/control/Constant.hpp>
 #include <eeros/math/Matrix.hpp>
 
@@ -11,7 +11,7 @@ using namespace eeros;
 using namespace eeros::control;
 
 
-TEST(MedianFilterUnitTest, templateInstantiations) {
+TEST(controlMedianFilterTest, templateInstantiations) {
   MedianFilter<2> f1{};
   MedianFilter<5,int> f2{};
   MedianFilter<100,float> f3{};
@@ -23,7 +23,7 @@ TEST(MedianFilterUnitTest, templateInstantiations) {
 }
 
 
-TEST(MedianFilterUnitTest, intMAFilter) {
+TEST(controlMedianFilterTest, intMedianFilter) {
   MedianFilter<5,int> mf{};
   
   Constant<int> c1{2};
@@ -52,7 +52,7 @@ TEST(MedianFilterUnitTest, intMAFilter) {
 }
 
 
-TEST(MedianFilterUnitTest, doubleMAFilter1) {
+TEST(controlMedianFilterTest, doubleMedianFilter1) {
   MedianFilter<51> mf{};
   
   Constant<> c1{};
@@ -75,7 +75,7 @@ TEST(MedianFilterUnitTest, doubleMAFilter1) {
 }
 
 
-TEST(MedianFilterUnitTest, doubleMAFilter2) {
+TEST(controlMedianFilterTest, doubleMedianFilter2) {
   /*
    * Tests enable disable feature and its performance benefit. 
    */
@@ -181,7 +181,7 @@ TEST(MedianFilterUnitTest, doubleMAFilter2) {
 }
 
 
-TEST(MedianFilterUnitTest, vector2MAFilter1) {
+TEST(controlMedianFilterTest, vector2MedianFilter1) {
   using namespace math; 
   MedianFilter<5,Vector2> mf{};
   
@@ -210,7 +210,7 @@ TEST(MedianFilterUnitTest, vector2MAFilter1) {
 }
 
 
-TEST(MedianFilterUnitTest, vector2MAFilter2) {
+TEST(controlMedianFilterTest, vector2MedianFilter2) {
   using namespace math; 
   MedianFilter<5,Vector2> mf{};
   
@@ -239,7 +239,7 @@ TEST(MedianFilterUnitTest, vector2MAFilter2) {
 }
 
 
-TEST(MedianFilterUnitTest, vector2MAFilter3) {
+TEST(controlMedianFilterTest, vector2MedianFilter3) {
   /*
    * Note: If the value pair of a Vector2 must be filtered without keeping them
    *       together, two MedianFilter instances must be used as shown in this test case.
@@ -299,7 +299,7 @@ TEST(MedianFilterUnitTest, vector2MAFilter3) {
 }
 
 
-TEST(MedianFilterUnitTest, printMAFilter) {
+TEST(controlMedianFilterTest, printMedianFilter) {
   MedianFilter<3> mf{};
   mf.setName("myMedianFilter");
   

@@ -253,7 +253,6 @@ endif()
 
 
 ## Use ROS if found and instructed
-message(STATUS "")
 message(STATUS "ROS")
 message(STATUS "**********************************")
 message( STATUS "ROS_ROOT: " $ENV{ROS_ROOT} )
