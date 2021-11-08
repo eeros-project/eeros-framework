@@ -11,23 +11,22 @@ namespace eeros {
 namespace control {
   
 /**
-* A WrapAround block wraps an input value between two limit values.
-* As soon as the input value exceeds an upper limit, the output will wrap
-* around and will be set to minVal. The wrap direction works in positive or 
-* direction. The output value will always vary between minVal and maxVal.
-* 
-* @tparam Tout - output type (double - default type) 
-* @tparam Twrap - type of min and max values for wrap. Must be double, or same as Tout (double - default type) 
-* @tparam minVal: minimum value - lower value of output signal
-* @tparam maxVal: maximum value - higher value of output signal
-*  
-* @since 1.3
-*/
+ * A WrapAround block wraps an input value between two limit values.
+ * As soon as the input value exceeds an upper limit, the output will wrap
+ * around and will be set to minVal. The wrap direction works in positive or 
+ * direction. The output value will always vary between minVal and maxVal.
+ * 
+ * @tparam Tout - output type (double - default type) 
+ * @tparam Twrap - type of min and max values for wrap. Must be double, or same as Tout (double - default type) 
+ * @tparam minVal: minimum value - lower value of output signal
+ * @tparam maxVal: maximum value - higher value of output signal
+ *  
+ * @since 1.3
+ */
 
 template<typename Tout = double, typename Twrap = Tout>
 class WrapAround : public Blockio<1,1,Tout> {
- public:
-   
+ public:   
   /**
    * Constructs a WrapAround instance specifying minValue and maxValue of output 
    * to realize wrap. \n

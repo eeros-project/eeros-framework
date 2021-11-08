@@ -6,7 +6,7 @@
 #include <eeros/control/Constant.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/task/Lambda.hpp>
-#include <eeros/control/sensors/SBGEllipseAInput.hpp>
+#include <eeros/control/sensor/SBGEllipseAInput.hpp>
 
 using namespace eeros;
 using namespace eeros::safety;
@@ -20,13 +20,10 @@ double alpha = 0.2;
 
 class ControlSystem {
  public:
-  ControlSystem() : 
-  sbg_imu("/dev/ttyUSB0",20),
-  td("td", period, true) 
-  {
-	td.addBlock(sbg_imu);
+  ControlSystem() : imu("/dev/ttyUSB0", 20), td("td", period, true) {
+    td.addBlock(imu);
   }
-  SBGEllipseAInput sbg_imu;
+  SBGEllipseAInput imu;
   TimeDomain td;
 };
 
@@ -53,7 +50,7 @@ int main() {
   Lambda l1 ([&] () { });
   Periodic p2("p2", period, l1);
   p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
-    log.info() << cs.sbg_imu.getOut_eulerAng().getSignal().getValue();
+    log.info() << cs.imu.getOutEulerAngle().getSignal().getValue();
   });
   
   auto& executor = Executor::instance();

@@ -21,6 +21,7 @@ namespace control {
 template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T> >
 class Mux: public Blockio<N,1,T,C> {
  public:
+   
   /**
    * Constructs a multiplexer instance.
    */
@@ -45,6 +46,17 @@ class Mux: public Blockio<N,1,T,C> {
   }
 
 };
+
+/**
+ * Operator overload (<<) to enable an easy way to print the state of a
+ * Multiplexer instance to an output stream.\n
+ * Does not print a newline control character.
+ */
+template <uint8_t N, typename T, typename C>
+std::ostream& operator<<(std::ostream& os, Mux<N,T,C>& m) {
+  os << "Block multiplexer: '" << m.getName() << "'"; 
+  return os;
+}
 
 }
 }

@@ -99,6 +99,7 @@ class Gain : public Blockio<1,1,Tout> {
    * the gain instance is enabled by enable().
    *
    * @see enableSmoothChange(bool)
+   * @see enableRootCurveChange(bool)
    * @see setGainDiff(Tgain)
    * @see enable()
    * @see disable()
@@ -131,15 +132,10 @@ class Gain : public Blockio<1,1,Tout> {
     }
 
     if (enabled) {
-        
-        if(rootCurve){
-            this->out.getSignal().setValue(calculateResultsWithRootCurve<Tout>(this->in.getSignal().getValue()));
-        } 
-        else {
-            this->out.getSignal().setValue(calculateResults<Tout>(this->in.getSignal().getValue()));
-        }
-    } 
-    else {
+//       if (rootCurve) this->out.getSignal().setValue(calculateResultsWithRootCurve<Tout,Tgain>(this->in.getSignal().getValue()));
+//       else 
+        this->out.getSignal().setValue(calculateResults<Tout>(this->in.getSignal().getValue()));
+    } else {
       this->out.getSignal().setValue(this->in.getSignal().getValue());
     }
 
@@ -194,6 +190,7 @@ class Gain : public Blockio<1,1,Tout> {
     smoothChange = enable;
   }
   
+  
   /**
    * Enables or disables a root curve profile for the gain
    *
@@ -207,11 +204,11 @@ class Gain : public Blockio<1,1,Tout> {
    * @see enable()
    * @see disable()
    */
-  virtual void enableRootCurve(bool enable) {
-      rootCurve = enable;
+  virtual void enableRootCurveChange(bool enable) {
+    rootCurve = enable;
   }
 
-
+  
   /**
    * Sets the gain value if smooth change is disabled and c is in the band in between minGain and maxGain.
    *
@@ -255,7 +252,6 @@ class Gain : public Blockio<1,1,Tout> {
     this->minGain = minGain;
   }
 
-
   /**
    * Sets the gain differential needed by run() to perform a smooth gain change.
    *
@@ -269,7 +265,8 @@ class Gain : public Blockio<1,1,Tout> {
   /**
    * Sets the root curve option parameters.
    *
-   * @param gainDiff - gain differential
+   * @param rootCurveMaxGain - gain differential
+   * @param rootCurveSwitchPoint - gain differential
    */
   virtual void setRootCurveParams(Tgain rootCurveMaxGain, Tgain rootCurveSwitchPoint) {
     std::lock_guard<std::mutex> lock(mtx);
@@ -284,80 +281,64 @@ class Gain : public Blockio<1,1,Tout> {
   template<typename Xout, typename Xgain>
   friend std::ostream &operator<<(std::ostream &os, Gain<Xout, Xgain> &gain);
 
-
  protected:
   Tgain gain;
   Tgain maxGain;
   Tgain minGain;
   Tgain targetGain;
   Tgain gainDiff;
-  
   bool enabled{true};
   bool smoothChange{false};
   bool rootCurve{false};
-  
   Tgain rootCurveMaxGain;
   Tgain rootCurveSwitchPoint;
-  
   std::mutex mtx;
 
-
  private:
-  template<typename S>
-  typename std::enable_if<std::is_arithmetic<S>::value, S>::type calculateResultsWithRootCurve(S value) {
-        Tout outVal;
-		if (fabs(value) > rootCurveSwitchPoint){
-			if(value >= 0) 
-				outVal =   sqrt(2*rootCurveMaxGain*(fabs(value)-rootCurveSwitchPoint/2));
-			else 
-				outVal = - sqrt(2*rootCurveMaxGain*(fabs(value)-rootCurveSwitchPoint/2));
-		}
-		else {
-			outVal = gain * value;
-		}
-		return outVal;
+  template<typename R, typename S>
+  typename std::enable_if<std::is_arithmetic<R>::value, R>::type calculateResultsWithRootCurve(R value) {
+    Tout outVal;
+    if (fabs(value) > rootCurveSwitchPoint) {
+      if (value >= 0) outVal = sqrt(2 * rootCurveMaxGain * (fabs(value)- rootCurveSwitchPoint / 2));
+      else outVal = -sqrt(2 * rootCurveMaxGain * (fabs(value) - rootCurveSwitchPoint / 2));
+    } else {
+      outVal = gain * value;
+    }
+    return outVal;
   }
   
-  template<typename S>
-  typename std::enable_if<std::is_compound<S>::value && !elementWise, S>::type calculateResultsWithRootCurve(S value) {
-        Tout outVal;
-		for(unsigned int i = 0; i < value.size(); i++) {
-            if (fabs(value[i]) > rootCurveSwitchPoint){
-                if(value[i] >= 0) 
-                    outVal[i] =   sqrt(2*rootCurveMaxGain*(fabs(value[i])-rootCurveSwitchPoint/2));
-                else 
-                    outVal[i] = - sqrt(2*rootCurveMaxGain*(fabs(value[i])-rootCurveSwitchPoint/2));
-            }
-            else {
-                outVal[i] = gain * value[i];
-            }
-        }
-		return outVal;
+  template<typename R, typename S>
+  typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value && !elementWise, R>::type calculateResultsWithRootCurve(R value) {
+    Tout outVal;
+//     for(unsigned int i = 0; i < value.size(); i++) {
+//       if (fabs(value[i]) > rootCurveSwitchPoint) {
+//         if(value[i] >= 0) outVal[i] = sqrt(2 * rootCurveMaxGain * (fabs(value[i]) - rootCurveSwitchPoint / 2));
+//         else outVal[i] = -sqrt(2 * rootCurveMaxGain * (fabs(value[i]) - rootCurveSwitchPoint / 2));
+//       } else {
+//         outVal[i] = gain * value[i];
+//       }
+//     }
+    return outVal;
   }
 
-  template<typename S>
-  typename std::enable_if<std::is_compound<S>::value && elementWise, S>::type calculateResultsWithRootCurve(S value) {
-        Tout outVal;
-		for(unsigned int i = 0; i < value.size(); i++) {
-            if (fabs(value[i]) > rootCurveSwitchPoint[i]){
-                if(value[i] >= 0) 
-                    outVal[i] =   sqrt(2*rootCurveMaxGain[i]*(fabs(value[i])-rootCurveSwitchPoint[i]/2));
-                else 
-                    outVal[i] = - sqrt(2*rootCurveMaxGain[i]*(fabs(value[i])-rootCurveSwitchPoint[i]/2));
-            }
-            else {
-                outVal[i] = gain[i] * value[i];
-            }
-        }
-		return outVal;
+  template<typename R, typename S>
+  typename std::enable_if<std::is_compound<R>::value && elementWise, R>::type calculateResultsWithRootCurve(R value) {
+    Tout outVal;
+//     for (unsigned int i = 0; i < value.size(); i++) {
+//       if (fabs(value[i]) > rootCurveSwitchPoint[i]) {
+//         if (value[i] >= 0) outVal[i] = sqrt(2 * rootCurveMaxGain[i] * (fabs(value[i]) - rootCurveSwitchPoint[i] / 2));
+//         else outVal[i] = -sqrt(2 * rootCurveMaxGain[i] * (fabs(value[i]) - rootCurveSwitchPoint[i] / 2));
+//       } else {
+//         outVal[i] = gain[i] * value[i];
+//       }
+//     }
+    return outVal;
   }
-
      
   template<typename S>
   typename std::enable_if<!elementWise, S>::type calculateResults(S value) {
     return gain * value;
   }
-
 
   template<typename S>
   typename std::enable_if<elementWise, S>::type calculateResults(S value) {
@@ -365,18 +346,11 @@ class Gain : public Blockio<1,1,Tout> {
     return value.multiplyElementWise(gain);
   }
   
-//   template<typename S>
-//   typename std::enable_if<elementWise && std::is_arithmetic<S>::value, S>::type calculateResults(S value) {
-//     static_assert(false, "aaaaaaaaaaa");
-//   }
-
-
   template<typename S>
   typename std::enable_if<std::is_integral<S>::value>::type resetMinMaxGain() {
     minGain = std::numeric_limits<int32_t>::min();
     maxGain = std::numeric_limits<int32_t>::max();
   }
-
 
   template<typename S>
   typename std::enable_if<std::is_floating_point<S>::value>::type resetMinMaxGain() {
@@ -384,14 +358,12 @@ class Gain : public Blockio<1,1,Tout> {
     maxGain = std::numeric_limits<double>::max();
   }
 
-
   template<typename S>
   typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type
   resetMinMaxGain() {
     minGain.fill(std::numeric_limits<int32_t>::min());
     maxGain.fill(std::numeric_limits<int32_t>::max());
   }
-
 
   template<typename S>
   typename std::enable_if<
@@ -413,9 +385,11 @@ std::ostream &operator<<(std::ostream &os, Gain<Tout, Tgain> &gain) {
   os << "Block Gain: '" << gain.getName() << "' is enabled=" << gain.enabled << ", gain=" << gain.gain << ", ";
   os << "smoothChange=" << gain.smoothChange << ", minGain=" << gain.minGain << ", maxGain=" << gain.maxGain;
   os << ", targetGain=" << gain.targetGain << ", gainDiff=" << gain.gainDiff;
+  os << ", rootCurveChange=" << gain.rootCurve << ", rootMaxGain=" << gain.rootCurveMaxGain << ", rootSwitchPoint=" << gain.rootCurveSwitchPoint;
   return os;
 }
-};
-};
+
+}
+}
 
 #endif /* ORG_EEROS_CONTROL_GAIN_HPP_ */

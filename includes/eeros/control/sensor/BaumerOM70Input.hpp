@@ -54,6 +54,17 @@ class BaumerOM70Input: public Blockio<0,1,double> {
   Logger log;
 };
 
+/**
+ * Operator overload (<<) to enable an easy way to print the state of a
+ * sensor instance to an output stream.\n
+ * Does not print a newline control character.
+ */
+template <typename T>
+std::ostream& operator<<(std::ostream& os, BaumerOM70Input& sensor) {
+  os << "Block BaumerOM70 input: '" << sensor.getName(); 
+  return os;
+}
+
 }
 }
 

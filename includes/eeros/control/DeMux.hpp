@@ -21,6 +21,7 @@ namespace control {
 template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T> >
 class DeMux: public Blockio<1,N,C,T> {
  public:
+   
   /**
    * Constructs a demultiplexer instance.
    */
@@ -43,6 +44,17 @@ class DeMux: public Blockio<1,N,C,T> {
   }
       
 };
+
+/**
+ * Operator overload (<<) to enable an easy way to print the state of a
+ * Demultiplexer instance to an output stream.\n
+ * Does not print a newline control character.
+ */
+template <uint8_t N, typename T, typename C>
+std::ostream& operator<<(std::ostream& os, DeMux<N,T,C>& d) {
+  os << "Block demultiplexer: '" << d.getName() << "'"; 
+  return os;
+}
 
 }
 }

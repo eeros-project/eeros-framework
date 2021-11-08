@@ -232,6 +232,7 @@ endif()
 
 
 
+## Use MODBUS if instructed
 if(USE_MODBUS)
   message(STATUS "**********************************")
   message(STATUS "Use modbus")
@@ -242,11 +243,56 @@ endif()
 
 
 
+## Use PIXYCAM if instructed
 if(USE_PIXYCAM)
   message(STATUS "**********************************")
   message(STATUS "Use pixy cam")
   message(STATUS "**********************************")
   list(APPEND EXTERNAL_LIBS pixy2 usb-1.0)
+  message(STATUS "")
+endif()
+
+
+
+## Use REALSENSE if instructed
+if(USE_REALSENSE)
+  message(STATUS "**********************************")
+  message(STATUS "Use realsense cam")
+  message(STATUS "**********************************")
+  list(APPEND EXTERNAL_LIBS realsense2)
+  message(STATUS "")
+endif()
+
+
+
+## Use RPLIDAR if instructed
+if(USE_RPLIDAR)
+  message(STATUS "**********************************")
+  message(STATUS "Use rp lidar")
+  message(STATUS "**********************************")
+  list(APPEND EXTERNAL_LIBS sl_lidar_sdk)
+  message(STATUS "")
+endif()
+
+
+
+## Use SBGECOMM if instructed
+if(USE_SBGECOMM)
+  message(STATUS "**********************************")
+  message(STATUS "Use ellipse sensors")
+  message(STATUS "**********************************")
+  list(APPEND EXTERNAL_LIBS sbgECom)
+  message(STATUS "")
+endif()
+
+
+
+## Use ODRIVE if instructed
+if(USE_ODRIVE)
+  message(STATUS "**********************************")
+  message(STATUS "Use ODrive")
+  message(STATUS "**********************************")
+  list(APPEND EXTERNAL_LIBS odrive)
   message(STATUS "")
 endif()
 

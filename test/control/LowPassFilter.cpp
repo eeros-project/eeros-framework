@@ -11,6 +11,15 @@ using namespace eeros;
 using namespace eeros::control;
 using namespace math; 
 
+// Test naming
+TEST(controlLPFilterTest, naming) {
+  LowPassFilter<> f{0.01};
+  EXPECT_EQ(f.getName(), std::string(""));
+  f.setName("filter 1");
+  EXPECT_EQ(f.getName(), std::string("filter 1"));
+}
+
+
 TEST(controlLPFilterTest, templateInstantiations) {
   LowPassFilter<> lp1{0.01};
   LowPassFilter<int> lp2{0.2};
