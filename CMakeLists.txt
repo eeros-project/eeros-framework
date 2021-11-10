@@ -292,7 +292,7 @@ if(USE_ODRIVE)
   message(STATUS "**********************************")
   message(STATUS "Use ODrive")
   message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS odrive)
+  list(APPEND EXTERNAL_LIBS odrive jsoncpp)
   message(STATUS "")
 endif()
 

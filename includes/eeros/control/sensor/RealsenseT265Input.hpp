@@ -11,6 +11,12 @@ using namespace eeros::math;
 namespace eeros {
 namespace control {
 
+/**
+ * This block reads a Realsense T256 camera over USB3.
+ *
+ * @since v1.3
+ */
+  
 class RealsenseT265Input : public Blockio<0,0> {
  public:
   /**

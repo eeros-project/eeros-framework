@@ -10,17 +10,9 @@
 
 #define LASER_COUNT_MAX 380
 
-// using namespace eeros::hal;
-// using namespace rp::standalone::rplidar;
-
 using namespace eeros::math;
 using namespace eeros::logger;
 using namespace rp::standalone::rplidar;
-//using namespace sl;
-
-#ifndef _countof
-#define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
-#endif
 
 namespace eeros {
 namespace hal {

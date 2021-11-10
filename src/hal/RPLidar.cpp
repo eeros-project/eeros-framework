@@ -1,16 +1,7 @@
 #include <eeros/hal/RPLidar.hpp>
-// #include <eeros/control/TimeDomain.hpp>
-// #include <eeros/logger/Logger.hpp>
-// #include <eeros/core/Thread.hpp>
-// #include <eeros/math/Matrix.hpp>
-// 
-// #define LASER_COUNT_MAX 380
-// 
 
 using namespace eeros::hal;
-// 
-// using namespace rp::standalone::rplidar;
-// 
+
 RPLidar::RPLidar(std::string dev, int priority) 
     : Thread(priority), starting(true), running(false), log(Logger::getLogger('P')) {
   bufSize = LASER_COUNT_MAX;
@@ -90,7 +81,7 @@ void RPLidar::run() {
   while (running) {
     u_result ans;
     rplidar_response_measurement_node_hq_t nodes[LASER_COUNT_MAX];
-    size_t count = _countof(nodes);
+    size_t count = (int)(sizeof(nodes) / sizeof(nodes[0]));
     // fetch extactly one 0-360 degrees' scan
     ans = ld->grabScanDataHq(nodes, count);
     bufSize = count; 

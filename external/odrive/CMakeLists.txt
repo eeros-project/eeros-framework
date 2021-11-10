@@ -13,5 +13,5 @@ include_directories(include include)
 add_library(odrive src/odrive.cpp src/odriveEP.cpp)
 target_link_libraries(odrive ${LIBUSB1_LIBRARIES} jsoncpp)
 
-add_executable(odriveTest src/main.cpp)
-target_link_libraries(odriveTest odrive)
+#add_executable(odriveTest src/main.cpp)
+#target_link_libraries(odriveTest odrive)

@@ -18,13 +18,13 @@ endif()
 
 if (USE_REALSENSE)
   add_executable(realsenseTest RealsenseT265Test.cpp)
-  target_link_libraries(realsenseTest eeros ${EEROS_LIBS} )
+  target_link_libraries(realsenseTest eeros ${EEROS_LIBS})
   list(APPEND targets realsenseTest)
 endif()
 
 if (USE_RPLIDAR)
   add_executable(rplidarTest RPLidarTest.cpp)
-  target_link_libraries(rplidarTest eeros ${EEROS_LIBS} )
+  target_link_libraries(rplidarTest eeros ${EEROS_LIBS})
   list(APPEND targets rplidarTest)
 endif()
 

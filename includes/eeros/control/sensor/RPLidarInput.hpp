@@ -12,6 +12,12 @@ using namespace eeros::math;
 namespace eeros {
 namespace control {
 
+/**
+ * This block reads a RP lidar laser range scanner over MODBUS and outputs the distance.
+ *
+ * @since v1.3
+ */
+
 class RPLidarInput : public Blockio<0,2,Matrix<LASER_COUNT_MAX,1>> {        
  public:
   /**

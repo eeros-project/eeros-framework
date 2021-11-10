@@ -3,71 +3,67 @@
 
 #include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
+#include <eeros/control/Input.hpp>
 #include <eeros/control/Output.hpp>
-#include <eeros/hal/Odrive_UART.hpp>
-#include <eeros/core/PeriodicCounter.hpp>
+#include <eeros/hal/ODriveUART.hpp>
 
+using namespace eeros::math;
+using namespace eeros::hal;
 
 namespace eeros {
 namespace control {
-	class ODriveInput_UART: public eeros::control::Blockio<0,1,eeros::math::Vector2> {
 
-	public:
-		/**
-		* Constructs a ODriveInput_USB instance \n
-		* @param dev - string with device id
-		* @param speed - communication speed of UART
-		* @param parity - parity bit set or not
-		* @param priority - execution priority of this thread
-		*/
-		ODriveInput_UART(std::string dev, int speed, int parity, int priority):
-		odrive(dev, speed, parity, priority) {}
-		
-		/**
-		* Disabling use of copy constructor because the block should never be copied unintentionally.
-		*/
-		ODriveInput_UART(const ODriveInput_UART& s) = delete; 
-		
-		/**
-		* Gets input data from ODrive_USB Thread and outputs them
-		*/
-		virtual void run() {
-			// 	counter.tick();
-				
-			// Output data 
-			double vel0 = odrive.get_actual_vel(0);
-			double vel1 = odrive.get_actual_vel(1);
-			Vector2 vel; vel << vel0, vel1;
-			
-			velOut.getSignal().setValue(vel);
-					
-			// Timestamps 
-			uint64_t ts = eeros::System::getTimeNs();
-			
-			// 	counter.tock();
-			// 	
-			// 	static int count = 0;
-			//         if(count % 1000 == 0){
-			// 			std::cout << "run mean: " << counter.run.mean << ", period mean: " << counter.period.mean << ", period max: " << counter.period.max << std::endl;
-			// 		}
-			//         count++;
-		}
-		
-		/**
-		* Returns velocity to be set on odrives
-		*/
-		virtual eeros::control::Output<eeros::math::Vector2>& getVelOut();
+/**
+ * This block controls an ODrive motor controller which can control two motors.
+ * The block offers 1 input for velocity control values and three outputs for
+ * actual velocity, actual current and current setpoint.
+ *
+ * @since v1.3
+ */
+class ODriveUARTInput : public Blockio<1,3,Vector2> {
+ public:
+  /**
+   * Constructs a ODriveUARTInput instance \n
+   * @param dev - string with device id
+   * @param speed - communication speed of UART
+   * @param parity - parity bit set or not
+   * @param priority - execution priority of this thread
+   */
+  ODriveUARTInput(std::string dev, int speed, int parity, int priority): odrive(dev, speed, parity, priority) { }
+  
+  /**
+   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   */
+  ODriveUARTInput(const ODriveUARTInput& s) = delete; 
+  
+  /**
+   * Gets input data from ODriveUART thread and outputs them
+   */
+  virtual void run() {
+    // Output data 
+    double vel0 = odrive.getVel(0);
+    double vel1 = odrive.getVel(1);
+    Vector2 vel; vel << vel0, vel1;
+    out[0].getSignal().setValue(vel);
+    // Timestamps 
+//    uint64_t ts = eeros::System::getTimeNs();
+  }
+  
+ private:
+  ODriveUART odrive;
+};
 
-	private:
-		std::thread* t;
-		ODrive_UART odrive;
+/**
+ * Operator overload (<<) to enable an easy way to print the state of a
+ * odrive instance to an output stream.\n
+ * Does not print a newline control character.
+ */
+template <typename T>
+std::ostream& operator<<(std::ostream& os, ODriveUARTInput& odrive) {
+  os << "Block ODriveUART input: '" << odrive.getName(); 
+  return os;
+}
 
-	protected:
-		eeros::PeriodicCounter counter;
-		eeros::control::Output<eeros::math::Vector2> velOut {
-			return velOut;
-		}
-	};
 }
 }
 

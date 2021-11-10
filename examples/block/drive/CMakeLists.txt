@@ -1,12 +1,6 @@
-# Test Basic Odrive functions USB + EEROS
+set(targets "")
 
-find_package(PkgConfig REQUIRED)
-pkg_search_module(LIBUSB1 REQUIRED libusb-1.0)
-
-message(STATUS "LIBUSB *** ${LIBUSB1_LIBRARIES}")
-
-include_directories(SYSTEM ${LIBUSB1_INCLUDE_DIRS})
-if (odrive_FOUND)
-add_executable(odrive_test_usb  ODriveUSB_Test.cpp )
-target_link_libraries(odrive_test_usb eeros ucl odrive ${CMAKE_DL_LIBS} ${ROS_LIBRARIES} ${LIBUSB1_LIBRARIES} usb-1.0 jsoncpp)
+if (USE_ODRIVE)
+  add_executable(odriveUSBTest  ODriveUSBTest.cpp )
+  target_link_libraries(odriveUSBTest eeros ${EEROS_LIBS})
 endif()
