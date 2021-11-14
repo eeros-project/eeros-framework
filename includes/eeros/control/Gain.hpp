@@ -132,9 +132,8 @@ class Gain : public Blockio<1,1,Tout> {
     }
 
     if (enabled) {
-//       if (rootCurve) this->out.getSignal().setValue(calculateResultsWithRootCurve<Tout,Tgain>(this->in.getSignal().getValue()));
-//       else 
-        this->out.getSignal().setValue(calculateResults<Tout>(this->in.getSignal().getValue()));
+      if (parabolic) this->out.getSignal().setValue(calculateParabolic<Tout,Tgain>(this->in.getSignal().getValue()));
+      else this->out.getSignal().setValue(calculate<Tout>(this->in.getSignal().getValue()));
     } else {
       this->out.getSignal().setValue(this->in.getSignal().getValue());
     }
@@ -192,20 +191,19 @@ class Gain : public Blockio<1,1,Tout> {
   
   
   /**
-   * Enables or disables a root curve profile for the gain
+   * Enables or disables a parabolic profile for the gain
    *
-   * If enabled, run() will calculate and apply a root curve profile to the gain.
+   * If enabled, run() will calculate and apply a parabolic profile to the gain above a
+   * given input value.
    *
    * Does not enable or disable the gain. This is done by calling enable() and disable() respectively.
    *
    * @param enable - enables or disables the root curve option
    *
-   * @see run()
-   * @see enable()
-   * @see disable()
+   * @see setParabolicGainParams()
    */
-  virtual void enableRootCurveChange(bool enable) {
-    rootCurve = enable;
+  virtual void enableParabolicGain(bool enable) {
+    parabolic = enable;
   }
 
   
@@ -263,15 +261,13 @@ class Gain : public Blockio<1,1,Tout> {
   }
 
   /**
-   * Sets the root curve option parameters.
+   * Sets the limit for the input value above which the gain follows a parabolic behavior.
    *
-   * @param rootCurveMaxGain - gain differential
-   * @param rootCurveSwitchPoint - gain differential
+   * @param parabolicSwitchPoint - input limit
    */
-  virtual void setRootCurveParams(Tgain rootCurveMaxGain, Tgain rootCurveSwitchPoint) {
+  virtual void setParabolicGainParams(Tout parabolicSwitchPoint) {
     std::lock_guard<std::mutex> lock(mtx);
-    this->rootCurveMaxGain = rootCurveMaxGain;
-    this->rootCurveSwitchPoint = rootCurveSwitchPoint;
+    this->parabolicSwitchPoint = parabolicSwitchPoint;
   }
 
   /*
@@ -289,18 +285,28 @@ class Gain : public Blockio<1,1,Tout> {
   Tgain gainDiff;
   bool enabled{true};
   bool smoothChange{false};
-  bool rootCurve{false};
-  Tgain rootCurveMaxGain;
-  Tgain rootCurveSwitchPoint;
+  bool parabolic{false};
+  Tout parabolicSwitchPoint;
   std::mutex mtx;
 
  private:
-  template<typename R, typename S>
-  typename std::enable_if<std::is_arithmetic<R>::value, R>::type calculateResultsWithRootCurve(R value) {
+  template<typename S>
+  typename std::enable_if<!elementWise, S>::type calculate(S value) {
+    return value * gain;
+  }
+
+  template<typename S>
+  typename std::enable_if<elementWise, S>::type calculate(S value) {
+    static_assert(std::is_compound<S>::value, "A gain block with element wise amplification must use matrices!");
+    return value.multiplyElementWise(gain);
+  }
+  
+  template<typename R, typename S>  // Tout, Tgain
+  typename std::enable_if<std::is_arithmetic<R>::value, R>::type calculateParabolic(R value) {
     Tout outVal;
-    if (fabs(value) > rootCurveSwitchPoint) {
-      if (value >= 0) outVal = sqrt(2 * rootCurveMaxGain * (fabs(value)- rootCurveSwitchPoint / 2));
-      else outVal = -sqrt(2 * rootCurveMaxGain * (fabs(value) - rootCurveSwitchPoint / 2));
+    if (fabs(value) > parabolicSwitchPoint) {
+      if (value >= 0) outVal = gain * sqrt(parabolicSwitchPoint * (2 * value - parabolicSwitchPoint));
+      else outVal = gain * -sqrt(parabolicSwitchPoint * (-2 * value - parabolicSwitchPoint));
     } else {
       outVal = gain * value;
     }
@@ -308,44 +314,39 @@ class Gain : public Blockio<1,1,Tout> {
   }
   
   template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value && !elementWise, R>::type calculateResultsWithRootCurve(R value) {
+  typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value, R>::type calculateParabolic(R value) {
     Tout outVal;
-//     for(unsigned int i = 0; i < value.size(); i++) {
-//       if (fabs(value[i]) > rootCurveSwitchPoint) {
-//         if(value[i] >= 0) outVal[i] = sqrt(2 * rootCurveMaxGain * (fabs(value[i]) - rootCurveSwitchPoint / 2));
-//         else outVal[i] = -sqrt(2 * rootCurveMaxGain * (fabs(value[i]) - rootCurveSwitchPoint / 2));
-//       } else {
-//         outVal[i] = gain * value[i];
-//       }
-//     }
+    for (unsigned int i = 0; i < value.size(); i++) {
+      if (fabs(value[i]) > parabolicSwitchPoint[i]) {
+        if (value[i] >= 0) outVal[i] = gain * sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
+        else outVal[i] = gain * -sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
+      } else {
+        outVal[i] = gain * value[i];
+      }
+    }
     return outVal;
   }
 
   template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && elementWise, R>::type calculateResultsWithRootCurve(R value) {
+  typename std::enable_if<std::is_compound<R>::value && std::is_compound<S>::value && !elementWise, R>::type calculateParabolic(R value) {
+    Tout outVal;  // multiplication with parabolic gain and gain matrix does not make sense
+    return outVal;
+  }
+
+  template<typename R, typename S>
+  typename std::enable_if<std::is_compound<R>::value && elementWise, R>::type calculateParabolic(R value) {
     Tout outVal;
-//     for (unsigned int i = 0; i < value.size(); i++) {
-//       if (fabs(value[i]) > rootCurveSwitchPoint[i]) {
-//         if (value[i] >= 0) outVal[i] = sqrt(2 * rootCurveMaxGain[i] * (fabs(value[i]) - rootCurveSwitchPoint[i] / 2));
-//         else outVal[i] = -sqrt(2 * rootCurveMaxGain[i] * (fabs(value[i]) - rootCurveSwitchPoint[i] / 2));
-//       } else {
-//         outVal[i] = gain[i] * value[i];
-//       }
-//     }
+    for (unsigned int i = 0; i < value.size(); i++) {
+      if (fabs(value[i]) > parabolicSwitchPoint[i]) {
+        if (value[i] >= 0) outVal[i] = gain[i] * sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
+        else outVal[i] = gain[i] * -sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
+      } else {
+        outVal[i] = gain[i] * value[i];
+      }
+    }
     return outVal;
   }
      
-  template<typename S>
-  typename std::enable_if<!elementWise, S>::type calculateResults(S value) {
-    return gain * value;
-  }
-
-  template<typename S>
-  typename std::enable_if<elementWise, S>::type calculateResults(S value) {
-    static_assert(std::is_compound<S>::value, "A gain block with element wise amplification must use matrices!");
-    return value.multiplyElementWise(gain);
-  }
-  
   template<typename S>
   typename std::enable_if<std::is_integral<S>::value>::type resetMinMaxGain() {
     minGain = std::numeric_limits<int32_t>::min();
@@ -385,7 +386,7 @@ std::ostream &operator<<(std::ostream &os, Gain<Tout, Tgain> &gain) {
   os << "Block Gain: '" << gain.getName() << "' is enabled=" << gain.enabled << ", gain=" << gain.gain << ", ";
   os << "smoothChange=" << gain.smoothChange << ", minGain=" << gain.minGain << ", maxGain=" << gain.maxGain;
   os << ", targetGain=" << gain.targetGain << ", gainDiff=" << gain.gainDiff;
-  os << ", rootCurveChange=" << gain.rootCurve << ", rootMaxGain=" << gain.rootCurveMaxGain << ", rootSwitchPoint=" << gain.rootCurveSwitchPoint;
+  os << ", parabolic=" << gain.parabolic << ", parabolicSwitchPoint=" << gain.parabolicSwitchPoint;
   return os;
 }
 
