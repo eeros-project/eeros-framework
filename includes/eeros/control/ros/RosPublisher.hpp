@@ -25,6 +25,7 @@ class RosPublisher : public Block1i<SigInType> {
    * 
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
+   * @param callNewest - not used
    */
   RosPublisher(const std::string& topic, uint32_t queueSize=1000, bool callNewest=false) 
       : topic(topic) {

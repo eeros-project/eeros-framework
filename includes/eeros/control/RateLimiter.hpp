@@ -118,7 +118,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
    * Sets falling and rising rates.
    * 
    * @param fRate - limit of the first derivative in negative direction
-   * @param fRate - limit of the first derivative in positive direction
+   * @param rRate - limit of the first derivative in positive direction
    */
   virtual void setRate(Trate fRate, Trate rRate) {
     std::lock_guard<std::mutex> lock(mtx);

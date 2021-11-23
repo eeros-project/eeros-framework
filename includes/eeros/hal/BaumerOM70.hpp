@@ -27,10 +27,10 @@ class BaumerOM70 : public eeros::Thread {
    * @see BaumerOM70(std::string dev, int port, int slave_id, int priority)
    * @param dev - string with device name
    * @param port - port for sensor data read (modbus interface)
-   * @param slave - sensor slave number (modbus interface)
+   * @param slaveId - sensor slave number (modbus interface)
    * @param priority - execution priority or BaumerOM70 thread, to get sensors data
    */
-  explicit BaumerOM70(std::string dev, int port, int slave_id, int priority);
+  explicit BaumerOM70(std::string dev, int port, int slaveId, int priority);
     
   /**
    * Destructor

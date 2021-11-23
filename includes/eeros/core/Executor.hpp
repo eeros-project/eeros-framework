@@ -63,6 +63,12 @@ class Executor : public Runnable {
    * @param period - period of the default main task
    */
   void setExecutorPeriod(double period);
+
+  /**
+   * Get the main task.
+   * 
+   * @return main task
+   */
   task::Periodic* getMainTask();
   
   /**
@@ -74,7 +80,7 @@ class Executor : public Runnable {
   void add(task::Periodic &task);
   
   /**
-   * An instance of the class \ref Periodic will be created which in turn is 
+   * An instance of the class \ref task::Periodic will be created which in turn is 
    * added to the executor. The executor will periodically execute the runnable
    * of the periodic, which is the timedomain.
    * 
