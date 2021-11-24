@@ -4,10 +4,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Unreleased
-(v1.4.0 targeted for 2021-12-31) ([Github compare v1.3.0...master](https://github.com/eeros-project/eeros-framework/compare/v1.3.0...master))
+## v1.3.1
+(2021-11-24) ([GitHub compare v1.3.0...v1.3.1](https://github.com/eeros-project/eeros-framework/compare/v1.3.0...v1.3.1))
 
 ### Added Features
+* Add new blocks for sensors and actors
+* Rearrange filters
+* Add parabolic gain
+* Reduce waiting time when reading the mouse
 
 
 ## v1.3.0
