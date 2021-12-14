@@ -7,6 +7,7 @@
 #include <device/beckhoff/EL1008.hpp>
 #include <eeros/hal/HAL.hpp> 
 #include <eeros/hal/Input.hpp>
+#include <eeros/hal/BeckhoffEL1008DigIn.hpp>
 
 using namespace eeros::hal;
 

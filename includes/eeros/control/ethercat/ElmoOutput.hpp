@@ -35,18 +35,18 @@ class ElmoOutput : public Blockio<0,0,double,double> {
   virtual void run() {
     using Mode = ecmasterlib::device::Elmo::Mode;
     const auto getValue = [](auto &input) { return input.getSignal().getValue(); };
-    switch (elmo.getMode()) {
+    switch (iface.getMode()) {
       case Mode::PROFILE_POSITION: 
-        elmo.setTargetPosition(getValue(position));
-        elmo.setMaximumTorque(getValue(torqueMax)); 
+        iface.setTargetPosition(getValue(position));
+        iface.setMaximumTorque(getValue(torqueMax)); 
         break;
       case Mode::PROFILE_VELOCITY:
-        elmo.setTargetVelocity(getValue(velocity));
-        elmo.setMaximumTorque(getValue(torqueMax)); 
+        iface.setTargetVelocity(getValue(velocity));
+        iface.setMaximumTorque(getValue(torqueMax)); 
         break;
       case Mode::PROFILE_TORQUE: 
-        elmo.setTargetTorque(getValue(torque));
-        elmo.setMaximumTorque(getValue(torqueMax)); 
+        iface.setTargetTorque(getValue(torque));
+        iface.setMaximumTorque(getValue(torqueMax)); 
         break; 
       default:
         break;
@@ -79,8 +79,24 @@ class ElmoOutput : public Blockio<0,0,double,double> {
    * 
    * @return input
    */
-  virtual Input<int16_t>& getTorqueMaxIn(){ return torqueMax; }
+  virtual Input<int16_t>& getTorqueMaxIn() { return torqueMax; }
 
+  /**
+   * Sets the mode of the elmo drive.
+   * Modes are: HOMING, PROFILE_VELOCITY, etc.
+   * 
+   * @param mode mode of the drive
+   */
+  virtual void setMode(ecmasterlib::device::Elmo::Mode mode) { iface.setMode(mode); }
+  
+  /**
+   * Sends a command to the elmo drive.
+   * Commands are: SWITCH_ON, ENABLE_OPERATION, etc.
+   * 
+   * @param cmd mode of the drive
+   */
+  virtual void sendCommand(ecmasterlib::device::Elmo::Command cmd) { iface.sendCommand(cmd); }
+  
  private:
    ecmasterlib::device::Elmo& iface;
    Input<int32_t> position, velocity;

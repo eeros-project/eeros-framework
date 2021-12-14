@@ -35,7 +35,7 @@ class BeckhoffEL3004 : public Blockio<0,4,double,double> {
   virtual void run() {
     uint64_t ts = eeros::System::getTimeNs();
     for(int i = 0; i < 4; i++) {
-      out[i].getSignal().setValue((double)iface[i]) / 3276.8);
+      out[i].getSignal().setValue((double)iface[i] / 3276.8);
       out[i].getSignal().setTimestamp(ts);
     }
   }
