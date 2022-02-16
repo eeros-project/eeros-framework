@@ -1,6 +1,6 @@
 
 macro(add_eeros_sources)
-    file(RELATIVE_PATH _relPath "${PROJECT_SOURCE_DIR}/src" "${CMAKE_CURRENT_SOURCE_DIR}")
+    file(RELATIVE_PATH _relPath "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
     foreach(_src ${ARGN})
         if(_relPath)
             list(APPEND EEROS_SRCS "${_relPath}/${_src}")
@@ -28,24 +28,5 @@ add_subdirectory(logger)
 add_subdirectory(config)
 # add_subdirectory(ui)
 
-link_directories(${EEROS_BINARY_DIR}/src/core)
-link_directories(${EEROS_BINARY_DIR}/src/math)
-link_directories(${EEROS_BINARY_DIR}/src/control)
-link_directories(${EEROS_BINARY_DIR}/src/hal)
-link_directories(${EEROS_BINARY_DIR}/src/sequencer)
-link_directories(${EEROS_BINARY_DIR}/src/socket)
-link_directories(${EEROS_BINARY_DIR}/src/safety)
-link_directories(${EEROS_BINARY_DIR}/src/logger)
-link_directories(${EEROS_BINARY_DIR}/src/config)
-# link_directories(${EEROS_BINARY_DIR}/src/ui)
-
-add_library(eeros SHARED ${EEROS_SRCS})
-
-target_link_libraries(eeros ${EXTERNAL_LIBS}) 
-
-
-set_target_properties(eeros PROPERTIES
-			VERSION ${EEROS_VERSION})
-
-
-INSTALL(TARGETS eeros LIBRARY DESTINATION lib)
+# EEROS_SRCS only exists in this CMakeLists.txt, so we need to explicitly set it in the main (parent) CmakeLists.txt
+set(EEROS_SRCS ${EEROS_SRCS} PARENT_SCOPE)
