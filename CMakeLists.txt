@@ -82,7 +82,7 @@ target_include_directories(eeros
                               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/includes> 
                               $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
 
-                              $<INSTALL_INTERFACE:include/eeros>)
+                              $<INSTALL_INTERFACE:include>)
 
                               
 set_target_properties(eeros PROPERTIES
