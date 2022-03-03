@@ -100,6 +100,6 @@ void Mouse::run() {
       if (event_action != nullptr) event_action(e);
 
       last = current;
-    } else usleep(10000);
+    } else usleep(1000);
   }
 }
