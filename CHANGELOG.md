@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## Unreleased
+(v1.4.0 targeted for 2022-07-31) ([Github compare v1.3.2...master](https://github.com/eeros-project/eeros-framework/compare/v1.3.2...master))
+
+### Added Features
+
+
 ## v1.3.2
 (2022-03-08) ([GitHub compare v1.3.1...v1.3.2](https://github.com/eeros-project/eeros-framework/compare/v1.3.1...v1.3.2))
 
