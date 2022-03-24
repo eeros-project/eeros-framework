@@ -17,6 +17,13 @@ TEST(controlSatTest, naming) {
   EXPECT_EQ(sat.getName(), std::string("saturation 1"));
 }
 
+// Test other ctor
+TEST(controlSatTest, ctor) {
+  Saturation<> sat(0.5);
+  sat.setName("saturation 2");
+  EXPECT_EQ(sat.getName(), std::string("saturation 2"));
+}
+
 // Test initial values for NaN
 TEST(controlSatTest, initialValue) {
   Saturation<Vector2> sat({-1,-2},{1,2});
@@ -41,7 +48,7 @@ TEST(controlSatTest, double) {
   sat1.disable();
   sat1.run();
   EXPECT_EQ(sat1.getOut().getSignal().getValue(), 1);
-  Saturation<double> sat2(-0.5, 0.5);
+  Saturation<double> sat2(0.5);
   sat2.getIn().connect(c0.getOut());
   sat2.run();
   EXPECT_EQ(sat2.getOut().getSignal().getValue(), 0.5);

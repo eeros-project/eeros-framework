@@ -34,6 +34,15 @@ class Saturation : public Blockio<1,1,T> {
   }
   
   /**
+   * Constructs a Saturation instance specifying a limit.
+   * The lower and upper limit will be the negative and positive 
+   * value of this limit.\n
+   *
+   * @param lim - limit
+   */
+  Saturation(T lim) : Saturation(-lim, lim) { }
+
+  /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
    */
   Saturation(const Saturation& s) = delete; 
