@@ -47,7 +47,7 @@ protected:
   double max_x = 0.045;
   double min_y = -0.03;
   double max_y = 0.03;
-  double min_z = -0.053;
+  double min_z = -0.063;
   double max_z = -0.015;
   double min_r = -2.8;
   double max_r = 2.8;
