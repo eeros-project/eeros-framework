@@ -2,20 +2,21 @@
 #define ORG_EEROS_CORE_CONFIG_HPP_
 
 #include <cmath>
-#include <map>
 #include <functional>
+#include <map>
 #include <string>
+#include <string_view>
 
 namespace eeros {
 namespace config {
 
 struct ConfigPropertyAccessor {
-  std::function<void(const std::string, std::string&)> set;
-  std::function<void(const std::string, const std::string)> get;
+  std::function<void(std::string, std::string &)> set;
+  std::function<void(std::string, std::string)> get;
 };
 
 struct StringCompare {
-  bool operator()(const std::string first, const std::string second) {
+  bool operator()(const std::string_view first, const std::string_view second) const {
     return first.compare(second) < 0;
   }
 };
@@ -56,24 +57,25 @@ class Config {
    * @return true if successful
    */
   virtual bool load(std::string path = "") = 0;
-    
- protected:
-  virtual void add(const std::string name, int &value);
-  virtual void add(const std::string name, double &value);
-  virtual void add(const std::string name, std::size_t length, int *start, int *end, int defaultValue = -1);
-  virtual void add(const std::string name, std::size_t length, double *start, double *end, double defaultValue = NAN);
-  virtual void add(const std::string name, std::string &value);
 
-  template < typename T, std::size_t N >
-  void add(const std::string name, std::array<T,N> &value);
-    
+protected:
+  virtual void add(std::string name, int &value);
+  virtual void add(std::string name, double &value);
+  virtual void add(std::string name, std::size_t length, int *start,
+                   int *end, int defaultValue = -1);
+  virtual void add(std::string name, std::size_t length,
+                   double *start, double *end, double defaultValue = NAN);
+  virtual void add(std::string name, std::string &value);
+
+  template <typename T, std::size_t N>
+  void add(std::string name, std::array<T, N> &value);
+
   std::string path;
   std::map<std::string, ConfigPropertyAccessor, StringCompare> properties;
 };
 
-
-template < typename T, std::size_t N >
-void Config::add(const std::string name, std::array<T,N> &value) {
+template <typename T, std::size_t N>
+void Config::add(std::string name, std::array<T, N> &value) {
   add(name, N, value.begin(), value.end());
 }
 
