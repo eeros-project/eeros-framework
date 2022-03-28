@@ -181,7 +181,7 @@ class KalmanFilter : public Blockio<0,0>{
       throw eeros::control::IndexOutOfBoundsFault("Trying to get inexistent element of system input vector u in Block " +
                                                       this->getName() + ".");
     }
-    return u.getIn(index);
+    return inU[index];
   }
 
   /**
@@ -194,7 +194,7 @@ class KalmanFilter : public Blockio<0,0>{
       throw eeros::control::IndexOutOfBoundsFault("Trying to get inexistent element of system output vector y in Block " +
                                                         this->getName() + ".");
     }
-    return y.getIn(index);
+    return inY[index];
   }
 
   /**
@@ -215,8 +215,11 @@ class KalmanFilter : public Blockio<0,0>{
    */
   void prediction() {
     std::lock_guard<std::mutex> lock(mtx);
-    u.run();
-    x = Ad * x + Bd * u.getOut().getSignal().getValue();
+    for (uint8_t i = 0; i < Nr_Of_Inputs; i++)
+    {
+        u[i] = inU[i].getSignal().getValue();
+    }
+    x = Ad * x + Bd * u;
     for (uint8_t i = 0; i < nofStates; i++) {
       out[i].getSignal().setValue(x[i]);
       out[i].getSignal().setTimestamp(eeros::System::getTimeNs());
@@ -236,11 +239,17 @@ class KalmanFilter : public Blockio<0,0>{
       }
       first = false;
     } else {
-      y.run();
-      u.run();
+      for (uint8_t i = 0; i < Nr_Of_Outputs; i++)
+      {
+          y[i] = inY[i].getSignal().getValue();
+      }
+      for (uint8_t i = 0; i < Nr_Of_Inputs; i++)
+      {
+          u[i] = inU[i].getSignal().getValue();
+      }
       CPCTR = (C * P * C.transpose() + R);
       K = P * C.transpose() * !CPCTR;
-      dy = y.getOut().getSignal().getValue() - C * x - D * u.getOut().getSignal().getValue();
+      dy = y - C * x - D * u;
       x = x + K * dy;
       for (uint8_t i = 0; i < nofStates; i++) {
         out[i].getSignal().setValue(x[i]);
@@ -254,8 +263,10 @@ class KalmanFilter : public Blockio<0,0>{
   std::mutex mtx;
   Vector<nofStates> x;
   Vector<nofOutputs> dy;
-  Mux<nofOutputs> y;
-  Mux<nofInputs> u;
+  Vector<Nr_Of_Outputs> y;
+  Vector<Nr_Of_Inputs> u;
+  Input<double> inY[Nr_Of_Outputs];
+  Input<double> inU[Nr_Of_Inputs];
   Output<double> out[nofStates];
   Matrix<nofStates, nofStates> Ad, P, eye, GdQGdT;
   Matrix<nofStates, nofInputs> Bd;
