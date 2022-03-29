@@ -89,7 +89,7 @@ set_target_properties(eeros PROPERTIES
                         VERSION ${EEROS_VERSION})
 
 target_compile_options(eeros PRIVATE -g -Wall PUBLIC -pthread)
-target_compile_features(eeros PUBLIC cxx_std_14)
+target_compile_features(eeros PUBLIC cxx_std_17)
 
 target_link_libraries(eeros PUBLIC pthread PRIVATE ucl ${CMAKE_DL_LIBS})
 
