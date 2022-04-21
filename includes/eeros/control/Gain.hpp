@@ -292,7 +292,7 @@ class Gain : public Blockio<1,1,Tout> {
  private:
   template<typename S>
   typename std::enable_if<!elementWise, S>::type calculate(S value) {
-    return value * gain;
+    return gain * value;
   }
 
   template<typename S>
