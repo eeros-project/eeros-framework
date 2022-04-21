@@ -1,4 +1,4 @@
-#include <eeros/control/filter/KalmanFilter.hpp>
+// #include <eeros/control/filter/KalmanFilter.hpp>
 #include <eeros/core/Fault.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/control/Constant.hpp>
@@ -11,7 +11,7 @@ using namespace eeros::math;
 
 // Test naming
 TEST(controlKLFTest, naming) {
-//   KalmanFilter<1,1,1,2> f({1},{1},{1},{1,1},{{1,1}{1,1}},{1});
+//   KalmanFilter<1,1,2,2> f({1,1,1,1},{1,1},{1,1},{1,1,1,1},{1,1,1,1},{1});
 //   EXPECT_EQ(f.getName(), std::string(""));
 //   f.setName("kalman filter 1");
 //   EXPECT_EQ(f.getName(), std::string("kalman filter 1"));
