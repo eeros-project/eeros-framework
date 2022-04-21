@@ -19,8 +19,6 @@ namespace control {
 /**
  * Helper class to separate prediction and correction of the kalman filter.
  * This class is used to periodically run the prediction in a timedomain.
- * 
- * @param owner - pointer to the owner class
  */
 template <uint8_t nofInputs, uint8_t nofOutputs, uint8_t nofStates, uint8_t nofRandVars>
 class KalmanFilterPrediction;
@@ -28,8 +26,6 @@ class KalmanFilterPrediction;
 /**
  * Helper class to separate prediction and correction of the kalman filter.
  * This class is used to periodically run the correction in a timedomain.
- * 
- * @param owner - pointer to the owner class
  */
 template <uint8_t nofInputs, uint8_t nofOutputs, uint8_t nofStates, uint8_t nofRandVars>
 class KalmanFilterCorrection;
