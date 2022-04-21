@@ -4,10 +4,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Unreleased
-(v1.4.0 targeted for 2022-07-31) ([Github compare v1.3.3...master](https://github.com/eeros-project/eeros-framework/compare/v1.3.3...master))
+## v1.3.4
+(2022-04-21) ([GitHub compare v1.3.3...v1.3.4](https://github.com/eeros-project/eeros-framework/compare/v1.3.3...v1.3.4))
 
 ### Added Features
+* Fix gain block, gain factor must be first operand
+* Correct Kalman filter, local names must match template parameter names
 
 
 ## v1.3.3
