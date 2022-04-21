@@ -215,7 +215,7 @@ class KalmanFilter : public Blockio<0,0>{
    */
   void prediction() {
     std::lock_guard<std::mutex> lock(mtx);
-    for (uint8_t i = 0; i < Nr_Of_Inputs; i++)
+    for (uint8_t i = 0; i < nofInputs; i++)
     {
         u[i] = inU[i].getSignal().getValue();
     }
@@ -239,11 +239,11 @@ class KalmanFilter : public Blockio<0,0>{
       }
       first = false;
     } else {
-      for (uint8_t i = 0; i < Nr_Of_Outputs; i++)
+      for (uint8_t i = 0; i < nofOutputs; i++)
       {
           y[i] = inY[i].getSignal().getValue();
       }
-      for (uint8_t i = 0; i < Nr_Of_Inputs; i++)
+      for (uint8_t i = 0; i < nofInputs; i++)
       {
           u[i] = inU[i].getSignal().getValue();
       }
@@ -263,10 +263,10 @@ class KalmanFilter : public Blockio<0,0>{
   std::mutex mtx;
   Vector<nofStates> x;
   Vector<nofOutputs> dy;
-  Vector<Nr_Of_Outputs> y;
-  Vector<Nr_Of_Inputs> u;
-  Input<double> inY[Nr_Of_Outputs];
-  Input<double> inU[Nr_Of_Inputs];
+  Vector<nofOutputs> y;
+  Vector<nofInputs> u;
+  Input<double> inY[nofOutputs];
+  Input<double> inU[nofInputs];
   Output<double> out[nofStates];
   Matrix<nofStates, nofStates> Ad, P, eye, GdQGdT;
   Matrix<nofStates, nofInputs> Bd;
