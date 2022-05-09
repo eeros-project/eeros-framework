@@ -41,9 +41,9 @@ class Output {
   }
 
   /**
-   * Every input is owned by a block. Sets the owner of this input.
+   * Every output is owned by a block. Sets the owner of this output.
    * 
-   * @param block - owner of this input
+   * @param block - owner of this output
    */
   virtual void setOwner(Block* block) {
     owner = block;
