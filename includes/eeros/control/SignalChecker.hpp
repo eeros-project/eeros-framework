@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_SIGNALCHECKER_HPP_
 #define ORG_EEROS_CONTROL_SIGNALCHECKER_HPP_
 
-#include <eeros/control/Block1i.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/logger/Logger.hpp>
@@ -44,7 +44,7 @@ namespace control {
  */
 
 template<typename Tsig = double, typename Tlim = Tsig, bool checkNorm = false>
-class SignalChecker : public Block1i<Tsig> {
+class SignalChecker : public Blockio<1,0,Tsig> {
 
  public:
   /**

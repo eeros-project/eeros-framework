@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_SOCKETDATA_HPP_
 #define ORG_EEROS_CONTROL_SOCKETDATA_HPP_
 
-#include <eeros/control/Block1i1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <array>
 #include <eeros/core/System.hpp>
@@ -14,7 +14,7 @@ namespace control {
 using namespace sockets;
 
 template < typename SigInType, typename SigOutType, typename Enable = void >
-class SocketData: public Block1i1o<SigInType, SigOutType> { };
+class SocketData: public Blockio<1,1,SigInType, SigOutType> { };
 
 /**
  * This class allows to deliver a signal over a socket connection. While one end of the connection 
@@ -32,7 +32,7 @@ class SocketData: public Block1i1o<SigInType, SigOutType> { };
 template < typename SigInType, typename SigOutType>
 class SocketData<SigInType, SigOutType, 
   typename std::enable_if<std::is_compound<SigInType>::value && std::is_compound<SigOutType>::value>::type> 
-      : public Block1i1o<SigInType, SigOutType> {
+      : public Blockio<1,1,SigInType, SigOutType> {
  public:
    
   /**
@@ -142,7 +142,7 @@ class SocketData<SigInType, SigOutType,
 template < typename SigInType, typename SigOutType >
 class SocketData<SigInType, SigOutType,
   typename std::enable_if<std::is_arithmetic<SigInType>::value && std::is_compound<SigOutType>::value>::type> 
-  : public Block1i1o<SigInType, SigOutType> {			
+  : public Blockio<1,1,SigInType, SigOutType> {			
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
     bufInLen = 1;
@@ -207,7 +207,7 @@ public:
 template < typename SigInType, typename SigOutType >
 class SocketData<SigInType, SigOutType,
   typename std::enable_if<std::is_compound<SigInType>::value && std::is_arithmetic<SigOutType>::value>::type> 
-  : public Block1i1o<SigInType, SigOutType> {			
+  : public Blockio<1,1,SigInType, SigOutType> {			
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
     bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
@@ -272,7 +272,7 @@ public:
 template < typename SigInType, typename SigOutType >
 class SocketData<SigInType, SigOutType,
   typename std::enable_if<std::is_arithmetic<SigInType>::value && std::is_arithmetic<SigOutType>::value>::type> 
-  : public Block1i1o<SigInType, SigOutType> {			
+  : public Blockio<1,1,SigInType, SigOutType> {			
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
     bufInLen = 1;
@@ -336,7 +336,7 @@ public:
 template < typename SigInType, typename SigOutType >
 class SocketData<SigInType, SigOutType,
   typename std::enable_if<std::is_compound<SigInType>::value && std::is_same<SigOutType, std::nullptr_t>::value>::type> 
-  : public Block1i1o<SigInType> {			
+  : public Blockio<1,1,SigInType> {			
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
     bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
@@ -378,7 +378,7 @@ public:
 template < typename SigInType, typename SigOutType >
 class SocketData<SigInType, SigOutType,
   typename std::enable_if<std::is_same<SigInType, std::nullptr_t>::value && std::is_compound<SigOutType>::value>::type> 
-  : public Block1i1o<SigOutType> {			
+  : public Blockio<1,1,SigOutType> {			
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
     bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
@@ -434,7 +434,7 @@ public:
 template < typename SigInType, typename SigOutType >
 class SocketData<SigInType, SigOutType,
   typename std::enable_if<std::is_arithmetic<SigInType>::value && std::is_same<SigOutType, std::nullptr_t>::value>::type> 
-  : public Block1i1o<SigInType> {			
+  : public Blockio<1,1,SigInType> {			
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
     bufInLen = 1;
@@ -475,7 +475,7 @@ public:
 template < typename SigInType, typename SigOutType >
 class SocketData<SigInType, SigOutType,
   typename std::enable_if<std::is_same<SigInType, std::nullptr_t>::value && std::is_arithmetic<SigOutType>::value>::type> 
-  : public Block1i1o<SigOutType> {			
+  : public Blockio<1,1,SigOutType> {			
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
     bufOutLen = 1;
