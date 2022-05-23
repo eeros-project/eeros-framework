@@ -4,6 +4,7 @@
 #include <eeros/control/Blockio.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
+#include <eeros/hal/HAL.hpp>
 #include <eeros/hal/Keyboard.hpp>
 #include <eeros/hal/KeyboardDigIn.hpp>
 #include <eeros/hal/KeyList.hpp>
@@ -87,6 +88,69 @@ class KeyboardInput: public Blockio<0,N,bool> {
  protected:
   Keyboard k;
 };
+
+/**
+ * This block serves to read the keys from a keyboard. The state
+ * of the keys are delivered as signals with values of type bool.
+ * Spezialization for one key.
+ *
+ * @since v0.6v
+ */
+template < >
+class KeyboardInput<1>: public Blockio<0,1,bool> {
+ public:
+  /**
+   * Constructs a block which reads one key on a keyboard.
+   * 
+   * @param asciiCode - ascii code of the key
+   * @param name - name of the key
+   * @param priority - priority of the associated thread
+   */
+  KeyboardInput(std::vector<char> asciiCode, std::vector<std::string> name, int priority = 20) : k(priority) {
+    auto& list = KeyList::instance();
+    list.addKeys(asciiCode, name);
+    HAL& hal = HAL::instance();
+    hal::Input<bool>* in = new KeyboardDigIn(list, list.key[0]);
+    hal.addInput(in);
+  }
+  
+  /**
+  * Disabling use of copy constructor because the block should never be copied unintentionally.
+  */
+  KeyboardInput(const KeyboardInput& s) = delete; 
+
+  /**
+   * Runs the block.
+   */
+  virtual void run() {
+    uint64_t time = eeros::System::getTimeNs();
+    auto& list = KeyList::instance();
+    this->out.getSignal().setValue(list.state[0]);
+    this->out.getSignal().setTimestamp(time);
+  }
+  
+  /**
+   * Reset the state of the key. This must be done manually after having consumed the state.
+   */
+  virtual void reset() {
+    auto& list = KeyList::instance();
+    list.state[0] = false;
+  }
+  
+ protected:
+  Keyboard k;
+};
+
+/**
+ * Operator overload (<<) to enable an easy way to print the state of a
+ * KeyboardInput instance to an output stream.\n
+ * Does not print a newline control character.
+ */
+template <uint8_t N>
+std::ostream& operator<<(std::ostream& os, KeyboardInput<N>& k) {
+  os << "Block keyboard input: '" << k.getName();
+  return os;
+}
 
 }
 }
