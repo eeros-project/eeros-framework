@@ -13,10 +13,11 @@ namespace control {
  * 
  * @tparam T - output type (double - default type)
  * @since v0.4
+ * @deprecated Will be removed in future releases
  */
 
 template < typename T = double >
-class Block1o : public Block {
+class [[deprecated("Replaced by Blockio<0,1>")]]Block1o : public Block {
  public:
   /**
    * Constructs an block with one output.

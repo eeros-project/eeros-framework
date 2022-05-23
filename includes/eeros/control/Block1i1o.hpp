@@ -14,10 +14,11 @@ namespace control {
  * @tparam Tin - input type (double - default type)
  * @tparam Tout - output type (double - default type)
  * @since v0.4
+ * @deprecated Will be removed in future releases
  */
 
 template < typename Tin = double, typename Tout = Tin >
-class Block1i1o : public Block {
+class [[deprecated("Replaced by Blockio<1,1>")]] Block1i1o : public Block {
  public:
   /**
    * Constructs an block with one input and one output.
