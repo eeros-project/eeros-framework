@@ -61,13 +61,14 @@ TEST(controlDTest, initialValue) {
 }
 
 // test function
-TEST(controlDTest, running) {
+TEST(controlDTest, running1) {
   Constant<> c1(1.0);
   D<> d1;
   d1.getIn().connect(c1.getOut());
   c1.run();
   d1.run();
-  EXPECT_TRUE(std::isnan(d1.getOut().getSignal().getValue()));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue(), 0, 1e-10));
+  EXPECT_EQ(d1.getOut().getSignal().getTimestamp(), c1.getOut().getSignal().getTimestamp());
   c1.run();
   d1.run();
   EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue(), 0, 1e-10));
@@ -75,15 +76,15 @@ TEST(controlDTest, running) {
   d1.run();
   EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue(), 0, 1e-10));
   timestamp_t start = d1.getOut().getSignal().getTimestamp();
-  usleep(10000);
+  usleep(20000);
   c1.setValue(0);
   c1.run();
   d1.run();
-  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue(), -100, 50));
-  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getTimestamp() - start, 5000000, 1000000));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue(), -50, 20));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getTimestamp() - start, 10000000, 3000000));
   d1.run();
-  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue(), -100, 50));
-  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getTimestamp() - start, 5000000, 1000000));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue(), -50, 20)); // no diff in time, must stay
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getTimestamp() - start, 10000000, 3000000));
   c1.run();
   d1.run();
   EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue(), 0, 0.01));
@@ -96,8 +97,8 @@ TEST(controlDTest, running2) {
   d1.getIn().connect(c1.getOut());
   c1.run();
   d1.run();
-  EXPECT_TRUE(std::isnan(d1.getOut().getSignal().getValue()[0]));
-  EXPECT_TRUE(std::isnan(d1.getOut().getSignal().getValue()[1]));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[0], 0, 1e-10));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[1], 0, 1e-10));
   c1.run();
   d1.run();
   EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[0], 0, 1e-10));
@@ -107,17 +108,17 @@ TEST(controlDTest, running2) {
   EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[0], 0, 1e-10));
   EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[1], 0, 1e-10));
   timestamp_t start = d1.getOut().getSignal().getTimestamp();
-  usleep(10000);
+  usleep(20000);
   c1.setValue(0.0);
   c1.run();
   d1.run();
-  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[0], -100, 50));
-  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[1], -100, 50));
-  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getTimestamp() - start, 5000000, 1000000));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[0], -50, 20));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[1], -50, 20));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getTimestamp() - start, 10000000, 3000000));
   d1.run();
-  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[0], -100, 50));
-  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[1], -100, 50));
-  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getTimestamp() - start, 5000000, 1000000));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[0], -50, 20));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[1], -50, 20));
+  EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getTimestamp() - start, 10000000, 3000000));
   c1.run();
   d1.run();
   EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[0], 0, 0.01));

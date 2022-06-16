@@ -31,6 +31,8 @@ class D: public Blockio<1,1,T> {
    * Runs the differentiator algorithm. If the input signal
    * carries the same time stamp as the last sampled input signal
    * the output value and time stamp are left unchanged.
+   * After the first run, the block would still carry a nan, due to 
+   * its memory. Therefore, the output will be set to zero.
    */
   virtual void run() {
     Signal<T> sig = this->in.getSignal(); 
@@ -39,9 +41,16 @@ class D: public Blockio<1,1,T> {
     T valin = sig.getValue();
     T valprev = prev.getValue();
       
-    if (tin != tprev) {
-      valOut = (valin - valprev) / (tin - tprev);
-      timeOut = (sig.getTimestamp() + prev.getTimestamp()) / 2;
+    if (first) {
+      prev = this->in.getSignal();
+      valOut = 0;
+      timeOut = sig.getTimestamp();
+      first = false;
+    } else {
+      if (tin != tprev) {
+        valOut = (valin - valprev) / (tin - tprev);
+        timeOut = (sig.getTimestamp() + prev.getTimestamp()) / 2;
+      }
     }
       
     this->out.getSignal().setValue(valOut);
@@ -59,6 +68,7 @@ class D: public Blockio<1,1,T> {
  private:
   Signal<T> prev;
   T valOut;
+  bool first = true;
   timestamp_t timeOut;
 };
 
