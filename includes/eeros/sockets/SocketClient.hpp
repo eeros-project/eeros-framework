@@ -140,15 +140,12 @@ class SocketClient : public eeros::Thread {
   std::array<inT, BufInLen> txBuf;
 };
 
-// specialization used when server doesn't receive data from its client
+// specialization used when client doesn't receive data from its server
 template < uint32_t BufInLen, typename inT >
 class SocketClient<BufInLen, inT, 0, std::nullptr_t> : public eeros::Thread {
 public:	
   SocketClient(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0, int priority = 5) 
-      : Thread(priority) {
-    this->port = port;
-    this->period = period;
-    this->serverIP = serverIP;
+      : Thread(priority), serverIP(serverIP), port(port), period(period), timeout(timeout) {
     signal(SIGPIPE, sigPipeHandler);	// make sure, that a broken pipe does not stop application
     running = false;
     connected = false;
@@ -193,11 +190,15 @@ public:
       bcopy((char *)server->h_addr,(char *)&servAddr.sin_addr.s_addr, server->h_length);
       servAddr.sin_port = htons(port);
     
-      while (connect(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0) ;
-      log.info() << "Client connected to ip=" << serverIP;
-      inT b_write[BufInLen]; 	
       using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
       auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
+      while (connect(sockfd, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0) {
+        std::this_thread::sleep_until(next_cycle);
+        next_cycle += seconds(period);
+      }
+      log.info() << "Client connected to ip=" << serverIP;
+      inT b_write[BufInLen]; 	
+
       connected = true;
     
       while (connected) {
@@ -222,6 +223,7 @@ public:
   std::string serverIP;
   uint16_t port;
   double period;
+  double timeout;	// time which thread tries to read until socket read timed out
   struct hostent *server;
   int sockfd;
   bool connected;
