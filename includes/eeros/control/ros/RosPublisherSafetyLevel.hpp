@@ -1,8 +1,10 @@
 #ifndef ORG_EEROS_CONTROL_ROSPUBLISHER_SAFETYLEVEL_HPP_
 #define ORG_EEROS_CONTROL_ROSPUBLISHER_SAFETYLEVEL_HPP_
 
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/logging.hpp>
+#include <std_msgs/msg/u_int32.hpp>
 #include <eeros/control/ros/RosPublisher.hpp>
-#include <std_msgs/UInt32.h>
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/control/Block.hpp>
 
@@ -13,26 +15,27 @@ namespace control {
 
 /**
  * This block allows to publish the safety level of the safety SafetySystem
- * as a ROS message of type std_msgs::UInt32::Type.
+ * as a ROS message of type std_msgs::msg::UInt32::Type.
  * 
  * @since v1.0
  */
 class RosPublisherSafetyLevel : public Block {
-  typedef std_msgs::UInt32::Type TRosMsg;
+  typedef std_msgs::msg::UInt32::Type TRosMsg;
   
  public:
   /**
    * Creates an instance of a publisher block which publishes the safety level.
    * 
+   * @param node_name - name of this node
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    */ 
-  RosPublisherSafetyLevel(const std::string& topic, const uint32_t queueSize=1000) 
+  RosPublisherSafetyLevel(const std::string& node_name, const std::string& topic, const uint32_t queueSize=1000)
       : topic(topic) {
-    if (ros::master::check()) {    
-      ros::NodeHandle handle;
-      publisher = handle.advertise<TRosMsg>(topic, queueSize);
-      ROS_DEBUG_STREAM("RosPublisherSafetyLevel, reading from topic: '" << topic << "' created.");
+    if (rclcpp::ok()) {
+      handle = rclcpp::Node::make_shared(node_name);
+      publisher = handle->create_publisher<TRosMsg>(topic, queueSize);
+      RCLCPP_DEBUG_STREAM(handle->get_logger(), "RosPublisherSafetyLevel, reading from topic: '" << topic << "' on node '" << node_name << "' created.");
       running = true;
     }
   }
@@ -59,16 +62,17 @@ class RosPublisherSafetyLevel : public Block {
     if (running && safetySystem != nullptr) {
       SafetyLevel sl = safetySystem->getCurrentLevel();
       msg.data = sl.getLevelId();
-      publisher.publish(msg);
+      publisher->publish(msg);
     }
   }
   
- protected:
-  ros::Publisher publisher;
-  const std::string& topic;
-  TRosMsg msg;
-  SafetySystem* safetySystem;
-  bool running = false;
+  protected:
+    rclcpp::Node::SharedPtr handle;
+    typename rclcpp::Publisher<TRosMsg>::SharedPtr publisher;
+    const std::string& topic;
+    TRosMsg msg;
+    SafetySystem* safetySystem;
+    bool running = false;
 };
 
 }

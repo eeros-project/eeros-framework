@@ -16,6 +16,10 @@ endmacro()
 
 include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR})
 
+find_package(rcl_interfaces REQUIRED)
+find_package(rclcpp REQUIRED)
+include_directories(${rclcpp_INCLUDE_DIRS} ${rcl_interfaces_INCLUDE_DIRS})
+
 add_subdirectory(core)
 add_subdirectory(task)
 add_subdirectory(math)

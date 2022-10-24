@@ -10,7 +10,7 @@
 #include <eeros/control/ros/RosSubscriberDoubleArray.hpp>
 #include <eeros/control/ros/RosSubscriberDouble.hpp>
 #include <eeros/control/ros/EerosRosTools.hpp>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <signal.h>
 
 using namespace eeros;
@@ -25,11 +25,11 @@ public:
   ControlSystem(double dt)
       : c1({2.4, 0, 4.443, 23.6, -11.2, 1.3, 0.003}),
         c2(0.5),
-        vectorOut("/test/vector"),
-        doubleOut("/test/val"),
-        slOut("/test/safetyLevel"),
-        vectorIn("/rosNodeTalker/vector"),
-        doubleIn("/rosNodeTalker/val"),
+        vectorOut("rosExample", "/test/vector"),
+        doubleOut("rosExample", "/test/val"),
+        slOut("rosExample", "/test/safetyLevel"),
+        vectorIn("rosExample", "/rosNodeTalker/vector"),
+        doubleIn("rosExample", "/rosNodeTalker/val"),
         timedomain("Main time domain", dt, true) {
     vectorOut.getIn().connect(c1.getOut());
     doubleOut.getIn().connect(c2.getOut());

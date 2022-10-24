@@ -7,7 +7,7 @@
 #include <eeros/core/System.hpp>
 
 // A-1 Include the header file of the ROS message
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/laser_scan.h>
 
 
 
@@ -17,16 +17,16 @@ namespace control {
 // C-1 Create the template definition. Each EEROS matrix input needs its own type
 template < typename TRangesInput, typename TIntensitiesInput >
 // A-3 Name your block and create the constructor. Copy the type definition
-class RosPublisherLaserScan : public RosPublisher<sensor_msgs::LaserScan::Type, double> {
+class RosPublisherLaserScan : public RosPublisher<sensor_msgs::msg::LaserScan::Type, double> {
   // A-2 Define the type of the ROS message
-  typedef sensor_msgs::LaserScan::Type	TRosMsg;
+  typedef sensor_msgs::msg::LaserScan::Type TRosMsg;
  public:
-  RosPublisherLaserScan(const std::string& topic, const std::string& frame_id, const uint32_t queueSize=1000) 
-      : RosPublisher<TRosMsg, double>(topic, queueSize), frame_id(frame_id) { }
+  RosPublisherLaserScan(const std::string& node_name, const std::string& topic, const std::string& frame_id, const uint32_t queueSize=1000)
+      : RosPublisher<TRosMsg, double>(node_name, topic, queueSize), frame_id(frame_id) { }
 
   void setRosMsg(TRosMsg& msg) {
     // B-3 If available, set time in msg header
-    msg.header.stamp = eeros::control::rosTools::convertToRosTime(eeros::System::getTimeNs());
+    msg.header.set__stamp(eeros::control::rosTools::convertToRosTime(eeros::System::getTimeNs()));
     msg.header.frame_id = frame_id;
     
     // B-4 Check if EEROS input is connected. Cast the data. Assign casted data to ROS message field

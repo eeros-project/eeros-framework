@@ -5,11 +5,6 @@
 #define NS_PER_SEC 1000000000
 #define CLOCK CLOCK_MONOTONIC_RAW
 
-
-#ifdef USE_ROS
-#include <ros/ros.h>
-#endif
-
 using namespace eeros;
 
 uint64_t timespec2nsec(struct timespec ts) {
@@ -41,8 +36,7 @@ void System::useRosTime() {
 uint64_t System::getTimeNs() {
 #ifdef USE_ROS
 	if (rosTimeIsUsed) {
-		auto time = ros::Time::now();
-		return time.toNSec();
+		return eeros::System::getTimeNs();
 	}
 #endif
 

@@ -1,8 +1,8 @@
 #ifndef ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_
 #define ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_
 
-#include <ros/ros.h>
-#include <ros/callback_queue.h>
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/logging.hpp>
 #include <eeros/control/Block1o.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
@@ -11,6 +11,8 @@
 namespace eeros {
 namespace control {
   
+  using std::placeholders::_1;
+
 /**
  * This is the base class for all blocks which subscribe to ROS messages.
  * 
@@ -29,16 +31,17 @@ class RosSubscriber : public Block1o<SigOutType> {
    * processes all pending messages.
    * If no ROS master can be found, the block does not do anything.
    * 
+   * @param node_name - name of this node
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    * @param callNewest - set to true if all pending messages should be processed
    */
-  RosSubscriber(const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false) 
+  RosSubscriber(const std::string& node_name, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false)
       : topic(topic), callNewest(callNewest) {
-    if (ros::master::check()) { 
-      ros::NodeHandle handle;
-      subscriber = handle.subscribe(topic, queueSize, &RosSubscriber::rosCallbackFct, this);
-      ROS_DEBUG_STREAM("RosBlockSubscriber, reading from topic: '" << topic << "' created.");
+    if (rclcpp::ok()) {
+      handle = rclcpp::Node::make_shared(node_name);
+      subscriber = handle->create_subscription<TRosMsg>(topic, queueSize, std::bind(&RosSubscriber::rosCallbackFct, this, _1));
+      RCLCPP_DEBUG_STREAM(handle->get_logger(), "RosBlockSubscriber, reading from topic: '" << topic << "' on node '" << node_name << "' created.");
       running = true;
     }
   }
@@ -74,15 +77,19 @@ class RosSubscriber : public Block1o<SigOutType> {
    */
   virtual void run() {
     if (running) {  
-      if (callNewest)
-        ros::getGlobalCallbackQueue()->callAvailable();	// calls callback fct. for all available messages.
-      else
-        ros::getGlobalCallbackQueue()->callOne();		// calls callback fct. only for the oldest message
+      if (callNewest) {
+        // calls callback fct. for all available messages.
+        rclcpp::spin_some(handle);
+      } else {
+        // calls callback fct. only for the oldest message
+        rclcpp::spin(handle);
+      }
     }
   }
 
  protected:
-  ros::Subscriber subscriber;
+  rclcpp::Node::SharedPtr handle;
+  typename rclcpp::Subscription<TRosMsg>::SharedPtr subscriber;
   const std::string& topic;
   bool callNewest;
   bool running = false;

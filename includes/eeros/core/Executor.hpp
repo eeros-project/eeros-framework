@@ -14,7 +14,7 @@
 #endif
 
 #ifdef USE_ROS
-#include <ros/ros.h>
+#include <ros/callback_queue.h>
 #endif
 
 

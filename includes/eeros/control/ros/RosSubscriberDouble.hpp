@@ -3,7 +3,7 @@
 
 #include <eeros/control/ros/RosSubscriber.hpp>
 #include <eeros/core/System.hpp>
-#include <std_msgs/Float64.h>
+#include <std_msgs/msg/float64.hpp>
 
 namespace eeros {
 namespace control {
@@ -14,24 +14,25 @@ namespace control {
  * 
  * @since v1.0
  */
-class RosSubscriberDouble : public RosSubscriber<std_msgs::Float64::Type, double> {
-  typedef std_msgs::Float64::Type TRosMsg;
+class RosSubscriberDouble : public RosSubscriber<std_msgs::msg::Float64::Type, double> {
+  typedef std_msgs::msg::Float64::Type TRosMsg;
  public:
   /**
    * Creates an instance of a ROS subscriber block. The block reads
-   * ROS messages of type std_msgs::Float64::Type under a given topic 
+   * ROS messages of type std_msgs::msg::Float64::Type under a given topic
    * and outputs its values onto a signal of type double. 
    * If several messages are pending for a given topic
    * you can choose if the block simply consumes the oldest message or 
    * processes all pending messages.
    * If no ROS master can be found, the block does not do anything.
    * 
+   * @param node_name - name of this node
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    * @param callNewest - set to true if all pending messages should be processed
    */
-  RosSubscriberDouble(const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false ) 
-      : RosSubscriber<TRosMsg, double>(topic, queueSize, callNewest) { }
+  RosSubscriberDouble(const std::string& node_name, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false )
+      : RosSubscriber<TRosMsg, double>(node_name, topic, queueSize, callNewest) { }
     
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.

@@ -1,8 +1,8 @@
 #ifndef ORG_EEROS_CONTROL_ROSPUBLISHER_HPP_
 #define ORG_EEROS_CONTROL_ROSPUBLISHER_HPP_
 
-#include <ros/ros.h>
-#include <ros/callback_queue.h>
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/logging.hpp>
 #include <eeros/control/Block1i.hpp>
 
 namespace eeros {
@@ -23,16 +23,17 @@ class RosPublisher : public Block1i<SigInType> {
    * the signal on its input and publishes it under a given topic name.
    * If no ROS master can be found, the block does not do anything.
    * 
+   * @param node_name - name of this node
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    * @param callNewest - not used
    */
-  RosPublisher(const std::string& topic, uint32_t queueSize=1000, bool callNewest=false) 
+  RosPublisher(const std::string& node_name, const std::string& topic, uint32_t queueSize=1000, bool callNewest=false)
       : topic(topic) {
-    if (ros::master::check()) {    
-      ros::NodeHandle handle;
-      publisher = handle.advertise<TRosMsg>(topic, queueSize);
-      ROS_DEBUG_STREAM("RosBlockPublisher, reading from topic: '" << topic << "' created.");
+    if (rclcpp::ok()) {
+      handle = rclcpp::Node::make_shared(node_name);
+      publisher = handle->create_publisher<TRosMsg>(topic, queueSize);
+      RCLCPP_DEBUG_STREAM(handle->get_logger(), "RosBlockPublisher, reading from topic: '" << topic << "' on node '" << node_name << "' created.");
       running = true;
     }
   }
@@ -55,16 +56,17 @@ class RosPublisher : public Block1i<SigInType> {
   virtual void run() {
     if (running) {    
       setRosMsg(msg);
-      publisher.publish(msg);
+      publisher->publish(msg);
     }
   }
 
 
- protected:
-  ros::Publisher publisher;
-  const std::string& topic;
-  TRosMsg msg;
-  bool running = false;
+  protected:
+    rclcpp::Node::SharedPtr handle;
+    typename rclcpp::Publisher<TRosMsg>::SharedPtr publisher;
+    const std::string& topic;
+    TRosMsg msg;
+    bool running = false;
 };
 
 }

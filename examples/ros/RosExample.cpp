@@ -33,15 +33,14 @@ int main(int argc, char **argv) {
 
   char* dummy_args[] = {NULL};
   int dummy_argc = sizeof(dummy_args)/sizeof(dummy_args[0]) - 1;
-  ros::init(dummy_argc, dummy_args, "rosExample");
-  ros::NodeHandle rosNodeHandler;
+  rclcpp::init(dummy_argc, dummy_args);
+  auto node = rclcpp::Node::make_shared("rosExample");
   log.trace() << "ROS node initialized.";
   
-  System::useRosTime();	// "ros::Time::now()" is used to get system time
+  System::useRosTime();	// "builtin_interfaces::msg::Time::now()" is used to get system time
   
-
+  // TODO: Rewrite this for ROS-2
   // This part only needed, if you want to sync the executor with a gazebo simulation
-// 	ros::NodeHandle syncNodeHandler;
 // 	ros::CallbackQueue syncCallbackQueue;
 // 	syncNodeHandler.setCallbackQueue(&syncCallbackQueue);
 // 	auto subscriberSync = syncNodeHandler.subscribe("motor_sim/joint_states", 1, &callback);

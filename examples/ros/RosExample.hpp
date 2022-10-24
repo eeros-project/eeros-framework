@@ -29,9 +29,9 @@ class MyControlSystem {
         digitalIn0("batteryPresent0"),
         analogOut0("scanTimeEchoOut0"),
         digitalOut0("batteryPresentEchoOut0"),       
-        laserScanIn ("/rosNodeTalker/TestTopic4", 100, false),
-        laserScanOut("/rosExample/TestTopic23", "laser", 100),
-        debugOut0("debugNode/debugOut0"),
+        laserScanIn ("rosExample", "/rosNodeTalker/TestTopic4", 100, false),
+        laserScanOut("rosExample", "/rosExample/TestTopic23", "laser", 100),
+        debugOut0("rosExample", "debugNode/debugOut0"),
         dt(ts),
         
         timedomain("Main time domain", dt, true) {

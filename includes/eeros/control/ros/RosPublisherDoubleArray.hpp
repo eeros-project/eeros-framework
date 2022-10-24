@@ -3,32 +3,33 @@
 
 #include <eeros/control/ros/RosPublisher.hpp>
 #include <eeros/math/Matrix.hpp>
-#include <std_msgs/Float64MultiArray.h>
+#include <std_msgs/msg/float64_multi_array.hpp>
 
 namespace eeros {
 namespace control {
 
 /**
  * This block allows to publish a single input signal of type Matrix<N,1,double> and
- * publishes it as a ROS message type std_msgs::Float64::Type.
+ * publishes it as a ROS message type std_msgs::msg::Float64::Type.
  * 
  * @tparam SigInType - type of the input signal
  * @since v1.0
  */
 template < typename SigInType >
-class RosPublisherDoubleArray : public RosPublisher<std_msgs::Float64MultiArray::Type, SigInType> {
-  typedef std_msgs::Float64MultiArray::Type TRosMsg;
+class RosPublisherDoubleArray : public RosPublisher<std_msgs::msg::Float64MultiArray::Type, SigInType> {
+  typedef std_msgs::msg::Float64MultiArray::Type TRosMsg;
   
  public:
   /**
    * Creates an instance of a publisher block which publishes a input signal 
-   * of type Matrix<N,1,double> as a ROS message of type std_msgs::Float64MultiArray::Type.
+   * of type Matrix<N,1,double> as a ROS message of type std_msgs::msg::Float64MultiArray::Type.
    * 
+   * @param node_name - name of this node
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    */ 
-  RosPublisherDoubleArray(const std::string& topic, const uint32_t queueSize=1000) :
-    RosPublisher<TRosMsg, SigInType>(topic, queueSize) { }
+  RosPublisherDoubleArray(const std::string& node_name, const std::string& topic, const uint32_t queueSize=1000) :
+    RosPublisher<TRosMsg, SigInType>(node_name, topic, queueSize) { }
     
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.

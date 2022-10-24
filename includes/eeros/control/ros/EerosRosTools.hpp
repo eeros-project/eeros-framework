@@ -1,8 +1,8 @@
 #ifndef EEROS_ROS_TOOLS_HPP
 #define EEROS_ROS_TOOLS_HPP
 
-#include <ros/ros.h>
-#include <std_msgs/Header.h>
+#include <rclcpp/rclcpp.hpp>
+#include <builtin_interfaces/msg/time.hpp>
 
 #define NS_PER_SEC 1000000000
 
@@ -23,13 +23,14 @@ namespace rosTools {
  * @param timestampNs - EEROS timestamp
  * @return ROS time
  */
-static ros::Time convertToRosTime(uint64_t timestampNs) __attribute__((unused));
-static ros::Time convertToRosTime(uint64_t timestampNs) {
-  ros::Time t;
-  t.sec = static_cast<double>(timestampNs) / NS_PER_SEC;
-  t.nsec = timestampNs % static_cast<uint64_t>(1e9);
+static builtin_interfaces::msg::Time convertToRosTime(uint64_t timestampNs) __attribute__((unused));
+static builtin_interfaces::msg::Time convertToRosTime(uint64_t timestampNs) {
+  builtin_interfaces::msg::Time t;
+  t.set__sec(static_cast<double>(timestampNs) / NS_PER_SEC);
+  t.set__nanosec(timestampNs % static_cast<uint64_t>(1e9));
   return t;
 }
+
 
 /**
  * Creates and initializes a ROS node. Checks if ROS master is up and running.
@@ -42,8 +43,10 @@ static bool initNode(std::string name) __attribute__((unused));
 static bool initNode(std::string name) {
   char* args[] = {NULL};
   int argc = sizeof(args)/sizeof(args[0]) - 1;
-  ros::init(argc, args, name);	// init ROS node and name it
-  return ros::master::check();
+  // init ROS node and name it
+  rclcpp::init(argc, args);
+  auto n = rclcpp::Node::make_shared(name);
+  return rclcpp::ok();
 }
 
 }

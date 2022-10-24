@@ -1,7 +1,7 @@
 #ifndef ORG_EEROS_CORE_ROS_TOPIC_SYNCHRONIZER_HPP_
 #define ORG_EEROS_CORE_ROS_TOPIC_SYNCHRONIZER_HPP_
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <ros/callback_queue.h>
 #include <list>
 

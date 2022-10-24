@@ -5,6 +5,9 @@ elseif(WINDOWS)
 	add_eeros_sources(System_Windows.cpp PeriodicThread_Windows.cpp)
 endif()
 
+find_package(rclcpp REQUIRED)
+include_directories(${rclcpp_INCLUDE_DIRS})
+
 # Platform independent source files 
 add_eeros_sources(
 	Version.cpp
