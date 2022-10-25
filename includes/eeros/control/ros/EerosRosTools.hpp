@@ -33,6 +33,18 @@ static builtin_interfaces::msg::Time convertToRosTime(uint64_t timestampNs) {
 
 
 /**
+ * Creates a timestamp (nanoseconds) based on a ROS-Message-Header Timestamp struct.
+ *
+ * @param time - The ROS-Message timestamp to convert
+ * @return timestampNs
+ */
+static uint64_t toNanoSec(const builtin_interfaces::msg::Time& time) __attribute__((unused));
+static uint64_t toNanoSec(const builtin_interfaces::msg::Time& time) {
+  return static_cast<uint64_t>(time.sec) * NS_PER_SEC + static_cast<uint64_t>(time.nanosec);
+}
+
+
+/**
  * Creates and initializes a ROS node. Checks if ROS master is up and running.
  * Returns false if no ROS master can be contacted.
  * 

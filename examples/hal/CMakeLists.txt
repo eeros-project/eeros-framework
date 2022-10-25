@@ -12,11 +12,11 @@ list(APPEND files ${EEROS_BINARY_DIR}/examples/hal/HalTest2ConfigFlink.json)
 set(targets "")
 
 add_executable(halTest1 HalTest1.cpp copyHalTest1Config)
-target_link_libraries(halTest1 eeros ${EEROS_LIBS})
+target_link_libraries(halTest1 eeros ${EEROS_LIBS} ${ROS_LIBRARIES})
 list(APPEND targets halTest1)
 
 add_executable(halTest2 HalTest2.cpp copyHalTest2CConfig copyHalTest2FConfig)
-target_link_libraries(halTest2 eeros ${EEROS_LIBS})
+target_link_libraries(halTest2 eeros ${EEROS_LIBS} ${ROS_LIBRARIES})
 list(APPEND targets halTest2)
 
 

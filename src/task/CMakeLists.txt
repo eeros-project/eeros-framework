@@ -4,4 +4,3 @@ add_eeros_sources(
 	HarmonicTaskList.cpp
 	Async.cpp
 )
-

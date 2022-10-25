@@ -2,7 +2,6 @@
 #define ORG_EEROS_CORE_ROS_TOPIC_SYNCHRONIZER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
-#include <ros/callback_queue.h>
 #include <list>
 
 namespace eeros {
@@ -19,10 +18,8 @@ namespace eeros {
 	
 	
 	private:
-		ros::NodeHandle syncNodeHandler;
-		ros::CallbackQueue syncCallbackQueue;
-// 		std::list
-	
+		rclcpp::Node::SharedPtr syncNodeHandler;
+		rclcpp::CallbackGroup::SharedPtr syncCallbackQueue;
 	};
 }
 

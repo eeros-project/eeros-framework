@@ -2,6 +2,10 @@
 #include <eeros/core/EEROSException.hpp>
 #include <windows.h>
 
+#ifdef USE_ROS
+#include <ros/time.h>
+#endif
+
 using namespace eeros;
 
 double System::getClockResolution() {
@@ -29,5 +33,10 @@ double System::getTime() {
 }
 
 uint64_t System::getTimeNs() {
-	return 0; // TODO
+#ifdef USE_ROS
+  if (rosTimeIsUsed) {
+    return ros::Time::now().toNSec();
+  }
+#endif
+  return 0; // TODO
 }

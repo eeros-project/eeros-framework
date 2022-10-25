@@ -1,9 +1,9 @@
 #ifndef ORG_EEROS_CONTROL_ROSSUBSCRIBER_LASERSCAN_HPP
 #define ORG_EEROS_CONTROL_ROSSUBSCRIBER_LASERSCAN_HPP
 
+#include <eeros/control/ros/EerosRosTools.hpp>
 #include <eeros/control/ros/RosSubscriber.hpp>
 #include <eeros/core/System.hpp>
-#include <ros/time.h>
 
 // A-1 Include the header file of the ROS message
 #include <sensor_msgs/msg/laser_scan.hpp>
@@ -24,7 +24,7 @@ class RosSubscriberLaserScan : public RosSubscriber<sensor_msgs::msg::LaserScan:
   void rosCallbackFct(const TRosMsg& msg) {
     // B-3 Set the timestamp of all EEROS signals
     // auto time = eeros::System::getTimeNs(); // use system time for timestamp
-    auto time = ros::Time(msg.header.stamp.sec, msg.header.stamp.nanosec).toNSec();
+    auto time = eeros::control::rosTools::toNanoSec(msg.header.stamp);
     angle_minOutput.getSignal().setTimestamp( time );
     angle_maxOutput.getSignal().setTimestamp( time );
     angle_incrementOutput.getSignal().setTimestamp( time );

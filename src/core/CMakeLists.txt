@@ -5,10 +5,11 @@ elseif(WINDOWS)
 	add_eeros_sources(System_Windows.cpp PeriodicThread_Windows.cpp)
 endif()
 
-find_package(rclcpp REQUIRED)
-include_directories(${rclcpp_INCLUDE_DIRS})
+if (roslib_FOUND AND USE_ROS)
+  include_directories(${rclcpp_INCLUDE_DIRS})
+endif()
 
-# Platform independent source files 
+# Platform independent source files
 add_eeros_sources(
 	Version.cpp
 	Runnable.cpp

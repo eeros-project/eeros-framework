@@ -1,6 +1,7 @@
 #ifndef ORG_EEROS_ROS_EXAMPLE_HPP_
 #define ORG_EEROS_ROS_EXAMPLE_HPP_
 
+#include <unistd.h>
 #include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/PeripheralInput.hpp>
 #include <eeros/control/TimeDomain.hpp>
@@ -12,7 +13,6 @@
 #include <eeros/control/ros/RosSubscriberLaserScan.hpp>
 #include <eeros/control/ros/RosPublisherLaserScan.hpp>
 #include <eeros/core/Executor.hpp>
-#include <unistd.h>
 #include <eeros/logger/Logger.hpp>
 
 using namespace eeros;

@@ -2,6 +2,10 @@
 #include <eeros/core/Fault.hpp>
 #include <time.h>
 
+#ifdef USE_ROS
+#include <ros/time.h>
+#endif
+
 #define NS_PER_SEC 1000000000
 #define CLOCK CLOCK_MONOTONIC_RAW
 
@@ -36,7 +40,7 @@ void System::useRosTime() {
 uint64_t System::getTimeNs() {
 #ifdef USE_ROS
 	if (rosTimeIsUsed) {
-		return eeros::System::getTimeNs();
+		return ros::Time::now().toNSec();
 	}
 #endif
 

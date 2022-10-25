@@ -130,7 +130,6 @@ find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 if(LIBCURSES)
   message(STATUS "-> libcurses available")
   target_link_libraries(eeros PRIVATE ncurses)
-
 endif()
 
 ## Use Find package ecmasterlib (EtherCAT) if found
@@ -240,13 +239,23 @@ find_package( roslib )
 
 if (roslib_FOUND AND USE_ROS)
   message( STATUS "--> ROS will be used")
-#    set( ROS_FOUND true)
-#  include_directories( "${roslib_INCLUDE_DIRS}" )
+
+  include_directories(${roslib_INCLUDE_DIRS})
   list(APPEND ROS_LIBRARIES "${roslib_LIBRARIES}")
+
   find_package( rosconsole QUIET)
   list(APPEND ROS_LIBRARIES "${rosconsole_LIBRARIES}")
-  find_package( roscpp QUIET )
-  list(APPEND ROS_LIBRARIES "${roscpp_LIBRARIES}")
+
+  find_package(rclcpp REQUIRED)
+  include_directories(${rclcpp_INCLUDE_DIRS})
+  list(APPEND ROS_LIBRARIES "${rclcpp_LIBRARIES}")
+
+  find_package(rcl_interfaces REQUIRED)
+  include_directories(${rcl_interfaces_INCLUDE_DIRS})
+  list(APPEND ROS_LIBRARIES "${rcl_interfaces_LIBRARIES}")
+
+  target_link_libraries(eeros PRIVATE ${roslib_LIBRARIES} ${rclcpp_LIBRARIES} ${rcl_interfaces_LIBRARIES})
+
   list(APPEND EXTERNAL_LIBS "${ROS_LIBRARIES}")
   add_definitions(-DUSE_ROS)
 endif (roslib_FOUND AND USE_ROS)

@@ -11,16 +11,13 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
+#include <eeros/core/System.hpp>
 #include <eeros/core/Executor.hpp>
 #include <eeros/task/Async.hpp>
 #include <eeros/task/Lambda.hpp>
 #include <eeros/task/HarmonicTaskList.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/safety/SafetySystem.hpp>
-#ifdef USE_ROS
-#include <ros/callback_queue_interface.h>
-#include <ros/callback_queue.h>
-#endif
 
 volatile bool running = true;
 
@@ -183,7 +180,7 @@ void Executor::syncWithRosTime() {
   syncWithRosTimeIsSet = true;
 }
 
-void Executor::syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue)
+void Executor::syncWithRosTopic(rclcpp::CallbackGroup::SharedPtr syncRosCallbackQueue)
 {
   std::cout << "sync executor with gazebo" << std::endl;
   syncWithRosTopicIsSet = true;
@@ -234,7 +231,7 @@ void Executor::run() {
 
   std::vector<std::shared_ptr<TaskThread>> threads; // smart pointer used because async objects must not be copied
   task::HarmonicTaskList taskList;
-  task::Periodic executorTask("executor", period, this, true);
+  task::Periodic executorTask("executor", period, mainTask, true);
 
   counter.monitors = this->mainTask->monitors;
 
@@ -274,16 +271,16 @@ void Executor::run() {
 #ifdef USE_ROS
   if (syncWithRosTimeIsSet) {
     log.trace() << "starting execution synced to rosTime";
-    if (syncWithEtherCatStackIsSet)	log.error() << "Can't use both RosTime and etherCAT to sync executor";
-    if (syncWithRosTopicIsSet)		log.error() << "Can't use both RosTime and RosTopic to sync executor";
+    if (syncWithEtherCatStackIsSet) log.error() << "Can't use both RosTime and etherCAT to sync executor";
+    if (syncWithRosTopicIsSet)      log.error() << "Can't use both RosTime and RosTopic to sync executor";
     useDefaultExecutor = false;
     
     uint64_t periodNsec = static_cast<uint64_t>(period * 1.0e9);
-    uint64_t next_cycle = ros::Time::now().toNSec() + periodNsec;
+    uint64_t next_cycle = eeros::System::getTimeNs() + periodNsec;
     
-// 		auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
+//    auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
     while (running) { 
-      while (ros::Time::now().toNSec() < next_cycle && running) usleep(10);
+      while (eeros::System::getTimeNs() < next_cycle && running) usleep(10);
       
       counter.tick();
       taskList.run();
@@ -296,33 +293,37 @@ void Executor::run() {
   }
   else if (syncWithRosTopicIsSet) {
     log.trace() << "starting execution synced to gazebo";
-    if (syncWithRosTimeIsSet)		log.error() << "Can't use both RosTopic and RosTime to sync executor";
-    if (syncWithEtherCatStackIsSet)	log.error() << "Can't use both RosTopic and etherCAT to sync executor";
+    if (syncWithRosTimeIsSet)       log.error() << "Can't use both RosTopic and RosTime to sync executor";
+    if (syncWithEtherCatStackIsSet) log.error() << "Can't use both RosTopic and etherCAT to sync executor";
     useDefaultExecutor = false;
     
-    auto timeOld = ros::Time::now();
-    auto timeNew = ros::Time::now();
+    rclcpp::executors::StaticSingleThreadedExecutor executor;
+    //executor.add_callback_group(syncRosCallbackQueue);
+
+    auto timeOld = eeros::System::getTimeNs();
+    auto timeNew = eeros::System::getTimeNs();
     static bool first = true;
     while (running) {
       if (first) {
-        while (timeOld == timeNew  && running) {	// waits for new rosTime beeing published
+        // waits for new rosTime beeing published
+        while (timeOld == timeNew  && running) {
           usleep(10);
-          timeNew = ros::Time::now();	
+          timeNew = eeros::System::getTimeNs();
         }
         first = false;
         timeOld = timeNew;
       }
-      
-      while (syncRosCallbackQueue->isEmpty() && running) usleep(10);	//waits for new message;
-      
-      while (timeOld == timeNew  && running) {		// waits for new rosTime beeing published
+
+      // waits for new rosTime beeing published
+      while (timeOld == timeNew  && running) {
         usleep(10);
-        timeNew = ros::Time::now();	
+        timeNew = eeros::System::getTimeNs();
       }
       timeOld = timeNew;
-      
-      syncRosCallbackQueue->callAvailable();
-// 			ros::getGlobalCallbackQueue()->callAvailable();
+
+      // Spins all work which is in the queue for now and returns after.
+      // New work will not be processed.
+      executor.spin_some();
       
       counter.tick();
       taskList.run();

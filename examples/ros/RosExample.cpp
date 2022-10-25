@@ -37,13 +37,12 @@ int main(int argc, char **argv) {
   auto node = rclcpp::Node::make_shared("rosExample");
   log.trace() << "ROS node initialized.";
   
-  System::useRosTime();	// "builtin_interfaces::msg::Time::now()" is used to get system time
+  // "builtin_interfaces::msg::Time::now()" is used to get system time
+  System::useRosTime();
   
-  // TODO: Rewrite this for ROS-2
   // This part only needed, if you want to sync the executor with a gazebo simulation
-// 	ros::CallbackQueue syncCallbackQueue;
-// 	syncNodeHandler.setCallbackQueue(&syncCallbackQueue);
-// 	auto subscriberSync = syncNodeHandler.subscribe("motor_sim/joint_states", 1, &callback);
+  //rclcpp::CallbackGroup::SharedPtr callback_group = node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+  //auto subscriber = node->create_subscription<...>(topic, queueSize, std::bind(&RosExample::ros_callback, this, _1));
     
   MyControlSystem controlSystem(dt);
   MySafetyProperties safetyProperties(controlSystem);
@@ -52,7 +51,7 @@ int main(int argc, char **argv) {
   signal(SIGINT, signalHandler);	
   auto& executor = Executor::instance();
   executor.setMainTask(safetySystem);
-// 	executor.syncWithRosTopic(&syncCallbackQueue);	// sync with gazebo simulation
+  //executor.syncWithRosTopic(callback_group);	// sync with gazebo simulation
   executor.run();
 
   log.info() << "ROS example end";	

@@ -14,7 +14,7 @@
 #endif
 
 #ifdef USE_ROS
-#include <ros/callback_queue.h>
+#include <rclcpp/rclcpp.hpp>
 #endif
 
 
@@ -101,8 +101,8 @@ class Executor : public Runnable {
 #endif
 #ifdef USE_ROS
   void syncWithRosTime();
-  void syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue);
-  ros::CallbackQueue* syncRosCallbackQueue;
+  void syncWithRosTopic(rclcpp::CallbackGroup::SharedPtr syncRosCallbackQueue);
+  rclcpp::CallbackGroup::SharedPtr syncRosCallbackQueue;
 #endif
 
  private:
