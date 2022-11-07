@@ -1,9 +1,10 @@
 #include <eeros/core/System.hpp>
 #include <eeros/core/Fault.hpp>
 #include <time.h>
+#include <chrono>
 
 #ifdef USE_ROS
-#include <ros/time.h>
+#include <rclcpp/rclcpp.hpp>
 #endif
 
 #define NS_PER_SEC 1000000000
@@ -40,15 +41,12 @@ void System::useRosTime() {
 uint64_t System::getTimeNs() {
 #ifdef USE_ROS
 	if (rosTimeIsUsed) {
-		return ros::Time::now().toNSec();
+		return rclcpp::Clock(RCL_ROS_TIME).now().nanoseconds();
 	}
 #endif
 
-	struct timespec ts;
-	if(clock_gettime(CLOCK, &ts) != 0) {
-		throw Fault("Failed to get time!");
-	}
-	return timespec2nsec(ts);
+	auto nsecs = std::chrono::high_resolution_clock::now().time_since_epoch();
+	return std::chrono::duration_cast<std::chrono::nanoseconds>(nsecs).count();
 }
 
 

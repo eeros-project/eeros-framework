@@ -1,9 +1,10 @@
 #include <eeros/core/System.hpp>
 #include <eeros/core/EEROSException.hpp>
 #include <windows.h>
+#include <chrono>
 
 #ifdef USE_ROS
-#include <ros/time.h>
+#include <rclcpp/rclcpp.hpp>
 #endif
 
 using namespace eeros;
@@ -35,8 +36,10 @@ double System::getTime() {
 uint64_t System::getTimeNs() {
 #ifdef USE_ROS
   if (rosTimeIsUsed) {
-    return ros::Time::now().toNSec();
+    return rclcpp::Clock(RCL_ROS_TIME).now().nanoseconds();
   }
 #endif
-  return 0; // TODO
+
+  auto nsecs = std::chrono::high_resolution_clock::now().time_since_epoch();
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(nsecs).count();
 }
