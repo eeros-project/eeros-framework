@@ -101,8 +101,7 @@ class Executor : public Runnable {
 #endif
 #ifdef USE_ROS
   void syncWithRosTime();
-  void syncWithRosTopic(rclcpp::CallbackGroup::SharedPtr syncRosCallbackQueue);
-  rclcpp::CallbackGroup::SharedPtr syncRosCallbackQueue;
+  void syncWithRosTopic(rclcpp::Executor::SharedPtr syncRosExecutor);
 #endif
 
  private:
@@ -115,6 +114,9 @@ class Executor : public Runnable {
   bool syncWithRosTimeIsSet;
   bool syncWithRosTopicIsSet;
   logger::Logger log;
+#ifdef USE_ROS
+  rclcpp::Executor::SharedPtr syncRosExecutor;
+#endif
 #ifdef USE_ETHERCAT
   ecmasterlib::EcMasterlibMain* etherCATStack;
 #endif

@@ -180,11 +180,11 @@ void Executor::syncWithRosTime() {
   syncWithRosTimeIsSet = true;
 }
 
-void Executor::syncWithRosTopic(rclcpp::CallbackGroup::SharedPtr syncRosCallbackQueue)
+void Executor::syncWithRosTopic(rclcpp::Executor::SharedPtr syncRosExecutor)
 {
   std::cout << "sync executor with gazebo" << std::endl;
   syncWithRosTopicIsSet = true;
-  this->syncRosCallbackQueue = syncRosCallbackQueue;
+  this->syncRosExecutor = syncRosExecutor;
 }
 #endif
 
@@ -254,8 +254,8 @@ void Executor::run() {
 #ifdef USE_ETHERCAT
   if (etherCATStack) {
     log.trace() << "starting execution synced to etcherCAT stack";
-    if (syncWithRosTimeIsSet)	log.error() << "Can't use both etherCAT and RosTime to sync executor";
-    if (syncWithRosTopicIsSet)	log.error() << "Can't use both etherCAT and RosTopic to sync executor";
+    if (syncWithRosTimeIsSet)  log.error() << "Can't use both etherCAT and RosTime to sync executor";
+    if (syncWithRosTopicIsSet) log.error() << "Can't use both etherCAT and RosTopic to sync executor";
     useDefaultExecutor = false;
     
     while (running) {
@@ -278,9 +278,10 @@ void Executor::run() {
     uint64_t periodNsec = static_cast<uint64_t>(period * 1.0e9);
     uint64_t next_cycle = eeros::System::getTimeNs() + periodNsec;
     
-//    auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
     while (running) { 
-      while (eeros::System::getTimeNs() < next_cycle && running) usleep(10);
+      while ((eeros::System::getTimeNs() < next_cycle) && running) {
+        usleep(10);
+      }
       
       counter.tick();
       taskList.run();
@@ -297,25 +298,11 @@ void Executor::run() {
     if (syncWithEtherCatStackIsSet) log.error() << "Can't use both RosTopic and etherCAT to sync executor";
     useDefaultExecutor = false;
     
-    rclcpp::executors::StaticSingleThreadedExecutor executor;
-    //executor.add_callback_group(syncRosCallbackQueue);
-
     auto timeOld = eeros::System::getTimeNs();
     auto timeNew = eeros::System::getTimeNs();
-    static bool first = true;
     while (running) {
-      if (first) {
-        // waits for new rosTime beeing published
-        while (timeOld == timeNew  && running) {
-          usleep(10);
-          timeNew = eeros::System::getTimeNs();
-        }
-        first = false;
-        timeOld = timeNew;
-      }
-
       // waits for new rosTime beeing published
-      while (timeOld == timeNew  && running) {
+      while ((timeOld == timeNew) && running && !syncRosExecutor->is_spinning()) {
         usleep(10);
         timeNew = eeros::System::getTimeNs();
       }
@@ -323,7 +310,7 @@ void Executor::run() {
 
       // Spins all work which is in the queue for now and returns after.
       // New work will not be processed.
-      executor.spin_some();
+      syncRosExecutor->spin_some();
       
       counter.tick();
       taskList.run();
