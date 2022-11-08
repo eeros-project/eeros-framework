@@ -53,10 +53,7 @@ static uint64_t toNanoSec(const builtin_interfaces::msg::Time& time) {
  */
 static bool initNode(std::string name) __attribute__((unused));
 static bool initNode(std::string name) {
-  char* args[] = {NULL};
-  int argc = sizeof(args)/sizeof(args[0]) - 1;
-  // init ROS node and name it
-  rclcpp::init(argc, args);
+  rclcpp::init(0, NULL);
   auto n = rclcpp::Node::make_shared(name);
   return rclcpp::ok();
 }

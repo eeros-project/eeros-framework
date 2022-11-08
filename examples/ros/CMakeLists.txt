@@ -3,10 +3,10 @@ if (roslib_FOUND AND USE_ROS)
   set(targets "")
 
   find_package( std_msgs REQUIRED )
-  list(APPEND MSG_LIBRARIES "${std_msgs_LIBRARIES}")
+  list(APPEND MSG_LIBRARIES ${std_msgs_LIBRARIES})
 
   find_package( sensor_msgs REQUIRED )
-  list(APPEND MSG_LIBRARIES "${sensor_msgs_LIBRARIES}")
+  list(APPEND MSG_LIBRARIES ${sensor_msgs_LIBRARIES})
 
   include_directories(${rclcpp_INCLUDE_DIRS})
   include_directories(${rcl_interfaces_INCLUDE_DIRS})

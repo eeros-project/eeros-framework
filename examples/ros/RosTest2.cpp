@@ -77,12 +77,12 @@ int main(int argc, char **argv) {
   ControlSystem controlSystem(dt);
   ROSTestSafetyProperties safetyProperties(controlSystem);
   eeros::safety::SafetySystem safetySystem(safetyProperties, dt);
-  
-  signal(SIGINT, signalHandler);	
+
+  signal(SIGINT, signalHandler);
   auto& executor = Executor::instance();
   executor.setMainTask(safetySystem);
   executor.run();
 
-  log.info() << "ROS Test2 end";	
+  log.info() << "ROS Test2 end";
   return 0;
 }

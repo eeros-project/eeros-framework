@@ -31,9 +31,7 @@ int main(int argc, char **argv) {
   HAL& hal = HAL::instance();
   hal.readConfigFromFile(&argc, argv);
 
-  char* dummy_args[] = {NULL};
-  int dummy_argc = sizeof(dummy_args)/sizeof(dummy_args[0]) - 1;
-  rclcpp::init(dummy_argc, dummy_args);
+  rclcpp::init(0, NULL);
   auto node = rclcpp::Node::make_shared("rosExample");
   log.trace() << "ROS node initialized.";
   
