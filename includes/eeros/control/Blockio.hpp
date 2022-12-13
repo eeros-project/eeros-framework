@@ -54,7 +54,9 @@ class Blockio : public Block {
    * @param f - function defining the algorithm
    */
   Blockio(std::function<void()> const &f) : func(f) {
-    for (uint8_t i = 0; i < N; i++) in[i].setOwner(this);
+    for (uint8_t i = 0; i < N; i++) {
+      in[i].setOwner(this);
+    }
     for (uint8_t i = 0; i < M; i++) {
       out[i].setOwner(this);
       out[i].getSignal().clear();
@@ -81,7 +83,9 @@ class Blockio : public Block {
    * @return input
    */
   virtual Input<Tin>& getIn(uint8_t index) {
-    if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
+    if (index >= N) {
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'");
+    }
     return in[index];
   }
 
@@ -92,7 +96,9 @@ class Blockio : public Block {
    * @return output
    */
   virtual Output<Tout>& getOut(uint8_t index) {
-    if (index >= M) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 
+    if (index >= M) {
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'");
+    }
     return out[index];
   }
 
@@ -124,7 +130,9 @@ class Blockio<N,1,Tin,Tout> : public Block {
    * @param f - function defining the algorithm
    */
   Blockio(std::function<void()> const &f) : out(this), func(f) {
-    for (uint8_t i = 0; i < N; i++) in[i].setOwner(this);
+    for (uint8_t i = 0; i < N; i++) {
+      in[i].setOwner(this);
+    }
     out.getSignal().clear();
   }
 
@@ -148,7 +156,9 @@ class Blockio<N,1,Tin,Tout> : public Block {
    * @return input
    */
   virtual Input<Tin>& getIn(uint8_t index) {
-    if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
+    if (index >= N) {
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'");
+    }
     return in[index];
   }
 
@@ -189,7 +199,9 @@ class Blockio<N,0,Tin> : public Block {
    * @param f - function defining the algorithm
    */
   Blockio(std::function<void()> const &f) : func(f) {
-    for (uint8_t i = 0; i < N; i++) in[i].setOwner(this);
+    for (uint8_t i = 0; i < N; i++) {
+      in[i].setOwner(this);
+    }
   }
 
   /**
@@ -212,7 +224,9 @@ class Blockio<N,0,Tin> : public Block {
    * @return input
    */
   virtual Input<Tin>& getIn(uint8_t index) {
-    if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
+    if (index >= N) {
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'");
+    }
     return in[index];
   }
 
@@ -278,7 +292,9 @@ class Blockio<1,M,Tin,Tout> : public Block {
    * @return output
    */
   virtual Output<Tout>& getOut(uint8_t index) {
-    if (index >= M) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 
+    if (index >= M) {
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'");
+    }
     return out[index];
   }
 
@@ -447,7 +463,9 @@ class Blockio<0,M,Tout> : public Block {
    * @return output
    */
   virtual Output<Tout>& getOut(uint8_t index) {
-    if (index >= M) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 
+    if (index >= M) {
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'");
+    }
     return out[index];
   }
 

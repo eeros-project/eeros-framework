@@ -11,13 +11,15 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
-#include <eeros/core/System.hpp>
 #include <eeros/core/Executor.hpp>
+#include <eeros/core/System.hpp>
 #include <eeros/task/Async.hpp>
 #include <eeros/task/Lambda.hpp>
 #include <eeros/task/HarmonicTaskList.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/safety/SafetySystem.hpp>
+
+#include <iostream>
 
 volatile bool running = true;
 
@@ -49,8 +51,8 @@ void traverse(std::vector<task::Periodic> &tasks, F func) {
 void createThread(Logger &log, task::Periodic &task, task::Periodic &baseTask, std::vector<std::shared_ptr<TaskThread>> &threads, std::vector<task::Harmonic> &output);
 
 void createThreads(Logger &log, std::vector<task::Periodic> &tasks, task::Periodic &baseTask, std::vector<std::shared_ptr<TaskThread>> &threads, task::HarmonicTaskList &output) {
-  for (task::Periodic &t: tasks) {
-    createThread(log, t, baseTask, threads, output.tasks);
+  for (task::Periodic &task: tasks) {
+    createThread(log, task, baseTask, threads, output.tasks);
   }
 }
 
@@ -68,23 +70,28 @@ void createThread(Logger &log, task::Periodic &task, task::Periodic &baseTask, s
     createThreads(log, task.after, task, threads, taskList);
   }
 
-  if (task.getRealtime())
+  if (task.getRealtime()) {
     log.trace() << "creating harmonic realtime task '" << task.getName()
           << "' with period " << actualPeriod << " sec (k = "
           << k << ") and priority " << ((int)(Executor::basePriority) - task.getNice())
           << " based on '" << baseTask.getName() << "'";
-  else
+  } else {
     log.trace() << "creating harmonic task '" << task.getName() << "' with period "
           << actualPeriod << " sec (k = " << k << ")"
           << " based on '" << baseTask.getName() << "'";
+  }
 
-  if (deviation > 0.01) throw std::runtime_error("period deviation too high");
+  if (deviation > 0.01) {
+    throw std::runtime_error("period deviation too high");
+  }
 
-  if (task.getRealtime() && task.getNice() <= 0)
+  if (task.getRealtime() && task.getNice() <= 0) {
     throw std::runtime_error("priority not set");
+  }
 
-  if (taskList.tasks.size() == 0)
+  if (taskList.tasks.size() == 0) {
     throw std::runtime_error("no task to execute");
+  }
 
   threads.push_back(std::make_shared<TaskThread>(actualPeriod, task, taskList));
   output.emplace_back(threads.back()->async, k);
@@ -113,8 +120,9 @@ void Executor::syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack
 
 
 void Executor::setMainTask(task::Periodic &mainTask) {
-  if (this->mainTask != nullptr)
+  if (this->mainTask != nullptr) {
     throw std::runtime_error("you can only define one main task per executor");
+  }
   period = mainTask.getPeriod();
   counter.setPeriod(period);
   this->mainTask = &mainTask;
@@ -126,8 +134,9 @@ void Executor::setMainTask(safety::SafetySystem &ss) {
 }
 
 void Executor::setExecutorPeriod(double period) {
-  if (this->mainTask != nullptr)
+  if (this->mainTask != nullptr) {
     throw std::runtime_error("set the executor period only in case you dont't have a main task");
+  }
   task::Periodic *task = new task::Periodic("default main task", period, new task::Lambda(), true);
   setMainTask(*task);
 }
@@ -137,16 +146,21 @@ task::Periodic* Executor::getMainTask() {
 }
 
 void Executor::add(task::Periodic &task) {
-  for(auto& t: tasks) {
-    if (&task.getTask() == &t.getTask()) log.error() << "periodic '" << task.getName() << "' is added twice to the executor";
+  for (auto& t: tasks) {
+    if (&task.getTask() == &t.getTask()) {
+      log.error() << "periodic '" << task.getName() << "' is added twice to the executor";
+    }
   }
   tasks.push_back(task);
 }
 
 void Executor::add(control::TimeDomain &td) {
+  td.start();
   task::Periodic task(td.getName(), td.getPeriod(), td, td.getRealtime());
-  for(auto& t: tasks) {
-    if (&td == &t.getTask()) log.error() << "periodic of time domain '" << td.getName() << "' is added twice to the executor";
+  for (auto& t: tasks) {
+    if (&td == &t.getTask()) {
+      log.error() << "periodic of time domain '" << td.getName() << "' is added twice to the executor";
+    }
   }
   tasks.push_back(task);
 }
@@ -171,7 +185,13 @@ void Executor::stop() {
   auto &instance = Executor::instance();
     (void)instance;
 #ifdef USE_ETHERCAT
-  if(instance.etherCATStack) instance.etherCATStack->stop();
+  if(instance.etherCATStack) {
+    instance.etherCATStack->stop();
+  }
+#endif
+#ifdef USE_ROS
+  rclcpp::shutdown();
+  instance.subscriberThread->join();
 #endif
 }
 
@@ -198,10 +218,11 @@ void Executor::assignPriorities() {
 
   // sort list of priority assignments
   std::sort(priorityAssignments.begin(), priorityAssignments.end(), [] (task::Periodic *a, task::Periodic *b) -> bool {
-    if (a->getRealtime() == b->getRealtime())
+    if (a->getRealtime() == b->getRealtime()) {
       return (a->getPeriod() < b->getPeriod());
-    else
+    } else {
       return a->getRealtime();
+    }
   });
 
   // assign priorities
@@ -216,8 +237,9 @@ void Executor::assignPriorities() {
 void Executor::run() {
   log.trace() << "starting executor with base period " << period << " sec and priority " << (int)(basePriority) << " (thread " << getpid() << ":" << syscall(SYS_gettid) << ")";
 
-  if (period == 0.0)
+  if (period == 0.0) {
     throw std::runtime_error("period of executor not set");
+  }
 
   log.trace() << "assigning priorities";
   assignPriorities();
@@ -240,15 +262,18 @@ void Executor::run() {
   using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
 
   // TODO: implement this with ready-flag (wait for all threads to be ready instead of blind sleep)
-  std::this_thread::sleep_for(seconds(1)); // wait 1 sec to allow threads to be created
+  // wait 1 sec to allow threads to be created
+  std::this_thread::sleep_for(seconds(1));
 
-  if (!set_priority(0))
+  if (!set_priority(0)) {
     log.error() << "could not set realtime priority";
+  }
 
   prefault_stack();
 
-  if (!lock_memory())
+  if (!lock_memory()) {
     log.error() << "could not lock memory in RAM";
+  }
 
   bool useDefaultExecutor = true;
 #ifdef USE_ETHERCAT
@@ -262,13 +287,19 @@ void Executor::run() {
       etherCATStack->sync();
       counter.tick();
       taskList.run();
-      if (mainTask != nullptr)
+      if (mainTask != nullptr) {
         mainTask->run();
+      }
       counter.tock();
     }
   }
 #endif
 #ifdef USE_ROS
+  // Starts spinning subscribers in an own thread to not block the program
+  subscriberThread = std::make_shared<std::thread>([this](){
+    subscriberExecutor->spin();
+  });
+
   if (syncWithRosTimeIsSet) {
     log.trace() << "starting execution synced to rosTime";
     if (syncWithEtherCatStackIsSet) log.error() << "Can't use both RosTime and etherCAT to sync executor";
@@ -285,8 +316,9 @@ void Executor::run() {
       
       counter.tick();
       taskList.run();
-      if (mainTask != nullptr)
+      if (mainTask != nullptr) {
         mainTask->run();
+      }
       counter.tock();
       next_cycle += periodNsec;
     }
@@ -310,12 +342,14 @@ void Executor::run() {
 
       // Spins all work which is in the queue for now and returns after.
       // New work will not be processed.
+      // TODO: Should this be done as the subscriberThread
       syncRosExecutor->spin_some();
       
       counter.tick();
       taskList.run();
-      if (mainTask != nullptr)
+      if (mainTask != nullptr) {
         mainTask->run();
+      }
       counter.tock();
     }
     
@@ -329,22 +363,23 @@ void Executor::run() {
 
       counter.tick();
       taskList.run();
-      if (mainTask != nullptr)
+      if (mainTask != nullptr) {
         mainTask->run();
+      }
       counter.tock();
       next_cycle += seconds(period);
     }
   }
 
   log.trace() << "stopping all threads";
-
-  for (auto &t: threads)
-    t->async.stop();
+  for (auto &thread: threads) {
+    thread->async.stop();
+  }
 
   log.trace() << "joining all threads";
-
-  for (auto &t: threads)
-    t->async.join();
+  for (auto &thread: threads) {
+    thread->async.join();
+  }
 
   log.trace() << "exiting executor " << " (thread " << getpid() << ":" << syscall(SYS_gettid) << ")";
 }

@@ -24,12 +24,12 @@ class RosPublisherDoubleArray : public RosPublisher<std_msgs::msg::Float64MultiA
    * Creates an instance of a publisher block which publishes a input signal 
    * of type Matrix<N,1,double> as a ROS message of type std_msgs::msg::Float64MultiArray::Type.
    * 
-   * @param node_name - name of this node
+   * @param node - The ROS Node as a SharedPtr
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    */ 
-  RosPublisherDoubleArray(const std::string& node_name, const std::string& topic, const uint32_t queueSize=1000) :
-    RosPublisher<TRosMsg, SigInType>(node_name, topic, queueSize) { }
+  RosPublisherDoubleArray(rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize=1000) :
+    RosPublisher<TRosMsg, SigInType>(node, topic, queueSize) { }
     
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -42,8 +42,8 @@ class RosPublisherDoubleArray : public RosPublisher<std_msgs::msg::Float64MultiA
    * @param msg - message content
    */
   void setRosMsg(TRosMsg& msg) {
-    if (this->in.isConnected()) {
-      auto val = this->in.getSignal().getValue();
+    if (this->getIn().isConnected()) {
+      auto val = this->getIn().getSignal().getValue();
       auto valTmpDouble = val.getColVector(0);
       msg.data = valTmpDouble;
     }

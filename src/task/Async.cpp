@@ -32,7 +32,9 @@ void Async::stop() {
 }
 
 void Async::join() {
-  if (thread.joinable()) thread.join();
+  if (thread.joinable()) {
+    thread.join();
+  }
 }
 
 void Async::run_thread() {
@@ -45,13 +47,14 @@ void Async::run_thread() {
     int priority = Executor::basePriority - nice;
     log.trace() << "starting realtime thread " << pid << ":" << tid << " with priority " << priority;
 
-    if (!Executor::set_priority(nice))
+    if (!Executor::set_priority(nice)) {
       log.error() << "could not set realtime priority";
+    }
 
-    if (!Executor::lock_memory())
+    if (!Executor::lock_memory()) {
       log.error() << "could not lock memory in RAM";
-  }
-  else {
+    }
+  } else {
     log.trace() << "starting thread " << pid << ":" << tid;
   }
 

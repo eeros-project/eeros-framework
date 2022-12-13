@@ -84,9 +84,8 @@ target_include_directories(eeros
 
                               $<INSTALL_INTERFACE:include>)
 
-                              
 set_target_properties(eeros PROPERTIES
-                        VERSION ${EEROS_VERSION})
+                            VERSION ${EEROS_VERSION})
 
 target_compile_options(eeros PRIVATE -g -Wall PUBLIC -pthread)
 target_compile_features(eeros PUBLIC cxx_std_17)

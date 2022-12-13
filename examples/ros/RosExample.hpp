@@ -24,14 +24,14 @@ using namespace eeros::logger;
 
 class MyControlSystem {
  public:
-  MyControlSystem(double ts)
+  MyControlSystem(const rclcpp::Node::SharedPtr node, double ts)
       : analogIn0("scanTimeIn0"), // argument has to match signalId of json
         digitalIn0("batteryPresent0"),
         analogOut0("scanTimeEchoOut0"),
         digitalOut0("batteryPresentEchoOut0"),       
-        laserScanIn ("rosExample", "/rosNodeTalker/TestTopic4", 100, false),
-        laserScanOut("rosExample", "/rosExample/TestTopic23", "laser", 100),
-        debugOut0("rosExample", "debugNode/debugOut0"),
+        laserScanIn (node, "/rosNodeTalker/TestTopic4", 100, false),
+        laserScanOut(node, "/rosExample/TestTopic23", "laser", 100),
+        debugOut0(node, "debugNode/debugOut0"),
         dt(ts),
         
         timedomain("Main time domain", dt, true) {

@@ -46,16 +46,15 @@ static uint64_t toNanoSec(const builtin_interfaces::msg::Time& time) {
 
 /**
  * Creates and initializes a ROS node. Checks if ROS master is up and running.
- * Returns false if no ROS master can be contacted.
+ * Returns a shared pointer to the ROS Node.
  * 
  * @param name - name of the ROS node
- * @param return true, if ROS master can be found
+ * @param return The ROS Node as a shared pointer
  */
-static bool initNode(std::string name) __attribute__((unused));
-static bool initNode(std::string name) {
+static rclcpp::Node::SharedPtr initNode(std::string name) __attribute__((unused));
+static rclcpp::Node::SharedPtr initNode(std::string name) {
   rclcpp::init(0, NULL);
-  auto n = rclcpp::Node::make_shared(name);
-  return rclcpp::ok();
+  return rclcpp::Node::make_shared(name);
 }
 
 }

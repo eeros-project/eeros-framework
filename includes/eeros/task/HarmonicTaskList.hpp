@@ -11,8 +11,8 @@ namespace eeros {
 		class HarmonicTaskList : public Runnable {
 		public:
 			virtual void run();
-			virtual void add(Runnable *t, int n = 1);
-			virtual void add(Runnable &t, int n = 1);
+			virtual void add(Runnable *task, int n = 1);
+			virtual void add(Runnable &task, int n = 1);
 			std::vector<Harmonic> tasks;
 		};
 

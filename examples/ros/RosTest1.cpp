@@ -22,17 +22,18 @@ using namespace eeros::hal;
 
 class ControlSystem {
 public:
-  ControlSystem(double dt)
+  ControlSystem(const rclcpp::Node::SharedPtr node, double dt)
       : c1({2.4, 0, 4.443, 23.6, -11.2, 1.3, 0.003}),
         c2(0.5),
-        vectorOut("rosExample", "/test/vector"),
-        doubleOut("rosExample", "/test/val"),
-        slOut("rosExample", "/test/safetyLevel"),
-        vectorIn("rosExample", "/rosNodeTalker/vector"),
-        doubleIn("rosExample", "/rosNodeTalker/val"),
-        timedomain("Main time domain", dt, true) {
+        vectorOut(node, "/test/vector"),
+        doubleOut(node, "/test/val"),
+        slOut(node, "/test/safetyLevel"),
+        vectorIn(node, "/rosNodeTalker/vector"),
+        doubleIn(node, "/rosNodeTalker/val"),
+        timedomain(node, "Main time domain", dt, true) {
     vectorOut.getIn().connect(c1.getOut());
     doubleOut.getIn().connect(c2.getOut());
+
     timedomain.addBlock(c1);
     timedomain.addBlock(c2);
     timedomain.addBlock(vectorOut);
@@ -45,18 +46,22 @@ public:
   
   typedef Matrix<7, 1, double> Vector7;
   Constant<Vector7> c1;
-  Constant<> c2;
-  RosPublisherDoubleArray<Vector7> vectorOut;	
-  RosPublisherDouble doubleOut;	
-  RosPublisherSafetyLevel slOut;	
-  RosSubscriberDoubleArray<Vector2> vectorIn;	
+  Constant<double> c2;
+  RosPublisherDoubleArray<Vector7> vectorOut;
+  RosPublisherDouble doubleOut;
+  RosPublisherSafetyLevel slOut;
+  RosSubscriberDoubleArray<Vector2> vectorIn;
   RosSubscriberDouble doubleIn;
   TimeDomain timedomain;
 };
 
 class ROSTestSafetyProperties : public SafetyProperties {
  public:
-  ROSTestSafetyProperties(ControlSystem& cs) : slOne("one"), slTwo("two"), se("change"), log(Logger::getLogger()) {
+  ROSTestSafetyProperties(ControlSystem& cs)
+      : slOne("one"),
+        slTwo("two"),
+        se("change"),
+        log(Logger::getLogger()) {
     addLevel(slOne);
     addLevel(slTwo);
     slOne.addEvent(se, slTwo, kPrivateEvent);
@@ -104,20 +109,24 @@ int main(int argc, char **argv) {
 
   Logger::setDefaultStreamLogger(std::cout);
   Logger log = Logger::getLogger();
+  log.show(LogLevel::TRACE);
   log.info() << "ROS Test1 started";
 
-  if (rosTools::initNode("eerosNode")) log.info() << "ROS node initialized";
+  auto node = rosTools::initNode("eerosNode");
+  if (node != nullptr) {
+    log.info() << "ROS node initialized: " << node->get_name();
+  }
      
-  ControlSystem controlSystem(dt);
+  ControlSystem controlSystem(node, dt);
   ROSTestSafetyProperties safetyProperties(controlSystem);
   SafetySystem safetySystem(safetyProperties, dt);
   controlSystem.slOut.setSafetySystem(safetySystem);
   
-  signal(SIGINT, signalHandler);	
-  auto &executor = Executor::instance();
+  signal(SIGINT, signalHandler);
+  auto executor = Executor::instance();
   executor.setMainTask(safetySystem);
   executor.run();
-  
+
   log.info() << "ROS Test1 end";
   return 0;
 }

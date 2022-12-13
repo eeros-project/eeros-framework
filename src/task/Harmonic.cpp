@@ -2,20 +2,19 @@
 
 using namespace eeros::task;
 
-
 Harmonic::Harmonic(Runnable &task, int n) :
-	n(n), k(0), task(&task) { }
+  n(n), k(0), task(&task) { }
 
 Harmonic::Harmonic(Runnable *task, int n) :
-	n(n), k(0), task(task) { }
+  n(n), k(0), task(task) { }
 
 eeros::Runnable * Harmonic::getTask() {
-	return task;
+  return task;
 }
 
 void Harmonic::run() {
-	if (++k >= n) {
-		task->run();
-		k = 0;
-	}
+  if (++k >= n) {
+    task->run();
+    k = 0;
+  }
 }

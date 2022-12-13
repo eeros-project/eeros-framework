@@ -2,6 +2,7 @@
 #define ORG_EEROS_CONTROL_CONSTANT_HPP_
 
 #include <type_traits>
+#include <iostream>
 #include <mutex>
 #include <eeros/control/Blockio.hpp>
 #include <eeros/core/System.hpp>
@@ -51,7 +52,7 @@ class Constant : public Blockio<0,1,T> {
     this->out.getSignal().setValue(value);
     this->out.getSignal().setTimestamp(System::getTimeNs());
   }
-  
+
   /**
    * Set the value of a constant block to newValue.
    *

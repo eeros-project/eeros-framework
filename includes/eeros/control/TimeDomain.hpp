@@ -3,6 +3,7 @@
 
 #include <list>
 #include <string>
+#include <rclcpp/rclcpp.hpp>
 #include <eeros/core/Runnable.hpp>
 #include <eeros/control/NotConnectedFault.hpp>
 #include <eeros/control/NaNOutputFault.hpp>
@@ -34,7 +35,17 @@ class TimeDomain : public virtual Runnable {
    * @param realtime - when true, executor creates a realtime thread if available by the system 
    */
   TimeDomain(std::string name, double period, bool realtime);
-  
+
+  /**
+   * Constructs a timedomain.
+   *
+   * @param node - The ROS Node as a SharedPtr
+   * @param name - name
+   * @param period - periodicity of the execution
+   * @param realtime - when true, executor creates a realtime thread if available by the system
+   */
+  TimeDomain(const rclcpp::Node::SharedPtr node, std::string name, double period, bool realtime);
+
   /**
    * Adds a block to a time domain.
    *
@@ -120,6 +131,7 @@ class TimeDomain : public virtual Runnable {
   friend std::ostream& operator<<(std::ostream& os, TimeDomain& td);
   
  private:
+  rclcpp::Node::SharedPtr handle;
   std::string name;
   double period;
   bool realtime;

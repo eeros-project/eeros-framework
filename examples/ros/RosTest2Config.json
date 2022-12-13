@@ -6,30 +6,38 @@
 			"type": "AnalogOut",
 			"channel0": {
 				"signalId": "doubleOut",
-				"scale": [ { "id" : "dac",
-								"scale":	1,
-								"offset":	0.0	}
-					 ],
-				"range": [ { "id" : "dac",
-							"minIn":	-9e99,  	"maxIn": 	9e99,
-							"minOut":	-9e99,	"maxOut": 	9e99 }
-					 ],
+				"scale": [ {
+					"id" : "dac",
+					"scale": 1,
+					"offset": 0.0
+					}],
+				"range": [{
+					"id" : "dac",
+					"minIn":  -9e99,
+					"maxIn":   9e99,
+					"minOut": -9e99,
+					"maxOut":  9e99
+				}],
 				"unit": "V",
 				"additionalArguments": "topic=/test/val; msgType=std_msgs::Float64"
 			}
-		},		
+		},
 		"subdevice1": {
 			"type": "AnalogIn",
 			"channel0": {
 				"signalId": "doubleIn",
-				"scale": [ { "id" : "adc",
-								"scale":	1,
-								"offset":	0.0	}
-					 ],
-				"range": [ { "id" : "adc",
-							"minIn":	-9e99,  "maxIn": 	9e99,
-							"minOut":	-9e99,	"maxOut": 	9e99 }
-					 ],
+				"scale": [{
+					"id" : "adc",
+					"scale": 1,
+					"offset": 0.0
+				}],
+				"range": [{
+					"id" : "adc",
+					"minIn":  -9e99,
+					"maxIn":   9e99,
+					"minOut": -9e99,
+					"maxOut":  9e99
+				}],
 				"unit": "V",
 				"additionalArguments": "topic=/rosNodeTalker/val; msgType=std_msgs::Float64"
 			}

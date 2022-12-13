@@ -29,13 +29,13 @@ class RosSubscriberDoubleArray : public RosSubscriber<std_msgs::msg::Float64Mult
    * processes all pending messages.
    * If no ROS master can be found, the block does not do anything.
    * 
-   * @param node_name - name of this node
+   * @param node - ROS Node as a SharedPtr
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    * @param callNewest - set to true if all pending messages should be processed
    */
-  RosSubscriberDoubleArray(const std::string& node_name, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false )
-      : RosSubscriber<TRosMsg, SigOutType>(node_name, topic, queueSize, callNewest) { }
+  RosSubscriberDoubleArray(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false )
+      : RosSubscriber<TRosMsg, SigOutType>(node, topic, queueSize, callNewest) { }
     
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.

@@ -102,6 +102,15 @@ class Executor : public Runnable {
 #ifdef USE_ROS
   void syncWithRosTime();
   void syncWithRosTopic(rclcpp::Executor::SharedPtr syncRosExecutor);
+
+  rclcpp::CallbackGroup::SharedPtr registerSubscriberNode(rclcpp::Node::SharedPtr node) {
+    if (subscriberExecutor == nullptr) {
+      subscriberExecutor = rclcpp::executors::MultiThreadedExecutor::make_shared();
+    }
+    auto callback_group = node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+    subscriberExecutor->add_callback_group(callback_group, node->get_node_base_interface());
+    return callback_group;
+  }
 #endif
 
  private:
@@ -116,6 +125,8 @@ class Executor : public Runnable {
   logger::Logger log;
 #ifdef USE_ROS
   rclcpp::Executor::SharedPtr syncRosExecutor;
+  rclcpp::Executor::SharedPtr subscriberExecutor;
+  std::shared_ptr<std::thread> subscriberThread;
 #endif
 #ifdef USE_ETHERCAT
   ecmasterlib::EcMasterlibMain* etherCATStack;

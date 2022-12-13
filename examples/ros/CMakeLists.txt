@@ -36,6 +36,10 @@ if (roslib_FOUND AND USE_ROS)
   target_link_libraries(rosTest2 eeros ${EEROS_LIBS} ${ROS_LIBRARIES}  ${MSG_LIBRARIES})
   list(APPEND targets rosTest2)
 
+  add_executable(eerosRosTest eerosRosTest.cpp)
+  target_link_libraries(eerosRosTest eeros ${EEROS_LIBS} ${ROS_LIBRARIES}  ${MSG_LIBRARIES})
+  list(APPEND targets eerosRosTest)
+
   if(INSTALL_EXAMPLES)
     install(TARGETS ${targets} RUNTIME DESTINATION examples/ros)
     install(FILES ${files} DESTINATION examples/ros)

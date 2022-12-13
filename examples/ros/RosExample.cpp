@@ -16,7 +16,7 @@ void signalHandler(int signum) {
   Executor::stop();
 }
 
-// This callback function is only needed, if you want to sync the executor with a gazebo simulation
+// This callback function is only needed, if you want to sync the executor with a subscriber
 // void callback(const sensor_msgs::JointState::Type){
 // 	std::cout << "callback" << std::endl;
 // };
@@ -38,18 +38,18 @@ int main(int argc, char **argv) {
   // "builtin_interfaces::msg::Time::now()" is used to get system time
   System::useRosTime();
   
-  // This part only needed, if you want to sync the executor with a gazebo simulation
+  // This part only needed, if you want to sync the executor with a subscriber
   //rclcpp::CallbackGroup::SharedPtr callback_group = node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
   //auto subscriber = node->create_subscription<...>(topic, queueSize, std::bind(&RosExample::ros_callback, this, _1));
     
-  MyControlSystem controlSystem(dt);
+  MyControlSystem controlSystem(node, dt);
   MySafetyProperties safetyProperties(controlSystem);
   SafetySystem safetySystem(safetyProperties, dt);
   
   signal(SIGINT, signalHandler);	
   auto& executor = Executor::instance();
   executor.setMainTask(safetySystem);
-  //executor.syncWithRosTopic(callback_group);	// sync with gazebo simulation
+  //executor.syncWithRosTopic(callback_group);	// sync with own subscriber
   executor.run();
 
   log.info() << "ROS example end";	

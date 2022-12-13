@@ -18,8 +18,8 @@ class RosSubscriberLaserScan : public RosSubscriber<sensor_msgs::msg::LaserScan:
   // A-2 Define the type of the ROS message
   typedef sensor_msgs::msg::LaserScan::Type TRosMsg;
  public:
-  RosSubscriberLaserScan(const std::string& node_name, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false ) :
-    RosSubscriber<TRosMsg, double>(node_name, topic, queueSize, callNewest){ }
+  RosSubscriberLaserScan(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false ) :
+    RosSubscriber<TRosMsg, double>(node, topic, queueSize, callNewest){ }
     
   void rosCallbackFct(const TRosMsg& msg) {
     // B-3 Set the timestamp of all EEROS signals

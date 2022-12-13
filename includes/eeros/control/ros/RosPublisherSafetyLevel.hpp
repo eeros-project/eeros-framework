@@ -26,16 +26,17 @@ class RosPublisherSafetyLevel : public Block {
   /**
    * Creates an instance of a publisher block which publishes the safety level.
    * 
-   * @param node_name - name of this node
+   * @param node - nThe ROS Node as a SharedPtr
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    */ 
-  RosPublisherSafetyLevel(const std::string& node_name, const std::string& topic, const uint32_t queueSize=1000)
-      : topic(topic) {
+  RosPublisherSafetyLevel(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize=1000)
+      : handle(node),
+        topic(topic),
+        log(logger::Logger::getLogger()) {
     if (rclcpp::ok()) {
-      handle = rclcpp::Node::make_shared(node_name);
       publisher = handle->create_publisher<TRosMsg>(topic, queueSize);
-      RCLCPP_DEBUG_STREAM(handle->get_logger(), "RosPublisherSafetyLevel, reading from topic: '" << topic << "' on node '" << node_name << "' created.");
+      log.trace() << "RosPublisherSafetyLevel, reading from topic: '" << topic << "' on node '" << node->get_name() << "' created.";
       running = true;
     }
   }
@@ -65,6 +66,11 @@ class RosPublisherSafetyLevel : public Block {
       publisher->publish(msg);
     }
   }
+
+  /**
+   * This logger is used to put out information about the safety system
+   */
+  logger::Logger log;
   
   protected:
     rclcpp::Node::SharedPtr handle;

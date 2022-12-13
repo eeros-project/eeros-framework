@@ -2,11 +2,13 @@
 #define ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
-#include <rclcpp/logging.hpp>
-#include <eeros/control/Block1o.hpp>
+#include <eeros/control/Blockio.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
+#include <eeros/core/Executor.hpp>
 #include <eeros/math/Matrix.hpp>
+#include <eeros/logger/Logger.hpp>
+#include <eeros/logger/LogWriter.hpp>
 
 namespace eeros {
 namespace control {
@@ -21,7 +23,7 @@ namespace control {
  * @since v1.0
  */
 template < typename TRosMsg, typename SigOutType >
-class RosSubscriber : public Block1o<SigOutType> {
+class RosSubscriber : public Blockio<0, 1, SigOutType> {
  public:
   /**
    * Creates an instance of a ROS subscriber block. The block reads
@@ -31,17 +33,20 @@ class RosSubscriber : public Block1o<SigOutType> {
    * processes all pending messages.
    * If no ROS master can be found, the block does not do anything.
    * 
-   * @param node_name - name of this node
+   * @param node - ROS Node as a SharedPtr
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
-   * @param callNewest - set to true if all pending messages should be processed
+   * @param callNewest - not used anymore
    */
-  RosSubscriber(const std::string& node_name, const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false)
-      : topic(topic), callNewest(callNewest) {
+  RosSubscriber(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize=1000, bool callNewest=false)
+      : handle(node),
+        topic(topic),
+        log(logger::Logger::getLogger()) {
     if (rclcpp::ok()) {
-      handle = rclcpp::Node::make_shared(node_name);
-      subscriber = handle->create_subscription<TRosMsg>(topic, queueSize, std::bind(&RosSubscriber::rosCallbackFct, this, _1));
-      RCLCPP_DEBUG_STREAM(handle->get_logger(), "RosBlockSubscriber, reading from topic: '" << topic << "' on node '" << node_name << "' created.");
+      rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> options;
+      options.callback_group = Executor::instance().registerSubscriberNode(handle);
+      subscriber = handle->create_subscription<TRosMsg>(topic, queueSize, std::bind(&RosSubscriber::rosCallbackFct, this, _1), options);
+      log.info() << "RosBlockSubscriber, reading from topic: '" << topic << "' on node '" << node->get_name() << "' created.";
       running = true;
     }
   }
@@ -76,16 +81,21 @@ class RosSubscriber : public Block1o<SigOutType> {
    * This method will be executed whenever the block runs.
    */
   virtual void run() {
-    if (running) {  
-      if (callNewest) {
+    if (running) {
+      /*if (callNewest) {
         // calls callback fct. for all available messages.
-        rclcpp::spin_some(handle);
+        //Executor::instance().spin_some();
       } else {
         // calls callback fct. only for the oldest message
-        rclcpp::spin(handle);
-      }
+        //Executor::instance().spin();
+      }*/
     }
   }
+
+  /**
+   * This logger is used to put out information about the safety system
+   */
+  logger::Logger log;
 
  protected:
   rclcpp::Node::SharedPtr handle;

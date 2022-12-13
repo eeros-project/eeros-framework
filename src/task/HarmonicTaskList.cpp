@@ -2,16 +2,16 @@
 
 using namespace eeros::task;
 
-
 void HarmonicTaskList::run() {
-	for (auto &t: tasks)
-		t.run();
+  for (auto &task: tasks) {
+    task.run();
+  }
 }
 
-void HarmonicTaskList::add(Runnable *t, int n) {
-	tasks.push_back(Harmonic(t, n));
+void HarmonicTaskList::add(Runnable *task, int n) {
+  tasks.push_back(Harmonic(task, n));
 }
 
-void HarmonicTaskList::add(Runnable &t, int n) {
-	tasks.push_back(Harmonic(t, n));
+void HarmonicTaskList::add(Runnable &task, int n) {
+  tasks.push_back(Harmonic(task, n));
 }
