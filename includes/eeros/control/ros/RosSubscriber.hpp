@@ -1,6 +1,9 @@
 #ifndef ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_
 #define ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_
 
+#include <deque>
+#include <thread>
+
 #include <rclcpp/rclcpp.hpp>
 #include <eeros/control/Blockio.hpp>
 #include <eeros/control/Output.hpp>
@@ -45,10 +48,19 @@ class RosSubscriber : public Blockio<0, 1, SigOutType> {
     if (rclcpp::ok()) {
       rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> options;
       options.callback_group = Executor::instance().registerSubscriberNode(handle);
-      subscriber = handle->create_subscription<TRosMsg>(topic, queueSize, std::bind(&RosSubscriber::rosCallbackFct, this, _1), options);
+      subscriber = handle->create_subscription<TRosMsg>(topic, queueSize, std::bind(&RosSubscriber::rosSubscriberCallback, this, _1), options);
       log.info() << "RosBlockSubscriber, reading from topic: '" << topic << "' on node '" << node->get_name() << "' created.";
       running = true;
     }
+  }
+
+  /**
+   * This is the callback which is called on every message the subscriber receives.
+   * The queue is afterwards worked by the run method which is called form the EEROS-Executor.
+   */
+  void rosSubscriberCallback(const TRosMsg& msg) {
+    std::lock_guard<std::mutex> lock(queue_mutex);
+    queue.push_back(std::move(msg));
   }
 
   /**
@@ -81,14 +93,21 @@ class RosSubscriber : public Blockio<0, 1, SigOutType> {
    * This method will be executed whenever the block runs.
    */
   virtual void run() {
-    if (running) {
-      /*if (callNewest) {
-        // calls callback fct. for all available messages.
-        //Executor::instance().spin_some();
+    if (running && !queue.empty()) {
+      std::lock_guard<std::mutex> lock(queue_mutex);
+      if (callNewest) {
+        // Calls callback function for all available messages.
+        // TODO: Check if this is really for all Messages or if the newest one would be enough
+        for (auto msg : queue) {
+          rosCallbackFct(msg);
+        }
+        queue.clear();
       } else {
-        // calls callback fct. only for the oldest message
-        //Executor::instance().spin();
-      }*/
+        // Calls callback function only for the oldest message.
+        TRosMsg msg = std::move(queue.front());
+        rosCallbackFct(msg);
+        queue.pop_front();
+      }
     }
   }
 
@@ -103,6 +122,10 @@ class RosSubscriber : public Blockio<0, 1, SigOutType> {
   const std::string& topic;
   bool callNewest;
   bool running = false;
+
+  // Thread-Safe Queue which is filled from ROS::Executor and handled by the EEROS::Executor on each run
+  std::deque<TRosMsg> queue;
+  std::mutex queue_mutex;
 };
 
 }

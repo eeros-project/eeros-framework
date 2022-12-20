@@ -183,15 +183,17 @@ bool Executor::set_priority(int nice) {
 void Executor::stop() {
   running = false;
   auto &instance = Executor::instance();
-    (void)instance;
+  (void)instance;
 #ifdef USE_ETHERCAT
-  if(instance.etherCATStack) {
+  if (instance.etherCATStack) {
     instance.etherCATStack->stop();
   }
 #endif
 #ifdef USE_ROS
   rclcpp::shutdown();
-  instance.subscriberThread->join();
+  if (instance.subscriberThread != nullptr) {
+    instance.subscriberThread->join();
+  }
 #endif
 }
 
@@ -296,9 +298,11 @@ void Executor::run() {
 #endif
 #ifdef USE_ROS
   // Starts spinning subscribers in an own thread to not block the program
-  subscriberThread = std::make_shared<std::thread>([this](){
-    subscriberExecutor->spin();
-  });
+  if (subscriberExecutor != nullptr) {
+    subscriberThread = std::make_shared<std::thread>([this]() {
+        subscriberExecutor->spin();
+    });
+  }
 
   if (syncWithRosTimeIsSet) {
     log.trace() << "starting execution synced to rosTime";
@@ -333,6 +337,9 @@ void Executor::run() {
     auto timeOld = eeros::System::getTimeNs();
     auto timeNew = eeros::System::getTimeNs();
     while (running) {
+      // TODO: Do this the same way as the RosSubscriber but trigger the run method on every message
+      //       Probably register a callback funrcion in here?
+
       // waits for new rosTime beeing published
       while ((timeOld == timeNew) && running && !syncRosExecutor->is_spinning()) {
         usleep(10);
