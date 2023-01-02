@@ -39,17 +39,20 @@ class RosSubscriber : public Blockio<0, 1, SigOutType> {
    * @param node - ROS Node as a SharedPtr
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
-   * @param callNewest - not used anymore
+   * @param callNewest - Should all waiting messages be processed (true) or only the oldest single one (false)
+   * @param syncWithTopic - If set, this RosSubscriber (actually the ROS-Topic) is the master clock generator
    */
-  RosSubscriber(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize=1000, bool callNewest=false)
+  RosSubscriber(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize=1000, bool callNewest=false, bool syncWithTopic=false)
       : handle(node),
         topic(topic),
+        callNewest(callNewest),
+        syncWithTopic(syncWithTopic),
         log(logger::Logger::getLogger()) {
     if (rclcpp::ok()) {
       rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> options;
-      options.callback_group = Executor::instance().registerSubscriberNode(handle);
+      options.callback_group = Executor::instance().registerSubscriber(handle, syncWithTopic);
       subscriber = handle->create_subscription<TRosMsg>(topic, queueSize, std::bind(&RosSubscriber::rosSubscriberCallback, this, _1), options);
-      log.info() << "RosBlockSubscriber, reading from topic: '" << topic << "' on node '" << node->get_name() << "' created.";
+      log.info() << "RosSubscriber, reading from topic: '" << topic << "' on node '" << node->get_name() << "' created.";
       running = true;
     }
   }
@@ -61,6 +64,9 @@ class RosSubscriber : public Blockio<0, 1, SigOutType> {
   void rosSubscriberCallback(const TRosMsg& msg) {
     std::lock_guard<std::mutex> lock(queue_mutex);
     queue.push_back(std::move(msg));
+    if (syncWithTopic) {
+      Executor::instance().processTasks();
+    }
   }
 
   /**
@@ -91,23 +97,20 @@ class RosSubscriber : public Blockio<0, 1, SigOutType> {
 
   /**
    * This method will be executed whenever the block runs.
+   * Calls the callback function for only the newest message or for all available.
    */
   virtual void run() {
     if (running && !queue.empty()) {
       std::lock_guard<std::mutex> lock(queue_mutex);
       if (callNewest) {
-        // Calls callback function for all available messages.
-        // TODO: Check if this is really for all Messages or if the newest one would be enough
+        TRosMsg msg = std::move(queue.back());
+        rosCallbackFct(msg);
+      } else {
         for (auto msg : queue) {
           rosCallbackFct(msg);
         }
-        queue.clear();
-      } else {
-        // Calls callback function only for the oldest message.
-        TRosMsg msg = std::move(queue.front());
-        rosCallbackFct(msg);
-        queue.pop_front();
       }
+      queue.clear();
     }
   }
 
@@ -121,6 +124,7 @@ class RosSubscriber : public Blockio<0, 1, SigOutType> {
   typename rclcpp::Subscription<TRosMsg>::SharedPtr subscriber;
   const std::string& topic;
   bool callNewest;
+  bool syncWithTopic;
   bool running = false;
 
   // Thread-Safe Queue which is filled from ROS::Executor and handled by the EEROS::Executor on each run

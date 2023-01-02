@@ -123,9 +123,8 @@ int main(int argc, char **argv) {
   controlSystem.slOut.setSafetySystem(safetySystem);
   
   signal(SIGINT, signalHandler);
-  auto executor = Executor::instance();
-  executor.setMainTask(safetySystem);
-  executor.run();
+  Executor::instance().setMainTask(safetySystem);
+  Executor::instance().run();
 
   log.info() << "ROS Test1 end";
   return 0;

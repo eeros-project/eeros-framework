@@ -6,6 +6,7 @@
 
 #include <eeros/core/Runnable.hpp>
 #include <eeros/core/PeriodicCounter.hpp>
+#include <eeros/task/HarmonicTaskList.hpp>
 #include <eeros/task/Periodic.hpp>
 #include <eeros/logger/Logger.hpp>
 
@@ -16,7 +17,6 @@
 #ifdef USE_ROS
 #include <rclcpp/rclcpp.hpp>
 #endif
-
 
 namespace eeros {
 
@@ -40,8 +40,18 @@ namespace safety {
 class Executor : public Runnable {
  public:
   virtual ~Executor();
+
+  /**
+   * Get the main Executor-Instance as a singleton
+   */
   static Executor& instance();
-  
+
+  /**
+   * Copy and Assignemt for a singletone is disabled
+   */
+  Executor(Executor const&) = delete;
+  void operator=(Executor const&) = delete;
+
   /**
    * Set the main task.
    * 
@@ -87,7 +97,15 @@ class Executor : public Runnable {
    * @param timedomain - timedomain
    */
   void add(control::TimeDomain &timedomain);
-  
+
+  /**
+   * This method should be called to process all blocks.
+   * Do not call this method manually, it's used internally and from the RosSubscriber
+   *
+   * TODO: Find a way to make this private but use it from the RosSubscriber anyway.
+   */
+  void processTasks();
+
   virtual void run();
 
   static void prefault_stack();
@@ -101,30 +119,24 @@ class Executor : public Runnable {
 #endif
 #ifdef USE_ROS
   void syncWithRosTime();
-  void syncWithRosTopic(rclcpp::Executor::SharedPtr syncRosExecutor);
-
-  rclcpp::CallbackGroup::SharedPtr registerSubscriberNode(rclcpp::Node::SharedPtr node) {
-    if (subscriberExecutor == nullptr) {
-      subscriberExecutor = rclcpp::executors::MultiThreadedExecutor::make_shared();
-    }
-    auto callback_group = node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
-    subscriberExecutor->add_callback_group(callback_group, node->get_node_base_interface());
-    return callback_group;
-  }
+  rclcpp::CallbackGroup::SharedPtr registerSubscriber(rclcpp::Node::SharedPtr node, const bool sync = false);
 #endif
 
  private:
   Executor();
   void assignPriorities();
+
   double period;
   task::Periodic* mainTask;
   std::vector<task::Periodic> tasks;
+  task::HarmonicTaskList taskList;
+
   bool syncWithEtherCatStackIsSet;
   bool syncWithRosTimeIsSet;
   bool syncWithRosTopicIsSet;
+  bool running = false;
   logger::Logger log;
 #ifdef USE_ROS
-  rclcpp::Executor::SharedPtr syncRosExecutor;
   rclcpp::Executor::SharedPtr subscriberExecutor;
   std::shared_ptr<std::thread> subscriberThread;
 #endif
