@@ -1,4 +1,3 @@
-
 macro(add_eeros_sources)
     file(RELATIVE_PATH _relPath "${PROJECT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
     foreach(_src ${ARGN})

@@ -14,7 +14,7 @@
 #endif
 
 #ifdef USE_ROS
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #endif
 
 
@@ -40,7 +40,19 @@ namespace safety {
 class Executor : public Runnable {
  public:
   virtual ~Executor();
+
+  /**
+   * Get the main executor instance as a singleton
+   */
   static Executor& instance();
+
+
+  /**
+   * Copy and assignemt for a singleton is disabled
+   */
+  Executor(Executor const&) = delete;
+  void operator=(Executor const&) = delete;
+
   
   /**
    * Set the main task.
@@ -101,8 +113,8 @@ class Executor : public Runnable {
 #endif
 #ifdef USE_ROS
   void syncWithRosTime();
-  void syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue);
-  ros::CallbackQueue* syncRosCallbackQueue;
+//   void syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue);
+//   ros::CallbackQueue* syncRosCallbackQueue;
 #endif
 
  private:
@@ -111,9 +123,10 @@ class Executor : public Runnable {
   double period;
   task::Periodic* mainTask;
   std::vector<task::Periodic> tasks;
-  bool syncWithEtherCatStackIsSet;
-  bool syncWithRosTimeIsSet;
-  bool syncWithRosTopicIsSet;
+  bool syncWithEtherCatStackSet;
+  bool syncWithRosTimeSet;
+  bool syncWithRosTopicSet;
+  bool running = true;
   logger::Logger log;
 #ifdef USE_ETHERCAT
   ecmasterlib::EcMasterlibMain* etherCATStack;

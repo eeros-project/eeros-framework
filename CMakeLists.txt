@@ -75,7 +75,7 @@ add_subdirectory(src) # EEROS framework
 
 add_library(eeros SHARED ${EEROS_SRCS})
 
-# include the eeros headers + eeros/config.cpp generateed earlier
+# include the eeros headers + eeros/config.cpp generated earlier
 # There is probably a better way to do this (config.hpp) and ideally the headers should be part of the project sources anyway
 target_include_directories(eeros
                             PUBLIC 
@@ -85,8 +85,7 @@ target_include_directories(eeros
                               $<INSTALL_INTERFACE:include>)
 
                               
-set_target_properties(eeros PROPERTIES
-                        VERSION ${EEROS_VERSION})
+set_target_properties(eeros PROPERTIES VERSION ${EEROS_VERSION})
 
 target_compile_options(eeros PRIVATE -g -Wall PUBLIC -pthread)
 target_compile_features(eeros PUBLIC cxx_std_17)
@@ -130,23 +129,20 @@ find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 if(LIBCURSES)
   message(STATUS "-> libcurses available")
   target_link_libraries(eeros PRIVATE ncurses)
-
+  message(STATUS "")
 endif()
 
-## Use Find package ecmasterlib (EtherCAT) if found
-message(STATUS "--")
-message(STATUS "**********************************")
-message(STATUS "EtherCAT")
-message(STATUS "**********************************")
-find_package(ecmasterlib QUIET)
-
+## Use EtherCAT if instructed
 if (USE_ETHERCAT)
-  message(STATUS "--> EtherCAT will be used")
+  message(STATUS "")
+  message(STATUS "**********************************")
+  message(STATUS "EtherCAT will be used")
+  message(STATUS "**********************************")
   find_package(ecmasterlib REQUIRED)
   target_link_libraries(eeros PUBLIC ecmasterlib)
   target_compile_definitions(eeros PUBLIC USE_ETHERCAT EEROS_ETHERCAT)
+  message(STATUS "")
 endif()
-
 
 # TODO: update for target based configuration
 
@@ -233,14 +229,16 @@ endif()
 
 
 ## Use ROS if found and instructed
+message(STATUS "**********************************")
 message(STATUS "ROS")
 message(STATUS "**********************************")
-message( STATUS "ROS_ROOT: " $ENV{ROS_ROOT} )
-find_package( roslib QUIET )
-
-if (roslib_FOUND AND USE_ROS)
-  message( STATUS "--> ROS will be used")
-#    set( ROS_FOUND true)
+if (USE_ROS)
+  find_package(roslib REQUIRED)
+  if (roslib_FOUND)
+    message(STATUS "--> 'ROS' is found, ROS examples will be built.")
+  else()
+    message(FATAL_ERROR "ERROR: ROS is not installed or setup.bash (for ROS) was not executed.")
+  endif()
   include_directories( "${roslib_INCLUDE_DIRS}" )
   list(APPEND ROS_LIBRARIES "${roslib_LIBRARIES}")
   find_package( rosconsole QUIET)
@@ -248,20 +246,36 @@ if (roslib_FOUND AND USE_ROS)
   find_package( roscpp QUIET )
   list(APPEND ROS_LIBRARIES "${roscpp_LIBRARIES}")
   list(APPEND EXTERNAL_LIBS "${ROS_LIBRARIES}")
+  target_link_libraries(eeros PRIVATE ${roslib_LIBRARIES})
   add_definitions(-DUSE_ROS)
-endif (roslib_FOUND AND USE_ROS)
-
-if (NOT roslib_FOUND AND USE_ROS)
-  message( FATAL_ERROR "ERROR: ROS should be used but could not be found. ROS may be not installed or setup.bash (for ROS) was not executed.")
-endif (NOT roslib_FOUND AND USE_ROS)
-
-if (roslib_FOUND AND NOT USE_ROS)
-  message(STATUS "--> ROS is installed, but ROS will NOT be used. You may want to use the -DUSE_ROS switch with cmake.")
-endif (roslib_FOUND AND NOT USE_ROS)
-
-if (NOT roslib_FOUND AND NOT USE_ROS)
-  message(STATUS "--> ROS is NOT  installed. ROS will NOT be used.")
-endif (NOT roslib_FOUND AND NOT USE_ROS)
+elseif (USE_ROS2)
+  find_package(rclcpp REQUIRED)
+  if (rclcpp_FOUND)
+    message(STATUS "--> 'ROS2' is found, ROS2 examples will be built.")
+  else()
+    message(FATAL_ERROR "ERROR: ROS is not installed or setup.bash (for ROS) was not executed.")
+  endif()
+  find_package(rosconsole QUIET)
+  list(APPEND ROS_LIBRARIES "${rosconsole_LIBRARIES}")
+  include_directories(${rclcpp_INCLUDE_DIRS})
+  list(APPEND ROS_LIBRARIES "${rclcpp_LIBRARIES}")
+  find_package(rcl_interfaces REQUIRED)
+  include_directories(${rcl_interfaces_INCLUDE_DIRS})
+  list(APPEND ROS_LIBRARIES "${rcl_interfaces_LIBRARIES}")
+  find_package(std_msgs REQUIRED)
+  include_directories(${std_msgs_INCLUDE_DIRS})
+  list(APPEND ROS_LIBRARIES ${std_msgs_LIBRARIES})
+  find_package( sensor_msgs REQUIRED )
+  include_directories(${sensor_msgs_INCLUDE_DIRS})
+  list(APPEND ROS_LIBRARIES ${sensor_msgs_LIBRARIES})
+  target_link_libraries(eeros PRIVATE ${rclcpp_LIBRARIES} ${rcl_interfaces_LIBRARIES})
+  add_definitions(-DUSE_ROS2)
+else()
+  message(STATUS "--> ROS will not be used. You may want to use the -DUSE_ROS or -DUSE_ROS2 switch with cmake.")
+endif (USE_ROS)
+if (USE_ROS AND USE_ROS2)
+  message(STATUS "--> You cannot use ROS and ROS2 together. Either use -DUSE_ROS or -DUSE_ROS2 switch with cmake.")
+endif ()
 message(STATUS "")
 
 

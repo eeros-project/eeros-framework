@@ -17,12 +17,10 @@
 #include <eeros/task/HarmonicTaskList.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/safety/SafetySystem.hpp>
-#ifdef USE_ROS
-#include <ros/callback_queue_interface.h>
-#include <ros/callback_queue.h>
-#endif
-
-volatile bool running = true;
+// #ifdef USE_ROS
+// #include <ros/callback_queue_interface.h>
+// #include <ros/callback_queue.h>
+// #endif
 
 using namespace eeros;
 
@@ -95,8 +93,8 @@ void createThread(Logger &log, task::Periodic &task, task::Periodic &baseTask, s
 }
 
 Executor::Executor() 
-    : period(0), mainTask(nullptr), syncWithEtherCatStackIsSet(false), 
-      syncWithRosTimeIsSet(false), syncWithRosTopicIsSet(false), 
+    : period(0), mainTask(nullptr), syncWithEtherCatStackSet(false),
+      syncWithRosTimeSet(false), syncWithRosTopicSet(false),
       log(logger::Logger::getLogger('E')) { }
 
 Executor::~Executor() { }
@@ -109,7 +107,7 @@ Executor& Executor::instance() {
 
 #ifdef USE_ETHERCAT
 void Executor::syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack) {
-  syncWithEtherCatStackIsSet = true;
+  syncWithEtherCatStackSet = true;
   this->etherCATStack = etherCATStack;
 }
 #endif
@@ -170,9 +168,8 @@ bool Executor::set_priority(int nice) {
 }
 
 void Executor::stop() {
-  running = false;
   auto &instance = Executor::instance();
-    (void)instance;
+  instance.running = false;
 #ifdef USE_ETHERCAT
   if(instance.etherCATStack) instance.etherCATStack->stop();
 #endif
@@ -180,15 +177,16 @@ void Executor::stop() {
 
 #ifdef USE_ROS
 void Executor::syncWithRosTime() {
-  syncWithRosTimeIsSet = true;
+  syncWithRosTimeSet = true;
+  eeros::System::useRosTime();
 }
 
-void Executor::syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue)
-{
-  std::cout << "sync executor with gazebo" << std::endl;
-  syncWithRosTopicIsSet = true;
-  this->syncRosCallbackQueue = syncRosCallbackQueue;
-}
+// void Executor::syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue)
+// {
+//   std::cout << "sync executor with gazebo" << std::endl;
+//   syncWithRosTopicIsSet = true;
+//   this->syncRosCallbackQueue = syncRosCallbackQueue;
+// }
 #endif
 
 void Executor::assignPriorities() {
@@ -253,14 +251,13 @@ void Executor::run() {
   if (!lock_memory())
     log.error() << "could not lock memory in RAM";
 
-  bool useDefaultExecutor = true;
+  running = true;
+
 #ifdef USE_ETHERCAT
   if (etherCATStack) {
     log.trace() << "starting execution synced to etcherCAT stack";
-    if (syncWithRosTimeIsSet)	log.error() << "Can't use both etherCAT and RosTime to sync executor";
-    if (syncWithRosTopicIsSet)	log.error() << "Can't use both etherCAT and RosTopic to sync executor";
-    useDefaultExecutor = false;
-    
+    if (syncWithRosTimeIsSet) log.error() << "Can't use both etherCAT and RosTime to sync executor";
+    if (syncWithRosTopicIsSet) log.error() << "Can't use both etherCAT and RosTopic to sync executor";
     while (running) {
       etherCATStack->sync();
       counter.tick();
@@ -269,22 +266,19 @@ void Executor::run() {
         mainTask->run();
       counter.tock();
     }
-  }
+  } else
 #endif
 #ifdef USE_ROS
-  if (syncWithRosTimeIsSet) {
+  if (syncWithRosTimeSet) {
     log.trace() << "starting execution synced to rosTime";
-    if (syncWithEtherCatStackIsSet)	log.error() << "Can't use both RosTime and etherCAT to sync executor";
-    if (syncWithRosTopicIsSet)		log.error() << "Can't use both RosTime and RosTopic to sync executor";
-    useDefaultExecutor = false;
-    
+    if (syncWithEtherCatStackSet) log.error() << "Can't use both RosTime and etherCAT to sync executor";
+    if (syncWithRosTopicSet) log.error() << "Can't use both RosTime and RosTopic to sync executor";
+
     uint64_t periodNsec = static_cast<uint64_t>(period * 1.0e9);
-    uint64_t next_cycle = ros::Time::now().toNSec() + periodNsec;
-    
-// 		auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
-    while (running) { 
-      while (ros::Time::now().toNSec() < next_cycle && running) usleep(10);
-      
+    uint64_t next_cycle = eeros::System::getTimeNs() + periodNsec; // get
+
+    while (running) {
+      while (eeros::System::getTimeNs() < next_cycle && running) usleep(10);
       counter.tick();
       taskList.run();
       if (mainTask != nullptr)
@@ -294,51 +288,49 @@ void Executor::run() {
     }
     
   }
-  else if (syncWithRosTopicIsSet) {
+  else if (syncWithRosTopicSet) {
     log.trace() << "starting execution synced to gazebo";
-    if (syncWithRosTimeIsSet)		log.error() << "Can't use both RosTopic and RosTime to sync executor";
-    if (syncWithEtherCatStackIsSet)	log.error() << "Can't use both RosTopic and etherCAT to sync executor";
-    useDefaultExecutor = false;
+    if (syncWithRosTimeSet) log.error() << "Can't use both RosTopic and RosTime to sync executor";
+    if (syncWithEtherCatStackSet) log.error() << "Can't use both RosTopic and etherCAT to sync executor";
+
+//     auto timeOld = ros::Time::now();
+//     auto timeNew = ros::Time::now();
+//     static bool first = true;
+//     while (running) {
+//       if (first) {
+//         while (timeOld == timeNew  && running) {	// waits for new rosTime beeing published
+//           usleep(10);
+//           timeNew = ros::Time::now();
+//         }
+//         first = false;
+//         timeOld = timeNew;
+//       }
+//
+//       while (syncRosCallbackQueue->isEmpty() && running) usleep(10);	//waits for new message;
+//
+//       while (timeOld == timeNew  && running) {		// waits for new rosTime beeing published
+//         usleep(10);
+//         timeNew = ros::Time::now();
+//       }
+//       timeOld = timeNew;
+//
+//       syncRosCallbackQueue->callAvailable();
+// // 			ros::getGlobalCallbackQueue()->callAvailable();
+//
+//       counter.tick();
+//       taskList.run();
+//       if (mainTask != nullptr)
+//         mainTask->run();
+//       counter.tock();
+//     }
     
-    auto timeOld = ros::Time::now();
-    auto timeNew = ros::Time::now();
-    static bool first = true;
-    while (running) {
-      if (first) {
-        while (timeOld == timeNew  && running) {	// waits for new rosTime beeing published
-          usleep(10);
-          timeNew = ros::Time::now();	
-        }
-        first = false;
-        timeOld = timeNew;
-      }
-      
-      while (syncRosCallbackQueue->isEmpty() && running) usleep(10);	//waits for new message;
-      
-      while (timeOld == timeNew  && running) {		// waits for new rosTime beeing published
-        usleep(10);
-        timeNew = ros::Time::now();	
-      }
-      timeOld = timeNew;
-      
-      syncRosCallbackQueue->callAvailable();
-// 			ros::getGlobalCallbackQueue()->callAvailable();
-      
-      counter.tick();
-      taskList.run();
-      if (mainTask != nullptr)
-        mainTask->run();
-      counter.tock();
-    }
-    
-  }
+  } else
 #endif
-  if (useDefaultExecutor) {
+  {
     log.trace() << "starting periodic execution";
     auto next_cycle = std::chrono::steady_clock::now() + seconds(period);
     while (running) {
       std::this_thread::sleep_until(next_cycle);
-
       counter.tick();
       taskList.run();
       if (mainTask != nullptr)
