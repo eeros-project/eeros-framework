@@ -22,16 +22,16 @@ class RosSubscriberDouble : public RosSubscriber<std_msgs::msg::Float64, double>
    * ROS messages of type std_msgs::Float64::Type under a given topic 
    * and outputs its values onto a signal of type double. 
    * If several messages are pending for a given topic
-   * you can choose if the block simply consumes the oldest message or 
-   * processes all pending messages.
-   * If no ROS master can be found, the block does not do anything.
+   * all the messages are consumed and the signal is set to the
+   * newest.
    * 
    * @param node - ROS node as a shared ptr
    * @param topic - name of the topic
-   * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
+   * @param syncWithTopic - when set to true the executor runs all time domains upen receiving this message
+   * @param queueSize - maximum number of incoming messages to be queued for delivery to subscribers
    */
-  RosSubscriberDouble(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize=1000)
-      : RosSubscriber<TRosMsg, double>(node, topic, queueSize) { }
+  RosSubscriberDouble(const rclcpp::Node::SharedPtr node, const std::string& topic, bool syncWithTopic=false, const uint32_t queueSize=1000)
+      : RosSubscriber<TRosMsg, double>(node, topic, syncWithTopic, queueSize) { }
     
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.

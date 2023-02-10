@@ -29,26 +29,25 @@ class RosSubscriber : public Blockio<0,1,SigOutType> {
    * Creates an instance of a ROS subscriber block. The block reads
    * ROS messages under a given topic and outputs its values onto
    * a signal output. If several messages are pending for a given topic
-   * you can choose if the block simply consumes the oldest message or 
-   * processes all pending messages.
-   * If no ROS master can be found, the block does not do anything.
+   * all the messages are consumed and the signal is set to the
+   * newest.
    * 
    * @param node - ROS node as a shared ptr
    * @param topic - name of the topic
-   * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
-   * @param callNewest - set to true if all pending messages should be processed
+   * @param syncWithTopic - when set to true the executor runs all time domains upen receiving this message
+   * @param queueSize - maximum number of incoming messages to be queued for delivery to subscribers
    */
-  RosSubscriber(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize=1000)
-      : node(node), t(std::thread(&RosSubscriber::spin,this)), log(logger::Logger::getLogger()) {
-    if (rclcpp::ok()) {
- //     rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> options;
- //     options.callback_group = Executor::instance().registerSubscriber(handle, syncWithTopic);
-      subscriber = node->create_subscription<TRosMsg>(topic, queueSize, std::bind(&RosSubscriber::rosSubscriberCallback, this, _1));
-      RCLCPP_INFO_STREAM(node->get_logger(), "RosBlockSubscriber, reading from topic: '" << topic << "' created.");
-//      log.warn() << "RosBlockSubscriber, reading from topic: '" << topic << "' created.";
-      running = true;
-    }
+  RosSubscriber(const rclcpp::Node::SharedPtr node, const std::string& topic, bool syncWithTopic=false, const uint32_t queueSize=1000)
+      : node(node), sync(syncWithTopic), log(logger::Logger::getLogger()) {
+  if (rclcpp::ok()) {
+    rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> options;
+    options.callback_group = Executor::instance().registerSubscriber(node, syncWithTopic);
+    subscriber = node->create_subscription<TRosMsg>(topic, queueSize, std::bind(&RosSubscriber::rosSubscriberCallback, this, _1), options);
+    RCLCPP_INFO_STREAM(node->get_logger(), "RosBlockSubscriber, reading from topic: '" << topic << "' created.");
+    //      log.warn() << "RosBlockSubscriber, reading from topic: '" << topic << "' created.";
+    running = true;
   }
+}
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -62,11 +61,9 @@ class RosSubscriber : public Blockio<0,1,SigOutType> {
   void rosSubscriberCallback(const TRosMsg& msg) {
     std::lock_guard<std::mutex> lock(queue_mutex);
     queue.push_back(std::move(msg));
-  }
-
-  void spin() {
-    while(!running);
-    eeros::control::rosTools::Spinner::getInstance().startSpinning(node);
+    if (sync) {
+      Executor::instance().handleTopic();
+    }
   }
 
   /**
@@ -93,11 +90,11 @@ class RosSubscriber : public Blockio<0,1,SigOutType> {
   rclcpp::Node::SharedPtr node;
   typename rclcpp::Subscription<TRosMsg>::SharedPtr subscriber;
   bool running = false;
+  bool sync;
   // thread-safe queue which is filled in callback function called by ROS::Executor
   // emptied by handled by run method called by EEROS::Executor
   std::deque<TRosMsg> queue;
   std::mutex queue_mutex;
-  std::thread t;
   logger::Logger log;
 };
 

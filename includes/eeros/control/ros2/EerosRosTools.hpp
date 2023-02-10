@@ -57,26 +57,6 @@ static rclcpp::Node::SharedPtr initNode(std::string name) {
   return rclcpp::Node::make_shared(name);
 }
 
-class Spinner {
- public:
-  static Spinner& getInstance() {
-    static Spinner instance;
-    return instance;
-  }
-  Spinner(Spinner const&) = delete;
-  void operator=(Spinner const&) = delete;
-  static void startSpinning(const rclcpp::Node::SharedPtr node) {
-    static std::mutex mtx;
-    std::unique_lock<std::mutex> lock(mtx);
-    static bool spinning = false;
-    if (!spinning) {
-      spinning = true;
-      rclcpp::spin(node);
-    }
-  }
- private:
-  Spinner() {}
-};
 
 }
 }

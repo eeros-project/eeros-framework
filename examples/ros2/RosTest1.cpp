@@ -9,7 +9,7 @@
 #include <eeros/control/ros2/RosPublisherSafetyLevel.hpp>
 #include <eeros/control/ros2/RosSubscriberDoubleArray.hpp>
 #include <eeros/control/ros2/RosSubscriberDouble.hpp>
-#include <eeros/control/ros/EerosRosTools.hpp>
+#include <eeros/control/ros2/EerosRosTools.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <signal.h>
 
@@ -30,7 +30,6 @@ public:
         slOut(node, "/test/safetyLevel"),
         vectorIn(node, "/rosNodeTalker/vector"),
         doubleIn(node, "/rosNodeTalker/val"),
-        doubleIn2(node, "/rosNodeTalker/val"),
         timedomain("Main time domain", dt, true) {
     vectorOut.getIn().connect(c1.getOut());
     doubleOut.getIn().connect(c2.getOut());
@@ -41,19 +40,17 @@ public:
     timedomain.addBlock(slOut);
     timedomain.addBlock(vectorIn);
     timedomain.addBlock(doubleIn);
-    timedomain.addBlock(doubleIn2);
     Executor::instance().add(timedomain);
   }
   
   typedef Matrix<7, 1, double> Vector7;
   Constant<Vector7> c1;
   Constant<> c2;
-  RosPublisherDoubleArray<Vector7> vectorOut;	
-  RosPublisherDouble doubleOut;	
+  RosPublisherDoubleArray<Vector7> vectorOut;
+  RosPublisherDouble doubleOut;
   RosPublisherSafetyLevel slOut;
   RosSubscriberDoubleArray<Vector2> vectorIn;
   RosSubscriberDouble doubleIn;
-  RosSubscriberDouble doubleIn2;
   TimeDomain timedomain;
 };
 
@@ -119,6 +116,7 @@ int main(int argc, char **argv) {
   
   signal(SIGINT, signalHandler);	
   auto &executor = Executor::instance();
+//   executor.syncWithRosTime();
   executor.setMainTask(ss);
   executor.run();
   

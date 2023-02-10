@@ -27,7 +27,7 @@ class RosSubscriberDouble : public RosSubscriber<std_msgs::Float64::Type, double
    * If no ROS master can be found, the block does not do anything.
    * 
    * @param topic - name of the topic
-   * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
+   * @param queueSize - maximum number of incoming messages to be queued for delivery to subscribers
    * @param callNewest - set to true if all pending messages should be processed
    */
   RosSubscriberDouble(const std::string& topic, const uint32_t queueSize=1000, const bool callNewest=false ) 
