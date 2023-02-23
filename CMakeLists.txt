@@ -90,12 +90,6 @@ set_target_properties(eeros PROPERTIES VERSION ${EEROS_VERSION})
 target_compile_options(eeros PRIVATE -g -Wall PUBLIC -pthread)
 target_compile_features(eeros PUBLIC cxx_std_17)
 
-target_link_libraries(eeros PUBLIC pthread PRIVATE ucl ${CMAKE_DL_LIBS})
-
-if(LINUX)
-  target_link_libraries(eeros PRIVATE rt)
-endif()
-
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
   VERSION ${EEROS_VERSION}
@@ -132,6 +126,7 @@ if(LIBCURSES)
   message(STATUS "")
 endif()
 
+
 ## Use EtherCAT if instructed
 if (USE_ETHERCAT)
   message(STATUS "")
@@ -144,6 +139,7 @@ if (USE_ETHERCAT)
   message(STATUS "")
 endif()
 
+
 # TODO: update for target based configuration
 
 ## Use CAN if instructed
@@ -154,6 +150,7 @@ if(USE_CAN)
   find_package(canopenlib QUIET)
   include_directories(${canopenlib_INCLUDE_DIR})
   link_directories(${canopenlib_DIR})
+  list(APPEND EXTERNAL_LIBS "canopenlib")
   if (canopenlib_FOUND)
     message(STATUS "--> 'canopenlib' is found, CANOpen examples will be built.")
   else()
@@ -161,6 +158,7 @@ if(USE_CAN)
   endif()
   message(STATUS "")
 endif()
+
 
 ## Use MODBUS if instructed
 if(USE_MODBUS)
@@ -229,11 +227,11 @@ endif()
 
 
 ## Use ROS if found and instructed
-message(STATUS "**********************************")
-message(STATUS "ROS")
-message(STATUS "**********************************")
 if (USE_ROS)
-  find_package(roslib REQUIRED)
+  message(STATUS "**********************************")
+  message(STATUS "ROS")
+  message(STATUS "**********************************")
+  find_package(roslib QUIET)
   if (roslib_FOUND)
     message(STATUS "--> 'ROS' is found, ROS examples will be built.")
   else()
@@ -249,6 +247,9 @@ if (USE_ROS)
   target_link_libraries(eeros PRIVATE ${roslib_LIBRARIES})
   add_definitions(-DUSE_ROS)
 elseif (USE_ROS2)
+  message(STATUS "**********************************")
+  message(STATUS "ROS2")
+  message(STATUS "**********************************")
   find_package(rclcpp REQUIRED)
   if (rclcpp_FOUND)
     message(STATUS "--> 'ROS2' is found, ROS2 examples will be built.")
@@ -299,6 +300,12 @@ endif(DOXYGEN_FOUND)
 ## Set EEROS libraries
 #set(EEROS_LIBS ${CMAKE_DL_LIBS} ucl pthread)
 set(EEROS_LIBS ucl)
+
+target_link_libraries(eeros PUBLIC pthread PRIVATE ucl ${CMAKE_DL_LIBS} ${EXTERNAL_LIBS})
+
+if(LINUX)
+  target_link_libraries(eeros PRIVATE rt)
+endif()
 
 ## Enable CTest
 enable_testing()
