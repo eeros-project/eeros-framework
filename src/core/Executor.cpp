@@ -216,7 +216,7 @@ void Executor::syncWithRosTime() {
 
 #ifdef USE_ROS
 void Executor::syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue) {
-  std::cout << "sync executor with gazebo" << std::endl;
+  log.warn() << "sync executor with gazebo";
   syncWithRosTopicSet = true;
   this->syncRosCallbackQueue = syncRosCallbackQueue;
 }
@@ -224,7 +224,10 @@ void Executor::syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue) {
 
 #ifdef USE_ROS2
 rclcpp::CallbackGroup::SharedPtr Executor::registerSubscriber(rclcpp::Node::SharedPtr node, const bool sync) {
-  if (sync) syncWithRosTopicSet = true;
+  if (sync) {
+    syncWithRosTopicSet = true;
+    log.warn() << "sync executor with gazebo";
+  }
   if (subscriberExecutor == nullptr) {
     subscriberExecutor = rclcpp::executors::MultiThreadedExecutor::make_shared();
   }

@@ -30,11 +30,11 @@ class RosSubscriberDoubleArray : public RosSubscriber<std_msgs::msg::Float64Mult
    * 
    * @param node - ROS node as a shared ptr
    * @param topic - name of the topic
-   * @param syncWithTopic - when set to true the executor runs all time domains upen receiving this message
+   * @param syncWithTopic - when set to true the executor runs all time domains upon receiving this message
    * @param queueSize - maximum number of incoming messages to be queued for delivery to subscribers
    */
   RosSubscriberDoubleArray(const rclcpp::Node::SharedPtr node, const std::string& topic, bool syncWithTopic=false, const uint32_t queueSize=1000)
-      : RosSubscriber<TRosMsg, SigOutType>(node, topic, queueSize, syncWithTopic) { }
+      : RosSubscriber<TRosMsg, SigOutType>(node, topic, syncWithTopic, queueSize) { }
     
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.

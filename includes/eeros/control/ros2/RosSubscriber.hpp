@@ -34,7 +34,7 @@ class RosSubscriber : public Blockio<0,1,SigOutType> {
    * 
    * @param node - ROS node as a shared ptr
    * @param topic - name of the topic
-   * @param syncWithTopic - when set to true the executor runs all time domains upen receiving this message
+   * @param syncWithTopic - when set to true the executor runs all time domains upon receiving this message
    * @param queueSize - maximum number of incoming messages to be queued for delivery to subscribers
    */
   RosSubscriber(const rclcpp::Node::SharedPtr node, const std::string& topic, bool syncWithTopic=false, const uint32_t queueSize=1000)
