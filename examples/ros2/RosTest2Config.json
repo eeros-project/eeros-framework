@@ -15,7 +15,7 @@
 							"minOut":	-9e99,	"maxOut": 	9e99 }
 					 ],
 				"unit": "V",
-				"additionalArguments": "topic=/test/val; msgType=std_msgs::Float64"
+				"additionalArguments": "topic=/test/val; msgType=std_msgs::msg::Float64"
 			}
 		},		
 		"subdevice1": {
@@ -31,7 +31,7 @@
 							"minOut":	-9e99,	"maxOut": 	9e99 }
 					 ],
 				"unit": "V",
-				"additionalArguments": "topic=/rosNodeTalker/val; msgType=std_msgs::Float64"
+				"additionalArguments": "topic=/rosNodeTalker/val; msgType=std_msgs::msg::Float64"
 			}
 		},
 		"subdevice2": {
@@ -39,7 +39,7 @@
 			"channel0": {
 				"signalId": "boolIn",
 				"inverted": false,
-				"additionalArguments": "topic=/rosNodeTalker/state; msgType=sensor_msgs::BatteryState; dataField=present"
+				"additionalArguments": "topic=/rosNodeTalker/state; msgType=sensor_msgs::msg::BatteryState; dataField=present"
 			}
 		},
 		"subdevice3": {
@@ -47,7 +47,7 @@
 			"channel0": {
 				"signalId": "boolOut",
 				"inverted": false,
-				"additionalArguments": "topic=/test/state; msgType=sensor_msgs::BatteryState; dataField=present"
+				"additionalArguments": "topic=/test/state; msgType=sensor_msgs::msg::BatteryState; dataField=present"
 			}
 		}
 	}
