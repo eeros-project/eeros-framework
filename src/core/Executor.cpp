@@ -278,8 +278,8 @@ void Executor::run() {
 #ifdef USE_ETHERCAT
   if (etherCATStack) {
     log.trace() << "starting execution synched to etcherCAT stack";
-    if (syncWithRosTimeIsSet) log.error() << "Can't use both etherCAT and RosTime to sync executor";
-    if (syncWithRosTopicIsSet) log.error() << "Can't use both etherCAT and RosTopic to sync executor";
+    if (syncWithRosTimeSet) log.error() << "Can't use both etherCAT and RosTime to sync executor";
+    if (syncWithRosTopicSet) log.error() << "Can't use both etherCAT and RosTopic to sync executor";
     while (running) {
       etherCATStack->sync();
       counter.tick();
