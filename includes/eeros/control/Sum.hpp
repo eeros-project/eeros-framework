@@ -18,7 +18,7 @@ namespace control {
  */
 
 template < uint8_t N = 2, typename T = double >
-class Sum : public Blockio<2,1,T> {
+class Sum : public Blockio<N,1,T> {
  public:
 
   /**
