@@ -4,10 +4,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Unreleased
-(v1.4.0 targeted for 2022-08-31) ([Github compare v1.3.4...master](https://github.com/eeros-project/eeros-framework/compare/v1.3.4...master))
+## v1.4.0
+(2023-03-08) ([GitHub compare v1.3.4...v1.4.0](https://github.com/eeros-project/eeros-framework/compare/v1.3.4...v1.4.0))
 
 ### Added Features
+* Add general Blockio with template parameters, mark others as deprecated
+* Correct differentiator block, handle first run
+* Add timeout in SocketData block in all specializations
+* Add ROS2 functionality
+* Correct sum block for template parameter N != 2
 
 
 ## v1.3.4
