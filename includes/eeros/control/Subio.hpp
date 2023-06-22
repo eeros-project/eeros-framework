@@ -49,7 +49,7 @@ class Subio : public Block {
    * @param index - index of the input
    * @return input
    */
-  virtual InputSub<Tin>& getIn(uint8_t index) {
+  virtual Input<Tin>& getIn(uint8_t index) {
     if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
     return in[index];
   }
@@ -96,7 +96,7 @@ class Subio<N,1,Tin,Tout> : public Block {
    * @param index - index of the input
    * @return input
    */
-  virtual InputSub<Tin>& getIn(uint8_t index) {
+  virtual Input<Tin>& getIn(uint8_t index) {
     if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
     return in[index];
   }
@@ -140,7 +140,7 @@ class Subio<N,0,Tin> : public Block {
    * @param index - index of the input
    * @return input
    */
-  virtual InputSub<Tin>& getIn(uint8_t index) {
+  virtual Input<Tin>& getIn(uint8_t index) {
     if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
     return in[index];
   }
@@ -176,7 +176,7 @@ class Subio<1,M,Tin,Tout> : public Block {
    * 
    * @return input
    */
-  virtual InputSub<Tin>& getIn() {
+  virtual Input<Tin>& getIn() {
     return in;
   }
 
@@ -220,7 +220,7 @@ class Subio<1,1,Tin,Tout> : public Block {
    * 
    * @return input
    */
-  virtual InputSub<Tin>& getIn() {
+  virtual Input<Tin>& getIn() {
     return in;
   }
 
@@ -259,7 +259,7 @@ class Subio<1,0,Tin> : public Block {
    * 
    * @return input
    */
-  virtual InputSub<Tin>& getIn() {
+  virtual Input<Tin>& getIn() {
     return in;
   }
 
