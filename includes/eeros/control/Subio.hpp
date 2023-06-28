@@ -31,11 +31,7 @@ class Subio : public Block {
    * Clears the output signal.
    */
   Subio() { 
-    for (uint8_t i = 0; i < N; i++) in[i].setOwner(this);
-    for (uint8_t i = 0; i < M; i++) {
-      out[i].setOwner(this);
-      out[i].getSignal().clear();
-    }
+    for (uint8_t i = 0; i < N; i++) in[i].Input<Tin>::setOwner(this);
   }
 
   /**
@@ -62,12 +58,24 @@ class Subio : public Block {
    */
   virtual Output<Tout>& getOut(uint8_t index) {
     if (index >= M) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 
-    return out[index];
+    return *out[index];
+  }
+
+  /**
+   * Set the output of the subsystem block.
+   *
+   * @param out - output
+   * @param index - index of the output
+   */
+  virtual void setOut(Output<Tout>& out, uint8_t index) {
+    this->out[index] = &out;
+    this->out[index]->setOwner(this);
+    this->out[index]->getSignal().clear();
   }
 
  protected:
   InputSub<Tin> in[N];
-  Output<Tout> out[M];
+  Output<Tout>* out[M];
 };
 
 /**
@@ -80,9 +88,8 @@ class Subio<N,1,Tin,Tout> : public Block {
    * Construct a subsystem block with several inputs and one output. 
    * Clears the output signal.
    */
-  Subio() : out(this) { 
-    for (uint8_t i = 0; i < N; i++) in[i].setOwner(this);
-    out.getSignal().clear();
+  Subio() {
+    for (uint8_t i = 0; i < N; i++) in[i].Input<Tin>::setOwner(this);
   }
 
   /**
@@ -107,12 +114,23 @@ class Subio<N,1,Tin,Tout> : public Block {
    * @return output
    */
   virtual Output<Tout>& getOut() {
-    return out;
+    return *out;
+  }
+
+  /**
+   * Set the output of the subsystem block.
+   *
+   * @param out - output
+   */
+  virtual void setOut(Output<Tout>& out) {
+    this->out = &out;
+    this->out->setOwner(this);
+    this->out->getSignal().clear();
   }
 
  protected:
   InputSub<Tin> in[N];
-  Output<Tout> out;
+  Output<Tout>* out;
 };
 
 /**
@@ -126,7 +144,7 @@ class Subio<N,0,Tin> : public Block {
    * Clears the output signal.
    */
   Subio() { 
-    for (uint8_t i = 0; i < N; i++) in[i].setOwner(this);
+    for (uint8_t i = 0; i < N; i++) in[i].Input<Tin>::setOwner(this);
   }
 
   /**
@@ -159,12 +177,7 @@ class Subio<1,M,Tin,Tout> : public Block {
    * Construct a subsystem block with one input and several outputs. 
    * Clears the output signal.
    */
-  Subio() : in(this) {
-    for (uint8_t i = 0; i < M; i++) {
-      out[i].setOwner(this);
-      out[i].getSignal().clear();
-    }
-  }
+  Subio() : in(this) { }
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -188,12 +201,24 @@ class Subio<1,M,Tin,Tout> : public Block {
    */
   virtual Output<Tout>& getOut(uint8_t index) {
     if (index >= M) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 
-    return out[index];
+    return *out[index];
+  }
+
+  /**
+   * Set the output of the subsystem block.
+   *
+   * @param out - output
+   * @param index - index of the output
+   */
+  virtual void setOut(Output<Tout>& out, uint8_t index) {
+    this->out[index] = &out;
+    this->out[index]->setOwner(this);
+    this->out[index]->getSignal().clear();
   }
 
  protected:
   InputSub<Tin> in;
-  Output<Tout> out[M];
+  Output<Tout>* out[M];
 };
 
 /**
@@ -206,9 +231,7 @@ class Subio<1,1,Tin,Tout> : public Block {
    * Construct a subsystem block with one input and one output. 
    * Clears the output signal.
    */
-  Subio() : in(this), out(this) {
-    out.getSignal().clear();
-   }
+  Subio() : in(this) { }
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -230,12 +253,23 @@ class Subio<1,1,Tin,Tout> : public Block {
    * @return output
    */
   virtual Output<Tout>& getOut() {
-    return out;
+    return *out;
+  }
+
+  /**
+   * Set the output of the subsystem block.
+   *
+   * @param out - output
+   */
+  virtual void setOut(Output<Tout>& out) {
+    this->out = &out;
+    this->out->setOwner(this);
+    this->out->getSignal().clear();
   }
 
  protected:
   InputSub<Tin> in;
-  Output<Tout> out;
+  Output<Tout>* out;
 };
 
 /**
@@ -277,12 +311,7 @@ class Subio<0,M,Tout> : public Block {
    * Construct a subsystem block with no input and several outputs. 
    * Clears the output signals.
    */
-  Subio() {
-    for (uint8_t i = 0; i < M; i++) {
-      out[i].setOwner(this);
-      out[i].getSignal().clear();
-    }
-  }
+  Subio() { }
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -297,11 +326,23 @@ class Subio<0,M,Tout> : public Block {
    */
   virtual Output<Tout>& getOut(uint8_t index) {
     if (index >= M) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 
-    return out[index];
+    return *out[index];
+  }
+
+  /**
+   * Set the output of the subsystem block.
+   *
+   * @param out - output
+   * @param index - index of the output
+   */
+  virtual void setOut(Output<Tout>& out, uint8_t index) {
+    this->out[index] = &out;
+    this->out[index]->setOwner(this);
+    this->out[index]->getSignal().clear();
   }
 
  protected:
-  Output<Tout> out[M];
+  Output<Tout>* out[M];
 };
 
 /**
@@ -314,9 +355,7 @@ class Subio<0,1,Tout> : public Block {
    * Construct a subsystem block with no input and one output. 
    * Clears the output signals.
    */
-  Subio() : out(this) {
-    out.getSignal().clear();
-   }
+  Subio() : out(this) { }
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -329,11 +368,21 @@ class Subio<0,1,Tout> : public Block {
    * @return output
    */
   virtual Output<Tout>& getOut() {
-    return out;
+    return *out;
   }
 
+  /**
+   * Set the output of the subsystem block.
+   *
+   * @param out - output
+   */
+  virtual void setOut(Output<Tout>& out) {
+    this->out = &out;
+    this->out->setOwner(this);
+    this->out->getSignal().clear();
+  }
  protected:
-  Output<Tout> out;
+  Output<Tout>* out;
 };
 
 /**

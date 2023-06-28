@@ -3,6 +3,7 @@
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/core/Executor.hpp>
+#include <eeros/control/Subio.hpp>
 #include <eeros/control/Constant.hpp>
 #include <eeros/control/Sum.hpp>
 #include <eeros/task/Lambda.hpp>
@@ -19,12 +20,13 @@ using namespace eeros::math;
 
 double period = 0.01;
 
-class Subsystem: public Block {
+class Subsystem : public Subio<1,1,Vector2,Vector2> {
  public: 
   Subsystem() : gain(3.0) {
     gain.getIn().connect(in);
     sum.getIn(0).connect(in);
     sum.getIn(1).connect(gain.getOut());
+    setOut(sum.getOut());
   }
 
   virtual void run()  {
@@ -32,11 +34,6 @@ class Subsystem: public Block {
     sum.run();
   }
  
-  virtual Input<Vector2>& getIn() {return in;}
-  virtual Output<Vector2>& getOut() {return sum.getOut();}
- 
-private: 
-  InputSub<Vector2> in;
   Gain<Vector2> gain;
   Sum<2, Vector2> sum;
 };
