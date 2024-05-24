@@ -1,13 +1,10 @@
-#include "CanExample.hpp"
-#include <signal.h>
-#include <eeros/control/can/CanHandle.hpp>
-#include <eeros/control/can/CanReceiveFaulhaber.hpp>
-#include <eeros/control/can/CanSendFaulhaber.hpp>
+#include "CANexample2.hpp"
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/core/Executor.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
+#include <signal.h>
 
 using namespace eeros;
 using namespace eeros::logger;
@@ -20,7 +17,7 @@ void signalHandler(int signum) {
 }
 
 int main(int argc, char **argv) {
-  double dt = 0.2;
+  double dt = 0.1;
   signal(SIGINT, signalHandler);
   
   Logger::setDefaultStreamLogger(std::cout);
@@ -28,11 +25,12 @@ int main(int argc, char **argv) {
 
   log.info() << "CAN test start";
 
-  ControlSystem cs(dt);
+  CANopen co("can0");
+  ControlSystem cs(co, dt);
   MySafetyProperties sp;
   SafetySystem ss(sp, dt);
   auto& sequencer = Sequencer::instance();
-  MainSequence mainSeq("Main Sequence", sequencer, cs, ss, sp);
+  MainSequence mainSeq("Main Sequence", sequencer, cs, ss, sp, co);
   mainSeq();
     
   auto& executor = Executor::instance();
