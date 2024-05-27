@@ -88,13 +88,12 @@ class MySafetyProperties : public SafetyProperties {
 
 class InitSequence : public Sequence {
  public:
-  InitSequence(std::string name, Sequence* caller, ControlSystem& cs, SafetySystem& ss, MySafetyProperties& sp, CANopen& co)
-      : Sequence(name, caller, true), cs(cs), ss(ss), sp(sp), co(co), wait("Wait", this) { }
+  InitSequence(std::string name, Sequence* caller, ControlSystem& cs, SafetySystem& ss, MySafetyProperties& sp, DS402& ds402)
+      : Sequence(name, caller, true), cs(cs), ss(ss), sp(sp), ds402(ds402), wait("Wait", this) { }
         
   int action() {
-    co.sendNMT(0, co.NMT_CS::PREOP); // set all nodes to CS_PREOP
+    ds402.co.sendNMT(0, ds402.co.NMT_CS::PREOP); // set all nodes to CS_PREOP
 
-    DS402 ds402(co);
     ds402.configureTPDO(nodeId1, 1, {statusObj,posActValObj,digInStateObj});
     ds402.configureTPDO(nodeId1, 2, {});
     ds402.configureTPDO(nodeId1, 3, {});
@@ -103,7 +102,7 @@ class InitSequence : public Sequence {
     ds402.configureTPDO(nodeId2, 2, {});
     ds402.configureTPDO(nodeId2, 3, {});
     ds402.configureTPDO(nodeId2, 4, {});
-    ds402.configureRPDO(nodeId1, 1, {controlObj,targVelObj}); //ctrl,vel
+    ds402.configureRPDO(nodeId1, 1, {controlObj,targVelObj});
     ds402.configureRPDO(nodeId1, 2, {});
     ds402.configureRPDO(nodeId1, 3, {});
     ds402.configureRPDO(nodeId1, 4, {});
@@ -117,15 +116,15 @@ class InitSequence : public Sequence {
     ds402.setOperationMode(nodeId2, ds402.OPERATION_MODES::PROFILE_VELOCITY);
     ds402.enableOperation(nodeId2);
 
-    co.sendNMT(0, co.NMT_CS::START);
+    ds402.co.sendNMT(0, ds402.co.NMT_CS::START);
 
     // enable canSend and canReceive block, from now on no SDO transfers possible
     cs.canSend.enable();
     cs.canReceive.enable();
 
-    log.info() << "drive 1: state = " << ds402.getStatusDesc(nodeId1);
+    log.info() << "drive 1: state = " << ds402.statusToString(ds402.getStatus(nodeId1));
     log.info() << "drive 1: error state = " << ds402.getErrorDesc(nodeId1);
-    log.info() << "drive 2: state = " << ds402.getStatusDesc(nodeId2);
+    log.info() << "drive 2: state = " << ds402.statusToString(ds402.getStatus(nodeId2));
     log.info() << "drive 2: error state = " << ds402.getErrorDesc(nodeId2);
 
     ss.triggerEvent(sp.seInitDone);
@@ -136,14 +135,14 @@ class InitSequence : public Sequence {
   ControlSystem& cs;
   SafetySystem& ss;
   MySafetyProperties& sp;
-  CANopen& co;
+  DS402& ds402;
   Wait wait;
 };
 
 class MoveSequence : public Sequence {
  public:
-  MoveSequence(std::string name, Sequence* caller, ControlSystem& cs, SafetySystem& ss, MySafetyProperties& sp) 
-      : Sequence(name, caller, true), cs(cs), ss(ss), sp(sp), wait("Wait", this), log(Logger::getLogger()) { }
+  MoveSequence(std::string name, Sequence* caller, ControlSystem& cs, SafetySystem& ss, MySafetyProperties& sp, DS402& ds402)
+      : Sequence(name, caller, true), cs(cs), ss(ss), sp(sp), ds402(ds402), wait("Wait", this), log(Logger::getLogger()) { }
         
   int action() {
     uint32_t vel = 2;
@@ -152,7 +151,7 @@ class MoveSequence : public Sequence {
       cs.velDrive1.setValue(vel*100);
       wait(2.0);
       log.info() << "act pos 1: " << cs.canReceive.getOut(0).getSignal().getValue() << " act pos 2: " << cs.canReceive.getOut(1).getSignal().getValue() << " dig 1: 0x" << hex << cs.canReceive.getDigOut(0).getSignal().getValue();
-      log.info() << hex << "status 1: 0x" << cs.canReceive.getStatus(0) << " status 2: 0x" << cs.canReceive.getStatus(1);
+      log.info() << hex << "status 1: " << ds402.statusToString(cs.canReceive.getStatus(0)) << " status 2: " << ds402.statusToString(cs.canReceive.getStatus(1));
       if (vel == 2) vel = 1;
       else vel = 2;
     }
@@ -163,6 +162,7 @@ class MoveSequence : public Sequence {
   ControlSystem& cs;
   SafetySystem& ss;
   MySafetyProperties& sp;
+  DS402& ds402;
   Wait wait;
   Logger log;
 };
@@ -179,8 +179,8 @@ class StopSequence : public Sequence {
     DS402 ds402(co);
     ds402.disableOperation(nodeId1);
     ds402.disableOperation(nodeId2);
-    log.info() << "state of drive = " << ds402.getStatusDesc(nodeId1);
-    log.info() << "state of drive = " << ds402.getStatusDesc(nodeId2);
+    log.info() << "state of drive = " << ds402.statusToString(ds402.getStatus(nodeId1));
+    log.info() << "state of drive = " << ds402.statusToString(ds402.getStatus(nodeId2));
     wait(0.5);
     Sequencer::instance().abort();
     Executor::instance().stop();
@@ -196,10 +196,10 @@ class StopSequence : public Sequence {
 class MainSequence : public Sequence {
  public:
   MainSequence(std::string name, Sequencer& seq, ControlSystem& cs, SafetySystem& ss, MySafetyProperties& sp, CANopen& co)
-      : Sequence(name, seq), ss(ss), sp(sp),
-        init("Initialization Sequence", this, cs, ss, sp, co),
-        move("Move Sequence", this, cs, ss, sp),
-        stop("Stopping Sequence", this, cs, co),
+      : Sequence(name, seq), ss(ss), sp(sp), ds402(co),
+        init("Initialization Sequence", this, cs, ss, sp, ds402),
+        move("Move Sequence", this, cs, ss, sp, ds402),
+        stop("Stopping Sequence", this, cs, ds402.co),
         wait("Wait", this) { }
      
   int action() {
@@ -222,6 +222,7 @@ class MainSequence : public Sequence {
  private:
    SafetySystem& ss;
    MySafetyProperties& sp;
+   DS402 ds402;
    InitSequence init;
    MoveSequence move;
    StopSequence stop;

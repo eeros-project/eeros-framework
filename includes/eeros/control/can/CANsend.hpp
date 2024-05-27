@@ -36,8 +36,13 @@ class CANsend : public Blockio<1,0,Matrix<N,1,double>> {
     for (size_t i = 0; i < node.size(); i++) {
       scale[i] = 1;
     }
-//     log.info() << "CAN send block constructed, " << node.size() << " nodes";
+    log.info() << "CAN send block constructed, " << node.size() << " nodes";
   }
+
+  /**
+   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   */
+  CANsend(const CANsend& s) = delete;
 
   /**
    * Transmits on the CAN bus. If enabled a CAN frame with data load of 8 bytes is sent

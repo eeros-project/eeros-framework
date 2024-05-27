@@ -22,7 +22,7 @@ namespace control {
  * through SDO transfers. After this, SDO transfer must stop. All further communication is
  * then done through PDO transfer. These PDOs must have been configured on the drive beforehand.
  * 
- * The drive must be configured to receive RPDOs as they are sent by this block.
+ * The drive must be configured to receive RPDOs which are sent by this block.
  * You have to configure this block by setting all PDOs which should be transmitted
  * by this block. They must be configured as RPDO (though they are sent by this block),
  * because the drive reads them as RPDO.
@@ -46,7 +46,7 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
   
  public:
   /**
-   * Constructs a CAN send block instance for a given set of nodes.
+   * Constructs a CANopen send block instance for a given set of nodes.
    * Sets the scale of floating point inputs to 1.
    *
    * @param co - CANopen object
@@ -67,10 +67,7 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
 
   /**
    * Transmits on the CAN bus. If enabled a sync package is sent for each run. After this the block
-   * will send two RPDO's to each of the connected CAN nodes.
-   * The RPDO2 will only be sent if the drive is set to interpolated position mode.
-   *
-   * If enabled transmits 2 PDO's to each CAN node. 
+   * will send all configured RPDO's to each of the connected CAN nodes.
    *
    * @see enable()
    * @see disable()
@@ -131,11 +128,11 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
   }
 
   /**
-   * Sets the scaling for the velocity information.
+   * Sets the scaling.
    *
-   * The drive needs its velocity information as a 4 bytes counter value.
-   * The scaling allows to transform this counter value into meaningful 
-   * velocity information in rad/s or m/s.
+   * The drive needs its position and velocity information as 4 bytes counter values.
+   * The scaling allows to transform this counter values into meaningful position and
+   * velocity information in rad, m, rad/s or m/s.
    *
    * @param scale the scaling factor for the velocity for all drives
    */
@@ -144,13 +141,10 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
   }
 
   /**
-   * Sets the scaling for the velocity information.
+   * Sets the control word to be sent to a given drive.
    *
-   * The drive needs its velocity information as a 4 bytes counter value.
-   * The scaling allows to transform this counter value into meaningful
-   * velocity information in rad/s or m/s.
-   *
-   * @param scale the scaling factor for the velocity for all drives
+   * @param index index of the drive
+   * @param ctrl control word
    */
   virtual void setCtrl(uint8_t index, uint16_t ctrl) {
     this->ctrl[index] = ctrl;
@@ -161,12 +155,17 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
    *
    * First of all this includes the node id of the slave drive. This id is searched for in the
    * list with all node ids and the corresponding index is saved as well for later use.
-   * Next,
+   * Next, you have to specify which RPDO number is chosen together with one or several
+   * CANopen dictionary objects which are mapped into this RPDO. Last, you must chose for
+   * each mapping, where the corresponding signal comes from.
    *
-   * @param nodeId the id of the node for which this PDO is sent
+   * @param nodeId the id of the node to which this PDO is sent
    * @param RPDOnr nr of the RPDO (1 to 4)
-   * @param objs The scaling factor for the velocity for all drives
-   * @param idx signal index
+   * @param objs opjects which are mapped into this PDO
+   * @param idx signal index, where
+   *            - > 0 : index in floating point inputs
+   *            - 0   : control word
+   *            - < 0 : index in integer inputs
    */
   virtual void configureRPDO(uint8_t nodeId, uint8_t RPDOnr, std::vector<coObject_t> objs, std::vector<int8_t> idx) {
     std::vector<uint8_t>::iterator it = std::find(node.begin(), node.end(), nodeId);

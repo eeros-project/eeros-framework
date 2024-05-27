@@ -21,18 +21,22 @@ namespace eeros {
 namespace control {
 
 /**
- * This block serves to receive CAN messages from a Faulhaber or similar drive.
- * The drive has to be initialized and brought up to its operational state 
- * through SDO transfers. After this, SDO transfer must stop. All further 
- * communication is done through PDO transfer. These PDOs must have been 
- * configured on the drive beforehand. 
- * 
- * The drive must be configured to send TPDOs as follows
- *   TPDO1: status word (16 bit unsigned), actual velocity (32 bit signed)
- *   TPDO2: actual position (32 bit signed), warnings (32 bit unsigned)
+ * This block serves to receive CANopen messages from one or several drives implementing the DS402
+ * specification. The drive has to be initialized and brought up to its operational state
+ * through SDO transfers. After this, SDO transfer must stop. All further communication is
+ * then done through PDO transfer. These PDOs must have been configured on the drive beforehand.
+ *
+ * The drive must be configured to send TPDOs which are received by this block.
+ * You have to configure this block by setting all PDOs which should be received
+ * by this block. They must be configured as TPDO (though they are sent by this block),
+ * because the drive reads them as TPDO.
+ * When configuring this TPDO, you have to indicate the node id of the drive, the TPDO number,
+ * CANopen objects which will be packed into this PDO and a signal index. This index holds
+ * information about which signal from the output of this block will be transmitted with this
+ * PDO.
  *
  * The drive will send its TPDOs upen receiving a sync package. This must be
- * sent by a CanSend block.
+ * sent by a CANopenSend block.
  *
  * @tparam N - number of CAN nodes (2 - default)
  * @tparam M - each drive can have several floating point output signals (1 - default)
@@ -52,7 +56,6 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    *
    * @param socket - socket of number of associated CAN bus
    * @param node - vector with node id's of all connected CAN nodes 
-   * @param functionCode - vector with function codes of all PDO's to be received
    */
   CANopenReceive(CANopen& co, std::initializer_list<uint8_t> node)
       :  co(co), node(node), log(Logger::getLogger('C')) {
@@ -70,8 +73,6 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
   /**
    * Reads from the CAN bus.
    *
-   * If enabled reads 2 PDO's from each CAN node. 
-   *
    * @see enable()
    * @see disable()
    */
@@ -83,13 +84,9 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
         uint8_t node, TPDOnr, buf[8], len;
         int err;
         if ((err = co.PDOreceive(node, TPDOnr, buf, len)) == 0) {
-//           std::cout << "PDO received from: node=" << (int)node << " TPDOnr=" << (int)TPDOnr << " len=" << (int)len
-//           << " status=0x" << std::hex << co.getPDOdata(buf, 0, 1)
-//           << " pos=0x" << co.getPDOdata(buf, 2, 5) << std::endl;
           // search for registered PDOreceive
           for (const auto& p : pdo) {
             uint8_t n = std::get<1>(p);
-//             log.error() << (int)n << " " << (int)node;
             uint8_t r = std::get<2>(p);
             if (node == n && TPDOnr == r) {
               uint8_t nodeNr = std::get<0>(p);
@@ -100,7 +97,6 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
                 len /= 8;
                 int32_t val = co.getPDOdata(buf, start, start + len - 1);
                 if (idx[i] > 0) {
-//                   log.fatal() << (int)nodeNr << " " << (int)n << " " << (int)idx[i];
                   auto sig = this->getOut(nodeNr).getSignal().getValue();
                   sig[idx[i]-1] = val;
                   this->getOut(nodeNr).getSignal().setValue(sig);
@@ -116,17 +112,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
               }
             }
           }
-
-//           uint16_t st = co.getPDOdata(buf, 0, 1);
-//           if ((st & 0x417f) != 0x137) {
-//             co.sendNMT(0, co.NMT_CS::PREOP);
-// //             std::cout << "status=" << ds402.getStatusDesc(node) << std::endl;
-// //             std::cout << "error=" << ds402.getErrorDesc(node) << std::endl;
-//             log.error() << "status wrong";
-//             break;
-//           }
-
-        } else log.warn() << err;
+        }
       }
     }
   }
@@ -155,11 +141,11 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
   }
   
   /**
-   * Sets the scaling for the velocity information.
+   * Sets the scaling.
    *
-   * The drive needs its velocity information as a 4 bytes counter value.
-   * The scaling allows to transform this counter value into meaningful
-   * velocity information in rad/s or m/s.
+   * The drive delivers its position and velocity information as 4 bytes counter values.
+   * The scaling allows to transform this counter values into meaningful position and
+   * velocity information in rad, m, rad/s or m/s.
    *
    * @param scale the scaling factor for the velocity for all drives
    */
@@ -168,29 +154,30 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
   }
 
   /**
-   * Sets the scaling for the velocity information.
+   * Reads the status information.
    *
-   * The drive needs its velocity information as a 4 bytes counter value.
-   * The scaling allows to transform this counter value into meaningful
-   * velocity information in rad/s or m/s.
-   *
-   * @param scale the scaling factor for the velocity for all drives
+   * @param index index of the drive
    */
   virtual uint16_t getStatus(uint8_t index) {
     return this->status[index];
   }
 
   /**
-   * Sets the scaling for the velocity information.
+   * Configures the PDO which are received by this block.
    *
-   * The drive needs its velocity information as a 4 bytes counter value.
-   * The scaling allows to transform this counter value into meaningful
-   * velocity information in rad/s or m/s.
+   * First of all this includes the node id of the slave drive. This id is searched for in the
+   * list with all node ids and the corresponding index is saved as well for later use.
+   * Next, you have to specify which TPDO number is chosen together with one or several
+   * CANopen dictionary objects which are mapped into this TPDO. Last, you must chose for
+   * each mapping, where the corresponding signal goes to.
    *
-   * @param nodeId the id of the node for which this PDO is sent
-   * @param TPDOnr nr of the TPDO (1 to 4)
-   * @param objs The scaling factor for the velocity for all drives
-   * @param idx signal index
+   * @param nodeId the id of the node to which this PDO is sent
+   * @param RPDOnr nr of the RPDO (1 to 4)
+   * @param objs opjects which are mapped into this PDO
+   * @param idx signal index, where
+   *            - > 0 : index in floating point inputs
+   *            - 0   : control word
+   *            - < 0 : index in integer inputs
    */
   virtual void configureTPDO(uint8_t nodeId, uint8_t TPDOnr, std::vector<coObject_t> objs, std::vector<int8_t> idx) {
     std::vector<uint8_t>::iterator it = std::find(node.begin(), node.end(), nodeId);
