@@ -37,10 +37,10 @@ class ControlSystem {
     canSend.setName("CAN send");
     canReceive.configureTPDO(nodeId1, TPDO1, {statusObj,posActValObj,digInStateObj}, {0,1,-1});
     canReceive.configureTPDO(nodeId2, TPDO1, {statusObj,posActValObj}, {0,1});
-    canSend.configureRPDO(nodeId1, RPDO1, {controlObj,targVelObj}, {0,1});
-    canSend.configureRPDO(nodeId2, RPDO1, {controlObj,targVelObj}, {0,1});
+    canSend.configureRPDO(nodeId1, RPDO1, {controlObj,velModeSetValObj}, {0,1});
+    canSend.configureRPDO(nodeId2, RPDO1, {controlObj,velModeSetValObj}, {0,1});
 
-    Matrix<2,1,double> scale({1 * 10, 1 * 10});    // accounts for encoder resolution and gear box
+    Matrix<2,1,double> scale({50, 200});    // accounts for encoder resolution and gear box
     canReceive.setScale(scale);
     canSend.setScale(scale);
     canSend.setCtrl(0, 0xf);
@@ -102,18 +102,18 @@ class InitSequence : public Sequence {
     ds402.configureTPDO(nodeId2, 2, {});
     ds402.configureTPDO(nodeId2, 3, {});
     ds402.configureTPDO(nodeId2, 4, {});
-    ds402.configureRPDO(nodeId1, 1, {controlObj,targVelObj});
+    ds402.configureRPDO(nodeId1, 1, {controlObj,velModeSetValObj});
     ds402.configureRPDO(nodeId1, 2, {});
     ds402.configureRPDO(nodeId1, 3, {});
     ds402.configureRPDO(nodeId1, 4, {});
-    ds402.configureRPDO(nodeId2, 1, {controlObj,targVelObj});
+    ds402.configureRPDO(nodeId2, 1, {controlObj,velModeSetValObj});
     ds402.configureRPDO(nodeId2, 2, {});
     ds402.configureRPDO(nodeId2, 3, {});
     ds402.configureRPDO(nodeId2, 4, {});
 
-    ds402.setOperationMode(nodeId1, ds402.OPERATION_MODES::PROFILE_VELOCITY);
+    ds402.setOperationMode(nodeId1, ds402.OPERATION_MODES::VELOCITY);
     ds402.enableOperation(nodeId1);
-    ds402.setOperationMode(nodeId2, ds402.OPERATION_MODES::PROFILE_VELOCITY);
+    ds402.setOperationMode(nodeId2, ds402.OPERATION_MODES::VELOCITY);
     ds402.enableOperation(nodeId2);
 
     ds402.co.sendNMT(0, ds402.co.NMT_CS::START);
@@ -147,12 +147,12 @@ class MoveSequence : public Sequence {
   int action() {
     uint32_t vel = 2;
     while(Sequencer::running  && ss.getCurrentLevel() == sp.slMoving) {
-      cs.velDrive0.setValue(-vel);
-      cs.velDrive1.setValue(vel*100);
+      cs.velDrive0.setValue(vel);
+      cs.velDrive1.setValue(vel);
       wait(2.0);
       log.info() << "act pos 1: " << cs.canReceive.getOut(0).getSignal().getValue() << " act pos 2: " << cs.canReceive.getOut(1).getSignal().getValue() << " dig 1: 0x" << hex << cs.canReceive.getDigOut(0).getSignal().getValue();
       log.info() << hex << "status 1: " << ds402.statusToString(cs.canReceive.getStatus(0)) << " status 2: " << ds402.statusToString(cs.canReceive.getStatus(1));
-      if (vel == 2) vel = 1;
+      if (vel == 2) vel = -1;
       else vel = 2;
     }
     return 0;
