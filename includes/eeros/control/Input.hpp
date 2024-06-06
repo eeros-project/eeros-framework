@@ -101,7 +101,7 @@ class Input {
    *
    * @return Output
    */
-  virtual Output<T>& getConOutput() {
+  virtual Output<T>& getOutput() {
     if(isConnected()) return *connectedOutput;
     std::string name;
     if (owner != nullptr) name = owner->getName(); else name = "";
