@@ -94,6 +94,19 @@ class Input {
   virtual void setOwner(Block* block) {
     owner = block;
   }
+
+  /**
+   * Return the connected output
+   * If the input is not connected an NotConnectedFault
+   *
+   * @return Output
+   */
+  virtual Output<T>& getConOutput() {
+    if(isConnected()) return *connectedOutput;
+    std::string name;
+    if (owner != nullptr) name = owner->getName(); else name = "";
+      throw NotConnectedFault("Tried to get an unconnnected block '" + name + "'");
+  }
             
  protected:
   Output<T>* connectedOutput;
