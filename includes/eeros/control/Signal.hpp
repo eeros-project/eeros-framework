@@ -176,6 +176,9 @@ class Signal : public SignalInterface {
     value.fill(std::numeric_limits<double>::quiet_NaN());
     timestamp = 0;
   }
+  template<typename S> typename std::enable_if<std::is_enum<S>::value>::type _clear() {
+    value = static_cast<S>(0);
+  }
       
   static std::list<SignalInterface*> signalList;
   static Signal<T> illegalSignal;
