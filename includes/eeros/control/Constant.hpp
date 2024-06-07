@@ -88,6 +88,9 @@ private:
   template <typename S> typename std::enable_if<std::is_compound<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
     value.fill(std::numeric_limits<double>::quiet_NaN());
   }
+  template<typename S> typename std::enable_if<std::is_enum<S>::value>::type _clear() {
+    value = static_cast<S>(0);
+  }
 };
 
 /********** Print functions **********/
