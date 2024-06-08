@@ -3,6 +3,7 @@
 #ifndef EEROS_ROS_TOOLS_HPP
 #define EEROS_ROS_TOOLS_HPP
 
+#include <assert.h> 
 #include <rclcpp/rclcpp.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <builtin_interfaces/msg/time.hpp>
@@ -12,7 +13,7 @@
 namespace eeros {
 namespace control {
 namespace rosTools {
-  
+
 /**
  * Helper functions for using ROS.
  * @since v1.0
@@ -68,7 +69,7 @@ static rclcpp::Node::SharedPtr initNode(std::string name) {
 
 /**
  * A fully static Class with Ros2 helpers
- * 
+ * It is recommended to use the initRos2 function first. (otherwise the call is implicit).
  * 
 */
 class EerosRos2Tools {
@@ -80,7 +81,7 @@ class EerosRos2Tools {
   EerosRos2Tools& operator=(const EerosRos2Tools&) = delete;
 
   static void initRos2(int argc, char** argv){
-    if(!rclcpp::ok) {
+    if(!rclcpp::ok()) {
       rclcpp::InitOptions options;
       const char* domain_id_env = std::getenv("ROS_DOMAIN_ID");
       if (domain_id_env) {
@@ -94,12 +95,32 @@ class EerosRos2Tools {
           options.set_domain_id(0);
         }
       } else {
-        options.set_domain_id(0);
+        options.set_domain_id(0); /* Default */
         logger::Logger::getLogger().trace() << "ROS_DOMAIN_ID not set. Using default: 0";
       }
-      std::atexit(cleanup); /* add function to call rclcpp::destroy at the end of the program */
-      rclcpp::init(argc,argv, options);
+      std::atexit(cleanup); /* add function to call rclcpp::shutdown at the end of the program */
+      rclcpp::init(0,nullptr, options);
     }
+  }
+
+  /** 
+   * This function let register your own SIGINT handler along the
+   * ROS2 SIGINT handler
+   */
+  static void registerCustomSigIntHandler(void (customHandler)(int)){
+    assert(rclcpp::ok() && "rclcpp not initialized!");
+
+    EerosRos2Tools::customHandler = customHandler;
+
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sigaction(SIGINT, NULL, &sa);
+    ros2Handler = sa.sa_handler;
+
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = aggregate_handler;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGINT, &sa, NULL);
   }
 
   /**
@@ -111,11 +132,11 @@ class EerosRos2Tools {
    * @return The ROS Node as a shared pointer
    */
   static rclcpp::Node::SharedPtr initNode(std::string nodeName, bool letNodeSpin = false) {
-    EerosRos2Tools::initRos2(0, NULL);
-    auto node = rclcpp::Node::make_shared(nodeName);
+    EerosRos2Tools::initRos2(0, nullptr);
+    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("test");
     if(letNodeSpin) {
       std::thread([node]() {
-        rclcpp::spin(node); /* Terminates when the node is destroyed or when rclcpp::shutdown is called. */
+        spin(node); /* Terminates when the node is destroyed or when rclcpp::shutdown is called. */
       }).detach();
     }
     return node;
@@ -146,13 +167,33 @@ class EerosRos2Tools {
   }
 
   private:
+
+  static void (*customHandler)(int);
+  static void (*ros2Handler)(int);
+  static void aggregate_handler(int signum) {
+    eeros::logger::Logger::getLogger().warn() << "sighandler";
+    if (ros2Handler != nullptr) {
+      ros2Handler(signum);
+      eeros::logger::Logger::getLogger().warn() << "Called Ros2 SIGINT Handler";
+    }
+    if (customHandler != nullptr) {
+      customHandler(signum);
+      eeros::logger::Logger::getLogger().warn() << "Called custom SIGINT Handler";
+    }
+  }
+
   static void cleanup(){
     if(rclcpp::ok) {
+      logger::Logger::getLogger().warn() << "rclcpp shutdown";
       rclcpp::shutdown();
     }
   }
 
 };
+
+// Initialisierung der statischen Funktionszeiger
+void (*EerosRos2Tools::customHandler)(int) = nullptr;
+void (*EerosRos2Tools::ros2Handler)(int) = nullptr;
 
 } /* Namespace rosTools */
 } /* Namespace control */
