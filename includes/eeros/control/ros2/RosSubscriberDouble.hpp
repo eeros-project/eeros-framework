@@ -13,6 +13,8 @@ namespace control {
  * and publishes it as a signal of type double.
  * 
  * @since v1.0
+ *
+ * @deprecated Since Foxy
  */
 class RosSubscriberDouble : public RosSubscriber<std_msgs::msg::Float64, double> {
   typedef std_msgs::msg::Float64 TRosMsg;

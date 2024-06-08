@@ -14,6 +14,8 @@ namespace control {
  * 
  * @tparam SigInType - type of the input signal
  * @since v1.0
+ *
+ * @deprecated Since Foxy
  */
 template < typename SigInType >
 class RosPublisherDoubleArray : public RosPublisher<std_msgs::msg::Float64MultiArray, SigInType> {
