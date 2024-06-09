@@ -130,9 +130,11 @@ class EerosRos2Tools {
    * @param letNodeSpin - if set to true it wil start a seperate thread to spin the node (needed for services, asynchrounus communication, ...)
    * @return The ROS Node as a shared pointer
    */
-  static rclcpp::Node::SharedPtr initNode(std::string nodeName, bool letNodeSpin = false) {
+  static rclcpp::Node::SharedPtr initNode(std::string nodeName, std::string nameSpace = "", bool letNodeSpin = false) {
     assert(rclcpp::ok() && "rclcpp not initialized!");
-    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared(nodeName);
+    rclcpp::NodeOptions opt;
+    
+    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared(nodeName, nameSpace);
     if(letNodeSpin) {
       std::thread([node]() {
         spin(node); /* Terminates when the node is destroyed or when rclcpp::shutdown is called. */
