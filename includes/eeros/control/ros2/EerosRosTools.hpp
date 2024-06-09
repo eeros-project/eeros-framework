@@ -69,8 +69,7 @@ static rclcpp::Node::SharedPtr initNode(std::string name) {
 
 /**
  * A fully static Class with Ros2 helpers
- * It is recommended to use the initRos2 function first. (otherwise the call is implicit).
- * 
+ * You have to use rosInit first.
 */
 class EerosRos2Tools {
   public:
@@ -132,7 +131,7 @@ class EerosRos2Tools {
    * @return The ROS Node as a shared pointer
    */
   static rclcpp::Node::SharedPtr initNode(std::string nodeName, bool letNodeSpin = false) {
-    EerosRos2Tools::initRos2(0, nullptr);
+    assert(rclcpp::ok() && "rclcpp not initialized!");
     rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared(nodeName);
     if(letNodeSpin) {
       std::thread([node]() {
