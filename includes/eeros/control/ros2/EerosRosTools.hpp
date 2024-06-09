@@ -133,7 +133,7 @@ class EerosRos2Tools {
    */
   static rclcpp::Node::SharedPtr initNode(std::string nodeName, bool letNodeSpin = false) {
     EerosRos2Tools::initRos2(0, nullptr);
-    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("test");
+    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared(nodeName);
     if(letNodeSpin) {
       std::thread([node]() {
         spin(node); /* Terminates when the node is destroyed or when rclcpp::shutdown is called. */
