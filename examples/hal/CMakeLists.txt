@@ -8,6 +8,8 @@ list(APPEND files ${EEROS_BINARY_DIR}/examples/hal/HalTest2ConfigComedi.json)
 add_custom_command(OUTPUT copyHalTest2FConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/examples/hal/HalTest2ConfigFlink.json" "${EEROS_BINARY_DIR}/examples/hal")
 list(APPEND files ${EEROS_BINARY_DIR}/examples/hal/HalTest2ConfigFlink.json)
 
+add_custom_command(OUTPUT copyHalTest3FConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/examples/hal/HalTest3ConfigFlink.json" "${EEROS_BINARY_DIR}/examples/hal")
+list(APPEND files ${EEROS_BINARY_DIR}/examples/hal/HalTest3ConfigFlink.json)
 
 set(targets "")
 
@@ -18,6 +20,10 @@ list(APPEND targets halTest1)
 add_executable(halTest2 HalTest2.cpp copyHalTest2CConfig copyHalTest2FConfig)
 target_link_libraries(halTest2 eeros ${EEROS_LIBS})
 list(APPEND targets halTest2)
+
+add_executable(halTest3 HalTest3.cpp copyHalTest3FConfig)
+target_link_libraries(halTest3 eeros ${EEROS_LIBS})
+list(APPEND targets halTest3)
 
 
 if(INSTALL_EXAMPLES)
