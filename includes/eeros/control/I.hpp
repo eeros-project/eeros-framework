@@ -159,19 +159,19 @@ class I: public Blockio<1,1,T> {
   }
   template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _clear() {
     upperLimit = std::numeric_limits<int32_t>::max();
-    lowerLimit = -upperLimit;
+    lowerLimit = std::numeric_limits<int32_t>::min();
   }
   template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type _clear() {
     upperLimit = std::numeric_limits<double>::max();
-    lowerLimit = -upperLimit;
+    lowerLimit = std::numeric_limits<double>::min();
   }
   template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type _clear() {
     upperLimit.fill(std::numeric_limits<int32_t>::max());
-    lowerLimit = -upperLimit;
+    lowerLimit.fill(std::numeric_limits<int32_t>::min());
   }
   template <typename S> typename std::enable_if<   !std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
     upperLimit.fill(std::numeric_limits<double>::max());
-    lowerLimit = -upperLimit;
+    lowerLimit.fill(std::numeric_limits<double>::min());
   }
 
 };

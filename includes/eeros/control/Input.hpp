@@ -94,7 +94,7 @@ class Input {
   virtual void setOwner(Block* block) {
     owner = block;
   }
-      
+            
  protected:
   Output<T>* connectedOutput;
   Block* owner;
