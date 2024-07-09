@@ -31,6 +31,8 @@ class Ros2PublisherOdometrie : public RosPublisher<nav_msgs::msg::Odometry, uint
    * @param node - ROS node as a shared ptr
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
+   * 
+   * @throw std::runtime_error if rclcpp not initialized
    */ 
   Ros2PublisherOdometrie(const rclcpp::Node::SharedPtr node, 
                          const std::string& topic,
@@ -42,6 +44,7 @@ class Ros2PublisherOdometrie : public RosPublisher<nav_msgs::msg::Odometry, uint
       odomFrame(odomFrame),
       clock(node->get_clock()) { 
     CHECK_RCLCPP_OK();
+    lastTime = 0;
   }
 
   /**
@@ -50,26 +53,55 @@ class Ros2PublisherOdometrie : public RosPublisher<nav_msgs::msg::Odometry, uint
   Ros2PublisherOdometrie(const Ros2PublisherOdometrie& other) = delete;
 
   virtual void setRosMsg(nav_msgs::msg::Odometry& msg) override {
+    this->isNaN = false;
     msg.header.frame_id = odomFrame;
     msg.header.stamp = clock->now();
     msg.child_frame_id = robotBaseFrame;
-    msg.twist.twist.linear.x = inTwistTranslation.getSignal().getValue()[0];
-    msg.twist.twist.linear.y = inTwistTranslation.getSignal().getValue()[1];
-    msg.twist.twist.linear.z = inTwistTranslation.getSignal().getValue()[2];
-    msg.twist.twist.angular.z = inTwistRotation.getSignal().getValue()[0];
-    msg.twist.twist.angular.x = inTwistRotation.getSignal().getValue()[1];
-    msg.twist.twist.angular.y = inTwistRotation.getSignal().getValue()[2];
-    msg.pose.pose.position.x = inPoseTranslation.getSignal().getValue()[0];
-    msg.pose.pose.position.y = inPoseTranslation.getSignal().getValue()[1];
-    msg.pose.pose.position.z = inPoseTranslation.getSignal().getValue()[2];
+    temp = inTwistTranslation.getSignal().getValue();
+    hasNaN(temp);
+    msg.twist.twist.linear.x = temp[0];
+    msg.twist.twist.linear.y = temp[1];
+    msg.twist.twist.linear.z = temp[2];
+    temp = inTwistRotation.getSignal().getValue();
+    hasNaN(temp);
+    msg.twist.twist.angular.x = temp[0];
+    msg.twist.twist.angular.y = temp[1];
+    msg.twist.twist.angular.z = temp[2];
+    temp = inPoseTranslation.getSignal().getValue();
+    hasNaN(temp);
+    msg.pose.pose.position.x = temp[0];
+    msg.pose.pose.position.y = temp[1];
+    msg.pose.pose.position.z = temp[2];
     temp = inPoseRotation.getSignal().getValue();
+    hasNaN(temp);
     quat.setRPY(temp[0], temp[1], temp[2]);
     msg.pose.pose.orientation.x = quat.getX();
     msg.pose.pose.orientation.y = quat.getY();
     msg.pose.pose.orientation.z = quat.getZ();
     msg.pose.pose.orientation.w = quat.getW();
+    hasNaN(inCovarianzTwist.getSignal().getValue());
+    hasNaN(inCovarianzPose.getSignal().getValue());
     msg.twist.covariance = inCovarianzTwist.getSignal().getValue();
     msg.pose.covariance = inCovarianzPose.getSignal().getValue();
+  }
+
+  /**
+   * Override to avoid publish if a Value is NaN
+   */
+  virtual void run() override{
+    if (running) {    
+      setRosMsg(msg);
+      /* if a value is NaN do not publish it */
+      if(this->isNaN) {
+        if((lastTime + 2000000000) < eeros::System::getTimeNs()){
+          log.warn() << "Odom block: \"" << this->getName() << "\"";
+          log.warn() << " -> It has not been published due to NaN value(s).";
+          lastTime = eeros::System::getTimeNs();
+        }
+      } else {
+        publisher->publish(msg);
+      }
+    }
   }
 
   inline control::Input<math::Vector3>& getInPoseTranslation(){return inPoseTranslation;}
@@ -88,10 +120,28 @@ class Ros2PublisherOdometrie : public RosPublisher<nav_msgs::msg::Odometry, uint
   control::Input<std::array<double,36>> inCovarianzTwist;
   math::Vector3 temp;
   tf2::Quaternion quat;
+  bool isNaN = false;
+  uint64_t lastTime;
 
   std::string robotBaseFrame;
   std::string odomFrame;
   rclcpp::Clock::SharedPtr clock;
+
+  void hasNaN(math::Vector3 x){
+    if(std::isnan(x[0]+x[1]+x[2])) {
+      isNaN = true;
+    }
+  }
+
+  void hasNaN(const std::array<double, 36>& x) {
+    double res = 0;
+    for (const auto& value : x) {
+      res += value;
+    }
+    if (std::isnan(res)) {
+      isNaN = true;
+    }
+  }
 };
 
 } /* END: Namespace control */
