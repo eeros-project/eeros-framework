@@ -1,7 +1,4 @@
-#ifdef USE_ROS2 /* header is only for use with ros2 */
-
-#ifndef EEROS_ROS_TOOLS_HPP
-#define EEROS_ROS_TOOLS_HPP
+#pragma once
 
 #include <assert.h> 
 #include <rclcpp/rclcpp.hpp>
@@ -15,6 +12,19 @@ namespace control {
 namespace rosTools {
 
 /**
+ * Makro to check if the rclcpp is initialized.
+ * If not it will throw a std::runtime_error
+ */
+#define CHECK_RCLCPP_OK() \
+do { \
+  if (!rclcpp::ok()) { \
+    std::ostringstream oss; \
+    oss << __FILE__ << "::" << __LINE__ << " \n rclcpp was not initialized"; \
+    throw std::runtime_error(oss.str()); \
+  } \
+} while (0)
+
+/**
  * Helper functions for using ROS.
  * @since v1.0
  * @deprecated
@@ -22,12 +32,11 @@ namespace rosTools {
   
 
 /**
- * @deprecated Use EerosRos2Tools::toNanoSec(...)
- * 
  * Converts a EEROS timestamp, which is in ns to ROS time in s.
  *
  * @param timestampNs - EEROS timestamp
  * @return ROS time
+ * @deprecated Use EerosRos2Tools::toNanoSec(...)
  */
 static builtin_interfaces::msg::Time convertToRosTime(uint64_t timestampNs) __attribute__((unused));
 static builtin_interfaces::msg::Time convertToRosTime(uint64_t timestampNs) {
@@ -38,13 +47,12 @@ static builtin_interfaces::msg::Time convertToRosTime(uint64_t timestampNs) {
 }
 
 
-/**
- * @deprecated Use EerosRos2Tools::toNanoSec(...)
- * 
+/** 
  * Creates an EEROS timestamp (nanoseconds) based on a ROS-Message-Header timestamp struct.
  *
  * @param time - the ROS-Message timestamp to convert
  * @return EEROS timestampNs
+ * @deprecated Use EerosRos2Tools::toNanoSec(...)
  */
 static uint64_t toNanoSec(const builtin_interfaces::msg::Time& time) __attribute__((unused));
 static uint64_t toNanoSec(const builtin_interfaces::msg::Time& time) {
@@ -53,13 +61,12 @@ static uint64_t toNanoSec(const builtin_interfaces::msg::Time& time) {
 
 
 /**
- * @deprecated Use EerosRos2Tools::initNode(...)
- * 
  * Creates and initializes a ROS node.
  * Returns a shared pointer to the ROS Node.
  *
  * @param name - name of the ROS node
  * @param return The ROS Node as a shared pointer
+ * @deprecated Use EerosRos2Tools::initNode(...)
  */
 static rclcpp::Node::SharedPtr initNode(std::string name) __attribute__((unused));
 static rclcpp::Node::SharedPtr initNode(std::string name) {
@@ -98,7 +105,9 @@ class EerosRos2Tools {
         logger::Logger::getLogger().trace() << "ROS_DOMAIN_ID not set. Using default: 0";
       }
       std::atexit(cleanup); /* add function to call rclcpp::shutdown at the end of the program */
-      rclcpp::init(0,nullptr, options);
+      rclcpp::init(argc, argv, options);
+    } else {
+      logger::Logger::getLogger().warn() << "Tried to initialize Ros2(rclcpp) multiple times";
     }
   }
 
@@ -107,7 +116,12 @@ class EerosRos2Tools {
    * ROS2 SIGINT handler
    */
   static void registerCustomSigIntHandler(void (customHandler)(int)){
-    assert(rclcpp::ok() && "rclcpp not initialized!");
+    CHECK_RCLCPP_OK();
+
+    if(EerosRos2Tools::customHandler != nullptr) {
+      logger::Logger::getLogger().warn() << "Custom SIGINT handler already registerd along ros2 SIGINT handler";
+      return;
+    }
 
     EerosRos2Tools::customHandler = customHandler;
 
@@ -131,7 +145,7 @@ class EerosRos2Tools {
    * @return The ROS Node as a shared pointer
    */
   static rclcpp::Node::SharedPtr initNode(std::string nodeName, std::string nameSpace = "", bool letNodeSpin = false) {
-    assert(rclcpp::ok() && "rclcpp not initialized!");
+    CHECK_RCLCPP_OK();
     rclcpp::NodeOptions opt;
     
     rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared(nodeName, nameSpace);
@@ -167,39 +181,30 @@ class EerosRos2Tools {
     return static_cast<uint64_t>(time.sec) * NS_PER_SEC + static_cast<uint64_t>(time.nanosec);
   }
 
-  private:
+  protected:
 
   static void (*customHandler)(int);
   static void (*ros2Handler)(int);
+
   static void aggregate_handler(int signum) {
-    eeros::logger::Logger::getLogger().warn() << "sighandler";
     if (ros2Handler != nullptr) {
       ros2Handler(signum);
-      eeros::logger::Logger::getLogger().warn() << "Called Ros2 SIGINT Handler";
+      eeros::logger::Logger::getLogger().trace() << "Called Ros2 SIGINT Handler";
     }
     if (customHandler != nullptr) {
       customHandler(signum);
-      eeros::logger::Logger::getLogger().warn() << "Called custom SIGINT Handler";
+      eeros::logger::Logger::getLogger().trace() << "Called custom SIGINT Handler";
     }
   }
 
   static void cleanup(){
     if(rclcpp::ok) {
-      logger::Logger::getLogger().warn() << "rclcpp shutdown";
+      logger::Logger::getLogger().trace() << "rclcpp shutdown";
       rclcpp::shutdown();
     }
   }
-
 };
-
-// Initialisierung der statischen Funktionszeiger
-void (*EerosRos2Tools::customHandler)(int) = nullptr;
-void (*EerosRos2Tools::ros2Handler)(int) = nullptr;
 
 } /* Namespace rosTools */
 } /* Namespace control */
 } /* Namespace eeros */
-
-#endif /* End EEROS_ROS_TOOLS_HPP*/
-
-#endif /* End USE_ROS2 */

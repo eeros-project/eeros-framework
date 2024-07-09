@@ -1,5 +1,4 @@
-#ifndef ORG_EEROS_CONTROL_ROSPUBLISHER_SAFETYLEVEL_HPP_
-#define ORG_EEROS_CONTROL_ROSPUBLISHER_SAFETYLEVEL_HPP_
+#pragma once
 
 #include <eeros/control/ros2/RosPublisher.hpp>
 #include <std_msgs/msg/string.hpp>
@@ -12,9 +11,7 @@ namespace control {
 
 /**
  * This block allows to read the safety level of the safety system and
- * publish it as a ROS message of type std_msgs::msg::UInt32.
- * 
- * @since v1.0
+ * publish it as a ROS message of type std_msgs::msg::String.
  */
 class RosPublisherSafetyLevelName : public RosPublisher<std_msgs::msg::String, double> {
   typedef std_msgs::msg::String TRosMsg;
@@ -61,7 +58,5 @@ class RosPublisherSafetyLevelName : public RosPublisher<std_msgs::msg::String, d
   SafetySystem* safetySystem;
 };
 
-}
-}
-
-#endif /* ORG_EEROS_CONTROL_ROSPUBLISHER_SAFETYLEVEL_HPP_ */
+} /* End namespace: control */
+} /* End namespace: eeros */
