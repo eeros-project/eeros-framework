@@ -39,6 +39,9 @@ class Ros2TransformBroadcaster : public Block {
    * @param frames: first element parent second element child frame
    *                Index n belongs to output n
    * @param queueSize: rclcpp QoS 
+   * 
+   * @throw std::runtime_error if rclcpp is not initialized
+   * @throw eeros::Fault if frames vector size unequal to template N
    */
   Ros2TransformBroadcaster(rclcpp::Node::SharedPtr node,
                            const std::vector<std::pair<std::string, std::string>>& frames_, 
@@ -111,6 +114,8 @@ class Ros2TransformBroadcaster : public Block {
    * 
    * @param index Index has the same function as getInPoseRotation. It belongs to a tf
    * @return the Input
+   * 
+   * @throw eeros::control::IndexOutOfBoundsFault if index >= N
    */
   inline control::Input<math::Vector3>& getInPoseTranslation(const uint8_t index){
     if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
@@ -122,6 +127,8 @@ class Ros2TransformBroadcaster : public Block {
    * 
    * @param index Index has the same function as getInPoseTranslation. It belongs to a tf
    * @return the Input
+   * 
+   * @throw eeros::control::IndexOutOfBoundsFault if index >= N
    */
   inline control::Input<math::Vector3>& getInPoseRotation(const uint8_t index){
     if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 

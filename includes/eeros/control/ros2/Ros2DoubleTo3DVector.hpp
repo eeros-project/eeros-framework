@@ -48,6 +48,8 @@ class Ros2DoubleTo3DVector : public control::Blockio<0,0> {
    * 
    * @param provPlane: Specifies the axe to which the value is aligned.
    * @param valueToFill: Defines the value with which the other dimension must be filled.
+   * 
+   * @throw eeros::Fault is thrown if the vectors of both params and template n are not the same.
    */
   Ros2DoubleTo3DVector(const std::vector<Axe_t> &provAxe,
                        const std::vector<math::Vector2> &valueToFill)
@@ -95,7 +97,9 @@ class Ros2DoubleTo3DVector : public control::Blockio<0,0> {
    * Get an input of the block.
    * 
    * @param index - index of the input
-   * @return input
+   * @return input 
+   * 
+   * @throw eeros::control::IndexOutOfBoundsFault if index >= N
    */
   virtual Input<double>& getIn(uint8_t index) {
     if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
@@ -106,6 +110,8 @@ class Ros2DoubleTo3DVector : public control::Blockio<0,0> {
    * Get the output of the block.
    * 
    * @return output
+   * 
+   * @throw eeros::control::IndexOutOfBoundsFault if index >= N
    */
   virtual Output<math::Vector3>& getOut(uint8_t index) {
     if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 

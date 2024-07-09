@@ -42,6 +42,8 @@ class Ros2TransformListener: public Block {
    * @param frames: first element parent second element child frame
    *                Index n belongs to output n
    * @param queueSize: rclcpp QoS 
+   * 
+   * @throw std::runtime_error if rclcpp is not initialized
    */
   Ros2TransformListener(rclcpp::Node::SharedPtr node,
                         const std::vector<std::pair<std::string, std::string>>& frames_, 
@@ -109,12 +111,27 @@ class Ros2TransformListener: public Block {
     }
   }
 
-
+  /**
+   * Get the output for rotation
+   * 
+   * @param index Index has the same function as getOutPoseRotation. It belongs to a tf
+   * @return the Input
+   * 
+   * @throw eeros::control::IndexOutOfBoundsFault if index >= N
+   */
   virtual control::Output<math::Vector3>& getOutPoseTranslation(uint8_t index) {
     if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
     return outPoseTranslation[index];
   }
 
+  /**
+   * Get the output for rotation
+   * 
+   * @param index Index has the same function as getOutPoseTranslation. It belongs to a tf
+   * @return the Input
+   * 
+   * @throw eeros::control::IndexOutOfBoundsFault if index >= N
+   */
   virtual control::Output<math::Vector3>& getOutPoseRotation(uint8_t index) {
     if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
     return outPoseRotation[index];

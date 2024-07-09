@@ -86,6 +86,12 @@ class EerosRos2Tools {
   EerosRos2Tools(const EerosRos2Tools&&) = delete;
   EerosRos2Tools& operator=(const EerosRos2Tools&) = delete;
 
+  /** 
+   * Initialized the rclcpp
+   * Read the enviroment variable "ROS_DOMAIN_ID" to set the domain id where ros2 has to be run.
+   * 
+   * It registers a function that will be called when the program ends to shut down rclcpp.
+   */
   static void initRos2(int argc, char** argv){
     if(!rclcpp::ok()) {
       rclcpp::InitOptions options;
@@ -112,8 +118,11 @@ class EerosRos2Tools {
   }
 
   /** 
-   * This function let register your own SIGINT handler along the
-   * ROS2 SIGINT handler
+   * This function let register your own SIGINT handler along the ROS2 SIGINT handler
+   * 
+   * It is recommended to call this immediately after the initRos2 function.
+   * 
+   * @throw std::runtime_error if rclcpp not initialized
    */
   static void registerCustomSigIntHandler(void (customHandler)(int)){
     CHECK_RCLCPP_OK();
@@ -143,6 +152,8 @@ class EerosRos2Tools {
    * @param name - name of the ROS node
    * @param letNodeSpin - if set to true it wil start a seperate thread to spin the node (needed for services, asynchrounus communication, ...)
    * @return The ROS Node as a shared pointer
+   * 
+   * @throw std::runtime_error if rclcpp not initialized
    */
   static rclcpp::Node::SharedPtr initNode(std::string nodeName, std::string nameSpace = "", bool letNodeSpin = false) {
     CHECK_RCLCPP_OK();
@@ -197,6 +208,7 @@ class EerosRos2Tools {
     }
   }
 
+  /* called if programm is shutting down */
   static void cleanup(){
     if(rclcpp::ok) {
       logger::Logger::getLogger().trace() << "rclcpp shutdown";

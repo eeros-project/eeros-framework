@@ -23,57 +23,67 @@ namespace control {
  */
 class Ros2StaticTransformBroadcaster {
 public:
-    static Ros2StaticTransformBroadcaster& getInstance(rclcpp::Node::SharedPtr node, uint32_t queueSize = 1000) {
-        static Ros2StaticTransformBroadcaster instance(node, queueSize);
-        return instance;
-    }
 
-    /**
-     * Broadcast a single static Tf
-     * If you need to send multiple TFs, use the overload feature (better performance).
-     * 
-     * @param tf: The static tf to broadcast
-     */
-    void addTf(const geometry_msgs::msg::TransformStamped& tf) {
-        static_tf_broadcaster->sendTransform(tf);
-        tfs.push_back(tf);
-    }
+  /** 
+   * Singleton
+   * The first call requires the params. Second or later calls do not require params.
+   * 
+   * @param node - The node from which the tf's must be sent.
+   * @param queueSize - rclcpp quality of service
+   * 
+   * @throw std::runtime_error if node is nullptr
+   */
+  static Ros2StaticTransformBroadcaster& getInstance(rclcpp::Node::SharedPtr node = nullptr, uint32_t queueSize = 1000) {
+    static Ros2StaticTransformBroadcaster instance(node, queueSize);
+    return instance;
+  }
 
-    /**
-     * Broadcast a list of static Tf
-     * 
-     * @param tf: The static tf list to broadcast
-     */
-    void addTf(const std::vector<geometry_msgs::msg::TransformStamped>& tf) {
-        static_tf_broadcaster->sendTransform(tf);
-        tfs.insert(tfs.end(), tf.begin(), tf.end());
-    }
+  /**
+   * Broadcast a single static Tf
+   * If you need to send multiple TFs, use the overload feature (better performance).
+   * 
+   * @param tf: The static tf to broadcast
+   */
+  void addTf(const geometry_msgs::msg::TransformStamped& tf) {
+    static_tf_broadcaster->sendTransform(tf);
+    tfs.push_back(tf);
+  }
 
-    /**
-     * Returns a list of all published tf's
-     */
-    std::vector<geometry_msgs::msg::TransformStamped> getTfs() const {
-        return tfs;
-    }
+  /**
+   * Broadcast a list of static Tf
+   * 
+   * @param tf: The static tf list to broadcast
+   */
+  void addTf(const std::vector<geometry_msgs::msg::TransformStamped>& tf) {
+    static_tf_broadcaster->sendTransform(tf);
+    tfs.insert(tfs.end(), tf.begin(), tf.end());
+  }
+
+  /**
+   * Returns a list of all published tf's
+   */
+  std::vector<geometry_msgs::msg::TransformStamped> getTfs() const {
+    return tfs;
+  }
 
 private:
-    Ros2StaticTransformBroadcaster(rclcpp::Node::SharedPtr node, uint32_t queueSize)
-        : node(node),
-          log(eeros::logger::Logger::getLogger('t')) {
-        if (!node) {
-            throw std::runtime_error("Node must not be null");
-        }
-        static_tf_broadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node, queueSize);
-        log.info() << "ROS TF static broadcaster generated on node '" << node->get_name() << "'";
+  Ros2StaticTransformBroadcaster(rclcpp::Node::SharedPtr node, uint32_t queueSize)
+    : node(node),
+      log(eeros::logger::Logger::getLogger('t')) {
+    if (!node) {
+      throw std::runtime_error("Node must not be null");
     }
+    static_tf_broadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node, queueSize);
+    log.info() << "ROS TF static broadcaster generated on node '" << node->get_name() << "'";
+  }
 
-    Ros2StaticTransformBroadcaster(const Ros2StaticTransformBroadcaster&) = delete;
-    Ros2StaticTransformBroadcaster& operator=(const Ros2StaticTransformBroadcaster&) = delete;
+  Ros2StaticTransformBroadcaster(const Ros2StaticTransformBroadcaster&) = delete;
+  Ros2StaticTransformBroadcaster& operator=(const Ros2StaticTransformBroadcaster&) = delete;
 
-    rclcpp::Node::SharedPtr node;
-    std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_broadcaster;
-    eeros::logger::Logger log;
-    std::vector<geometry_msgs::msg::TransformStamped> tfs;
+  rclcpp::Node::SharedPtr node;
+  std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_broadcaster;
+  eeros::logger::Logger log;
+  std::vector<geometry_msgs::msg::TransformStamped> tfs;
 };
 
 } /* END Namespace: control */

@@ -25,6 +25,8 @@ class Ros2SubscriberTwist : public RosSubscriber<ros2_msg_t, math::Vector3>{
    * @param node - ROS node as a shared ptr
    * @param topic - name of the topic
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
+   * 
+   * @throw std::runtime_error if rclcpp is not initialized
    */ 
   Ros2SubscriberTwist(const rclcpp::Node::SharedPtr node, 
                        const std::string& topic, 
