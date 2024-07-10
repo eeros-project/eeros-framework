@@ -12,6 +12,8 @@ namespace control {
  * publishes it as a ROS message of type std_msgs::msg::Float64.
  * 
  * @since v1.0
+ *
+ * @deprecated Since Foxy
  */
 class RosPublisherDouble : public RosPublisher<std_msgs::msg::Float64, double> {
   typedef std_msgs::msg::Float64 TRosMsg;

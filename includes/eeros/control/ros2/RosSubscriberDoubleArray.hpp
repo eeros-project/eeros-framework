@@ -14,6 +14,8 @@ namespace control {
  * 
  * @tparam SigOutType - type of the output signal
  * @since v1.0
+ *
+ * @deprecated Since Foxy
  */
 template < typename SigOutType >
 class RosSubscriberDoubleArray : public RosSubscriber<std_msgs::msg::Float64MultiArray, SigOutType> {
