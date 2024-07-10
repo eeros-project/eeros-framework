@@ -178,6 +178,7 @@ class Signal : public SignalInterface {
   }
   template<typename S> typename std::enable_if<std::is_enum<S>::value>::type _clear() {
     value = static_cast<S>(0);
+    timestamp = 0;
   }
       
   static std::list<SignalInterface*> signalList;
