@@ -290,14 +290,14 @@ class Gain : public Blockio<1,1,Tout> {
   std::mutex mtx;
 
  private:
-  template<typename S>
-  typename std::enable_if<!elementWise, S>::type calculate(S value) {
+  template<typename R>
+  typename std::enable_if<!elementWise, R>::type calculate(R value) {
     return gain * value;
   }
 
-  template<typename S>
-  typename std::enable_if<elementWise, S>::type calculate(S value) {
-    static_assert(std::is_compound<S>::value, "A gain block with element wise amplification must use matrices!");
+  template<typename R>
+  typename std::enable_if<elementWise, R>::type calculate(R value) {
+    static_assert(std::is_compound<R>::value, "A gain block with element wise amplification must use matrices!");
     return value.multiplyElementWise(gain);
   }
   
@@ -314,7 +314,7 @@ class Gain : public Blockio<1,1,Tout> {
   }
   
   template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value, R>::type calculateParabolic(R value) {
+  typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value && !elementWise, R>::type calculateParabolic(R value) {
     Tout outVal;
     for (unsigned int i = 0; i < value.size(); i++) {
       if (fabs(value[i]) > parabolicSwitchPoint[i]) {
@@ -328,13 +328,21 @@ class Gain : public Blockio<1,1,Tout> {
   }
 
   template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_compound<S>::value && !elementWise, R>::type calculateParabolic(R value) {
-    Tout outVal;  // multiplication with parabolic gain and gain matrix does not make sense
+  typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value && elementWise, R>::type calculateParabolic(R value) {
+    Tout outVal;
+    // a gain block with scalar gain factor must not use elementwise multiplication
     return outVal;
   }
 
   template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && elementWise, R>::type calculateParabolic(R value) {
+  typename std::enable_if<std::is_compound<R>::value && std::is_compound<S>::value && !elementWise, R>::type calculateParabolic(R value) {
+    Tout outVal;
+    // multiplication with parabolic gain and gain matrix does not make sense
+    return outVal;
+  }
+
+  template<typename R, typename S>
+  typename std::enable_if<std::is_compound<R>::value && std::is_compound<S>::value && elementWise, R>::type calculateParabolic(R value) {
     Tout outVal;
     for (unsigned int i = 0; i < value.size(); i++) {
       if (fabs(value[i]) > parabolicSwitchPoint[i]) {

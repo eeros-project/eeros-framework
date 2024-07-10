@@ -1,0 +1,30 @@
+{
+	"device0": {
+		"library": "libflinkeeros.so",
+		"devHandle": "/dev/flink0",
+		"subdevice5": {
+			"type": "Watchdog",
+			"channel0": {
+				"signalId": "Wdt",
+				"additionalArguments": "4.5"
+			}
+		},
+		"subdevice7": {
+			"type": "DigIn",
+			"channel0": {
+				"type": "DigOut",
+				"signalId": "led1"
+			},
+			"channel1": {
+				"type": "DigOut",
+				"signalId": "led2"
+			},
+			"channel10": {
+				"signalId": "button1",
+			},
+			"channel11": {
+				"signalId": "button2"
+			}
+		}
+	}
+}

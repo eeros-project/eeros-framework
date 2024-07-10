@@ -5,9 +5,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## Unreleased
-(v1.4.1 targeted for 2023-08-31) ([Github compare v1.4.0...master](https://github.com/eeros-project/eeros-framework/compare/v1.4.0...master))
+(v1.4.2 targeted for 2024-10-30) ([Github compare v1.4.1...master](https://github.com/eeros-project/eeros-framework/compare/v1.4.1...master))
 
 ### Added Features
+
+
+## v1.4.1
+(2024-06-13) ([GitHub compare v1.4.0...v1.4.1](https://github.com/eeros-project/eeros-framework/compare/v1.4.0...v1.4.1))
+
+### Added Features
+* Add Subio block for sybsystems
+* Add feature to use internal signals as outputs
+* Add missing include to Matrix.hpp
+* Adapt to new version of canopen library
+* Add watchdog block together with example
 
 
 ## v1.4.0

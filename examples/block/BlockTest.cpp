@@ -1,7 +1,6 @@
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/control/Constant.hpp>
-#include <eeros/control/Gain.hpp>
 #include <eeros/control/Step.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/control/Sum.hpp>
