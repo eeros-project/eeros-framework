@@ -2,6 +2,7 @@
 
 #include <eeros/control/ros2/RosPublisher.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <memory>
 #include <eeros/safety/SafetySystem.hpp>
 
 using namespace eeros::safety;
@@ -38,8 +39,8 @@ class RosPublisherSafetyLevelName : public RosPublisher<std_msgs::msg::String, d
    * 
    * @param ss - safety system
    */
-  void setSafetySystem(SafetySystem& ss) {
-    safetySystem = &ss;
+  void setSafetySystem(std::shared_ptr<SafetySystem> ss) {
+    safetySystem = ss;
   }
 
   /**
@@ -55,7 +56,7 @@ class RosPublisherSafetyLevelName : public RosPublisher<std_msgs::msg::String, d
   }
   
  private:
-  SafetySystem* safetySystem;
+  std::shared_ptr<SafetySystem> safetySystem;
 };
 
 } /* End namespace: control */
