@@ -140,12 +140,6 @@ if(DOXYGEN_FOUND)
     COMMENT "Generating API documentation with Doxygen" VERBATIM )
 endif(DOXYGEN_FOUND)
 
-
-
-## Set EEROS libraries
-#set(EEROS_LIBS ${CMAKE_DL_LIBS} ucl pthread)
-set(EEROS_LIBS ucl)
-
 target_link_libraries(eeros PUBLIC pthread PRIVATE ucl ${CMAKE_DL_LIBS} ${EXTERNAL_LIBS})
 
 if(LINUX)
