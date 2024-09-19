@@ -109,159 +109,22 @@ if(LIBCURSES)
   message(STATUS "")
 endif()
 
+include(cmake/driver_config.cmake)
 
-## Use EtherCAT if instructed
-if (USE_ETHERCAT)
-  message(STATUS "")
-  message(STATUS "**********************************")
-  message(STATUS "EtherCAT will be used")
-  message(STATUS "**********************************")
-  find_package(ecmasterlib REQUIRED)
-  target_link_libraries(eeros PUBLIC ecmasterlib)
-  target_compile_definitions(eeros PUBLIC USE_ETHERCAT EEROS_ETHERCAT)
-  message(STATUS "")
+add_driver_option(FLAG_NAME "USE_ETHERCAT" HELP_TEXT "Enable EtherCAT support" PACKAGE_DEPENDS ecmasterlib COMPILE_DEFINITIONS USE_ETHERCAT EEROS_ETHERCAT)
+add_driver_option(FLAG_NAME "USE_CAN" HELP_TEXT "Enable CAN support" PACKAGE_DEPENDS canopenlib LINK_LIBRARIES canopenlib::canopen COMPILE_DEFINITIONS USE_CAN)
+add_driver_option(FLAG_NAME "USE_MODBUS" HELP_TEXT "Enable Modbus suppport" PACKAGE_DEPENDS modbus)
+add_driver_option(FLAG_NAME "USE_PIXYCAM" HELP_TEXT "Enable Pixycam suppport" PACKAGE_DEPENDS pixy2 usb-1.0)
+add_driver_option(FLAG_NAME "USE_REALSENSE" HELP_TEXT "Enable Realsense suppport" PACKAGE_DEPENDS realsense2)
+add_driver_option(FLAG_NAME "USE_RPLIDAR" HELP_TEXT "Enable RP LIDAR suppport" PACKAGE_DEPENDS sl_lidar_sdk)
+add_driver_option(FLAG_NAME "USE_SBGECOMM" HELP_TEXT "Enable ellipse sensors suppport" PACKAGE_DEPENDS sbgECom)
+add_driver_option(FLAG_NAME "USE_ODRIVE" HELP_TEXT "Enable ODrive suppport" PACKAGE_DEPENDS odrive jsoncpp)
+add_driver_option(FLAG_NAME "USE_ROS" HELP_TEXT "Enable ROS1 support" CMAKE_FILES ros1.cmake)
+add_driver_option(FLAG_NAME "USE_ROS2" HELP_TEXT "Enable ROS2 support" CMAKE_FILES ros2.cmake)
+
+if(USE_ROS AND USE_ROS2)
+message(FATAL_ERROR "ROS1 and ROS2 support are mutually exlusive. Enable either ROS1 or ROS2, but not both")
 endif()
-
-
-# TODO: update for target based configuration
-
-## Use CAN if instructed
-if(USE_CAN)
-  message(STATUS "**********************************")
-  message(STATUS "Use canopenlib")
-  message(STATUS "**********************************")
-  find_package(canopenlib REQUIRED)
-  target_link_libraries(eeros PUBLIC canopelib::canopen)
-  target_compile_definitions(eeros PUBLIC USE_CAN)
-  if (canopen_FOUND)
-    message(STATUS "--> 'canopen' is found, CANopen examples will be built.")
-  else()
-    message(STATUS "--> 'canopen' is not installed. CANopen will NOT be used.")
-  endif()
-  message(STATUS "")
-endif()
-
-
-## Use MODBUS if instructed
-if(USE_MODBUS)
-  message(STATUS "**********************************")
-  message(STATUS "Use modbus")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS modbus)
-  message(STATUS "")
-endif()
-
-
-
-## Use PIXYCAM if instructed
-if(USE_PIXYCAM)
-  message(STATUS "**********************************")
-  message(STATUS "Use pixy cam")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS pixy2 usb-1.0)
-  message(STATUS "")
-endif()
-
-
-
-## Use REALSENSE if instructed
-if(USE_REALSENSE)
-  message(STATUS "**********************************")
-  message(STATUS "Use realsense cam")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS realsense2)
-  message(STATUS "")
-endif()
-
-
-
-## Use RPLIDAR if instructed
-if(USE_RPLIDAR)
-  message(STATUS "**********************************")
-  message(STATUS "Use rp lidar")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS sl_lidar_sdk)
-  message(STATUS "")
-endif()
-
-
-
-## Use SBGECOMM if instructed
-if(USE_SBGECOMM)
-  message(STATUS "**********************************")
-  message(STATUS "Use ellipse sensors")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS sbgECom)
-  message(STATUS "")
-endif()
-
-
-
-## Use ODRIVE if instructed
-if(USE_ODRIVE)
-  message(STATUS "**********************************")
-  message(STATUS "Use ODrive")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS odrive jsoncpp)
-  message(STATUS "")
-endif()
-
-
-
-## Use ROS if found and instructed
-if (USE_ROS)
-  message(STATUS "**********************************")
-  message(STATUS "ROS")
-  message(STATUS "**********************************")
-  find_package(roslib QUIET)
-  if (roslib_FOUND)
-    message(STATUS "--> 'ROS' is found, ROS examples will be built.")
-  else()
-    message(FATAL_ERROR "ERROR: ROS is not installed or setup.bash (for ROS) was not executed.")
-  endif()
-  include_directories( "${roslib_INCLUDE_DIRS}" )
-  list(APPEND ROS_LIBRARIES "${roslib_LIBRARIES}")
-  find_package( rosconsole QUIET)
-  list(APPEND ROS_LIBRARIES "${rosconsole_LIBRARIES}")
-  find_package( roscpp QUIET )
-  list(APPEND ROS_LIBRARIES "${roscpp_LIBRARIES}")
-  list(APPEND EXTERNAL_LIBS "${ROS_LIBRARIES}")
-  target_link_libraries(eeros PRIVATE ${roslib_LIBRARIES})
-  add_definitions(-DUSE_ROS)
-elseif (USE_ROS2)
-  message(STATUS "**********************************")
-  message(STATUS "ROS2")
-  message(STATUS "**********************************")
-  find_package(rclcpp REQUIRED)
-  if (rclcpp_FOUND)
-    message(STATUS "--> 'ROS2' is found, ROS2 examples will be built.")
-  else()
-    message(FATAL_ERROR "ERROR: ROS is not installed or setup.bash (for ROS) was not executed.")
-  endif()
-  find_package(rosconsole QUIET)
-  list(APPEND ROS_LIBRARIES "${rosconsole_LIBRARIES}")
-  include_directories(${rclcpp_INCLUDE_DIRS})
-  list(APPEND ROS_LIBRARIES "${rclcpp_LIBRARIES}")
-  find_package(rcl_interfaces REQUIRED)
-  include_directories(${rcl_interfaces_INCLUDE_DIRS})
-  list(APPEND ROS_LIBRARIES "${rcl_interfaces_LIBRARIES}")
-  find_package(std_msgs REQUIRED)
-  include_directories(${std_msgs_INCLUDE_DIRS})
-  list(APPEND ROS_LIBRARIES ${std_msgs_LIBRARIES})
-  find_package( sensor_msgs REQUIRED )
-  include_directories(${sensor_msgs_INCLUDE_DIRS})
-  list(APPEND ROS_LIBRARIES ${sensor_msgs_LIBRARIES})
-  target_link_libraries(eeros PRIVATE ${rclcpp_LIBRARIES} ${rcl_interfaces_LIBRARIES})
-  add_definitions(-DUSE_ROS2)
-else()
-  message(STATUS "--> ROS will not be used. You may want to use the -DUSE_ROS or -DUSE_ROS2 switch with cmake.")
-endif (USE_ROS)
-if (USE_ROS AND USE_ROS2)
-  message(STATUS "--> You cannot use ROS and ROS2 together. Either use -DUSE_ROS or -DUSE_ROS2 switch with cmake.")
-endif ()
-message(STATUS "")
-
-
 
 ## Set special variable for eclipse IDE
 set(CMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT ON)
