@@ -70,7 +70,7 @@ target_include_directories(eeros
                               
 set_target_properties(eeros PROPERTIES VERSION ${EEROS_VERSION})
 
-target_compile_options(eeros PRIVATE -g -Wall PUBLIC -pthread)
+target_compile_options(eeros PRIVATE -g -Wall)
 target_compile_features(eeros PUBLIC cxx_std_17)
 
 write_basic_package_version_file(
@@ -140,7 +140,8 @@ if(DOXYGEN_FOUND)
     COMMENT "Generating API documentation with Doxygen" VERBATIM )
 endif(DOXYGEN_FOUND)
 
-target_link_libraries(eeros PUBLIC pthread PRIVATE ucl ${CMAKE_DL_LIBS} ${EXTERNAL_LIBS})
+find_package(Threads)
+target_link_libraries(eeros PUBLIC Threads::Threads PRIVATE ucl ${CMAKE_DL_LIBS} ${EXTERNAL_LIBS})
 
 if(LINUX)
   target_link_libraries(eeros PRIVATE rt)
