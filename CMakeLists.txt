@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 
 project(EEROS)
 
@@ -51,24 +51,7 @@ else()
   message(WARNING "Unknown operating system!")
 endif()
 
-## download and builds libucl
-configure_file(CMakeLists.txt.in ${EEROS_BINARY_DIR}/libucl-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${EEROS_BINARY_DIR}/libucl-download )
-if(result)
-  message(FATAL_ERROR "CMake step for libucl failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${EEROS_BINARY_DIR}/libucl-download )
-if(result)
-  message(FATAL_ERROR "Build step for libucl failed: ${result}")
-endif()
-
-# Add libucl directly to our build. This defines the libucl target.
-add_subdirectory(${EEROS_BINARY_DIR}/libucl-src
-                ${EEROS_BINARY_DIR}/libucl-build)
+include(cmake/libucl.cmake)
 
 ## Add subdirectories
 add_subdirectory(src) # EEROS framework
@@ -147,8 +130,9 @@ if(USE_CAN)
   message(STATUS "**********************************")
   message(STATUS "Use canopenlib")
   message(STATUS "**********************************")
-  find_package(canopen QUIET)
-  list(APPEND EXTERNAL_LIBS "canopen")
+  find_package(canopenlib REQUIRED)
+  target_link_libraries(eeros PUBLIC canopelib::canopen)
+  target_compile_definitions(eeros PUBLIC USE_CAN)
   if (canopen_FOUND)
     message(STATUS "--> 'canopen' is found, CANopen examples will be built.")
   else()
