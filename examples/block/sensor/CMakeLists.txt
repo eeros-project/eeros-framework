@@ -6,7 +6,7 @@ if (USE_MODBUS)
   list(APPEND targets baumerTest)
     
   add_executable(baumerTestBasic  BaumerOM70TestBasic.cpp)
-  target_link_libraries(baumerTestBasic ${EXTERNAL_LIBS} )
+  target_link_libraries(baumerTestBasic)
   list(APPEND targets baumerTestBasic)
 endif()
 

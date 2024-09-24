@@ -50,7 +50,7 @@ find_package(Threads REQUIRED)
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 include(cmake/libucl.cmake)
 
-target_link_libraries(eeros PUBLIC Threads::Threads PRIVATE ucl rt ${CMAKE_DL_LIBS} ${EXTERNAL_LIBS})
+target_link_libraries(eeros PUBLIC Threads::Threads PRIVATE ucl rt ${CMAKE_DL_LIBS})
 
 include(cmake/driver_config.cmake)
 
