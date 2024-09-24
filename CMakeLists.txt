@@ -4,14 +4,16 @@ project(EEROS)
 
 include(GNUInstallDirs)
 
-## Load CMake modules library at specified version
+# # Load CMake modules library at specified version
 set(LOAD_CMAKE_MODULES_LIB TRUE CACHE BOOL "TRUE if the cmake-modules library should be loaded.")
 
 if(LOAD_CMAKE_MODULES_LIB)
   include(cmake/CMakeModulesLibLoader.cmake)
   load_cmake_modules_lib(https://github.com/eeros-project/cmake-modules.git)
 endif()
+
 include(CMakeModulesLib)
+
 if(LOAD_CMAKE_MODULES_LIB)
   checkout_cmake_modules_lib_version(a50add2)
 endif()
@@ -20,7 +22,7 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug|DEBUG")
   logger_on()
 endif()
 
-## Fetch the version information from git tag
+# # Fetch the version information from git tag
 include(VersioningHelpers)
 setLibraryVersion()
 
@@ -34,12 +36,12 @@ log("Going to build EEROS v${EEROS_VERSION}")
 
 include(CMakePackageConfigHelpers)
 
-
-## Check environment
+# # Check environment
 if(WIN32 AND NOT CYGWIN)
   set(WINDOWS TRUE) # Windows (native)
 elseif(UNIX)
   set(POSIX TRUE) # Linux, BSD, Mac OS X, ...
+
   if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     set(LINUX TRUE) # GNU/Linux
   else()
@@ -53,7 +55,7 @@ endif()
 
 include(cmake/libucl.cmake)
 
-## Add subdirectories
+# # Add subdirectories
 add_subdirectory(src) # EEROS framework
 
 add_library(eeros SHARED ${EEROS_SRCS})
@@ -61,13 +63,12 @@ add_library(eeros SHARED ${EEROS_SRCS})
 # include the eeros headers + eeros/config.cpp generated earlier
 # There is probably a better way to do this (config.hpp) and ideally the headers should be part of the project sources anyway
 target_include_directories(eeros
-                            PUBLIC 
-                              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/includes> 
-                              $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+  PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/includes>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
 
-                              $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:include>)
 
-                              
 set_target_properties(eeros PROPERTIES VERSION ${EEROS_VERSION})
 
 target_compile_options(eeros PRIVATE -g -Wall)
@@ -78,31 +79,32 @@ write_basic_package_version_file(
   VERSION ${EEROS_VERSION}
   COMPATIBILITY SameMinorVersion)
 
-## Configure and install config header file
+# # Configure and install config header file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
 
-## Install all eeros header files
+# # Install all eeros header files
 INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
 
 install(TARGETS eeros
-        EXPORT EEROS
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
+  EXPORT EEROS
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
 install(EXPORT EEROS NAMESPACE ${PROJECT_NAME}:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/EEROS/cmake)
 install(FILES EEROSConfig.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/EEROS/cmake)
 
 install(
   FILES
-    # ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
+
+  # ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
   DESTINATION
-    ${CMAKE_INSTALL_LIBDIR}/EEROS/cmake)
+  ${CMAKE_INSTALL_LIBDIR}/EEROS/cmake)
 
-
-## Use ncurses library if available
+# # Use ncurses library if available
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
+
 if(LIBCURSES)
   message(STATUS "-> libcurses available")
   target_link_libraries(eeros PRIVATE ncurses)
@@ -123,21 +125,20 @@ add_driver_option(FLAG_NAME "USE_ROS" HELP_TEXT "Enable ROS1 support" CMAKE_FILE
 add_driver_option(FLAG_NAME "USE_ROS2" HELP_TEXT "Enable ROS2 support" CMAKE_FILES ros2.cmake)
 
 if(USE_ROS AND USE_ROS2)
-message(FATAL_ERROR "ROS1 and ROS2 support are mutually exlusive. Enable either ROS1 or ROS2, but not both")
+  message(FATAL_ERROR "ROS1 and ROS2 support are mutually exlusive. Enable either ROS1 or ROS2, but not both")
 endif()
 
-## Set special variable for eclipse IDE
+# # Set special variable for eclipse IDE
 set(CMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT ON)
 
-
-
-## Configure Doxygen documentation target (make doc)
+# # Configure Doxygen documentation target (make doc)
 find_package(Doxygen)
+
 if(DOXYGEN_FOUND)
   configure_file(doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
   add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating API documentation with Doxygen" VERBATIM )
+    COMMENT "Generating API documentation with Doxygen" VERBATIM)
 endif(DOXYGEN_FOUND)
 
 find_package(Threads)
@@ -147,7 +148,7 @@ if(LINUX)
   target_link_libraries(eeros PRIVATE rt)
 endif()
 
-## Enable CTest
+# # Enable CTest
 enable_testing()
 
 if(NOT LIB_ONLY_BUILD)
@@ -158,4 +159,3 @@ endif(NOT LIB_ONLY_BUILD)
 if(USE_TESTS)
   add_subdirectory(test)
 endif(USE_TESTS)
-
