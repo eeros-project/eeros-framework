@@ -38,8 +38,6 @@ log("Going to build EEROS v${EEROS_VERSION}")
 
 include(CMakePackageConfigHelpers)
 
-include(cmake/libucl.cmake)
-
 # # Add subdirectories
 add_subdirectory(src) # EEROS framework
 
@@ -58,6 +56,57 @@ set_target_properties(eeros PROPERTIES VERSION ${EEROS_VERSION})
 
 target_compile_options(eeros PRIVATE -g -Wall)
 target_compile_features(eeros PUBLIC cxx_std_17)
+
+find_package(Doxygen)
+find_package(Threads REQUIRED)
+find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
+include(cmake/libucl.cmake)
+
+target_link_libraries(eeros PUBLIC Threads::Threads PRIVATE ucl rt ${CMAKE_DL_LIBS} ${EXTERNAL_LIBS})
+
+include(cmake/driver_config.cmake)
+
+add_driver_option(FLAG_NAME "USE_ETHERCAT" HELP_TEXT "Enable EtherCAT support" PACKAGE_DEPENDS ecmasterlib COMPILE_DEFINITIONS USE_ETHERCAT EEROS_ETHERCAT)
+add_driver_option(FLAG_NAME "USE_CAN" HELP_TEXT "Enable CAN support" PACKAGE_DEPENDS canopenlib LINK_LIBRARIES canopenlib::canopen COMPILE_DEFINITIONS USE_CAN)
+add_driver_option(FLAG_NAME "USE_MODBUS" HELP_TEXT "Enable Modbus suppport" PACKAGE_DEPENDS modbus)
+add_driver_option(FLAG_NAME "USE_PIXYCAM" HELP_TEXT "Enable Pixycam suppport" PACKAGE_DEPENDS pixy2 usb-1.0)
+add_driver_option(FLAG_NAME "USE_REALSENSE" HELP_TEXT "Enable Realsense suppport" PACKAGE_DEPENDS realsense2)
+add_driver_option(FLAG_NAME "USE_RPLIDAR" HELP_TEXT "Enable RP LIDAR suppport" PACKAGE_DEPENDS sl_lidar_sdk)
+add_driver_option(FLAG_NAME "USE_SBGECOMM" HELP_TEXT "Enable ellipse sensors suppport" PACKAGE_DEPENDS sbgECom)
+add_driver_option(FLAG_NAME "USE_ODRIVE" HELP_TEXT "Enable ODrive suppport" PACKAGE_DEPENDS odrive jsoncpp)
+add_driver_option(FLAG_NAME "USE_ROS" HELP_TEXT "Enable ROS1 support" CMAKE_FILES ros1.cmake)
+add_driver_option(FLAG_NAME "USE_ROS2" HELP_TEXT "Enable ROS2 support" CMAKE_FILES ros2.cmake)
+
+if(USE_ROS AND USE_ROS2)
+  message(FATAL_ERROR "ROS1 and ROS2 support are mutually exlusive. Enable either ROS1 or ROS2, but not both")
+endif()
+
+# # Configure Doxygen documentation target (make doc)
+if(DOXYGEN_FOUND)
+  configure_file(doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+  add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating API documentation with Doxygen" VERBATIM)
+endif(DOXYGEN_FOUND)
+
+# # Use ncurses library if available
+if(LIBCURSES)
+  message(STATUS "-> libcurses available")
+  target_link_libraries(eeros PRIVATE ncurses)
+  message(STATUS "")
+endif()
+
+# # Enable CTest
+enable_testing()
+
+if(NOT LIB_ONLY_BUILD)
+  add_subdirectory(tools)
+  add_subdirectory(examples)
+endif(NOT LIB_ONLY_BUILD)
+
+if(USE_TESTS)
+  add_subdirectory(test)
+endif(USE_TESTS)
 
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
@@ -81,64 +130,9 @@ install(FILES EEROSConfig.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/EEROS/cmake)
 
 install(
   FILES
-
-  # ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
   DESTINATION
   ${CMAKE_INSTALL_LIBDIR}/EEROS/cmake)
 
-# # Use ncurses library if available
-find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
-
-if(LIBCURSES)
-  message(STATUS "-> libcurses available")
-  target_link_libraries(eeros PRIVATE ncurses)
-  message(STATUS "")
-endif()
-
-include(cmake/driver_config.cmake)
-
-add_driver_option(FLAG_NAME "USE_ETHERCAT" HELP_TEXT "Enable EtherCAT support" PACKAGE_DEPENDS ecmasterlib COMPILE_DEFINITIONS USE_ETHERCAT EEROS_ETHERCAT)
-add_driver_option(FLAG_NAME "USE_CAN" HELP_TEXT "Enable CAN support" PACKAGE_DEPENDS canopenlib LINK_LIBRARIES canopenlib::canopen COMPILE_DEFINITIONS USE_CAN)
-add_driver_option(FLAG_NAME "USE_MODBUS" HELP_TEXT "Enable Modbus suppport" PACKAGE_DEPENDS modbus)
-add_driver_option(FLAG_NAME "USE_PIXYCAM" HELP_TEXT "Enable Pixycam suppport" PACKAGE_DEPENDS pixy2 usb-1.0)
-add_driver_option(FLAG_NAME "USE_REALSENSE" HELP_TEXT "Enable Realsense suppport" PACKAGE_DEPENDS realsense2)
-add_driver_option(FLAG_NAME "USE_RPLIDAR" HELP_TEXT "Enable RP LIDAR suppport" PACKAGE_DEPENDS sl_lidar_sdk)
-add_driver_option(FLAG_NAME "USE_SBGECOMM" HELP_TEXT "Enable ellipse sensors suppport" PACKAGE_DEPENDS sbgECom)
-add_driver_option(FLAG_NAME "USE_ODRIVE" HELP_TEXT "Enable ODrive suppport" PACKAGE_DEPENDS odrive jsoncpp)
-add_driver_option(FLAG_NAME "USE_ROS" HELP_TEXT "Enable ROS1 support" CMAKE_FILES ros1.cmake)
-add_driver_option(FLAG_NAME "USE_ROS2" HELP_TEXT "Enable ROS2 support" CMAKE_FILES ros2.cmake)
-
-if(USE_ROS AND USE_ROS2)
-  message(FATAL_ERROR "ROS1 and ROS2 support are mutually exlusive. Enable either ROS1 or ROS2, but not both")
-endif()
-
 # # Set special variable for eclipse IDE
 set(CMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT ON)
-
-# # Configure Doxygen documentation target (make doc)
-find_package(Doxygen)
-
-if(DOXYGEN_FOUND)
-  configure_file(doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-  add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating API documentation with Doxygen" VERBATIM)
-endif(DOXYGEN_FOUND)
-
-find_package(Threads)
-target_link_libraries(eeros PUBLIC Threads::Threads PRIVATE ucl ${CMAKE_DL_LIBS} ${EXTERNAL_LIBS})
-
-target_link_libraries(eeros PRIVATE rt)
-
-# # Enable CTest
-enable_testing()
-
-if(NOT LIB_ONLY_BUILD)
-  add_subdirectory(tools)
-  add_subdirectory(examples)
-endif(NOT LIB_ONLY_BUILD)
-
-if(USE_TESTS)
-  add_subdirectory(test)
-endif(USE_TESTS)
