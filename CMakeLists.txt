@@ -22,6 +22,8 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug|DEBUG")
   logger_on()
 endif()
 
+include(cmake/platform.cmake)
+
 # # Fetch the version information from git tag
 include(VersioningHelpers)
 setLibraryVersion()
@@ -35,23 +37,6 @@ set(EEROS_VERSION ${EEROS_VERSION_MAJOR}.${EEROS_VERSION_MINOR}.${EEROS_VERSION_
 log("Going to build EEROS v${EEROS_VERSION}")
 
 include(CMakePackageConfigHelpers)
-
-# # Check environment
-if(WIN32 AND NOT CYGWIN)
-  set(WINDOWS TRUE) # Windows (native)
-elseif(UNIX)
-  set(POSIX TRUE) # Linux, BSD, Mac OS X, ...
-
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(LINUX TRUE) # GNU/Linux
-  else()
-    # Unkown UNIX
-    message(WARNING "Unknown UNIX operating system!")
-  endif()
-else()
-  # Unkown OS
-  message(WARNING "Unknown operating system!")
-endif()
 
 include(cmake/libucl.cmake)
 
@@ -144,9 +129,7 @@ endif(DOXYGEN_FOUND)
 find_package(Threads)
 target_link_libraries(eeros PUBLIC Threads::Threads PRIVATE ucl ${CMAKE_DL_LIBS} ${EXTERNAL_LIBS})
 
-if(LINUX)
-  target_link_libraries(eeros PRIVATE rt)
-endif()
+target_link_libraries(eeros PRIVATE rt)
 
 # # Enable CTest
 enable_testing()
