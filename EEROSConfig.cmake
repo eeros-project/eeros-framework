@@ -1,18 +1,22 @@
 include(CMakeFindDependencyMacro)
+include(FindPkgConfig)
+
 include(${CMAKE_CURRENT_LIST_DIR}/EEROS.cmake)
 
-get_target_property(eeros_interface_comp_defs EEROS::eeros "INTERFACE_COMPILE_DEFINITIONS")
+get_target_property(eers_cmake_package_depends EEROS::eeros "EEROS_CMAKE_PACKAGE_DEPENDS")
 
-if("USE_ETHERCAT" IN_LIST eeros_interface_comp_defs)
-  find_dependency(ecmasterlib)
+if(eers_cmake_package_depends)
+  foreach(dependency IN LISTS eers_cmake_package_depends)
+    message("found EEROS dep: ${dependency}")
+    find_dependency(${dependency})
+  endforeach()
 endif()
 
-get_target_property(eeros_interface_libs EEROS::eeros "INTERFACE_LINK_LIBRARIES")
+get_target_property(eeros_pkgconfig_depends EEROS::eeros "EEROS_PKGCONFIG_DEPENDS")
 
-foreach(dependency IN LISTS eeros_interface_libs)
-  message("found EEROS dep: ${dependency}")
-  string(FIND ${dependency} :: package_name_end)
-  string(SUBSTRING ${dependency} 0 ${package_name_end} dep_package)
-  message("package name: ${dep_package}")
-  find_dependency(${dep_package})
-endforeach()
+if(eeros_pkgconfig_depends)
+  foreach(dependency IN LISTS eeros_pkgconfig_depends)
+    message("found EEROS pkgconfig dep: ${dependency}")
+    pkg_search_module("${dependency}" IMPORTED_TARGET REQUIRED ${dependency})
+  endforeach()
+endif()

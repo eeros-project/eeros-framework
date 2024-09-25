@@ -1,3 +1,4 @@
+include(cmake/package_management.cmake)
 
 function(add_driver_option)
     set(noValues)
@@ -8,9 +9,11 @@ function(add_driver_option)
     option(${ARG_FLAG_NAME} ${ARG_HELP_TEXT} OFF)
 
     if(${ARG_FLAG_NAME})
+        target_compile_definitions(eeros PUBLIC EEROS_${ARG_FLAG_NAME})
+
         foreach(package IN LISTS ARG_PACKAGE_DEPENDS)
             message("looking for ${package}")
-            find_package(${package} REQUIRED)
+            eeros_find_package(eeros ${package})
         endforeach()
 
         if(DEFINED ARG_LINK_LIBRARIES)
@@ -27,8 +30,8 @@ function(add_driver_option)
             include(FindPkgConfig)
 
             foreach(pkg IN LISTS ARG_PKG_CONFIG)
-                pkg_search_module("${pkg}" IMPORTED_TARGET REQUIRED ${pkg})
-                target_link_libraries(eeros PRIVATE "${pkg}")
+                eeros_find_pkgconfig(eeros "${pkg}")
+                target_link_libraries(eeros PUBLIC "PkgConfig::${pkg}")
             endforeach()
         endif()
 

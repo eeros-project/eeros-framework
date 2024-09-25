@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_CONTROL_PIXYCAM_INPUT_HPP_
 #define ORG_EEROS_CONTROL_PIXYCAM_INPUT_HPP_
 
+#ifdef EEROS_USE_PIXYCAM
+
 #include <eeros/control/Blockio.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
@@ -134,5 +136,6 @@ std::ostream& operator<<(std::ostream& os, PixyCamInput& sensor) {
 }
 }
 
+#endif
 #endif /* ORG_EEROS_CONTROL_PIXYCAM_INPUT_HPP_ */
 

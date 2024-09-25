@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_HAL_BAUMEROM70_HPP_
 #define ORG_EEROS_HAL_BAUMEROM70_HPP_
 
+#ifdef EEROS_USE_MODBUS
+
 #include <eeros/core/Thread.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <modbus/modbus.h>    
@@ -91,7 +93,7 @@ class BaumerOM70 : public eeros::Thread {
 
 }
 }
-
+#endif
 #endif /* ORG_EEROS_HAL_BAUMEROM70_HPP_ */
 
 

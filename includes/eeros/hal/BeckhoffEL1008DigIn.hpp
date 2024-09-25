@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_BECKHOFFEL1008_DIGIN_HPP_
 #define ORG_EEROS_BECKHOFFEL1008_DIGIN_HPP_
 
+#ifdef EEROS_USE_ETHERCAT
+
 #include <eeros/hal/Input.hpp>
 #include <EcMasterlibMain.hpp>
 #include <device/beckhoff/EL1008.hpp>
@@ -49,5 +51,5 @@ class BeckhoffEL1008DigIn : public Input<bool> {
 
 }
 }
-
+#endif
 #endif /* ORG_EEROS_BECKHOFFEL1008_DIGIN_HPP_ */

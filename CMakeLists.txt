@@ -5,6 +5,7 @@ project(EEROS)
 include(GNUInstallDirs)
 
 include(cmake/CMakeModulesLib.cmake)
+include(cmake/package_management.cmake)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug|DEBUG")
   logger_on()
@@ -46,7 +47,7 @@ target_compile_options(eeros PRIVATE -g -Wall)
 target_compile_features(eeros PUBLIC cxx_std_17)
 
 find_package(Doxygen)
-find_package(Threads REQUIRED)
+eeros_find_package(eeros Threads)
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 include(cmake/libucl.cmake)
 
@@ -56,7 +57,7 @@ include(cmake/driver_config.cmake)
 
 add_driver_option(FLAG_NAME "USE_ETHERCAT" HELP_TEXT "Enable EtherCAT support" PACKAGE_DEPENDS ecmasterlib LINK_LIBRARIES_PUBLIC ecmasterlib COMPILE_DEFINITIONS USE_ETHERCAT EEROS_ETHERCAT)
 add_driver_option(FLAG_NAME "USE_CAN" HELP_TEXT "Enable CAN support" PACKAGE_DEPENDS canopenlib LINK_LIBRARIES_PUBLIC canopenlib::canopen COMPILE_DEFINITIONS USE_CAN)
-add_driver_option(FLAG_NAME "USE_MODBUS" HELP_TEXT "Enable Modbus suppport" PKG_CONFIG modbus SOURCES src/hal/BaumerOM70.cpp)
+add_driver_option(FLAG_NAME "USE_MODBUS" HELP_TEXT "Enable Modbus suppport" PKG_CONFIG libmodbus SOURCES src/hal/BaumerOM70.cpp)
 add_driver_option(FLAG_NAME "USE_PIXYCAM" HELP_TEXT "Enable Pixycam suppport" PKG_CONFIG pixy2 usb-1.0)
 add_driver_option(FLAG_NAME "USE_REALSENSE" HELP_TEXT "Enable Realsense suppport" PKG_CONFIG realsense2 SOURCES src/hal/RealsenseT265.cpp)
 add_driver_option(FLAG_NAME "USE_RPLIDAR" HELP_TEXT "Enable RP LIDAR suppport" PKG_CONFIG sl_lidar_sdk SOURCES src/hal/RPLidar.cpp external/rplidar/RPlidarDriver.cpp)
@@ -102,11 +103,11 @@ write_basic_package_version_file(
   COMPATIBILITY SameMinorVersion)
 
 # # Configure and install config header file
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/public/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
 
 # # Install all eeros header files
-INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/public/eeros DESTINATION include)
+INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
 
 install(TARGETS eeros
   EXPORT EEROS

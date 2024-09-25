@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_HAL_PIXYCAM_HPP_
 #define ORG_EEROS_HAL_PIXYCAM_HPP_
 
+#ifdef EEROS_USE_PIXYCAM
+
 #include <eeros/math/Matrix.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/core/Thread.hpp>
@@ -235,4 +237,5 @@ class PixyCam : public eeros::Thread {
 }
 }
 
+#endif
 #endif // ORG_EEROS_HAL_PIXYCAM_HPP_

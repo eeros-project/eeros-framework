@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_CONTROL_REALSENSET265_INPUT_HPP
 #define ORG_EEROS_CONTROL_REALSENSET265_INPUT_HPP
 
+#ifdef EEROS_USE_REALSENSE
+
 #include <eeros/control/Blockio.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/math/Matrix.hpp>
@@ -130,5 +132,6 @@ std::ostream& operator<<(std::ostream& os, RealsenseT265Input& sensor) {
 }
 }
 
+#endif
 #endif /* ORG_EEROS_CONTROL_REALSENSET265_INPUT_HPP */
 

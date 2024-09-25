@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_HAL_REALSENSE_T265_HPP
 #define ORG_EEROS_HAL_REALSENSE_T265_HPP
 
+#ifdef EEROS_USE_REALSENSE
+
 #include <eeros/core/Runnable.hpp>
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/logger/Logger.hpp>
@@ -75,4 +77,5 @@ class RealsenseT265 : public Thread {
 }
 }
 
+#endif
 #endif /* ORG_EEROS_HAL_REALSENSE_T265_HPP */

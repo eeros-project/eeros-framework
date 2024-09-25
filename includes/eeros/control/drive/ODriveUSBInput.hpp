@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_CONTROL_ODRIVEINPUT_USB_HPP
 #define ORG_EEROS_CONTROL_ODRIVEINPUT_USB_HPP
 
+#ifdef EEROS_USE_ODRIVE
+
 #include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/control/Input.hpp>
@@ -123,4 +125,5 @@ std::ostream& operator<<(std::ostream& os, ODriveUSBInput& odrive) {
 }
 }
 
+#endif
 #endif /* ORG_EEROS_CONTROL_ODRIVEINPUT_USB_HPP */
