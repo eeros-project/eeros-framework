@@ -49,9 +49,14 @@ target_compile_features(eeros PUBLIC cxx_std_17)
 find_package(Doxygen)
 eeros_find_package(eeros Threads)
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
-include(cmake/libucl.cmake)
 
-target_link_libraries(eeros PUBLIC Threads::Threads PRIVATE ucl rt ${CMAKE_DL_LIBS})
+option(BUILD_LIBUCL "Build libucl rather than relying on the system to provide it" ON)
+
+if(BUILD_LIBUCL)
+  include(cmake/libucl.cmake)
+endif()
+
+target_link_libraries(eeros PUBLIC Threads::Threads ucl PRIVATE rt ${CMAKE_DL_LIBS})
 
 include(cmake/driver_config.cmake)
 
@@ -115,7 +120,9 @@ install(TARGETS eeros
   RUNTIME DESTINATION bin)
 
 install(EXPORT EEROS NAMESPACE ${PROJECT_NAME}:: DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
-install(FILES cmake/EEROSConfig.cmake DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
+get_target_property(EEROS_CMAKE_PACKAGE_DEPENDS eeros EEROS_CMAKE_PACKAGE_DEPENDS)
+configure_file(cmake/EEROSConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
 
 install(
   FILES

@@ -1,4 +1,24 @@
-@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+include(FindPkgConfig)
 
-set_and_check(EEROS_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
-set_and_check(EEROS_LIB_DIR "@PACKAGE_LIB_INSTALL_DIR@")
+foreach(dependency IN ITEMS @EEROS_CMAKE_PACKAGE_DEPENDS@)
+    message("found EEROS dep: ${dependency}")
+    find_dependency(${dependency})
+
+    if(${dependency}_FOUND)
+        message("found ${dependency}")
+    else()
+        message("could not find ${dependency}")
+    endif()
+endforeach()
+
+include(${CMAKE_CURRENT_LIST_DIR}/EEROS.cmake)
+
+get_target_property(eeros_pkgconfig_depends EEROS::eeros "EEROS_PKGCONFIG_DEPENDS")
+
+if(eeros_pkgconfig_depends)
+    foreach(dependency IN LISTS eeros_pkgconfig_depends)
+        message("found EEROS pkgconfig dep: ${dependency}")
+        pkg_search_module("${dependency}" IMPORTED_TARGET REQUIRED ${dependency})
+    endforeach()
+endif()
