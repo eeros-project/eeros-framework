@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14)
 project(EEROS)
 
 include(GNUInstallDirs)
-
+include(CMakeDependentOption)
 include(cmake/CMakeModulesLib.cmake)
 include(cmake/package_management.cmake)
 
@@ -50,10 +50,22 @@ find_package(Doxygen)
 eeros_find_package(eeros Threads)
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 
+option(LIB_ONLY_BUILD "Only build library, no tools or examples" FALSE)
+cmake_dependent_option(BUILD_EXAMLES "Also build examples" TRUE "NOT LIB_ONLY_BUILD" FALSE)
+cmake_dependent_option(BUILD_TOOLS "Also build examples" TRUE "NOT LIB_ONLY_BUILD" FALSE)
+
 option(BUILD_LIBUCL "Build libucl rather than relying on the system to provide it" ON)
 
 if(BUILD_LIBUCL)
   include(cmake/libucl.cmake)
+endif()
+
+if(NOT BUILD_TOOLS)
+  add_subdirectory(tools)
+endif()
+
+if(BUILD_EXAMLES)
+  add_subdirectory(examples)
 endif()
 
 target_link_libraries(eeros PUBLIC Threads::Threads ucl PRIVATE rt ${CMAKE_DL_LIBS})
@@ -92,11 +104,6 @@ endif()
 
 # # Enable CTest
 enable_testing()
-
-if(NOT LIB_ONLY_BUILD)
-  add_subdirectory(tools)
-  add_subdirectory(examples)
-endif(NOT LIB_ONLY_BUILD)
 
 if(USE_TESTS)
   add_subdirectory(test)

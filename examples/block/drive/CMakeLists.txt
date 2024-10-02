@@ -1,6 +1,2 @@
-set(targets "")
-
-if (USE_ODRIVE)
-  add_executable(odriveUSBTest  ODriveUSBTest.cpp )
-  target_link_libraries(odriveUSBTest eeros ${EEROS_LIBS})
-endif()
+include(${PROJECT_SOURCE_DIR}/cmake/target_management.cmake)
+eeros_add_dependent_target(odriveUSBTest DEPENDS_ON USE_ODRIVE SOURCES ODriveUSBTest.cpp)

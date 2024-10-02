@@ -1,7 +1,3 @@
-add_executable(multithreading multithreading.cpp)
-target_link_libraries(multithreading eeros ${EEROS_LIBS})
+include(${PROJECT_SOURCE_DIR}/cmake/target_management.cmake)
 
-if(INSTALL_EXAMPLES)
-  install(TARGETS multithreading RUNTIME DESTINATION examples/devel)
-endif()
-
+eeros_add_target(multithreading multithreading.cpp)

@@ -1,56 +1,18 @@
-add_custom_command(OUTPUT copyPathFile POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/examples/block/path.txt" "${EEROS_BINARY_DIR}/examples/block")
+include(${PROJECT_SOURCE_DIR}/cmake/target_management.cmake)
 
-set(targets "")
+eeros_copy_file_post_build(copyPathFile path.txt)
 
-add_executable(blockTest BlockTest.cpp)
-target_link_libraries(blockTest eeros ${EEROS_LIBS})
-list(APPEND targets blockTest)
-
-add_executable(mouseTest MouseTest.cpp)
-target_link_libraries(mouseTest eeros ${EEROS_LIBS})
-list(APPEND targets mouseTest)
-
-add_executable(xBoxTest XBoxTest.cpp)
-target_link_libraries(xBoxTest eeros ${EEROS_LIBS})
-list(APPEND targets xBoxTest)
-
-add_executable(keyboardTest KeyboardTest.cpp)
-target_link_libraries(keyboardTest eeros ${EEROS_LIBS})
-list(APPEND targets keyboardTest)
-
-add_executable(traceTest TraceTest.cpp)
-target_link_libraries(traceTest eeros ${EEROS_LIBS})
-list(APPEND targets traceTest)
-
-add_executable(spaceNavigatorTest SpaceNavigatorTest.cpp)
-target_link_libraries(spaceNavigatorTest eeros ${EEROS_LIBS})
-list(APPEND targets spaceNavigatorTest)
-
-add_executable(transitionBlockTest1 TransitionBlockTest.cpp)
-target_link_libraries(transitionBlockTest1 eeros ${EEROS_LIBS})
-list(APPEND targets transitionBlockTest1)
-
-add_executable(pathPlannerTest1 PathPlannerTest1.cpp)
-target_link_libraries(pathPlannerTest1 eeros ${EEROS_LIBS})
-list(APPEND targets pathPlannerTest1)
-
-add_executable(pathPlannerTest2 PathPlannerTest2.cpp)
-target_link_libraries(pathPlannerTest2 eeros ${EEROS_LIBS})
-list(APPEND targets pathPlannerTest2)
-
-add_executable(pathPlannerTest3 PathPlannerTest3.cpp copyPathFile)
-target_link_libraries(pathPlannerTest3 eeros ${EEROS_LIBS})
-list(APPEND targets pathPlannerTest3)
-
-add_executable(rateLimiterTest RateLimiterTest.cpp)
-target_link_libraries(rateLimiterTest eeros ${EEROS_LIBS})
-list(APPEND targets rateLimiterTest)
+eeros_add_target(blockTest BlockTest.cpp)
+eeros_add_target(mouseTest MouseTest.cpp)
+eeros_add_target(xBoxTest XBoxTest.cpp)
+eeros_add_target(keyboardTest KeyboardTest.cpp)
+eeros_add_target(traceTest TraceTest.cpp)
+eeros_add_target(spaceNavigatorTest SpaceNavigatorTest.cpp)
+eeros_add_target(transitionBlockTest1 TransitionBlockTest.cpp)
+eeros_add_target(pathPlannerTest1 PathPlannerTest1.cpp)
+eeros_add_target(pathPlannerTest2 PathPlannerTest2.cpp)
+eeros_add_target(pathPlannerTest3 PathPlannerTest3.cpp copyPathFile)
+eeros_add_target(rateLimiterTest RateLimiterTest.cpp)
 
 add_subdirectory(sensor)
 add_subdirectory(drive)
-
-if(INSTALL_EXAMPLES)
-  install(TARGETS ${targets} RUNTIME DESTINATION examples/block)
-  install(FILES ${EEROS_BINARY_DIR}/examples/block/path.txt DESTINATION examples/block)
-endif()
-

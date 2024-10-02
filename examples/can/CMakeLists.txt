@@ -1,13 +1,2 @@
-if (canopen_FOUND)
-  add_executable(canExample1 CANexample1.cpp)
-  target_link_libraries(canExample1 eeros ${EEROS_LIBS})
-
-  add_executable(canExample2 CANexample2.cpp)
-	target_link_libraries(canExample2 eeros ${EEROS_LIBS})
-
-  if(INSTALL_EXAMPLES)
-    install(TARGETS canExample1 RUNTIME DESTINATION examples/can)
-    install(TARGETS canExample2 RUNTIME DESTINATION examples/can)
-  endif()
-endif()
-
+eeros_add_dependent_target(canExample1 DEPENDS_ON USE_CAN SOURCES CANexample1.cpp)
+eeros_add_dependent_target(canExample2 DEPENDS_ON USE_CAN SOURCES CANexample2.cpp)
