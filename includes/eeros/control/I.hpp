@@ -158,20 +158,20 @@ class I: public Blockio<1,1,T> {
     _clear<T>();
   }
   template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _clear() {
-    upperLimit = std::numeric_limits<int32_t>::max();
-    lowerLimit = -upperLimit;
+    upperLimit = std::numeric_limits<S>::max();
+    lowerLimit = std::numeric_limits<S>::lowest();
   }
   template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type _clear() {
-    upperLimit = std::numeric_limits<double>::max();
-    lowerLimit = -upperLimit;
+    upperLimit = std::numeric_limits<S>::max();
+    lowerLimit = std::numeric_limits<S>::lowest();
   }
   template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type _clear() {
-    upperLimit.fill(std::numeric_limits<int32_t>::max());
-    lowerLimit = -upperLimit;
+    upperLimit.fill(std::numeric_limits<typename S::value_type>::max());
+    lowerLimit.fill(std::numeric_limits<typename S::value_type>::lowest());
   }
-  template <typename S> typename std::enable_if<   !std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
-    upperLimit.fill(std::numeric_limits<double>::max());
-    lowerLimit = -upperLimit;
+  template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
+    upperLimit.fill(std::numeric_limits<typename S::value_type>::max());
+    lowerLimit.fill(std::numeric_limits<typename S::value_type>::lowest());
   }
 
 };
