@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_CONTROL_BAUMEROM70_INPUT_HPP
 #define ORG_EEROS_CONTROL_BAUMEROM70_INPUT_HPP
 
+#ifdef EEROS_USE_MODBUS
+
 #include <string>
 #include <thread>
 #include <eeros/control/Blockio.hpp>
@@ -68,6 +70,7 @@ std::ostream& operator<<(std::ostream& os, BaumerOM70Input& sensor) {
 }
 }
 
+#endif
 #endif /* ORG_EEROS_CONTROL_BAUMEROM70_INPUT_HPP */
 
 

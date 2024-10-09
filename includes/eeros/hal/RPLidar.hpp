@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_HAL_RPLIDAR_HPP_
 #define ORG_EEROS_HAL_RPLIDAR_HPP_
 
+#ifdef EEROS_USE_RPLIDAR
+
 #include <eeros/control/TimeDomain.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/core/Thread.hpp>
@@ -81,4 +83,5 @@ class RPLidar : public eeros::Thread {
 }
 }
 
+#endif
 #endif /* ORG_EEROS_HAL_RPLIDAR_HPP_ */

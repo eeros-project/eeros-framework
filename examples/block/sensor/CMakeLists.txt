@@ -1,40 +1,8 @@
-set(targets "")
+include(${PROJECT_SOURCE_DIR}/cmake/target_management.cmake)
 
-if (USE_MODBUS)
-  add_executable(baumerTest BaumerOM70Test.cpp)
-  target_link_libraries(baumerTest eeros ${EEROS_LIBS})
-  list(APPEND targets baumerTest)
-    
-  add_executable(baumerTestBasic  BaumerOM70TestBasic.cpp)
-  target_link_libraries(baumerTestBasic ${EXTERNAL_LIBS} )
-  list(APPEND targets baumerTestBasic)
-endif()
-
-if (USE_PIXYCAM)
-  add_executable(pixycamTest PixyCamTest.cpp)
-  target_link_libraries(pixycamTest eeros ${EEROS_LIBS})
-  list(APPEND targets pixycamTest)
-endif()
-
-if (USE_REALSENSE)
-  add_executable(realsenseTest RealsenseT265Test.cpp)
-  target_link_libraries(realsenseTest eeros ${EEROS_LIBS})
-  list(APPEND targets realsenseTest)
-endif()
-
-if (USE_RPLIDAR)
-  add_executable(rplidarTest RPLidarTest.cpp)
-  target_link_libraries(rplidarTest eeros ${EEROS_LIBS})
-  list(APPEND targets rplidarTest)
-endif()
-
-if (USE_SBGECOMM)
-  add_executable(sbgTest SBGEllipseATest.cpp)
-  target_link_libraries(sbgTest eeros ${EEROS_LIBS} )
-  list(APPEND targets sbgTest)
-endif()
-
-
-if(INSTALL_EXAMPLES)
-  install(TARGETS ${targets} RUNTIME DESTINATION examples/block/sensor)
-endif()
+eeros_add_dependent_target(baumerTest DEPENDS_ON USE_MODBUS SOURCES BaumerOM70Test.cpp)
+eeros_add_dependent_target(baumerTestBasic DEPENDS_ON USE_MODBUS SOURCES BaumerOM70TestBasic.cpp)
+eeros_add_dependent_target(pixycamTest DEPENDS_ON USE_PIXYCAM SOURCES PixyCamTest.cpp)
+eeros_add_dependent_target(realsenseTest DEPENDS_ON USE_RPLIDAR SOURCES RealsenseT265Test.cpp)
+eeros_add_dependent_target(rplidarTest DEPENDS_ON USE_MODBUS SOURCES RPLidarTest.cpp)
+eeros_add_dependent_target(sbgTest DEPENDS_ON USE_SBGECOMM SOURCES SBGEllipseATest.cpp)

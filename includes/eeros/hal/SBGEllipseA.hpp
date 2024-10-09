@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_HAL_SBGELLIPSEA_HPP_
 #define ORG_EEROS_HAL_SBGELLIPSEA_HPP_
 
+#ifdef EEROS_USE_SBGECOMM
+
 #include <eeros/logger/Logger.hpp>
 #include <eeros/core/Thread.hpp>
 #include <eeros/math/Matrix.hpp>
@@ -193,5 +195,6 @@ class SBGEllipseA : public eeros::Thread {
 }
 }
 
+#endif
 #endif /* ORG_EEROS_HAL_SBGELLIPSEA_HPP_ */
 

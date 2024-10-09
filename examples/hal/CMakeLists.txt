@@ -1,33 +1,8 @@
-set(files "")
-add_custom_command(OUTPUT copyHalTest1Config POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/examples/hal/HalTest1Config.json" "${EEROS_BINARY_DIR}/examples/hal")
-list(APPEND files ${EEROS_BINARY_DIR}/examples/hal/HalTest1Config.json)
+eeros_copy_file_post_build(HalTest1Config HalTest1Config.json)
+eeros_copy_file_post_build(HalTest2ComediConfig HalTest2ConfigComedi.json)
+eeros_copy_file_post_build(HalTest2FlinkConfig HalTest2ConfigFlink.json)
+eeros_copy_file_post_build(HalTest3Config HalTest3ConfigFlink.json)
 
-add_custom_command(OUTPUT copyHalTest2CConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/examples/hal/HalTest2ConfigComedi.json" "${EEROS_BINARY_DIR}/examples/hal")
-list(APPEND files ${EEROS_BINARY_DIR}/examples/hal/HalTest2ConfigComedi.json)
-
-add_custom_command(OUTPUT copyHalTest2FConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/examples/hal/HalTest2ConfigFlink.json" "${EEROS_BINARY_DIR}/examples/hal")
-list(APPEND files ${EEROS_BINARY_DIR}/examples/hal/HalTest2ConfigFlink.json)
-
-add_custom_command(OUTPUT copyHalTest3FConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${EEROS_SOURCE_DIR}/examples/hal/HalTest3ConfigFlink.json" "${EEROS_BINARY_DIR}/examples/hal")
-list(APPEND files ${EEROS_BINARY_DIR}/examples/hal/HalTest3ConfigFlink.json)
-
-set(targets "")
-
-add_executable(halTest1 HalTest1.cpp copyHalTest1Config)
-target_link_libraries(halTest1 eeros ${EEROS_LIBS})
-list(APPEND targets halTest1)
-
-add_executable(halTest2 HalTest2.cpp copyHalTest2CConfig copyHalTest2FConfig)
-target_link_libraries(halTest2 eeros ${EEROS_LIBS})
-list(APPEND targets halTest2)
-
-add_executable(halTest3 HalTest3.cpp copyHalTest3FConfig)
-target_link_libraries(halTest3 eeros ${EEROS_LIBS})
-list(APPEND targets halTest3)
-
-
-if(INSTALL_EXAMPLES)
-  install(TARGETS ${targets} RUNTIME DESTINATION examples/hal)
-  install(FILES ${files} DESTINATION examples/hal)
-endif()
-
+eeros_add_target(halTest1 HalTest1.cpp HalTest1Config)
+eeros_add_target(halTest2 HalTest2.cpp HalTest2ComediConfig HalTest2FlinkConfig)
+eeros_add_target(halTest3 HalTest3.cpp HalTest3Config)

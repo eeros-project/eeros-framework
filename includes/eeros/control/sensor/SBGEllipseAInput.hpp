@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_CONTROL_SBGELLIPSEAINPUT_HPP_
 #define ORG_EEROS_CONTROL_SBGELLIPSEAINPUT_HPP_
 
+#ifdef EEROS_USE_SBGECOMM
+
 #include <eeros/control/Blockio.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/logger/Logger.hpp>
@@ -122,5 +124,6 @@ std::ostream& operator<<(std::ostream& os, SBGEllipseAInput& imu) {
 }
 }
 
+#endif
 #endif /* ORG_EEROS_CONTROL_SBGELLIPSEAINPUT_HPP_ */
 

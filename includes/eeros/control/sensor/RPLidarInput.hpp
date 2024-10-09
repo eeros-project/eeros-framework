@@ -1,6 +1,8 @@
 #ifndef ORG_EEROS_CONTROL_RPLIDAR_INPUT_HPP
 #define ORG_EEROS_CONTROL_RPLIDAR_INPUT_HPP
 
+#ifdef EEROS_USE_RPLIDAR
+
 #include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/hal/RPLidar.hpp> 
@@ -65,4 +67,5 @@ std::ostream& operator<<(std::ostream& os, RPLidarInput& lidar) {
 }
 }
 
+#endif
 #endif /* ORG_EEROS_CONTROL_RPLIDAR_INPUT_HPP */

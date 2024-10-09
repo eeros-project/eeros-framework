@@ -1,26 +1,19 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 
 project(EEROS)
 
 include(GNUInstallDirs)
-
-## Load CMake modules library at specified version
-set(LOAD_CMAKE_MODULES_LIB TRUE CACHE BOOL "TRUE if the cmake-modules library should be loaded.")
-
-if(LOAD_CMAKE_MODULES_LIB)
-  include(cmake/CMakeModulesLibLoader.cmake)
-  load_cmake_modules_lib(https://github.com/eeros-project/cmake-modules.git)
-endif()
-include(CMakeModulesLib)
-if(LOAD_CMAKE_MODULES_LIB)
-  checkout_cmake_modules_lib_version(a50add2)
-endif()
+include(CMakeDependentOption)
+include(cmake/CMakeModulesLib.cmake)
+include(cmake/package_management.cmake)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug|DEBUG")
   logger_on()
 endif()
 
-## Fetch the version information from git tag
+include(cmake/platform.cmake)
+
+# # Fetch the version information from git tag
 include(VersioningHelpers)
 setLibraryVersion()
 
@@ -34,43 +27,7 @@ log("Going to build EEROS v${EEROS_VERSION}")
 
 include(CMakePackageConfigHelpers)
 
-
-## Check environment
-if(WIN32 AND NOT CYGWIN)
-  set(WINDOWS TRUE) # Windows (native)
-elseif(UNIX)
-  set(POSIX TRUE) # Linux, BSD, Mac OS X, ...
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(LINUX TRUE) # GNU/Linux
-  else()
-    # Unkown UNIX
-    message(WARNING "Unknown UNIX operating system!")
-  endif()
-else()
-  # Unkown OS
-  message(WARNING "Unknown operating system!")
-endif()
-
-## download and builds libucl
-configure_file(CMakeLists.txt.in ${EEROS_BINARY_DIR}/libucl-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${EEROS_BINARY_DIR}/libucl-download )
-if(result)
-  message(FATAL_ERROR "CMake step for libucl failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${EEROS_BINARY_DIR}/libucl-download )
-if(result)
-  message(FATAL_ERROR "Build step for libucl failed: ${result}")
-endif()
-
-# Add libucl directly to our build. This defines the libucl target.
-add_subdirectory(${EEROS_BINARY_DIR}/libucl-src
-                ${EEROS_BINARY_DIR}/libucl-build)
-
-## Add subdirectories
+# # Add subdirectories
 add_subdirectory(src) # EEROS framework
 
 add_library(eeros SHARED ${EEROS_SRCS})
@@ -78,242 +35,107 @@ add_library(eeros SHARED ${EEROS_SRCS})
 # include the eeros headers + eeros/config.cpp generated earlier
 # There is probably a better way to do this (config.hpp) and ideally the headers should be part of the project sources anyway
 target_include_directories(eeros
-                            PUBLIC 
-                              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/includes> 
-                              $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+  PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/includes>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
 
-                              $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:include>)
 
-                              
 set_target_properties(eeros PROPERTIES VERSION ${EEROS_VERSION})
 
-target_compile_options(eeros PRIVATE -g -Wall PUBLIC -pthread)
+target_compile_options(eeros PRIVATE -g -Wall)
 target_compile_features(eeros PUBLIC cxx_std_17)
 
-write_basic_package_version_file(
-  ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
-  VERSION ${EEROS_VERSION}
-  COMPATIBILITY SameMinorVersion)
-
-## Configure and install config header file
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
-
-## Install all eeros header files
-INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
-
-install(TARGETS eeros
-        EXPORT EEROS
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin)
-
-install(EXPORT EEROS DESTINATION ${CMAKE_INSTALL_LIBDIR}/EEROS/cmake)
-install(FILES EEROSConfig.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/EEROS/cmake)
-
-install(
-  FILES
-    # ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
-  DESTINATION
-    ${CMAKE_INSTALL_LIBDIR}/EEROS/cmake)
-
-
-## Use ncurses library if available
+find_package(Doxygen)
+eeros_find_package(eeros Threads)
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
+
+option(LIB_ONLY_BUILD "Only build library, no tools or examples" FALSE)
+cmake_dependent_option(BUILD_EXAMLES "Also build examples" TRUE "NOT LIB_ONLY_BUILD" FALSE)
+cmake_dependent_option(BUILD_TOOLS "Also build examples" TRUE "NOT LIB_ONLY_BUILD" FALSE)
+
+option(BUILD_LIBUCL "Build libucl rather than relying on the system to provide it" ON)
+
+if(BUILD_LIBUCL)
+  include(cmake/libucl.cmake)
+endif()
+
+if(NOT BUILD_TOOLS)
+  add_subdirectory(tools)
+endif()
+
+if(BUILD_EXAMLES)
+  add_subdirectory(examples)
+endif()
+
+target_link_libraries(eeros PUBLIC Threads::Threads ucl PRIVATE rt ${CMAKE_DL_LIBS})
+
+include(cmake/driver_config.cmake)
+
+add_driver_option(FLAG_NAME "USE_ETHERCAT" HELP_TEXT "Enable EtherCAT support" PACKAGE_DEPENDS ecmasterlib LINK_LIBRARIES_PUBLIC ecmasterlib COMPILE_DEFINITIONS USE_ETHERCAT EEROS_ETHERCAT)
+add_driver_option(FLAG_NAME "USE_CAN" HELP_TEXT "Enable CAN support" PACKAGE_DEPENDS canopenlib LINK_LIBRARIES_PUBLIC canopenlib::canopen COMPILE_DEFINITIONS USE_CAN)
+add_driver_option(FLAG_NAME "USE_MODBUS" HELP_TEXT "Enable Modbus suppport" PKG_CONFIG libmodbus SOURCES src/hal/BaumerOM70.cpp)
+add_driver_option(FLAG_NAME "USE_PIXYCAM" HELP_TEXT "Enable Pixycam suppport" PKG_CONFIG pixy2 usb-1.0)
+add_driver_option(FLAG_NAME "USE_REALSENSE" HELP_TEXT "Enable Realsense suppport" PKG_CONFIG realsense2 SOURCES src/hal/RealsenseT265.cpp)
+add_driver_option(FLAG_NAME "USE_RPLIDAR" HELP_TEXT "Enable RP LIDAR suppport" PKG_CONFIG sl_lidar_sdk SOURCES src/hal/RPLidar.cpp external/rplidar/RPlidarDriver.cpp)
+add_driver_option(FLAG_NAME "USE_SBGECOMM" HELP_TEXT "Enable ellipse sensors suppport" PKG_CONFIG sbgECom SOURCES src/hal/SBGEllipseA.cpp)
+add_driver_option(FLAG_NAME "USE_ODRIVE" HELP_TEXT "Enable ODrive suppport" PKG_CONFIG odrive jsoncpp)
+add_driver_option(FLAG_NAME "USE_ROS" HELP_TEXT "Enable ROS1 support" CMAKE_FILES ros1.cmake)
+add_driver_option(FLAG_NAME "USE_ROS2" HELP_TEXT "Enable ROS2 support" CMAKE_FILES ros2.cmake)
+
+if(USE_ROS AND USE_ROS2)
+  message(FATAL_ERROR "ROS1 and ROS2 support are mutually exlusive. Enable either ROS1 or ROS2, but not both")
+endif()
+
+# # Configure Doxygen documentation target (make doc)
+if(DOXYGEN_FOUND)
+  configure_file(doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+  add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating API documentation with Doxygen" VERBATIM)
+endif(DOXYGEN_FOUND)
+
+# # Use ncurses library if available
 if(LIBCURSES)
   message(STATUS "-> libcurses available")
   target_link_libraries(eeros PRIVATE ncurses)
   message(STATUS "")
 endif()
 
-
-## Use EtherCAT if instructed
-if (USE_ETHERCAT)
-  message(STATUS "")
-  message(STATUS "**********************************")
-  message(STATUS "EtherCAT will be used")
-  message(STATUS "**********************************")
-  find_package(ecmasterlib REQUIRED)
-  target_link_libraries(eeros PUBLIC ecmasterlib)
-  target_compile_definitions(eeros PUBLIC USE_ETHERCAT EEROS_ETHERCAT)
-  message(STATUS "")
-endif()
-
-
-# TODO: update for target based configuration
-
-## Use CAN if instructed
-if(USE_CAN)
-  message(STATUS "**********************************")
-  message(STATUS "Use canopenlib")
-  message(STATUS "**********************************")
-  find_package(canopen QUIET)
-  list(APPEND EXTERNAL_LIBS "canopen")
-  if (canopen_FOUND)
-    message(STATUS "--> 'canopen' is found, CANopen examples will be built.")
-  else()
-    message(STATUS "--> 'canopen' is not installed. CANopen will NOT be used.")
-  endif()
-  message(STATUS "")
-endif()
-
-
-## Use MODBUS if instructed
-if(USE_MODBUS)
-  message(STATUS "**********************************")
-  message(STATUS "Use modbus")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS modbus)
-  message(STATUS "")
-endif()
-
-
-
-## Use PIXYCAM if instructed
-if(USE_PIXYCAM)
-  message(STATUS "**********************************")
-  message(STATUS "Use pixy cam")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS pixy2 usb-1.0)
-  message(STATUS "")
-endif()
-
-
-
-## Use REALSENSE if instructed
-if(USE_REALSENSE)
-  message(STATUS "**********************************")
-  message(STATUS "Use realsense cam")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS realsense2)
-  message(STATUS "")
-endif()
-
-
-
-## Use RPLIDAR if instructed
-if(USE_RPLIDAR)
-  message(STATUS "**********************************")
-  message(STATUS "Use rp lidar")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS sl_lidar_sdk)
-  message(STATUS "")
-endif()
-
-
-
-## Use SBGECOMM if instructed
-if(USE_SBGECOMM)
-  message(STATUS "**********************************")
-  message(STATUS "Use ellipse sensors")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS sbgECom)
-  message(STATUS "")
-endif()
-
-
-
-## Use ODRIVE if instructed
-if(USE_ODRIVE)
-  message(STATUS "**********************************")
-  message(STATUS "Use ODrive")
-  message(STATUS "**********************************")
-  list(APPEND EXTERNAL_LIBS odrive jsoncpp)
-  message(STATUS "")
-endif()
-
-
-
-## Use ROS if found and instructed
-if (USE_ROS)
-  message(STATUS "**********************************")
-  message(STATUS "ROS")
-  message(STATUS "**********************************")
-  find_package(roslib QUIET)
-  if (roslib_FOUND)
-    message(STATUS "--> 'ROS' is found, ROS examples will be built.")
-  else()
-    message(FATAL_ERROR "ERROR: ROS is not installed or setup.bash (for ROS) was not executed.")
-  endif()
-  include_directories( "${roslib_INCLUDE_DIRS}" )
-  list(APPEND ROS_LIBRARIES "${roslib_LIBRARIES}")
-  find_package( rosconsole QUIET)
-  list(APPEND ROS_LIBRARIES "${rosconsole_LIBRARIES}")
-  find_package( roscpp QUIET )
-  list(APPEND ROS_LIBRARIES "${roscpp_LIBRARIES}")
-  list(APPEND EXTERNAL_LIBS "${ROS_LIBRARIES}")
-  target_link_libraries(eeros PRIVATE ${roslib_LIBRARIES})
-  add_definitions(-DUSE_ROS)
-elseif (USE_ROS2)
-  message(STATUS "**********************************")
-  message(STATUS "ROS2")
-  message(STATUS "**********************************")
-  find_package(rclcpp REQUIRED)
-  if (rclcpp_FOUND)
-    message(STATUS "--> 'ROS2' is found, ROS2 examples will be built.")
-  else()
-    message(FATAL_ERROR "ERROR: ROS is not installed or setup.bash (for ROS) was not executed.")
-  endif()
-  find_package(rosconsole QUIET)
-  list(APPEND ROS_LIBRARIES "${rosconsole_LIBRARIES}")
-  include_directories(${rclcpp_INCLUDE_DIRS})
-  list(APPEND ROS_LIBRARIES "${rclcpp_LIBRARIES}")
-  find_package(rcl_interfaces REQUIRED)
-  include_directories(${rcl_interfaces_INCLUDE_DIRS})
-  list(APPEND ROS_LIBRARIES "${rcl_interfaces_LIBRARIES}")
-  find_package(std_msgs REQUIRED)
-  include_directories(${std_msgs_INCLUDE_DIRS})
-  list(APPEND ROS_LIBRARIES ${std_msgs_LIBRARIES})
-  find_package( sensor_msgs REQUIRED )
-  include_directories(${sensor_msgs_INCLUDE_DIRS})
-  list(APPEND ROS_LIBRARIES ${sensor_msgs_LIBRARIES})
-  target_link_libraries(eeros PRIVATE ${rclcpp_LIBRARIES} ${rcl_interfaces_LIBRARIES})
-  add_definitions(-DUSE_ROS2)
-else()
-  message(STATUS "--> ROS will not be used. You may want to use the -DUSE_ROS or -DUSE_ROS2 switch with cmake.")
-endif (USE_ROS)
-if (USE_ROS AND USE_ROS2)
-  message(STATUS "--> You cannot use ROS and ROS2 together. Either use -DUSE_ROS or -DUSE_ROS2 switch with cmake.")
-endif ()
-message(STATUS "")
-
-
-
-## Set special variable for eclipse IDE
-set(CMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT ON)
-
-
-
-## Configure Doxygen documentation target (make doc)
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-  configure_file(doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-  add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating API documentation with Doxygen" VERBATIM )
-endif(DOXYGEN_FOUND)
-
-
-
-## Set EEROS libraries
-#set(EEROS_LIBS ${CMAKE_DL_LIBS} ucl pthread)
-set(EEROS_LIBS ucl)
-
-target_link_libraries(eeros PUBLIC pthread PRIVATE ucl ${CMAKE_DL_LIBS} ${EXTERNAL_LIBS})
-
-if(LINUX)
-  target_link_libraries(eeros PRIVATE rt)
-endif()
-
-## Enable CTest
+# # Enable CTest
 enable_testing()
-
-if(NOT LIB_ONLY_BUILD)
-  add_subdirectory(tools)
-  add_subdirectory(examples)
-endif(NOT LIB_ONLY_BUILD)
 
 if(USE_TESTS)
   add_subdirectory(test)
 endif(USE_TESTS)
 
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
+  VERSION ${EEROS_VERSION}
+  COMPATIBILITY SameMinorVersion)
+
+# # Configure and install config header file
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/includes/config.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/eeros)
+
+# # Install all eeros header files
+INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
+
+install(TARGETS eeros
+  EXPORT EEROS
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+
+install(EXPORT EEROS NAMESPACE ${PROJECT_NAME}:: DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
+get_target_property(EEROS_CMAKE_PACKAGE_DEPENDS eeros EEROS_CMAKE_PACKAGE_DEPENDS)
+configure_file(cmake/EEROSConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
+
+install(
+  FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
+  DESTINATION
+  ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
+
+# # Set special variable for eclipse IDE
+set(CMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT ON)
