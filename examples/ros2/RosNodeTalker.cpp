@@ -1,7 +1,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/node.hpp>
-#include <std_msgs/msg/float64.hpp>
-#include <std_msgs/msg/float64_multi_array.hpp>
+#include <example_interfaces/msg/float64.hpp>
+#include <example_interfaces/msg/float64_multi_array.hpp>
 #include <sensor_msgs/msg/joy.hpp>
 #include <sensor_msgs/msg/detail/joy__struct.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
@@ -17,8 +17,8 @@ int main(int argc, char *argv[]) {
 
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("rosNodeTalker");
-  auto chatter_topic1 = node->create_publisher<std_msgs::msg::Float64>("rosNodeTalker/val", 1000);
-  auto chatter_topic2 = node->create_publisher<std_msgs::msg::Float64MultiArray>("rosNodeTalker/vector", 1000);
+  auto chatter_topic1 = node->create_publisher<example_interfaces::msg::Float64>("rosNodeTalker/val", 1000);
+  auto chatter_topic2 = node->create_publisher<example_interfaces::msg::Float64MultiArray>("rosNodeTalker/vector", 1000);
   auto chatter_topic3 = node->create_publisher<sensor_msgs::msg::Joy>("rosNodeTalker/TestTopic3", 1000);
   auto chatter_topic4 = node->create_publisher<sensor_msgs::msg::LaserScan>("rosNodeTalker/TestTopic4", 1000);
   auto chatter_topic5 = node->create_publisher<sensor_msgs::msg::BatteryState>("rosNodeTalker/state", 1000);
@@ -27,8 +27,8 @@ int main(int argc, char *argv[]) {
   cout << "'rosNodeTalker' initialized" << endl;
   int count = 0;
   while (rclcpp::ok()) {
-    std_msgs::msg::Float64 msg1;
-    std_msgs::msg::Float64MultiArray msg2;
+    example_interfaces::msg::Float64 msg1;
+    example_interfaces::msg::Float64MultiArray msg2;
     sensor_msgs::msg::Joy msg3;
     sensor_msgs::msg::LaserScan msg4;
     sensor_msgs::msg::BatteryState msg5;
