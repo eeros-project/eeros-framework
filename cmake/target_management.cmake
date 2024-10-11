@@ -1,12 +1,14 @@
 # eeros_add_dependent_target(odriveUSBTest DEPENDS_ON USE_ODRIVE SOURCES)
 
 function(eeros_add_target target)
-    add_executable("${target}" ${ARGN})
-    target_link_libraries("${target}" PRIVATE eeros)
+    add_executable("${PROJECT_NAME}_${target}" ${ARGN})
+    # preserve old naming for examples, since they are installed under ${PROJECT_NAME} anyway
+    set_target_properties("${PROJECT_NAME}_${target}" PROPERTIES OUTPUT_NAME "${target}")
+    target_link_libraries("${PROJECT_NAME}_${target}" PRIVATE ${PROJECT_NAME}::eeros)
     message("current list dir: ${CMAKE_CURRENT_LIST_DIR}, project dir: ${PROJECT_SOURCE_DIR}")
     cmake_path(RELATIVE_PATH CMAKE_CURRENT_LIST_DIR BASE_DIRECTORY "${PROJECT_SOURCE_DIR}" OUTPUT_VARIABLE "${target}_relpath")
     message("path for ${target}: ${${target}_relpath}")
-    install(TARGETS "${target}" RUNTIME DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/${${target}_relpath})
+    install(TARGETS "${PROJECT_NAME}_${target}" RUNTIME DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/${${target}_relpath})
 endfunction()
 
 function(eeros_add_dependent_target target)

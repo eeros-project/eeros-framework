@@ -7,4 +7,4 @@ FetchContent_Declare(libucl
     BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/libucl-build")
 
 FetchContent_MakeAvailable(libucl)
-eeros_add_package(eeros ucl)
+eeros_add_package(${PROJECT_NAME}_eeros ucl)
