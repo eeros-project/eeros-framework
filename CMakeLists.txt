@@ -1,29 +1,18 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(EEROS)
+include(cmake/git.cmake)
+
+version_from_git(GIT_VERSION)
+message("git version: ${GIT_VERSION}")
+
+project(EEROS VERSION ${GIT_VERSION})
 
 include(GNUInstallDirs)
 include(CMakeDependentOption)
-include(cmake/CMakeModulesLib.cmake)
+
 include(cmake/package_management.cmake)
 
-if(CMAKE_BUILD_TYPE MATCHES "Debug|DEBUG")
-  logger_on()
-endif()
-
 include(cmake/platform.cmake)
-
-# # Fetch the version information from git tag
-include(VersioningHelpers)
-setLibraryVersion()
-
-set(EEROS_VERSION_MAJOR ${VERSION_MAJOR})
-set(EEROS_VERSION_MINOR ${VERSION_MINOR})
-set(EEROS_VERSION_PATCH ${VERSION_PATCH})
-set(EEROS_VERSION_TWEAK ${VERSION_TWEAK})
-set(EEROS_VERSION ${EEROS_VERSION_MAJOR}.${EEROS_VERSION_MINOR}.${EEROS_VERSION_PATCH}.${EEROS_VERSION_TWEAK})
-
-log("Going to build EEROS v${EEROS_VERSION}")
 
 include(CMakePackageConfigHelpers)
 
