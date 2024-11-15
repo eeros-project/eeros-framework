@@ -1,5 +1,4 @@
-#ifndef ORG_EEROS_CONTROL_ROSSUBSCRIBER_DOUBLE_HPP
-#define ORG_EEROS_CONTROL_ROSSUBSCRIBER_DOUBLE_HPP
+#pragma once
 
 #include <example_interfaces/msg/float64.h>
 
@@ -15,7 +14,7 @@ namespace control {
  *
  * @since v1.0
  */
-class RosSubscriberDouble : public RosSubscriber<example_interfaces::msg::Float64, double> {
+class RosSubscriberDouble : public RosSubscriber<example_interfaces::msg::Float64, 1, double> {
   typedef example_interfaces::msg::Float64 TRosMsg;
 
  public:
@@ -34,7 +33,7 @@ class RosSubscriberDouble : public RosSubscriber<example_interfaces::msg::Float6
    */
   RosSubscriberDouble(const rclcpp::Node::SharedPtr node, const std::string& topic, bool syncWithTopic = false,
                       const uint32_t queueSize = 1000)
-      : RosSubscriber<TRosMsg, double>(node, topic, syncWithTopic, queueSize) {}
+      : RosSubscriber<TRosMsg, 1, double>(node, topic, syncWithTopic, queueSize) {}
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -47,14 +46,18 @@ class RosSubscriberDouble : public RosSubscriber<example_interfaces::msg::Float6
    *
    * @param msg - message content
    */
-  virtual void parseMsg(const TRosMsg& msg) {
+  virtual void parseMsg(const TRosMsg& msg) override {
     auto time = eeros::System::getTimeNs();  // use system time for timestamp
     this->out.getSignal().setTimestamp(time);
     this->out.getSignal().setValue(static_cast<double>(msg.data));
   }
 };
 
-}  // namespace control
-}  // namespace eeros
+/********** Print functions **********/
+std::ostream& operator<<(std::ostream& os, RosSubscriberDouble& s) {
+  os << "Block RosSubscriberDouble: '" << s.getName();
+  return os;
+}
 
-#endif  // ORG_EEROS_CONTROL_ROSSUBSCRIBER_DOUBLE_HPP
+}
+}

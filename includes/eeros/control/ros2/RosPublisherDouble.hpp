@@ -1,5 +1,4 @@
-#ifndef ORG_EEROS_CONTROL_ROSPUBLISHER_DOUBLE_HPP_
-#define ORG_EEROS_CONTROL_ROSPUBLISHER_DOUBLE_HPP_
+#pragma once
 
 #include <eeros/control/ros2/RosPublisher.hpp>
 #include <example_interfaces/msg/float64.hpp>
@@ -13,7 +12,7 @@ namespace control {
  *
  * @since v1.0
  */
-class RosPublisherDouble : public RosPublisher<example_interfaces::msg::Float64, double> {
+class RosPublisherDouble : public RosPublisher<example_interfaces::msg::Float64, 1, double> {
   typedef example_interfaces::msg::Float64 TRosMsg;
 
  public:
@@ -26,7 +25,7 @@ class RosPublisherDouble : public RosPublisher<example_interfaces::msg::Float64,
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    */
   RosPublisherDouble(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize = 1000)
-      : RosPublisher<TRosMsg, double>(node, topic, queueSize) {}
+      : RosPublisher<TRosMsg, 1, double>(node, topic, queueSize) {}
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -38,10 +37,14 @@ class RosPublisherDouble : public RosPublisher<example_interfaces::msg::Float64,
    *
    * @param msg - message content
    */
-  virtual void setRosMsg(TRosMsg& msg) { msg.data = in.getSignal().getValue(); }
+  virtual void setRosMsg(TRosMsg& msg) override { msg.data = in.getSignal().getValue(); }
 };
 
-}  // namespace control
-}  // namespace eeros
+/********** Print functions **********/
+std::ostream& operator<<(std::ostream& os, RosPublisherDouble& p) {
+  os << "Block RosPublisherDouble: '" << p.getName();
+  return os;
+}
 
-#endif /* ORG_EEROS_CONTROL_ROSPUBLISHER_DOUBLE_HPP_ */
+}
+}

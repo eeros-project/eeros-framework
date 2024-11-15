@@ -1,5 +1,4 @@
-#ifndef ORG_EEROS_CONTROL_ROSPUBLISHER_HPP_
-#define ORG_EEROS_CONTROL_ROSPUBLISHER_HPP_
+#pragma once
 
 #include <rclcpp/rclcpp.hpp>
 #include <eeros/control/Blockio.hpp>
@@ -14,11 +13,12 @@ namespace control {
  * This is the base class for all blocks which publish ROS messages.
  * 
  * @tparam TRosMsg - type of the ROS message
+ * @tparam N - number of inputs
  * @tparam SigInType - type of the input signal
  * @since v1.0
  */
-template < typename TRosMsg, typename SigInType >
-class RosPublisher : public Blockio<1,0,SigInType> {
+template < typename TRosMsg, uint8_t N, typename SigInType >
+class RosPublisher : public Blockio<N,0,SigInType> {
  public:
   /**
    * Creates an instance of a ROS publisher block. The block reads
@@ -33,8 +33,8 @@ class RosPublisher : public Blockio<1,0,SigInType> {
       : log(Logger::getLogger()) {
     if (rclcpp::ok()) {
       publisher = node->create_publisher<TRosMsg>(topic, queueSize);
-      log.info() << "RosBlockPublisher, writing to topic: '" << topic << "' on node '" << node->get_name() << "' created.";
-      RCLCPP_INFO_STREAM(node->get_logger(), "RosBlockPublisher to topic: '" << topic << "' created.");
+      log.info() << "RosBlockPublisher, writing to topic: '" << topic << "' on node '" << node->get_name();
+//       RCLCPP_INFO_STREAM(node->get_logger(), "RosBlockPublisher to topic: '" << topic << "' created.");
       running = true;
     }
   }
@@ -71,5 +71,3 @@ class RosPublisher : public Blockio<1,0,SigInType> {
 
 }
 }
-
-#endif /* ORG_EEROS_CONTROL_ROSPUBLISHER_HPP_ */

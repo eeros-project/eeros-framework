@@ -6,7 +6,8 @@
 #include <sensor_msgs/msg/detail/joy__struct.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 #include <sensor_msgs/msg/battery_state.hpp>
-#include <eeros/control/ros2/EerosRosTools.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <eeros/control/ros2/RosTools.hpp>
 #include <eeros/core/System.hpp>
 #include <iostream>
 
@@ -22,6 +23,7 @@ int main(int argc, char *argv[]) {
   auto chatter_topic3 = node->create_publisher<sensor_msgs::msg::Joy>("rosNodeTalker/TestTopic3", 1000);
   auto chatter_topic4 = node->create_publisher<sensor_msgs::msg::LaserScan>("rosNodeTalker/TestTopic4", 1000);
   auto chatter_topic5 = node->create_publisher<sensor_msgs::msg::BatteryState>("rosNodeTalker/state", 1000);
+  auto chatter_topic6 = node->create_publisher<geometry_msgs::msg::Twist>("rosNodeTalker/twist", 1000);
   rclcpp::Rate loop_rate(5); // 5Hz
 
   cout << "'rosNodeTalker' initialized" << endl;
@@ -32,18 +34,19 @@ int main(int argc, char *argv[]) {
     sensor_msgs::msg::Joy msg3;
     sensor_msgs::msg::LaserScan msg4;
     sensor_msgs::msg::BatteryState msg5;
+    geometry_msgs::msg::Twist msg6;
 
     msg1.data = static_cast<double>( static_cast<int>(count) % 17 );
 
     msg2.data = {static_cast<double>(static_cast<int>(count) % 37), static_cast<double>( static_cast<int>(count) % 73 )};
 
-    msg3.header.set__stamp(eeros::control::rosTools::convertToRosTime(eeros::System::getTimeNs()));
+    msg3.header.set__stamp(eeros::control::RosTools::convertToRosTime(eeros::System::getTimeNs()));
     sensor_msgs::msg::Joy::_axes_type axes {(float)(count/10), (float)((count+1)/10), (float)((count+2)/10)};
     msg3.axes = axes;
     sensor_msgs::msg::Joy::_buttons_type buttons {count, count+1, count+2, count+3, count+4};
     msg3.buttons = buttons;
 
-    msg4.header.set__stamp(eeros::control::rosTools::convertToRosTime(eeros::System::getTimeNs()));
+    msg4.header.set__stamp(eeros::control::RosTools::convertToRosTime(eeros::System::getTimeNs()));
     msg4.angle_min = (count+10)/10;
     msg4.angle_max = (count+11)/10;
     msg4.angle_increment = (count+12)/10;
@@ -53,14 +56,18 @@ int main(int argc, char *argv[]) {
     msg4.ranges = axes;
     msg4.intensities = axes;
 
-    msg5.header.set__stamp(eeros::control::rosTools::convertToRosTime(eeros::System::getTimeNs()));
+    msg5.header.set__stamp(eeros::control::RosTools::convertToRosTime(eeros::System::getTimeNs()));
     msg5.present = static_cast<bool>( static_cast<int>(count)%3 );
+
+    msg6.linear.x = 2;
+    msg6.angular.x = -0.01;
 
     chatter_topic1->publish(msg1);
     chatter_topic2->publish(msg2);
     chatter_topic3->publish(msg3);
     chatter_topic4->publish(msg4);
     chatter_topic5->publish(msg5);
+    chatter_topic6->publish(msg6);
 
     std::cout << count+1 << ". message sent" << std::endl;
 

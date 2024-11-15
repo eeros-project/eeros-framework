@@ -1,5 +1,4 @@
-#ifndef ORG_EEROS_CONTROL_ROSSUBSCRIBER_LASERSCAN_HPP
-#define ORG_EEROS_CONTROL_ROSSUBSCRIBER_LASERSCAN_HPP
+#pragma once
 
 #include <eeros/control/ros2/RosSubscriber.hpp>
 #include <eeros/core/System.hpp>
@@ -82,7 +81,12 @@ class RosSubscriberLaserScan : public RosSubscriber<sensor_msgs::LaserScan::Type
   Output<TIntensitiesOutput>	intensitiesOutput;
 };
 
+/********** Print functions **********/
+template < typename TRangesOutput, typename TIntensitiesOutput >
+std::ostream& operator<<(std::ostream& os, RosSubscriberLaserScan& s) {
+  os << "Block RosSubscriberLaserScan: '" << s.getName();
+  return os;
+}
 }
 }
 
-#endif // ORG_EEROS_CONTROL_ROSSUBSCRIBER_LASERSCAN_HPP

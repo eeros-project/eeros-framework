@@ -1,12 +1,11 @@
-#ifndef ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_
-#define ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_
+#pragma once
 
 #include <rclcpp/rclcpp.hpp>
 #include <eeros/control/Blockio.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/core/Thread.hpp>
-#include <eeros/control/ros2/EerosRosTools.hpp>
+#include <eeros/control/ros2/RosTools.hpp>
 #include <deque>
 #include <thread>
 
@@ -19,11 +18,12 @@ using std::placeholders::_1;
  * This is the base class for all blocks which subscribe to ROS messages.
  * 
  * @tparam TRosMsg - type of the ROS message
- * @tparam SigOutType - type of the input signal
+ * @tparam M - number of outputs
+ * @tparam SigOutType - type of the output signal
  * @since v1.0
  */
-template < typename TRosMsg, typename SigOutType >
-class RosSubscriber : public Blockio<0,1,SigOutType> {
+template < typename TRosMsg, uint8_t M, typename SigOutType >
+class RosSubscriber : public Blockio<0,M,SigOutType> {
  public:
   /**
    * Creates an instance of a ROS subscriber block. The block reads
@@ -43,8 +43,8 @@ class RosSubscriber : public Blockio<0,1,SigOutType> {
     rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> options;
     options.callback_group = Executor::instance().registerSubscriber(node, syncWithTopic);
     subscriber = node->create_subscription<TRosMsg>(topic, queueSize, std::bind(&RosSubscriber::rosSubscriberCallback, this, _1), options);
-    RCLCPP_INFO_STREAM(node->get_logger(), "RosBlockSubscriber, reading from topic: '" << topic << "' created.");
-    //      log.warn() << "RosBlockSubscriber, reading from topic: '" << topic << "' created.";
+    log.info() << "RosBlockSubscriber, reading from topic: '" << topic << "' on node '" << node->get_name();
+//     RCLCPP_INFO_STREAM(node->get_logger(), "RosBlockSubscriber, reading from topic: '" << topic << "' created.");
     running = true;
   }
 }
@@ -100,5 +100,3 @@ class RosSubscriber : public Blockio<0,1,SigOutType> {
 
 }
 }
-
-#endif /* ORG_EEROS_CONTROL_ROSSUBCRIBER_HPP_ */

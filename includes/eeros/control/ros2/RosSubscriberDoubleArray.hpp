@@ -1,5 +1,4 @@
-#ifndef ORG_EEROS_CONTROL_ROSSUBSCRIBER_DOUBLEARRAY_HPP
-#define ORG_EEROS_CONTROL_ROSSUBSCRIBER_DOUBLEARRAY_HPP
+#pragma once
 
 #include <eeros/control/ros2/RosSubscriber.hpp>
 #include <eeros/core/System.hpp>
@@ -16,7 +15,7 @@ namespace control {
  * @since v1.0
  */
 template <typename SigOutType>
-class RosSubscriberDoubleArray : public RosSubscriber<example_interfaces::msg::Float64MultiArray, SigOutType> {
+class RosSubscriberDoubleArray : public RosSubscriber<example_interfaces::msg::Float64MultiArray, 1, SigOutType> {
   typedef example_interfaces::msg::Float64MultiArray TRosMsg;
 
  public:
@@ -35,7 +34,7 @@ class RosSubscriberDoubleArray : public RosSubscriber<example_interfaces::msg::F
    */
   RosSubscriberDoubleArray(const rclcpp::Node::SharedPtr node, const std::string& topic, bool syncWithTopic = false,
                            const uint32_t queueSize = 1000)
-      : RosSubscriber<TRosMsg, SigOutType>(node, topic, syncWithTopic, queueSize) {}
+      : RosSubscriber<TRosMsg, 1, SigOutType>(node, topic, syncWithTopic, queueSize) {}
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -48,7 +47,7 @@ class RosSubscriberDoubleArray : public RosSubscriber<example_interfaces::msg::F
    *
    * @param msg - message content
    */
-  virtual void parseMsg(const TRosMsg& msg) {
+  virtual void parseMsg(const TRosMsg& msg) override {
     auto time = eeros::System::getTimeNs();  // use system time for timestamp
     this->out.getSignal().setTimestamp(time);
     std::vector<double> valTmp(msg.data.begin(), msg.data.end());
@@ -60,7 +59,13 @@ class RosSubscriberDoubleArray : public RosSubscriber<example_interfaces::msg::F
   SigOutType val;
 };
 
-}  // namespace control
-}  // namespace eeros
+/********** Print functions **********/
+template <typename T>
+std::ostream& operator<<(std::ostream& os, RosSubscriberDoubleArray<T>& s) {
+  os << "Block RosSubscriberDoubleArray: '" << s.getName();
+  return os;
+}
 
-#endif  // ORG_EEROS_CONTROL_ROSSUBSCRIBER_DOUBLEARRAY_HPP
+}
+}
+

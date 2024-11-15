@@ -1,5 +1,4 @@
-#ifndef ORG_EEROS_CONTROL_ROSPUBLISHER_DOUBLEARRAY_HPP
-#define ORG_EEROS_CONTROL_ROSPUBLISHER_DOUBLEARRAY_HPP
+#pragma once
 
 #include <eeros/control/ros2/RosPublisher.hpp>
 #include <eeros/math/Matrix.hpp>
@@ -16,7 +15,7 @@ namespace control {
  * @since v1.0
  */
 template <typename SigInType>
-class RosPublisherDoubleArray : public RosPublisher<example_interfaces::msg::Float64MultiArray, SigInType> {
+class RosPublisherDoubleArray : public RosPublisher<example_interfaces::msg::Float64MultiArray, 1, SigInType> {
   typedef example_interfaces::msg::Float64MultiArray TRosMsg;
 
  public:
@@ -29,7 +28,7 @@ class RosPublisherDoubleArray : public RosPublisher<example_interfaces::msg::Flo
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    */
   RosPublisherDoubleArray(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize = 1000)
-      : RosPublisher<TRosMsg, SigInType>(node, topic, queueSize) {}
+      : RosPublisher<TRosMsg, 1, SigInType>(node, topic, queueSize) {}
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -41,7 +40,7 @@ class RosPublisherDoubleArray : public RosPublisher<example_interfaces::msg::Flo
    *
    * @param msg - message content
    */
-  void setRosMsg(TRosMsg& msg) {
+  void setRosMsg(TRosMsg& msg) override {
     if (this->in.isConnected()) {
       auto val = this->in.getSignal().getValue();
       auto valTmpDouble = val.getColVector(0);
@@ -50,7 +49,12 @@ class RosPublisherDoubleArray : public RosPublisher<example_interfaces::msg::Flo
   }
 };
 
-}  // namespace control
-}  // namespace eeros
+/********** Print functions **********/
+template <typename T>
+std::ostream& operator<<(std::ostream& os, RosPublisherDoubleArray<T>& p) {
+  os << "Block RosPublisherDoubleArray: '" << p.getName();
+  return os;
+}
 
-#endif  // ORG_EEROS_CONTROL_ROSPUBLISHER_DOUBLEARRAY_HPP
+}
+}
