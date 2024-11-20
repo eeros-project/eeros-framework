@@ -57,7 +57,8 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    * @param socket - socket of number of associated CAN bus
    * @param node - vector with node id's of all connected CAN nodes 
    */
-  CANopenReceive(CANopen& co, std::initializer_list<uint8_t> node)
+  template<typename CanOpen, typename NodeList = std::initializer_list<uint8_t>>
+  CANopenReceive(CanOpen&& co, NodeList node)
       :  co(co), node(node), log(Logger::getLogger('C')) {
     for (size_t i = 0; i < node.size(); i++) {
       scale[i] = 1;
@@ -205,7 +206,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
   }
 
  private:
-  CANopen& co;
+  CANopen co;
   bool enabled = false;
   Output<Matrix<P,1,uint32_t>> digOut[N];
   Matrix<N,1,uint16_t> status;

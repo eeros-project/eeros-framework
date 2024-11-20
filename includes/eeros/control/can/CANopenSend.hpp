@@ -52,7 +52,8 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
    * @param co - CANopen object
    * @param node - vector with node id's of all connected CAN nodes 
    */
-  CANopenSend(CANopen& co, std::initializer_list<uint8_t> node)
+  template<typename CanOpen, typename NodeList = std::initializer_list<uint8_t>>
+  CANopenSend(CanOpen&& co, NodeList node)
       : co(co), node(node), log(Logger::getLogger('Y')) {
     for (size_t i = 0; i < node.size(); i++) {
       scale[i] = 1;
@@ -193,7 +194,7 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
   }
 
  private:
-  CANopen& co;
+  CANopen co;
   bool enabled = false;
   Input<Matrix<P,1,uint32_t>> digIn[N];
   Matrix<N,1,uint16_t> ctrl;

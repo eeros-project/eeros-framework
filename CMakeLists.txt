@@ -1,53 +1,46 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(EEROS)
+include(cmake/git.cmake)
+
+version_from_git(GIT_VERSION)
+message("git version: ${GIT_VERSION}")
+
+project(EEROS VERSION ${GIT_VERSION})
 
 include(GNUInstallDirs)
 include(CMakeDependentOption)
-include(cmake/CMakeModulesLib.cmake)
+
 include(cmake/package_management.cmake)
 
-if(CMAKE_BUILD_TYPE MATCHES "Debug|DEBUG")
-  logger_on()
-endif()
-
 include(cmake/platform.cmake)
-
-# # Fetch the version information from git tag
-include(VersioningHelpers)
-setLibraryVersion()
-
-set(EEROS_VERSION_MAJOR ${VERSION_MAJOR})
-set(EEROS_VERSION_MINOR ${VERSION_MINOR})
-set(EEROS_VERSION_PATCH ${VERSION_PATCH})
-set(EEROS_VERSION_TWEAK ${VERSION_TWEAK})
-set(EEROS_VERSION ${EEROS_VERSION_MAJOR}.${EEROS_VERSION_MINOR}.${EEROS_VERSION_PATCH}.${EEROS_VERSION_TWEAK})
-
-log("Going to build EEROS v${EEROS_VERSION}")
 
 include(CMakePackageConfigHelpers)
 
 # # Add subdirectories
 add_subdirectory(src) # EEROS framework
 
-add_library(eeros SHARED ${EEROS_SRCS})
+add_library(${PROJECT_NAME}_eeros SHARED ${EEROS_SRCS})
+add_library(${PROJECT_NAME}::eeros ALIAS ${PROJECT_NAME}_eeros)
+set_target_properties(${PROJECT_NAME}_eeros PROPERTIES
+  OUTPUT_NAME eeros
+  EXPORT_NAME eeros)
 
 # include the eeros headers + eeros/config.cpp generated earlier
 # There is probably a better way to do this (config.hpp) and ideally the headers should be part of the project sources anyway
-target_include_directories(eeros
+target_include_directories(${PROJECT_NAME}_eeros
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/includes>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
 
   $<INSTALL_INTERFACE:include>)
 
-set_target_properties(eeros PROPERTIES VERSION ${EEROS_VERSION})
+set_target_properties(${PROJECT_NAME}_eeros PROPERTIES VERSION ${EEROS_VERSION})
 
-target_compile_options(eeros PRIVATE -g -Wall)
-target_compile_features(eeros PUBLIC cxx_std_17)
+target_compile_options(${PROJECT_NAME}_eeros PRIVATE -g -Wall)
+target_compile_features(${PROJECT_NAME}_eeros PUBLIC cxx_std_17)
 
 find_package(Doxygen)
-eeros_find_package(eeros Threads)
+eeros_find_package(${PROJECT_NAME}_eeros Threads)
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 
 option(LIB_ONLY_BUILD "Only build library, no tools or examples" FALSE)
@@ -68,7 +61,7 @@ if(BUILD_EXAMLES)
   add_subdirectory(examples)
 endif()
 
-target_link_libraries(eeros PUBLIC Threads::Threads ucl PRIVATE rt ${CMAKE_DL_LIBS})
+target_link_libraries(${PROJECT_NAME}_eeros PUBLIC Threads::Threads ucl PRIVATE rt ${CMAKE_DL_LIBS})
 
 include(cmake/driver_config.cmake)
 
@@ -98,7 +91,7 @@ endif(DOXYGEN_FOUND)
 # # Use ncurses library if available
 if(LIBCURSES)
   message(STATUS "-> libcurses available")
-  target_link_libraries(eeros PRIVATE ncurses)
+  target_link_libraries(${PROJECT_NAME}_eeros PRIVATE ncurses)
   message(STATUS "")
 endif()
 
@@ -121,13 +114,13 @@ INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/eeros/config.hpp DESTINATION include/e
 # # Install all eeros header files
 INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/includes/eeros DESTINATION include)
 
-install(TARGETS eeros
+install(TARGETS ${PROJECT_NAME}_eeros
   EXPORT EEROS
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
 install(EXPORT EEROS NAMESPACE ${PROJECT_NAME}:: DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
-get_target_property(EEROS_CMAKE_PACKAGE_DEPENDS eeros EEROS_CMAKE_PACKAGE_DEPENDS)
+get_target_property(EEROS_CMAKE_PACKAGE_DEPENDS ${PROJECT_NAME}_eeros EEROS_CMAKE_PACKAGE_DEPENDS)
 configure_file(cmake/EEROSConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfig.cmake DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
 
