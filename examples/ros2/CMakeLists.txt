@@ -1,5 +1,4 @@
 eeros_add_dependent_target(rosNodeTalker DEPENDS_ON USE_ROS2 SOURCES RosNodeTalker.cpp)
 eeros_copy_file_post_build(HalTest2Config RosTest2Config.json)
-eeros_copy_file_post_build(HalTest3Config HalConfigRos.json)
 eeros_add_dependent_target(rosTest1 DEPENDS_ON USE_ROS2 SOURCES RosTest1.cpp)
-eeros_add_dependent_target(rosTest2 DEPENDS_ON USE_ROS2 SOURCES RosTest2.cpp HalTest2Config HalTest3Config)
+eeros_add_dependent_target(rosTest2 DEPENDS_ON USE_ROS2 SOURCES RosTest2.cpp HalTest2Config)

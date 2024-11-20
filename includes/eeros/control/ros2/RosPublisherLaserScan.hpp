@@ -1,5 +1,4 @@
-#ifndef ORG_EEROS_CONTROL_ROSPUBLISHER_LASERSCAN_HPP
-#define ORG_EEROS_CONTROL_ROSPUBLISHER_LASERSCAN_HPP
+#pragma once
 
 #include <eeros/control/ros2/RosPublisher.hpp>
 #include <eeros/math/Matrix.hpp>
@@ -24,7 +23,7 @@ class RosPublisherLaserScan : public RosPublisher<sensor_msgs::LaserScan::Type, 
   RosPublisherLaserScan(const std::string& topic, const std::string& frame_id, const uint32_t queueSize=1000) 
       : RosPublisher<TRosMsg, double>(topic, queueSize), frame_id(frame_id) { }
 
-  void setRosMsg(TRosMsg& msg) {
+  void setRosMsg(TRosMsg& msg) override {
     // B-3 If available, set time in msg header
     msg.header.stamp = eeros::control::rosTools::convertToRosTime(eeros::System::getTimeNs());
     msg.header.frame_id = frame_id;
@@ -90,7 +89,12 @@ class RosPublisherLaserScan : public RosPublisher<sensor_msgs::LaserScan::Type, 
   std::string frame_id;
 };
 
-};
-};
+/********** Print functions **********/
+template < typename TRangesInput, typename TIntensitiesInput >
+std::ostream& operator<<(std::ostream& os, RosPublisherLaserScan& p) {
+  os << "Block RosPublisherLaserScan: '" << p.getName();
+  return os;
+}
 
-#endif // ORG_EEROS_CONTROL_ROSPUBLISHER_LASERSCAN_HPP
+}
+}
