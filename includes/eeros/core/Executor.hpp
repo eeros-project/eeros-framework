@@ -3,9 +3,12 @@
 
 #include <vector>
 #include <condition_variable>
+#include <memory>
+#include <thread>
 
 #include <eeros/core/Runnable.hpp>
 #include <eeros/core/PeriodicCounter.hpp>
+#include <eeros/core/TimeSource.hpp>
 #include <eeros/task/Periodic.hpp>
 #include <eeros/logger/Logger.hpp>
 
@@ -43,6 +46,7 @@ namespace safety {
  */
 class Executor : public Runnable {
  public:
+
   virtual ~Executor();
 
   /**
@@ -127,6 +131,10 @@ class Executor : public Runnable {
    */
   virtual void run();
 
+  void setTimeSource(std::shared_ptr<core::TimeSource> source) {
+    sync = source;
+  }
+
   /**
    * Stops the executor.
    */
@@ -172,6 +180,7 @@ class Executor : public Runnable {
 
  private:
   Executor();
+  std::shared_ptr<core::TimeSource> sync;
   void assignPriorities();
   double period;
   task::Periodic* mainTask;
