@@ -5,7 +5,7 @@
 		"subdevice0": {
 			"type": "AnalogOut",
 			"channel0": {
-				"signalId": "doubleOut",
+				"signalId": "analogOut",
 				"scale": [ { "id" : "dac",
 								"scale":	1,
 								"offset":	0.0	}
@@ -15,13 +15,13 @@
 							"minOut":	-9e99,	"maxOut": 	9e99 }
 					 ],
 				"unit": "V",
-				"additionalArguments": "topic=/test/val; msgType=std_msgs::msg::Float64"
+				"additionalArguments": "topic=/test/analogSignal; msgType=eeros_msgs::msg::AnalogSignal"
 			}
 		},		
 		"subdevice1": {
 			"type": "AnalogIn",
 			"channel0": {
-				"signalId": "doubleIn",
+				"signalId": "analogIn",
 				"scale": [ { "id" : "adc",
 								"scale":	1,
 								"offset":	0.0	}
@@ -31,23 +31,23 @@
 							"minOut":	-9e99,	"maxOut": 	9e99 }
 					 ],
 				"unit": "V",
-				"additionalArguments": "topic=/rosNodeTalker/val; msgType=std_msgs::msg::Float64"
+				"additionalArguments": "topic=/rosNodeTalker/analogSignal; msgType=eeros_msgs::msg::AnalogSignal"
 			}
 		},
 		"subdevice2": {
 			"type": "DigIn",
 			"channel0": {
-				"signalId": "boolIn",
-				"inverted": false,
-				"additionalArguments": "topic=/rosNodeTalker/state; msgType=sensor_msgs::msg::BatteryState; dataField=present"
+				"signalId": "digitalIn",
+				"inverted": true,
+				"additionalArguments": "topic=/rosNodeTalker/digitalSignal; msgType=eeros_msgs::msg::DigitalSignal"
 			}
 		},
 		"subdevice3": {
 			"type": "DigOut",
 			"channel0": {
-				"signalId": "boolOut",
+				"signalId": "digitalOut",
 				"inverted": false,
-				"additionalArguments": "topic=/test/state; msgType=sensor_msgs::msg::BatteryState; dataField=present"
+				"additionalArguments": "topic=/test/digitalSignal; msgType=eeros_msgs::msg::DigitalSignal"
 			}
 		}
 	}

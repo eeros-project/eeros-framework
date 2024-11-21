@@ -9,6 +9,8 @@
 #include <deque>
 #include <thread>
 
+using namespace eeros::logger;
+
 namespace eeros {
 namespace control {
   
@@ -38,7 +40,7 @@ class RosSubscriber : public Blockio<0,M,SigOutType> {
    * @param queueSize - maximum number of incoming messages to be queued for delivery to subscribers
    */
   RosSubscriber(const rclcpp::Node::SharedPtr node, const std::string& topic, bool syncWithTopic=false, const uint32_t queueSize=1000)
-      : node(node), sync(syncWithTopic), log(logger::Logger::getLogger()) {
+      : node(node), sync(syncWithTopic), log(Logger::getLogger()) {
   if (rclcpp::ok()) {
     rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> options;
     options.callback_group = Executor::instance().registerSubscriber(node, syncWithTopic);
@@ -95,7 +97,7 @@ class RosSubscriber : public Blockio<0,M,SigOutType> {
   // emptied by handled by run method called by EEROS::Executor
   std::deque<TRosMsg> queue;
   std::mutex queue_mutex;
-  logger::Logger log;
+  Logger log;
 };
 
 }

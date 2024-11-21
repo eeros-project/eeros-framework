@@ -105,7 +105,7 @@ class RosTools {
   }
 
   /**
-   * Converts a EEROS timestamp, which is in ns to ROS time in s.
+   * Converts a EEROS timestamp, which is in ns, to ROS time in s.
    *
    * @param timestampNs - EEROS timestamp
    * @return ROS time
@@ -118,13 +118,13 @@ class RosTools {
   }
 
   /**
-   * Creates an EEROS timestamp (nanoseconds) based on a ROS message header timestamp struct.
+   * Converts an ROS timestamp, which is in s, to EEROS time in ns.
    *
-   * @param time - the ROS-Message timestamp to convert
-   * @return EEROS timestampNs
+   * @param timestamp - ROS timestamp
+   * @return EEROS time
    */
-  static uint64_t toNanoSec(const builtin_interfaces::msg::Time& time) {
-    return static_cast<uint64_t>(time.sec) * NS_PER_SEC + static_cast<uint64_t>(time.nanosec);
+  static uint64_t convertToEerosTime(const builtin_interfaces::msg::Time& timestamp) {
+    return static_cast<uint64_t>(timestamp.sec) * NS_PER_SEC + static_cast<uint64_t>(timestamp.nanosec);
   }
 
  protected:
@@ -142,6 +142,7 @@ class RosTools {
     }
   }
 
+public:
   // called when shutting down
   static void cleanup(){
     if(rclcpp::ok()) {

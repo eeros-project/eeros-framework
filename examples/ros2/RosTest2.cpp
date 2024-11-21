@@ -18,27 +18,29 @@ class ControlSystem {
  public:
   ControlSystem(double ts)
       : c1(0.5),
-        doubleIn("doubleIn"),
-        boolIn("boolIn"),
-        doubleOut("doubleOut"),
-        boolOut("boolOut"),
+        aIn("analogIn"),
+        dIn("digitalIn"),
+        aOut("analogOut"),
+        dOut("digitalOut"),
         timedomain("Main time domain", ts, true) {
-    doubleOut.getIn().connect(c1.getOut());
-    boolOut.getIn().connect(boolIn.getOut());
+    aIn.getOut().getSignal().setName("analog in");
+    dIn.getOut().getSignal().setName("digital in");
+    aOut.getIn().connect(c1.getOut());
+    dOut.getIn().connect(dIn.getOut());
     timedomain.addBlock(c1);
-    timedomain.addBlock(doubleOut);
-    timedomain.addBlock(doubleIn);
-    timedomain.addBlock(boolIn);
-    timedomain.addBlock(boolOut);
+    timedomain.addBlock(aOut);
+    timedomain.addBlock(aIn);
+    timedomain.addBlock(dIn);
+    timedomain.addBlock(dOut);
     
     eeros::Executor::instance().add(timedomain);
   }
 
   Constant<> c1;
-  PeripheralInput<double> doubleIn;
-  PeripheralInput<bool> boolIn;
-  PeripheralOutput<double> doubleOut;
-  PeripheralOutput<bool> boolOut;
+  PeripheralInput<double> aIn;
+  PeripheralInput<bool> dIn;
+  PeripheralOutput<double> aOut;
+  PeripheralOutput<bool> dOut;
   TimeDomain timedomain;
 };
 
@@ -50,7 +52,8 @@ public:
     slOff.setLevelAction([&](SafetyContext* privateContext) {
       if ((slOff.getNofActivations() % 5) == 0) {
         cs.c1.setValue(cs.c1.getOut().getSignal().getValue() + 0.01);
-        log.info() << cs.doubleIn.getOut().getSignal() << "   " << cs.boolIn.getOut().getSignal();
+        log.info() << cs.aIn.getOut().getSignal();
+        log.info() << cs.dIn.getOut().getSignal();
       }
     });
   }
@@ -69,6 +72,7 @@ int main(int argc, char **argv) {
   
   Logger::setDefaultStreamLogger(std::cout);
   Logger log = Logger::getLogger();
+  log.show(LogLevel::TRACE);
   log.info() << "ROS Test 2 started";
 
   HAL& hal = HAL::instance();

@@ -1,13 +1,14 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/node.hpp>
-#include <example_interfaces/msg/float64.hpp>
-#include <example_interfaces/msg/float64_multi_array.hpp>
+#include <eeros_msgs/msg/analog_signal.hpp>
+#include <eeros_msgs/msg/digital_signal.hpp>
 #include <sensor_msgs/msg/joy.hpp>
 #include <sensor_msgs/msg/detail/joy__struct.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 #include <sensor_msgs/msg/battery_state.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <eeros/control/ros2/RosTools.hpp>
+#include <eeros/math/Matrix.hpp>
 #include <eeros/core/System.hpp>
 #include <iostream>
 
@@ -18,56 +19,41 @@ int main(int argc, char *argv[]) {
 
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("rosNodeTalker");
-  auto chatter_topic1 = node->create_publisher<example_interfaces::msg::Float64>("rosNodeTalker/val", 1000);
-  auto chatter_topic2 = node->create_publisher<example_interfaces::msg::Float64MultiArray>("rosNodeTalker/vector", 1000);
-  auto chatter_topic3 = node->create_publisher<sensor_msgs::msg::Joy>("rosNodeTalker/TestTopic3", 1000);
-  auto chatter_topic4 = node->create_publisher<sensor_msgs::msg::LaserScan>("rosNodeTalker/TestTopic4", 1000);
-  auto chatter_topic5 = node->create_publisher<sensor_msgs::msg::BatteryState>("rosNodeTalker/state", 1000);
-  auto chatter_topic6 = node->create_publisher<geometry_msgs::msg::Twist>("rosNodeTalker/twist", 1000);
-  rclcpp::Rate loop_rate(5); // 5Hz
+  auto topic1 = node->create_publisher<eeros_msgs::msg::AnalogSignal>("rosNodeTalker/analogSignal", 1000);
+  auto topic2 = node->create_publisher<eeros_msgs::msg::DigitalSignal>("rosNodeTalker/digitalSignal", 1000);
+  auto topic3 = node->create_publisher<eeros_msgs::msg::AnalogSignal>("rosNodeTalker/analogSignalVector", 1000);
+  auto topic4 = node->create_publisher<eeros_msgs::msg::DigitalSignal>("rosNodeTalker/digitalSignalVector", 1000);
+  auto topic5 = node->create_publisher<geometry_msgs::msg::Twist>("rosNodeTalker/twist", 1000);
+  rclcpp::Rate loop_rate(1); // 5Hz
 
   cout << "'rosNodeTalker' initialized" << endl;
   int count = 0;
   while (rclcpp::ok()) {
-    example_interfaces::msg::Float64 msg1;
-    example_interfaces::msg::Float64MultiArray msg2;
-    sensor_msgs::msg::Joy msg3;
-    sensor_msgs::msg::LaserScan msg4;
-    sensor_msgs::msg::BatteryState msg5;
-    geometry_msgs::msg::Twist msg6;
+    eeros_msgs::msg::AnalogSignal msg1;
+    msg1.val = {(double)(count % 10) / 10};
+    msg1.timestamp = eeros::control::RosTools::convertToRosTime(eeros::System::getTimeNs());
 
-    msg1.data = static_cast<double>( static_cast<int>(count) % 17 );
+    eeros_msgs::msg::DigitalSignal msg2;
+    msg2.val = {count%2==0?false:true};
+    msg2.timestamp = eeros::control::RosTools::convertToRosTime(eeros::System::getTimeNs());
 
-    msg2.data = {static_cast<double>(static_cast<int>(count) % 37), static_cast<double>( static_cast<int>(count) % 73 )};
+    eeros_msgs::msg::AnalogSignal msg3;
+    msg3.val = {(double)(count % 10) / 10, (double)(count % 10) / 100};
+    msg3.timestamp = eeros::control::RosTools::convertToRosTime(eeros::System::getTimeNs());
 
-    msg3.header.set__stamp(eeros::control::RosTools::convertToRosTime(eeros::System::getTimeNs()));
-    sensor_msgs::msg::Joy::_axes_type axes {(float)(count/10), (float)((count+1)/10), (float)((count+2)/10)};
-    msg3.axes = axes;
-    sensor_msgs::msg::Joy::_buttons_type buttons {count, count+1, count+2, count+3, count+4};
-    msg3.buttons = buttons;
+    eeros_msgs::msg::DigitalSignal msg4;
+    msg4.val = {count%2==0?false:true, true, count%2==0?true:false};
+    msg4.timestamp = eeros::control::RosTools::convertToRosTime(eeros::System::getTimeNs());
 
-    msg4.header.set__stamp(eeros::control::RosTools::convertToRosTime(eeros::System::getTimeNs()));
-    msg4.angle_min = (count+10)/10;
-    msg4.angle_max = (count+11)/10;
-    msg4.angle_increment = (count+12)/10;
-    msg4.scan_time = (count+13)/10;
-    msg4.range_min = (count+14)/10;
-    msg4.range_max = (count+15)/10;
-    msg4.ranges = axes;
-    msg4.intensities = axes;
+    geometry_msgs::msg::Twist msg5;
+    msg5.linear.x = 2;
+    msg5.angular.x = -0.01;
 
-    msg5.header.set__stamp(eeros::control::RosTools::convertToRosTime(eeros::System::getTimeNs()));
-    msg5.present = static_cast<bool>( static_cast<int>(count)%3 );
-
-    msg6.linear.x = 2;
-    msg6.angular.x = -0.01;
-
-    chatter_topic1->publish(msg1);
-    chatter_topic2->publish(msg2);
-    chatter_topic3->publish(msg3);
-    chatter_topic4->publish(msg4);
-    chatter_topic5->publish(msg5);
-    chatter_topic6->publish(msg6);
+    topic1->publish(msg1);
+    topic2->publish(msg2);
+    topic3->publish(msg3);
+    topic4->publish(msg4);
+    topic5->publish(msg5);
 
     std::cout << count+1 << ". message sent" << std::endl;
 

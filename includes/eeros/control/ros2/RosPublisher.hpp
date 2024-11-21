@@ -1,6 +1,7 @@
 #pragma once
 
 #include <rclcpp/rclcpp.hpp>
+#include <eeros/control/ros2/RosTools.hpp>
 #include <eeros/control/Blockio.hpp>
 #include <eeros/logger/Logger.hpp>
 
@@ -15,6 +16,7 @@ namespace control {
  * @tparam TRosMsg - type of the ROS message
  * @tparam N - number of inputs
  * @tparam SigInType - type of the input signal
+ *
  * @since v1.0
  */
 template < typename TRosMsg, uint8_t N, typename SigInType >
