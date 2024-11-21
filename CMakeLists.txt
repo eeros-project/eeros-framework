@@ -16,6 +16,14 @@ include(cmake/platform.cmake)
 
 include(CMakePackageConfigHelpers)
 
+
+option(EEROS_USE_TESTS "Enable Tests" FALSE)
+if(EEROS_USE_TESTS)
+  enable_testing()
+  message("tests enabled")
+  add_subdirectory(test)
+endif()
+
 # # Add subdirectories
 add_subdirectory(src) # EEROS framework
 
@@ -94,13 +102,6 @@ if(LIBCURSES)
   target_link_libraries(${PROJECT_NAME}_eeros PRIVATE ncurses)
   message(STATUS "")
 endif()
-
-# # Enable CTest
-enable_testing()
-
-if(USE_TESTS)
-  add_subdirectory(test)
-endif(USE_TESTS)
 
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/EEROSConfigVersion.cmake
