@@ -2,6 +2,7 @@
 #define ORG_EEROS_TASK_ASYNC_HPP_
 
 #include <thread>
+#include <atomic>
 
 #include <eeros/core/Runnable.hpp>
 #include <eeros/core/Semaphore.hpp>
@@ -19,6 +20,7 @@ class Async : public Runnable {
   virtual void run();
   void stop();
   void join();
+  bool cycleComplete();
 
   PeriodicCounter counter;
 
@@ -29,7 +31,9 @@ class Async : public Runnable {
   int nice;
   Semaphore semaphore;
   std::thread thread;
-  bool finished;
+  std::atomic<bool> finished;
+  std::atomic<uint32_t> runCycle{0};
+  std::atomic<uint32_t> checkCycle{1};
   logger::Logger log;
 };
 

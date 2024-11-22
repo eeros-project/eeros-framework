@@ -1,6 +1,7 @@
 #include <eeros/core/System.hpp>
 #include <eeros/core/Fault.hpp>
 #include <time.h>
+#include <eeros/core/Executor.hpp>
 
 #ifdef USE_ROS
 #include <ros/ros.h>
@@ -42,23 +43,7 @@ void System::useRosTime() {
 #endif
 
 uint64_t System::getTimeNs() {
-#ifdef USE_ROS
-  if (rosTimeIsUsed) {
-    auto time = ros::Time::now();
-    return time.toNSec();
-  }
-#endif
-#ifdef USE_ROS2
-  if (rosTimeIsUsed) {
-    return rclcpp::Clock(RCL_ROS_TIME).now().nanoseconds();
-  }
-#endif
-
-  struct timespec ts;
-  if(clock_gettime(CLOCK, &ts) != 0) {
-    throw Fault("Failed to get time!");
-  }
-  return timespec2nsec(ts);
+  return eeros::Executor::uptime().count()*NS_PER_SEC;
 }
 
 

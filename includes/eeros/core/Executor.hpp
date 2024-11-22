@@ -135,6 +135,14 @@ class Executor : public Runnable {
     sync = source;
   }
 
+  static core::TimeSource::Uptime uptime() {
+    auto& exec = Executor::instance();
+    if(exec.sync)
+      return exec.sync->currentUptime();
+    else
+      return core::TimeSource::Uptime(0);
+  }
+
   /**
    * Stops the executor.
    */

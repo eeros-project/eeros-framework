@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <eeros/control/TimeDomain.hpp>
@@ -304,6 +305,7 @@ void Executor::run() {
     taskList.run();
     if (mainTask != nullptr)
       mainTask->run();
+    while (std::all_of(threads.begin(), threads.end(), [](auto t){return !t->async.cycleComplete();})) std::this_thread::yield();
     counter.tock();
   }
 

@@ -26,8 +26,38 @@ void Async::run() {
   semaphore.post();
 }
 
+bool Async::cycleComplete()
+{
+  auto areWeBehind = [](uint32_t current, uint32_t checked){
+        auto difference = current > checked ? current - checked : checked - current;
+        bool assumeOverflow = difference > std::numeric_limits<decltype(current)>::max()/2;
+        if (assumeOverflow) return current < checked;
+        else return current > checked;
+  };
+  while(true) {
+    auto current = runCycle.load(std::memory_order::memory_order_relaxed);
+    auto checked = checkCycle.load(std::memory_order::memory_order_relaxed);
+    if (current == checked) { // we are in sync
+      if (checkCycle.compare_exchange_weak(checked, checked+1, std::memory_order::memory_order_relaxed)) {
+        return true;
+      }
+    } else if (areWeBehind(current, checked)) { // run() is multiple cycles ahead, so the cycle we are checking is complete
+        if(checkCycle.compare_exchange_weak(checked, current+1)) {
+          return true;
+
+        }
+
+    } else
+    {
+      return false;
+    }
+    std::this_thread::yield();
+  }
+}
+
+
 void Async::stop() {
-  finished = true;
+  finished.store(true, std::memory_order::memory_order_relaxed);
   semaphore.post();
 }
 
@@ -55,12 +85,12 @@ void Async::run_thread() {
     log.trace() << "starting thread " << pid << ":" << tid;
   }
 
-  semaphore.wait();
-  while (!finished) {
+  while (!finished.load(std::memory_order::memory_order_relaxed)) {
+    semaphore.wait();
     counter.tick();
     task.run();
     counter.tock();
-    semaphore.wait();
+    runCycle.fetch_add(1, std::memory_order::memory_order_relaxed);
   }
 
   log.trace() << "stopping thread " << pid << ":" << tid;
