@@ -5,6 +5,7 @@
 #include <condition_variable>
 #include <memory>
 #include <thread>
+#include <atomic>
 
 #include <eeros/core/Runnable.hpp>
 #include <eeros/core/PeriodicCounter.hpp>
@@ -137,10 +138,24 @@ class Executor : public Runnable {
 
   static core::TimeSource::Uptime uptime() {
     auto& exec = Executor::instance();
-    if(exec.sync)
-      return exec.sync->currentUptime();
-    else
-      return core::TimeSource::Uptime(0);
+    while(true) {
+      if(exec.time.readInProgress.test_and_set(std::memory_order_acquire)) {
+        // someone else is already reading
+        auto now = exec.time.currentCycle.load(std::memory_order_relaxed);
+        auto cached = exec.time.lastUpdatedCycle.load(std::memory_order_relaxed);
+        if (now == cached) return exec.time.cachedUptime.load(std::memory_order_relaxed);
+      } else {
+        // we locked it
+        auto uptime = core::TimeSource::Uptime{0};
+        if(exec.sync) uptime = exec.sync->currentUptime();
+        exec.time.cachedUptime.store(uptime, std::memory_order_relaxed);
+        auto now = exec.time.currentCycle.load(std::memory_order_relaxed);
+        exec.time.lastUpdatedCycle.store(now, std::memory_order_relaxed);
+        //unlock
+        exec.time.readInProgress.clear(std::memory_order_release);
+        return uptime;
+      }
+    }
   }
 
   /**
@@ -198,6 +213,12 @@ class Executor : public Runnable {
   bool syncWithRosTopicSet;
   bool running = true;
   logger::Logger log;
+  struct {
+    std::atomic<core::TimeSource::Uptime> cachedUptime;
+    std::atomic_flag readInProgress{false};
+    std::atomic<uint32_t> lastUpdatedCycle{0};
+    std::atomic<uint32_t> currentCycle{0};
+  } time;
 #ifdef USE_ROS2
   rclcpp::Executor::SharedPtr subscriberExecutor;
   std::shared_ptr<std::thread> subscriberThread;

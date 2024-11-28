@@ -1,5 +1,7 @@
 #include <eeros/control/TimeDomain.hpp>
 
+#include <iostream>
+
 using namespace eeros::control;
 
 TimeDomain::TimeDomain(std::string name, double period, bool realtime) 
@@ -25,6 +27,7 @@ void TimeDomain::registerSafetyEvent(SafetySystem& ss, SafetyEvent& e) {
 void TimeDomain::run() {
   if(!running) return;
   try {
+    // std::cout << "running td\n";
     for(auto block : blocks) block->run();
   } catch (NotConnectedFault const& e) {
     if(safetySystem != nullptr && safetyEvent != nullptr) {

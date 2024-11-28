@@ -27,7 +27,7 @@ public:
    */
   LogEntry(std::shared_ptr<LogWriter> writer, LogLevel level, unsigned category = 0) 
       : w(std::move(writer)) {
-    enable = (level <= w->visible_level);
+    enable = w != nullptr && (level <= w->visible_level);
     if(enable) w->begin(os, level, category);
   }
   

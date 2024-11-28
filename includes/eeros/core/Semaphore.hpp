@@ -4,6 +4,7 @@
 #include <mutex>
 #include <chrono>
 #include <condition_variable>
+#include <atomic>
 
 namespace eeros {
 
@@ -14,10 +15,11 @@ namespace eeros {
 		void wait();
 		bool wait(double timeout_sec);
 		void post();
+		bool isFree() const noexcept;
 	private:
 		std::mutex mutex;
 		std::condition_variable condvar;
-		int counter;
+		std::atomic_int counter;
 	};
 
 };
