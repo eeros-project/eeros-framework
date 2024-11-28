@@ -12,6 +12,9 @@
 #include <memory>
 #include <iostream>
 #include <iomanip>
+#include <functional>
+#include <initializer_list>
+#include <cassert>
 
 class LongTask : public eeros::Runnable {
 public:
@@ -22,9 +25,47 @@ public:
     }
 };
 
-class LogBlock : public eeros::control::Blockio<1, 0> {
+template<typename T>
+class LogBlock : public eeros::control::Blockio<1, 0, T> {
     virtual void run() override {
-        std::cout << "block time: " << eeros::System::getTime() <<", block signal: " << getIn().getSignal().getValue() << '\n';
+        std::cout << "block time: " << eeros::System::getTime() <<", block signal: " << this->getIn().getSignal().getValue() << '\n';
+    }
+};
+
+struct ReferenceGenerator {
+    using Uptime = eeros::core::SystemTime::Uptime;
+    using GeneratorFunc = std::function<double(Uptime)>;
+    Uptime end;
+    GeneratorFunc generator;
+};
+
+class Validator : public eeros::control::Blockio<1, 1, double, bool> {
+    public:
+        Validator(std::initializer_list<ReferenceGenerator> references): generators(references) {
+            assert(generators.size() > 0);
+        }
+
+        std::size_t failures() {
+            return failedCycles;
+        }
+private:
+    std::vector<ReferenceGenerator> generators;
+    std::size_t currentGeneratorIndex = 0;
+    ReferenceGenerator::Uptime generatorStart;
+    std::size_t failedCycles = 0;
+
+    virtual void run() override {
+        auto now = eeros::Executor::uptime();
+        while(currentGeneratorIndex < generators.size() && generators[currentGeneratorIndex].end < now) {
+            generatorStart = generators[currentGeneratorIndex].end;
+            ++currentGeneratorIndex;
+        };
+        auto& in = getIn().getSignal();
+        auto& out = getOut().getSignal();
+        auto result = std::abs(in.getValue() - generators[currentGeneratorIndex].generator(now - generatorStart)) < 1e-6;
+        failedCycles += !result; //branchless version of if(!result) ++failedCycles;
+        out.setValue(result);
+        out.setTimestamp(eeros::System::getTimeNs());
     }
 };
 
@@ -34,20 +75,23 @@ int main() {
     using namespace eeros::logger;
 
     constexpr double period = 0.1;
-    std::cout << "start\n";
+    std::cout << std::boolalpha <<"start\n";
     Logger::setDefaultStreamLogger(std::cout);
 
     Constant<double> c(1);
     I<double> integrator{};
     integrator.setInitCondition(0);
-    LogBlock lb{};
+    Validator v{ReferenceGenerator{ReferenceGenerator::Uptime(11), [](ReferenceGenerator::Uptime time){return time.count() - 0.1;}}};
+    LogBlock<bool> lb{};
     TimeDomain d("test", period, false);
     d.addBlock(c);
     d.addBlock(integrator);
+    d.addBlock(v);
     d.addBlock(lb);
 
     integrator.getIn().connect(c.getOut());
-    lb.getIn().connect(integrator.getOut());
+    v.getIn().connect(integrator.getOut());
+    lb.getIn().connect(v.getOut());
 
     integrator.enable();
     d.start();
@@ -67,4 +111,6 @@ int main() {
     exec.add(d);
     exec.add(p);
     exec.run();
+    std::cout << "failed validations: " << v.failures() << '\n';
 }
+
