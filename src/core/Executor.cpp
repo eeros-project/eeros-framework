@@ -304,7 +304,6 @@ void Executor::run() {
   while (running) {
     counter.tick();
     time.currentCycle.fetch_add(1, std::memory_order::memory_order_relaxed);
-    std::atomic_thread_fence(std::memory_order::memory_order_acquire);
     taskList.run();
     if (mainTask != nullptr)
       mainTask->run();
@@ -312,7 +311,6 @@ void Executor::run() {
     // make sure we wait for all async tasks to have completed the cycle before we sync memory operations
     // also makes sure we stay in sync for TimeSources like ManualClock that don't sleep between cycles
     while (!std::all_of(threads.begin(), threads.end(), [](auto t){return t->async.cycleComplete();}));
-    std::atomic_thread_fence(std::memory_order::memory_order_release);
     counter.tock();
     sync->sync();
   }

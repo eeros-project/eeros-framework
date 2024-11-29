@@ -29,12 +29,12 @@ void Async::run() {
 
 bool Async::cycleComplete()
 {
-  return state.load(std::memory_order_relaxed) == TaskState::Idle;
+  return state.load(std::memory_order_acquire) == TaskState::Idle;
 }
 
 
 void Async::stop() {
-  finished.store(true, std::memory_order::memory_order_relaxed);
+  finished.store(true, std::memory_order::memory_order_release);
   semaphore.post();
 }
 
@@ -64,14 +64,12 @@ void Async::run_thread() {
 
   while (!finished.load(std::memory_order::memory_order_relaxed)) {
     semaphore.wait();
-    state.store(TaskState::Running, std::memory_order_relaxed);
+    state.store(TaskState::Running, std::memory_order_acquire);
     counter.tick();
-    std::atomic_thread_fence(std::memory_order::memory_order_acquire);
     task.run();
-    std::atomic_thread_fence(std::memory_order::memory_order_release);
     counter.tock();
     auto s = TaskState::Running;
-    while(s == TaskState::Running) state.compare_exchange_weak(s, TaskState::Idle, std::memory_order_relaxed);
+    while(s == TaskState::Running) state.compare_exchange_weak(s, TaskState::Idle, std::memory_order_release);
   }
 
   log.trace() << "stopping thread " << pid << ":" << tid;

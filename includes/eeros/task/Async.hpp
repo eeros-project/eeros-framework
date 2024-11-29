@@ -18,9 +18,17 @@ class Async : public Runnable {
   Async(Runnable &task, double period, bool realtime = false, int nice = 0);
   Async(Runnable *task, double period, bool realtime = false, int nice = 0);
   virtual ~Async();
+  /**
+   * schedule task to run
+   * also syncs memory: release (calling thread) -> acquire (task thread)
+   */
   virtual void run();
   void stop();
   void join();
+  /**
+   * check if async task has finished running
+   * also syncs memory: acquire (calling thread) -> release (task thread)
+   */
   bool cycleComplete();
 
   PeriodicCounter counter;
@@ -34,8 +42,6 @@ class Async : public Runnable {
   Semaphore semaphore;
   std::thread thread;
   std::atomic<bool> finished;
-  // std::atomic<uint32_t> runCycle{0};
-  // std::atomic<uint32_t> checkCycle{1};
   enum class TaskState { Idle, Running, WaitingToRun};
   std::atomic<TaskState> state{TaskState::Idle};
   logger::Logger log;
