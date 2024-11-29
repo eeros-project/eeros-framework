@@ -302,7 +302,6 @@ void Executor::run() {
   log.trace() << "starting periodic execution";
   sync->start();
   while (running) {
-    sync->sync();
     counter.tick();
     time.currentCycle.fetch_add(1, std::memory_order::memory_order_relaxed);
     std::atomic_thread_fence(std::memory_order::memory_order_acquire);
@@ -315,6 +314,7 @@ void Executor::run() {
     while (!std::all_of(threads.begin(), threads.end(), [](auto t){return t->async.cycleComplete();}));
     std::atomic_thread_fence(std::memory_order::memory_order_release);
     counter.tock();
+    sync->sync();
   }
 
   log.trace() << "stopping all threads";

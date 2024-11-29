@@ -20,7 +20,7 @@ class LongTask : public eeros::Runnable {
 public:
     virtual void run() override {
         std::cout << "sleeping...\n";
-        std::this_thread::sleep_for(eeros::core::TimeSource::Seconds(0.5));
+        // std::this_thread::sleep_for(eeros::core::TimeSource::Seconds(0.5));
         std::cout << "...woke up\n";
     }
 };
@@ -69,6 +69,14 @@ private:
     }
 };
 
+ReferenceGenerator::GeneratorFunc RampValidator(double from, double to, double timeFrame) {
+    return [from, to, timeFrame](ReferenceGenerator::Uptime time){
+        double res =  from + time.count()*to/timeFrame;
+        std::cout << "ref: " << res << '\n';
+        return res;
+    };
+}
+
 int main() {
     using namespace eeros::core;
     using namespace eeros::control;
@@ -81,7 +89,8 @@ int main() {
     Constant<double> c(1);
     I<double> integrator{};
     integrator.setInitCondition(0);
-    Validator v{ReferenceGenerator{ReferenceGenerator::Uptime(11), [](ReferenceGenerator::Uptime time){return time.count() - 0.1;}}};
+    // Validator v{ReferenceGenerator{ReferenceGenerator::Uptime(11), [](ReferenceGenerator::Uptime time){return time.count() - 0.1;}}};
+    Validator v{ReferenceGenerator{ReferenceGenerator::Uptime(11), RampValidator(0, 10.0, 10.0)}};
     LogBlock<bool> lb{};
     TimeDomain d("test", period, false);
     d.addBlock(c);
