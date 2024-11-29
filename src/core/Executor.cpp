@@ -212,7 +212,7 @@ void Executor::assignPriorities() {
 
 void Executor::stop() {
   auto &instance = Executor::instance();
-  instance.running = false;
+  instance.running.store(false, std::memory_order_relaxed);
 #ifdef USE_ETHERCAT
   if (instance.etherCATStack)
     instance.etherCATStack->stop();
@@ -297,11 +297,11 @@ void Executor::run() {
   if (!sync)
     sync = std::make_shared<core::SystemTime>(period);
 
-  running = true;
+  running.store(true, std::memory_order_relaxed);
 
   log.trace() << "starting periodic execution";
   sync->start();
-  while (running) {
+  while (running.load(std::memory_order_relaxed)) {
     counter.tick();
     time.currentCycle.fetch_add(1, std::memory_order::memory_order_relaxed);
     taskList.run();

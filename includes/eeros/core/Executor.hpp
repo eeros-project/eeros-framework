@@ -211,7 +211,7 @@ class Executor : public Runnable {
   bool syncWithEtherCatStackSet;
   bool syncWithRosTimeSet;
   bool syncWithRosTopicSet;
-  bool running = true;
+  std::atomic<bool> running{true};
   logger::Logger log;
   struct {
     std::atomic<core::TimeSource::Uptime> cachedUptime;
