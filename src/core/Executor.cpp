@@ -17,10 +17,6 @@
 #include <thread>
 #include <unistd.h>
 #include <vector>
-#ifdef USE_ROS
-#include <ros/callback_queue.h>
-#include <ros/callback_queue_interface.h>
-#endif
 
 using namespace eeros;
 using namespace std::chrono;
@@ -106,9 +102,7 @@ void createThread(Logger &log, task::Periodic &task, task::Periodic &baseTask,
 } // namespace
 
 Executor::Executor()
-    : period(0), mainTask(nullptr), syncWithEtherCatStackSet(false),
-      syncWithRosTimeSet(false), syncWithRosTopicSet(false),
-      log(logger::Logger::getLogger('E')) {}
+    : period(0), mainTask(nullptr), log(logger::Logger::getLogger('E')) {}
 
 Executor::~Executor() {}
 
@@ -116,14 +110,6 @@ Executor &Executor::instance() {
   static Executor executor;
   return executor;
 }
-
-#ifdef USE_ETHERCAT
-void Executor::syncWithEtherCATSTack(
-    ecmasterlib::EcMasterlibMain *etherCATStack) {
-  syncWithEtherCatStackSet = true;
-  this->etherCATStack = etherCATStack;
-}
-#endif
 
 void Executor::setMainTask(task::Periodic &mainTask) {
   if (this->mainTask != nullptr)
@@ -213,54 +199,7 @@ void Executor::assignPriorities() {
 void Executor::stop() {
   auto &instance = Executor::instance();
   instance.running.store(false, std::memory_order_relaxed);
-#ifdef USE_ETHERCAT
-  if (instance.etherCATStack)
-    instance.etherCATStack->stop();
-#endif
-#ifdef USE_ROS2
-  rclcpp::shutdown();
-  if (instance.subscriberThread != nullptr) {
-    instance.subscriberThread->join();
-  }
-  instance.handleTopic(); // release lock to stop executor
-#endif
 }
-
-#if defined USE_ROS || defined USE_ROS2
-void Executor::syncWithRosTime() {
-  syncWithRosTimeSet = true;
-  eeros::System::useRosTime();
-}
-#endif
-
-#ifdef USE_ROS
-void Executor::syncWithRosTopic(ros::CallbackQueue *syncRosCallbackQueue) {
-  log.warn() << "sync executor with gazebo";
-  syncWithRosTopicSet = true;
-  this->syncRosCallbackQueue = syncRosCallbackQueue;
-}
-#endif
-
-#ifdef USE_ROS2
-rclcpp::CallbackGroup::SharedPtr
-Executor::registerSubscriber(rclcpp::Node::SharedPtr node, const bool sync) {
-  if (sync) {
-    syncWithRosTopicSet = true;
-    log.warn() << "sync executor with gazebo";
-  }
-  if (subscriberExecutor == nullptr) {
-    subscriberExecutor =
-        rclcpp::executors::MultiThreadedExecutor::make_shared();
-  }
-  auto callback_group =
-      node->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
-  subscriberExecutor->add_callback_group(callback_group,
-                                         node->get_node_base_interface());
-  return callback_group;
-}
-
-void Executor::handleTopic() { cv.notify_one(); }
-#endif
 
 void Executor::run() {
   log.trace() << "starting executor with base period " << period

@@ -13,19 +13,6 @@
 #include <eeros/task/Periodic.hpp>
 #include <eeros/logger/Logger.hpp>
 
-#ifdef USE_ETHERCAT
-#include <EcMasterlibMain.hpp>
-#endif
-
-#ifdef USE_ROS
-#include <ros/ros.h>
-#endif
-
-#ifdef USE_ROS2
-#include <rclcpp/rclcpp.hpp>
-#endif
-
-
 namespace eeros {
 
 namespace control {
@@ -166,41 +153,6 @@ class Executor : public Runnable {
   static constexpr int basePriority = 49;
   PeriodicCounter counter;
 
-#ifdef USE_ETHERCAT
-  /**
-   * The executor will run in synch with the EtherCAT stack.
-   *
-   * @param etherCATStack - reference to the EtherCAT stack
-   */
-  void syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack);
-#endif
-#if defined USE_ROS || defined USE_ROS2
-  /**
-   * Caused the executor to fetch its time base from ROS time.
-   * Further, all blocks using the system time base will also switch.
-   * Do not use this together with EtherCAT.
-   */
-  void syncWithRosTime();
-#endif
-#ifdef USE_ROS
-  void syncWithRosTopic(ros::CallbackQueue* syncRosCallbackQueue);
-  ros::CallbackQueue* syncRosCallbackQueue;
-#endif
-#ifdef USE_ROS2
-  /**
-   * Called by a ROS subscriber, registers a subscriber.
-   * Do not use this together with EtherCAT.
-   *
-   * @param node - ROS node as a shared ptr
-   * @param sync - when true, executor is triggered by ROS subscriber
-   */
-  rclcpp::CallbackGroup::SharedPtr registerSubscriber(rclcpp::Node::SharedPtr node, const bool sync = false);
-  /**
-   * Called by a ROS subscriber, will trigger the executor upon receiving a ROS message.
-   */
-  void handleTopic();
-#endif
-
  private:
   Executor();
   std::shared_ptr<core::TimeSource> sync;
@@ -208,9 +160,7 @@ class Executor : public Runnable {
   double period;
   task::Periodic* mainTask;
   std::vector<task::Periodic> tasks;
-  bool syncWithEtherCatStackSet;
-  bool syncWithRosTimeSet;
-  bool syncWithRosTopicSet;
+
   std::atomic<bool> running{true};
   logger::Logger log;
   struct {
@@ -219,16 +169,6 @@ class Executor : public Runnable {
     std::atomic<uint32_t> lastUpdatedCycle{0};
     std::atomic<uint32_t> currentCycle{0};
   } time;
-#ifdef USE_ROS2
-  rclcpp::Executor::SharedPtr subscriberExecutor;
-  std::shared_ptr<std::thread> subscriberThread;
-  std::condition_variable cv;
-  std::mutex cv_m;
-  int count;
-#endif
-#ifdef USE_ETHERCAT
-  ecmasterlib::EcMasterlibMain* etherCATStack;
-#endif
 };
 
 }
