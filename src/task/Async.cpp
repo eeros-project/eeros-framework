@@ -29,32 +29,6 @@ void Async::run() {
 
 bool Async::cycleComplete()
 {
-  // auto areWeBehind = [](uint32_t current, uint32_t checked){
-  //       auto difference = current > checked ? current - checked : checked - current;
-  //       bool assumeOverflow = difference > std::numeric_limits<decltype(current)>::max()/2;
-  //       if (assumeOverflow) return current < checked;
-  //       else return current > checked;
-  // };
-  // while(true) {
-  //   auto current = runCycle.load(std::memory_order::memory_order_relaxed);
-  //   auto checked = checkCycle.load(std::memory_order::memory_order_relaxed);
-  //   if (current == checked) { // we are in sync
-  //     if (checkCycle.compare_exchange_weak(checked, checked+1, std::memory_order::memory_order_relaxed)) {
-  //       return true;
-  //     }
-  //   } else if (areWeBehind(current, checked)) { // run() is multiple cycles ahead, so the cycle we are checking is complete
-  //       if(checkCycle.compare_exchange_weak(checked, current+1)) {
-  //         return true;
-  //
-  //       }
-  //
-  //   } else
-  //   {
-  //     return false;
-  //   }
-  //
-  // }
-
   return state.load(std::memory_order_relaxed) == TaskState::Idle;
 }
 
@@ -96,7 +70,6 @@ void Async::run_thread() {
     task.run();
     std::atomic_thread_fence(std::memory_order::memory_order_release);
     counter.tock();
-    // runCycle.fetch_add(1, std::memory_order::memory_order_relaxed);
     auto s = TaskState::Running;
     while(s == TaskState::Running) state.compare_exchange_weak(s, TaskState::Idle, std::memory_order_relaxed);
   }
