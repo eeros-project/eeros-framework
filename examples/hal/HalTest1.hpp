@@ -1,5 +1,4 @@
-#ifndef ORG_EEROS_HALTEST1_HPP_
-#define ORG_EEROS_HALTEST1_HPP_
+#pragma once
 
 #include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/PeripheralInput.hpp>
@@ -63,7 +62,6 @@ class MySafetyProperties : public SafetyProperties {
     addLevel(slSingle);
     setEntryLevel(slSingle);
   }
-  virtual ~MySafetyProperties() { }
   SafetyLevel slSingle;
 };
 
@@ -97,12 +95,12 @@ class StepAnalogOut : public Step {
 class SeqDigital : public Sequence {
  public:
   SeqDigital(std::string name, Sequence* caller, MyControlSystem& cs) 
-    : Sequence(name, caller, false), stepDigOut("step dig out", this, cs), wait("waiting time digital", this) { }
+    : Sequence(name, caller, false), stepDigOut("step dig out", this, cs), pause("waiting time digital", this) { }
     int action() {
       bool toggle = false;
       while (Sequencer::running) {
         stepDigOut(toggle);
-        wait(5);
+        pause(5);
         toggle = !toggle;
       }
       return 0;
@@ -110,18 +108,18 @@ class SeqDigital : public Sequence {
 
  private:
   StepDigOut stepDigOut;
-  Wait wait;
+  Wait pause;
 };
 
 class SeqAnalog : public Sequence {
  public:
   SeqAnalog(std::string name, Sequence* caller, MyControlSystem& cs) 
-    : Sequence(name, caller, false), stepAnalogOut("step analog out", this, cs), wait("waiting time analog", this) { }
+    : Sequence(name, caller, false), stepAnalogOut("step analog out", this, cs), pause("waiting time analog", this) { }
     int action() {
       bool toggle = false;
       while (Sequencer::running) {
         stepAnalogOut(toggle);
-        wait(10);
+        pause(10);
         toggle = !toggle;
       }
       return 0;
@@ -129,7 +127,7 @@ class SeqAnalog : public Sequence {
  
  private:
   StepAnalogOut stepAnalogOut;
-  Wait wait;
+  Wait pause;
 };
 
 class MyMainSequence : public Sequence {
@@ -138,8 +136,8 @@ class MyMainSequence : public Sequence {
   int action() {
     seqDigital();
     seqAnalog();
-    Sequence::wait();
-    Sequence::wait();
+    seqDigital.wait();
+    seqAnalog.wait();
     return 0;
   }
 
@@ -149,4 +147,3 @@ class MyMainSequence : public Sequence {
   SeqAnalog seqAnalog;
 };
 
-#endif // ORG_EEROS_HALTEST1_HPP_

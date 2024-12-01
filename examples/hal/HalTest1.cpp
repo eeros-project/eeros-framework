@@ -19,9 +19,7 @@ int main(int argc, char **argv){
   
   HAL& hal = HAL::instance();
   hal.readConfigFromFile(&argc, argv);
-    
-// 	hal.callOutputFeature("pwm1", "setPwmFrequency", 100.0);
-    
+
   // Create safety and control system
   MyControlSystem cs(dt);
   MySafetyProperties safetyProperties;
