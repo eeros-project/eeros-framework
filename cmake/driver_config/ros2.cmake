@@ -5,6 +5,8 @@ include(cmake/package_management.cmake)
 if(DEFINED ENV{ROS_DISTRO})
     target_compile_definitions(${PROJECT_NAME}_eeros PUBLIC USE_ROS2)
 
+    include(cmake/eeros-msgs.cmake)
+
     eeros_find_package(${PROJECT_NAME}_eeros ament_cmake)
     eeros_find_package(${PROJECT_NAME}_eeros rclcpp)
     eeros_find_package(${PROJECT_NAME}_eeros std_msgs)
@@ -22,7 +24,9 @@ if(DEFINED ENV{ROS_DISTRO})
     find_package(tf2 REQUIRED)
     ament_target_dependencies(${PROJECT_NAME}_eeros PUBLIC rclcpp std_msgs example_interfaces sensor_msgs nav_msgs tf2)
 
-    add_subdirectory(eeros_msgs)
+    # some libraries will be built as statis per default
+    set(BUILD_SHARED_LIBS ON)
+    add_subdirectory(eeros_msgs/eeros_msgs)
     target_link_libraries(${PROJECT_NAME}_eeros PUBLIC eeros_msgs__rosidl_typesupport_cpp)
 
 else()
