@@ -5,3 +5,4 @@ cmake*.sh
 install*/
 *.txt.user
 libucl-src
+eeros_msgs
