@@ -28,6 +28,9 @@ class Block : public Runnable {
    * @return name
    */
   virtual std::string getName() const;
+
+  virtual void enable() {}
+  virtual void disable() {}
   
  private:
   std::string name;

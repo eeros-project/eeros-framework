@@ -3,7 +3,7 @@
 
 #include <list>
 #include <string>
-#include <eeros/core/Runnable.hpp>
+#include <eeros/control/Block.hpp>
 #include <eeros/control/NotConnectedFault.hpp>
 #include <eeros/control/NaNOutputFault.hpp>
 #include <eeros/safety/SafetySystem.hpp>
@@ -40,28 +40,28 @@ class TimeDomain : public virtual Runnable {
    *
    * @param block - block 
    */
-  virtual void addBlock(Runnable* block);
+  virtual void addBlock(Block* block);
 
   /**
    * Adds a block to a time domain.
    *
    * @param block - block 
    */
-  virtual void addBlock(Runnable& block);
+  virtual void addBlock(Block& block);
 
   /**
    * Removes a block from a time domain.
    *
    * @param block - block 
    */
-  virtual void removeBlock(Runnable* block);
+  virtual void removeBlock(Block* block);
 
   /**
    * Removes a block from a time domain.
    *
    * @param block - block 
    */
-  virtual void removeBlock(Runnable& block);
+  virtual void removeBlock(Block& block);
   
   /**
    * Returns the name of the timedomain.
@@ -113,6 +113,15 @@ class TimeDomain : public virtual Runnable {
    */
   virtual void stop();
 
+  /**
+   * Enable all blocks in the domain
+   */
+  void enableBlocks();
+  /**
+   * Disable all blocks in the domain
+   */
+  void disableBlocks();
+
   /*
    * Friend operator overload to give the operator overload outside
    * the class access to the private fields.
@@ -124,7 +133,7 @@ class TimeDomain : public virtual Runnable {
   double period;
   bool realtime;
   bool running = true;
-  std::list<Runnable*> blocks;
+  std::list<Block*> blocks;
   SafetySystem* safetySystem;
   SafetyEvent* safetyEvent;
 };

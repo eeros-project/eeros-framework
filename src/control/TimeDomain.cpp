@@ -47,25 +47,36 @@ void TimeDomain::stop() {
   running = false;
 }
 
-void TimeDomain::addBlock(eeros::Runnable* block) {
+void TimeDomain::addBlock(Block* block) {
   blocks.push_back(block);
 }
 
-void TimeDomain::addBlock(eeros::Runnable& block) {
+void TimeDomain::addBlock(Block& block) {
   blocks.push_back(&block);
 }
 
-void TimeDomain::removeBlock(eeros::Runnable* block) {
+void TimeDomain::removeBlock(Block* block) {
   blocks.remove(block);
 }
 
-void TimeDomain::removeBlock(eeros::Runnable& block) {
+void TimeDomain::removeBlock(Block& block) {
   blocks.remove(&block);
 }
 
 // void TimeDomain::sortBlocks() {
 // 	// TODO
 // }
+
+void TimeDomain::enableBlocks()
+{
+  for(auto& block : blocks) block->enable();
+}
+
+void TimeDomain::disableBlocks()
+{
+  for(auto& block : blocks) block->disable();
+}
+
 
 namespace eeros {
 namespace control {
