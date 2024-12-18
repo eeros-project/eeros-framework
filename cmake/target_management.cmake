@@ -25,7 +25,7 @@ function(eeros_copy_file_post_build commandName filename)
     cmake_path(RELATIVE_PATH CMAKE_CURRENT_LIST_DIR BASE_DIRECTORY "${PROJECT_SOURCE_DIR}" OUTPUT_VARIABLE copy_relpath)
     set("${commandName}_buildpath" "${PROJECT_BINARY_DIR}/${copy_relpath}/${filename}")
     # message("${commandName}_buildpath: ${${commandName}_buildpath}")
-    add_custom_command(OUTPUT "${commandName}" POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_LIST_DIR}/${filename}" "${${commandName}_buildpath}")
+    add_custom_command(OUTPUT "${commandName}" COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_LIST_DIR}/${filename}" "${${commandName}_buildpath}")
 
     if(EXISTS "${${commandName}_buildpath}")
         install(FILES "${${commandName}_buildpath}" DESTINATION "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/${copy_relpath}")
