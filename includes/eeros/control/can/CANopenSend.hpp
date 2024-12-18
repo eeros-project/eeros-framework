@@ -8,6 +8,9 @@
 #include <CANopen.hpp>
 #include <vector>
 #include <initializer_list>
+#include <algorithm>
+#include <sstream>
+#include <cstring>
 
 using namespace eeros::control;
 using namespace eeros::logger;
@@ -76,7 +79,10 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
   virtual void run() {
     if (enabled) {
       int err;
-      if ((err = co.sendSync()) != 0) throw eeros::Fault("send sync failed");
+      if ((err = co.sendSync()) != 0){
+        std::ostringstream os; log.error() << "send sync failed: " << std::strerror(errno);
+        throw eeros::Fault(os.str());
+      };
 
       for (const auto& p : pdo) {
         uint8_t nodeNr = std::get<0>(p);

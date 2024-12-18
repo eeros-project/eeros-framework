@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
   log.info() << "CAN test start";
 
-  CANopen co("can0");
+  CANopen co = std::make_shared<CAN::CANSocket>("can0");
   ControlSystem cs(co, dt);
   MySafetyProperties sp;
   SafetySystem ss(sp, dt);

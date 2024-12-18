@@ -10,8 +10,9 @@
 #include <CANopen.hpp>
 #include <vector>
 #include <algorithm>
+#include <atomic>
 #include <initializer_list>
-
+#include <cstring>
 
 using namespace eeros::control;
 using namespace eeros::math;
@@ -64,6 +65,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
       scale[i] = 1;
     }
     log.info() << "CAN receive block constructed with " << node.size() << " nodes";
+    last_ts = eeros::System::getTimeNs();
   }
 
   /**
@@ -78,17 +80,35 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    * @see disable()
    */
   virtual void run() {
-    if (enabled) {
+    if (enabled.load(std::memory_order_relaxed)) {
       uint64_t ts = eeros::System::getTimeNs();
       for (uint32_t i = 0; i < nofPDO; i++) {
-        // read PDO
-        uint8_t node, TPDOnr, buf[8], len;
-        int err;
-        if ((err = co.PDOreceive(node, TPDOnr, buf, len)) == 0) {
+        coFrame_t frame;
+        int err = co.frameRecv(frame);
+        if (err == 0) {
+          switch(frame.fnctCode) {
+            case CANopen::FNCT_CODE::PDO1_TX:
+            case CANopen::FNCT_CODE::PDO2_TX:
+            case CANopen::FNCT_CODE::PDO3_TX:
+            case CANopen::FNCT_CODE::PDO4_TX:
+              handlePDO(frame);
+              break;
+            default:
+              log.trace() << "unhandled CANOpen frame: fnctCode = 0x" << std::hex << (int)frame.fnctCode << ", id = 0x" << frame.id;
+          }
+        }
+      }
+    }
+  }
+
+  void handlePDO(coFrame_t& frame) {
+          auto ts = eeros::System::getTimeNs();
           // search for registered PDOreceive
           for (const auto& p : pdo) {
             uint8_t n = std::get<1>(p);
             uint8_t r = std::get<2>(p);
+            auto node = frame.id;
+            auto TPDOnr = ((frame.fnctCode - CANopen::FNCT_CODE::PDO1_TX) >> 1) + 1;
             if (node == n && TPDOnr == r) {
               uint8_t nodeNr = std::get<0>(p);
               std::vector<uint8_t> length = std::get<3>(p);
@@ -96,7 +116,8 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
               uint8_t i = 0, start = 0;
               for (auto& len : length) {
                 len /= 8;
-                int32_t val = co.getPDOdata(buf, start, start + len - 1);
+                int32_t val = co.getPDOdata(&frame.payload.data[0], start, start + len - 1);
+                // log.info() << "got value " << val << " for node:index " << (int)nodeNr << ':' <<(int)idx[i];
                 if (idx[i] > 0) {
                   auto sig = this->getOut(nodeNr).getSignal().getValue();
                   sig[idx[i]-1] = val;
@@ -107,15 +128,12 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
                   sig[-idx[i]-1] = val;
                   this->getDigOut(nodeNr).getSignal().setValue(sig);
                   this->getDigOut(nodeNr).getSignal().setTimestamp(ts);
-                } else status[nodeNr] = val & 0x26F;
+                } else {/*std::cout << "R:status[" << (int)nodeNr << "] = 0x" << std::hex << val << '\n';*/ status[nodeNr] = val;}// & 0x26F;
                 start += len;
                 i++;
               }
             }
           }
-        }
-      }
-    }
   }
   
   /**
@@ -127,7 +145,8 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    */
   virtual void enable() {
     nofPDO = pdo.size();
-    enabled = true;
+    enabled.store(true, std::memory_order_relaxed);
+    log.trace() << "enabling can receive block";
   }
   
   /**
@@ -138,7 +157,8 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    * @see run()
    */
   virtual void disable() {
-    enabled = false;
+    enabled.store(false, std::memory_order_relaxed);
+    log.trace() << "disabling can receive block";
   }
   
   /**
@@ -207,7 +227,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
 
  private:
   CANopen co;
-  bool enabled = false;
+  std::atomic<bool> enabled = false;
   Output<Matrix<P,1,uint32_t>> digOut[N];
   Matrix<N,1,uint16_t> status;
   Matrix<N,M,double> scale;
@@ -216,6 +236,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
   std::vector<std::tuple<uint8_t,uint8_t,uint8_t,std::vector<uint8_t>,std::vector<int8_t>>> pdo;
   uint32_t nofPDO;
   Logger log;
+  uint64_t last_ts = 0;
 };
 
 }

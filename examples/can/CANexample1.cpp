@@ -31,7 +31,7 @@ static constexpr uint8_t nofNodes = 2;        // nof nodes
 class ControlSystem {
 public:
   ControlSystem(double ts)
-      : canHandle("can0"),
+      : canHandle(std::make_shared<CAN::CANSocket>("can0")),
         canSend(canHandle, {node1, node2}),
         canReceive(canHandle, {node1, node2}),
         timedomain("Main time domain", ts, true) {
