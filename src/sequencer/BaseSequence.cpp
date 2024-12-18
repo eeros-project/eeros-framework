@@ -22,6 +22,7 @@ BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking)
 
 int BaseSequence::action() {
   int retVal = -1;
+  state = SequenceState::idle;
   auto& seq = Sequencer::instance();
   if (seq.stepping) {
     log.warn() << "wait for next step command";
@@ -72,7 +73,6 @@ int BaseSequence::action() {
         log.error() << "undefined sequence state";
     }
   }
-  state = SequenceState::idle;
   return retVal;
 }
 

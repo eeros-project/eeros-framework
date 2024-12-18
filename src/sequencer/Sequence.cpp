@@ -10,7 +10,7 @@ namespace sequencer {
 
 Sequence::Sequence(std::string name, Sequencer& seq) : Sequence(name, seq, nullptr, false) { }
 
-Sequence::Sequence(std::string name, BaseSequence* caller, bool blocking) : Sequence(name, caller->seq, caller, blocking) { }
+Sequence::Sequence(std::string name, BaseSequence* caller, bool blocking) : Sequence(name, caller ? caller->seq : Sequencer::instance(), caller, blocking) { }
 
 Sequence::Sequence(std::string name, Sequencer& seq, BaseSequence* caller, bool blocking) : BaseSequence(seq, caller, blocking) {
   if (name.empty()) {
@@ -57,6 +57,10 @@ int Sequence::start() {
 
 int Sequence::getResult() {
   return retVal;
+}
+
+bool Sequence::done() {
+  return state == SequenceState::terminated;
 }
 
 void Sequence::wait() {

@@ -80,6 +80,13 @@ class Sequence : public BaseSequence {
    * @return - return value 
    */ 
   int getResult();
+
+  /**
+   * Check if sequence has finished running
+   *
+   * @return true if done, false otherwise
+   */
+  bool done();
  
  protected:
   int start();
