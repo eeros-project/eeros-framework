@@ -11,11 +11,12 @@ using namespace eeros::logger;
 
 Async::Async(Runnable &task, bool realtime , int nice) 
     : task(task), realtime(realtime), nice(nice), thread(&Async::run_thread, this), 
-      finished(false), log(Logger::getLogger('A')) { }
+      finished(false) {
+      }
 
 Async::Async(Runnable *task, bool realtime , int nice) 
     : task(*task), realtime(realtime), nice(nice), thread(&Async::run_thread, this), 
-      finished(false), log(Logger::getLogger('A')) { }
+      finished(false) { }
 
 Async::~Async() {
   stop();
@@ -40,6 +41,8 @@ void Async::run_thread() {
   const auto tid = syscall(SYS_gettid);
 
   Executor::prefault_stack();
+
+  auto log = Logger::getLogger('A');
 
   if (realtime) {
     int priority = Executor::basePriority - nice;

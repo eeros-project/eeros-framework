@@ -30,7 +30,6 @@ class Async : public Runnable {
   Semaphore semaphore;
   std::thread thread;
   bool finished;
-  logger::Logger log;
 };
 
 }
