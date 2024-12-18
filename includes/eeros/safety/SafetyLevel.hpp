@@ -152,6 +152,18 @@ class SafetyLevel {
   void setLevelAction(std::function<void (SafetyContext* context)> action);
 
   /**
+   * Set a function to run when entering the safety level
+   * @param action function to run
+   */
+  void setEntryAction(std::function<void (SafetyContext* context)> action);
+
+  /**
+   * Set a function to run when exiting the safety level
+   * @param action function to run
+   */
+  void setExitAction(std::function<void ()> action);
+
+  /**
    * The level id of this level is compared to another level id.
    *
    * @param level safety level
@@ -213,6 +225,8 @@ class SafetyLevel {
   std::map<uint32_t, std::pair<SafetyLevel*, EventType>> transitions;
   std::vector<InputAction*> inputAction;
   std::vector<OutputAction*> outputAction;
+  std::function<void (SafetyContext*)> onEntry;
+  std::function<void ()> onExit;
   logger::Logger log;
 };
 

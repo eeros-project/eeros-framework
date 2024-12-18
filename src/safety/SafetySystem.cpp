@@ -80,7 +80,11 @@ namespace eeros {
 
 		void SafetySystem::run() {
 			// level must only change before safety system runs or after run method has finished
-			if(nextLevel != nullptr) currentLevel = nextLevel; 
+			if(nextLevel != nullptr) {
+				if(currentLevel && currentLevel->onExit) currentLevel->onExit();
+				currentLevel = nextLevel;
+				if(currentLevel->onEntry) currentLevel->onEntry(&privateContext);
+			}
 			if(currentLevel != nullptr) {
 
 				// 1) Get currentLevel

@@ -69,6 +69,14 @@ void SafetyLevel::setLevelAction(std::function<void (SafetyContext*)> action) {
   this->action = action;
 }
 
+void SafetyLevel::setEntryAction(std::function<void (SafetyContext*)> action) {
+  this->onEntry = action;
+}
+
+void SafetyLevel::setExitAction(std::function<void ()> action) {
+  this->onExit = action;
+}
+
 void SafetyLevel::setInputAction(InputAction* action) {
   inputAction.push_back(action);
 }
