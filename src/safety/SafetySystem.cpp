@@ -1,6 +1,11 @@
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/core/Fault.hpp>
 
+#include<exception>
+#include <array>
+
+#include <execinfo.h>
+
 namespace eeros {
 	namespace safety {
 		
@@ -19,6 +24,31 @@ namespace eeros {
 				throw Fault("verification of safety properties failed!");
 			}
 			instance = this;
+			std::set_terminate([](){
+				try {
+					try {
+						std::exception_ptr e = std::current_exception();
+						if(e) std::rethrow_exception(e);
+
+					} catch (std::exception& e) {
+						if(instance)
+						{
+							instance->log.error() << "uncaught exception: " << e.what();
+							std::array<void*, 10> pointers;
+							auto num_elems = backtrace(pointers.data(), pointers.size());
+							auto symbols = backtrace_symbols(pointers.data(), num_elems);
+							for (auto i = 0; i < num_elems; ++i) {
+								instance->log.error() << symbols[i];
+							}
+						}
+					}
+					if(instance)instance->log.error() << "Terminating";
+					if(instance && &(instance->properties.abortFunction)) instance->properties.abortFunction();
+					std::exit(EXIT_FAILURE);
+				} catch(...) {
+					std::abort();
+				}
+			});
 		}
 		
 		SafetySystem::~SafetySystem() {

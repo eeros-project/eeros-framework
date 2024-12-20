@@ -30,7 +30,8 @@ namespace eeros {
 		protected:
 			void setEntryLevel(SafetyLevel& entryLevel);
 			
-			std::function<void (SafetyContext*)> exitFunction;			
+			std::function<void (SafetyContext*)> exitFunction;
+			std::function<void ()> abortFunction;
 			std::vector<SafetyLevel*> levels;
 			std::vector<eeros::hal::OutputInterface*> criticalOutputs;
 			std::vector<eeros::hal::InputInterface*> criticalInputs;
