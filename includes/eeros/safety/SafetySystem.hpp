@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <mutex>
+#include <atomic>
 #include <eeros/core/Runnable.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetyProperties.hpp>
@@ -65,8 +66,8 @@ namespace eeros {
 			bool setProperties(SafetyProperties& safetyProperties);
 			std::mutex mtx;
 			SafetyProperties properties;
-			SafetyLevel* currentLevel;
-			SafetyLevel* nextLevel;
+			std::atomic<SafetyLevel*> currentLevel;
+			std::atomic<SafetyLevel*> nextLevel;
 			SafetyContext privateContext;
 			static uint8_t instCount;
 			static SafetySystem* instance;

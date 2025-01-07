@@ -56,8 +56,9 @@ namespace eeros {
 		}
 
 		SafetyLevel& SafetySystem::getCurrentLevel(void) {
-			if(currentLevel) {
-				return *currentLevel;
+			auto level = currentLevel.load(std::memory_order_relaxed);
+			if(level) {
+				return *level;
 			}
 			else {
 				throw Fault("currentLevel not defined"); // TODO define error number and send error message to logger
@@ -67,9 +68,9 @@ namespace eeros {
 		bool SafetySystem::setProperties(SafetyProperties& safetyProperties) {
 			if(safetyProperties.verify()) {
 				properties = safetyProperties;
-				currentLevel = properties.getEntryLevel();
-				currentLevel->nofActivations = 0;
-				nextLevel = currentLevel;
+				currentLevel.store(properties.getEntryLevel(), std::memory_order_relaxed);
+				currentLevel.load(std::memory_order_relaxed)->nofActivations = 0;
+				nextLevel.store(currentLevel.load(std::memory_order_relaxed), std::memory_order_relaxed);
 				log.warn() << "safety system verified: " << (int)properties.levels.size() << " safety levels are present";
 				return true;
 			}
@@ -77,23 +78,25 @@ namespace eeros {
 		}
 		
 		void SafetySystem::triggerEvent(SafetyEvent event, SafetyContext* context) {
-			if(currentLevel) {
-				SafetyLevel* newLevel = currentLevel->getDestLevelForEvent(event, context == &privateContext);
+			auto current = currentLevel.load(std::memory_order_relaxed);
+			auto next = nextLevel.load(std::memory_order_relaxed);
+			if(current) {
+				SafetyLevel* newLevel = current->getDestLevelForEvent(event, context == &privateContext);
 				if(newLevel != nullptr) {
 					// prioritize multiple events, 
 					// can be called by different threads
 					mtx.lock();
-					if(nextLevel == currentLevel) {
-						nextLevel = newLevel;
-						nextLevel->nofActivations = 0;
-					} else if(newLevel->id < nextLevel->id) {
-						nextLevel = newLevel;
-						nextLevel->nofActivations = 0;
+					if(next == current) {
+						newLevel->nofActivations = 0;
+						nextLevel.store(newLevel, std::memory_order_release);
+					} else if(newLevel->id < next->id) {
+						newLevel->nofActivations = 0;
+						nextLevel.store(newLevel, std::memory_order_release);
 					}
 					mtx.unlock();
-					log.info() << "triggering event \'" << event << "\' in level '" << currentLevel << "\': transition to safety level: '" << nextLevel << "\'";
+					log.info() << "triggering event \'" << event << "\' in level '" << current << "\': transition to safety level: '" << newLevel << "\'";
 				} else {
-					log.error() << "triggering event \'" << event << "\' in level '" << currentLevel << "\': no transition for this event";
+					log.error() << "triggering event \'" << event << "\' in level '" << current << "\': no transition for this event";
 				}
 			} else {
 				throw Fault("current level not defined"); // TODO define error number and send error message to logger
@@ -109,30 +112,23 @@ namespace eeros {
 		}
 
 		void SafetySystem::run() {
-			// level must only change before safety system runs or after run method has finished
-			if(nextLevel != nullptr) {
-				if(currentLevel && currentLevel->onExit) currentLevel->onExit();
-				currentLevel = nextLevel;
-				if(currentLevel->onEntry) currentLevel->onEntry(&privateContext);
-			}
-			if(currentLevel != nullptr) {
+			// 1) Get currentLevel and nextLevel
+			SafetyLevel* level = currentLevel.load(std::memory_order_acquire);
+			SafetyLevel* nLevel = nextLevel.load(std::memory_order_acquire);
+			if(level != nullptr) {
 
-				// 1) Get currentLevel
-				SafetyLevel* level = currentLevel;
 				level->nofActivations++;
 				
 				// 2) Read inputs
 				for(auto ia : level->inputAction) {
 					if(ia != nullptr) {
-						SafetyLevel* oldLevel = currentLevel;
 						if(ia->check(&privateContext)) {
-							SafetyLevel* newLevel = nextLevel;
 							using namespace logger;
 							hal::InputInterface* input = (hal::InputInterface*)(ia->getInput());
-							if(oldLevel != newLevel) {
+							if(level != nLevel) {
 								log.info()	<< "level changed due to input action: " << input->getId()
-											<< " from level '" << oldLevel << "'"
-											<< " to level '" << newLevel << "'";
+											<< " from level '" << level << "'"
+											<< " to level '" << nLevel << "'";
 							}
 						}
 					}
@@ -149,7 +145,17 @@ namespace eeros {
 						oa->set();
 					}
 				}
-				if(nextLevel != nullptr) currentLevel = nextLevel; 
+				if(nLevel != nullptr && nLevel != level) {
+					if(level->onExit) {
+						log.info() << "running " << level << "->onExit()";
+						level->onExit();
+					}
+					currentLevel.store(nLevel, std::memory_order_acq_rel);
+					if(nLevel->onEntry) {
+						log.info() << "running " << nLevel << "->onEntry()";
+						nLevel->onEntry(&privateContext);
+					}
+				}
 			}
 			else {
 				log.error() << "current level is null!";
