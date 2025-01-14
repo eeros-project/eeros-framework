@@ -14,7 +14,8 @@ namespace control {
  * A multiplexer block is used to bundle multiple inputs into one output vector.
  *
  * @tparam N - number of inputs
- * @tparam T - signal type (double - default type)
+ * @tparam T - signal input type (double - default type)
+ * @tparam C - signal output type (Matrix<N,1,T - default type)
  * @since v0.6
  */
 
