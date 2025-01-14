@@ -69,9 +69,9 @@ namespace eeros {
 		bool SafetySystem::setProperties(SafetyProperties& safetyProperties) {
 			if(safetyProperties.verify()) {
 				properties = safetyProperties;
-				currentLevel.store(properties.getEntryLevel(), std::memory_order_relaxed);
-				currentLevel.load(std::memory_order_relaxed)->nofActivations = 0;
-				nextLevel.store(currentLevel.load(std::memory_order_relaxed), std::memory_order_relaxed);
+				auto entryLevel = properties.getEntryLevel();
+				entryLevel->nofActivations = 0;
+				nextLevel.store(entryLevel, std::memory_order_release);
 				log.warn() << "safety system verified: " << (int)properties.levels.size() << " safety levels are present";
 				return true;
 			}
@@ -79,22 +79,18 @@ namespace eeros {
 		}
 		
 		void SafetySystem::triggerEvent(SafetyEvent event, SafetyContext* context) {
-			auto current = currentLevel.load(std::memory_order_relaxed);
-			auto next = nextLevel.load(std::memory_order_relaxed);
+			auto current = currentLevel.load(std::memory_order_acquire);
 			if(current) {
 				SafetyLevel* newLevel = current->getDestLevelForEvent(event, context == &privateContext);
 				if(newLevel != nullptr) {
-					// prioritize multiple events, 
-					// can be called by different threads
-					mtx.lock();
-					if(next == current) {
-						newLevel->nofActivations = 0;
-						nextLevel.store(newLevel, std::memory_order_release);
-					} else if(newLevel->id < next->id) {
-						newLevel->nofActivations = 0;
-						nextLevel.store(newLevel, std::memory_order_release);
+					SafetyLevel* expected = nullptr;
+					// using std::memory_order_relaxed should be ok even though we access ->id, since the ids should be constant
+					while(!nextLevel.compare_exchange_strong(expected, newLevel, std::memory_order_relaxed)) {
+						// prioritize "lower" levels (i.e. levels with a lower id)
+						// so only keep trying to store our level, if the existing one isn't lower
+						if (expected->id < newLevel->id) return;
 					}
-					mtx.unlock();
+
 					log.info() << "triggering event \'" << event << "\' in level '" << current << "\': transition to safety level: '" << newLevel << "\'";
 				} else {
 					log.error() << "triggering event \'" << event << "\' in level '" << current << "\': no transition for this event";
@@ -113,50 +109,54 @@ namespace eeros {
 		}
 
 		void SafetySystem::run() {
-			// 1) Get currentLevel and nextLevel
+			// 1) Get currentLevel
 			SafetyLevel* level = currentLevel.load(std::memory_order_acquire);
-			SafetyLevel* nLevel = nextLevel.load(std::memory_order_acquire);
+
+			// 2) Set new level
+			SafetyLevel* nLevel = nullptr;
+			while(!nextLevel.compare_exchange_strong(nLevel, nullptr, std::memory_order_acquire));
+
+			if(nLevel != nullptr && nLevel != level) {
+				if(level && level->onExit) {
+					log.info() << "running " << level << "->onExit()";
+					level->onExit();
+				}
+				currentLevel.store(nLevel, std::memory_order_acq_rel);
+				level = nLevel;
+				if(nLevel->onEntry) {
+					log.info() << "running " << nLevel << "->onEntry()";
+					nLevel->onEntry(&privateContext);
+				}
+			}
+
 			if(level != nullptr) {
 
 				level->nofActivations++;
 				
-				// 2) Read inputs
+				// 3) Read inputs
 				for(auto ia : level->inputAction) {
 					if(ia != nullptr) {
 						if(ia->check(&privateContext)) {
 							using namespace logger;
 							hal::InputInterface* input = (hal::InputInterface*)(ia->getInput());
-							if(level != nLevel) {
-								log.info()	<< "level changed due to input action: " << input->getId()
-											<< " from level '" << level << "'"
-											<< " to level '" << nLevel << "'";
-							}
+							log.info()	<< "input action triggered: " << input->getId();
 						}
 					}
 				}
 				
-				// 3) Execute level action
+				// 4) Execute level action
 				if(level->action != nullptr) {
 					level->action(&privateContext);
 				}
 					
-				// 4) Set outputs
+				// 5) Set outputs
 				for(auto oa : level->outputAction) {
 					if(oa != nullptr) {
 						oa->set();
 					}
 				}
-				if(nLevel != nullptr && nLevel != level) {
-					if(level->onExit) {
-						log.info() << "running " << level << "->onExit()";
-						level->onExit();
-					}
-					currentLevel.store(nLevel, std::memory_order_acq_rel);
-					if(nLevel->onEntry) {
-						log.info() << "running " << nLevel << "->onEntry()";
-						nLevel->onEntry(&privateContext);
-					}
-				}
+
+
 			}
 			else {
 				log.error() << "current level is null!";
