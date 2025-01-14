@@ -64,6 +64,7 @@ namespace eeros {
 			
 		private:
 			bool setProperties(SafetyProperties& safetyProperties);
+			static void printStackTrace();
 			std::mutex mtx;
 			SafetyProperties properties;
 			std::atomic<SafetyLevel*> currentLevel;

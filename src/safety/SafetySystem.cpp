@@ -5,6 +5,8 @@
 #include <array>
 
 #include <execinfo.h>
+#include <cxxabi.h>
+#include <typeinfo>
 
 namespace eeros {
 	namespace safety {
@@ -33,17 +35,17 @@ namespace eeros {
 					} catch (std::exception& e) {
 						if(instance)
 						{
-							instance->log.error() << "uncaught exception: " << e.what();
-							std::array<void*, 20> pointers;
-							auto num_elems = backtrace(pointers.data(), pointers.size());
-							auto symbols = backtrace_symbols(pointers.data(), num_elems);
-							for (int i = 0; i < num_elems; ++i) {
-								instance->log.error() << i << ": " << symbols[i];
-							}
+							int status;
+							auto et = abi::__cxa_demangle(typeid(e).name(), NULL, NULL, &status);
+							instance->log.error() << "uncaught exception: " << (status == 0 ? et : "") << ' ' << e.what();
 						}
 					}
-					if(instance)instance->log.error() << "Terminating";
-					if(instance && &(instance->properties.abortFunction)) instance->properties.abortFunction();
+					if(instance) {
+						printStackTrace();
+						instance->log.error() << "Terminating";
+						if(&(instance->properties.abortFunction)) instance->properties.abortFunction();
+					}
+
 					std::exit(EXIT_FAILURE);
 				} catch(...) {
 					if(instance)instance->log.error() << "Aborting";
@@ -166,6 +168,36 @@ namespace eeros {
 		void SafetySystem::exitHandler() {
 			SafetySystem* ss = SafetySystem::instance;
 			if(ss) ss->properties.exitFunction(&ss->privateContext);
+		}
+
+		void SafetySystem::printStackTrace() {
+			std::array<void*, 20> pointers;
+			auto num_elems = backtrace(pointers.data(), pointers.size());
+			auto symbols = backtrace_symbols(pointers.data(), num_elems);
+			for (int i = 0; i < num_elems; ++i) {
+				// find mangled function name substring
+				int start = 0;
+				while(symbols[i][start] != '(' && symbols[i][start] != 0) ++start;
+				++start;
+				int end = start;
+				for(char c = symbols[i][start]; c != '+' && c != 0; c = symbols[i][end]) ++end;
+
+				// demangle if we have a symbol name
+				if(start == end || end == start + 1) {
+					instance->log.error() << i << ": " << symbols[i];
+				} else {
+					// C string shenanigans to splice the demangled name into the output without copying strings
+					symbols[i][end] = '\0';
+					if(start != 0) symbols[i][start-1] = '\0';
+					// demangle name
+					int status;
+					auto demangled = abi::__cxa_demangle(&symbols[i][start], NULL, NULL, &status);
+
+					// print demangled name if we can
+					if(status == 0) instance->log.error() << i << ": " << symbols[i] << '(' << demangled << '+' << &symbols[i][end+1];
+					else instance->log.error() << i << ": " << symbols[i] << '(' << &symbols[i][start] << '+' << &symbols[i][end+1];
+				}
+			}
 		}
 	};
 };
