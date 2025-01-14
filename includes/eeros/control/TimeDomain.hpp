@@ -115,10 +115,14 @@ class TimeDomain : public virtual Runnable {
 
   /**
    * Enable all blocks in the domain
+   *
+   * @see Block::enable()
    */
   void enableBlocks();
   /**
    * Disable all blocks in the domain
+   *
+   * @see Block::disable()
    */
   void disableBlocks();
 

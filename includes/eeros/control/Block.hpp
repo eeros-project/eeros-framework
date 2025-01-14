@@ -29,7 +29,22 @@ class Block : public Runnable {
    */
   virtual std::string getName() const;
 
+  /**
+   * Enable block
+   *
+   * May not be applicable to all block types
+   *
+   * @see TimeDomain::enableBlocks()
+   */
   virtual void enable() {}
+
+  /**
+   * Disable block
+   *
+   * May not be applicable to all block types
+   *
+   * @see TimeDomain::enableBlocks()
+   */
   virtual void disable() {}
   
  private:
