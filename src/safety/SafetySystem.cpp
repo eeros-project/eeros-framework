@@ -34,11 +34,11 @@ namespace eeros {
 						if(instance)
 						{
 							instance->log.error() << "uncaught exception: " << e.what();
-							std::array<void*, 10> pointers;
+							std::array<void*, 20> pointers;
 							auto num_elems = backtrace(pointers.data(), pointers.size());
 							auto symbols = backtrace_symbols(pointers.data(), num_elems);
-							for (auto i = 0; i < num_elems; ++i) {
-								instance->log.error() << symbols[i];
+							for (int i = 0; i < num_elems; ++i) {
+								instance->log.error() << i << ": " << symbols[i];
 							}
 						}
 					}
@@ -46,6 +46,7 @@ namespace eeros {
 					if(instance && &(instance->properties.abortFunction)) instance->properties.abortFunction();
 					std::exit(EXIT_FAILURE);
 				} catch(...) {
+					if(instance)instance->log.error() << "Aborting";
 					std::abort();
 				}
 			});
