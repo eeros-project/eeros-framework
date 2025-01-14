@@ -15,7 +15,7 @@ namespace control {
  *
  * @tparam N - number of inputs
  * @tparam T - signal input type (double - default type)
- * @tparam C - signal output type (Matrix<N,1,T - default type)
+ * @tparam C - signal output type (Matrix<N,1,T> - default type)
  * @since v0.6
  */
 
