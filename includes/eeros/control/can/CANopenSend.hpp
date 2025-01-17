@@ -138,7 +138,7 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
    * Sets the scaling.
    *
    * The drive needs its position and velocity information as 4 bytes counter values.
-   * The scaling allows to transform this counter values into meaningful position and
+   * The scaling allows to transform this counter values from meaningful position and
    * velocity information in rad, m, rad/s or m/s.
    *
    * @param scale the scaling factor for the velocity for all drives

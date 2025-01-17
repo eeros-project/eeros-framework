@@ -120,7 +120,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
                 // log.info() << "got value " << val << " for node:index " << (int)nodeNr << ':' <<(int)idx[i];
                 if (idx[i] > 0) {
                   auto sig = this->getOut(nodeNr).getSignal().getValue();
-                  sig[idx[i]-1] = val;
+                  sig[idx[i]-1] = val * scale[nodeNr];
                   this->getOut(nodeNr).getSignal().setValue(sig);
                   this->getOut(nodeNr).getSignal().setTimestamp(ts);
                 } else if (idx[i] < 0) {
