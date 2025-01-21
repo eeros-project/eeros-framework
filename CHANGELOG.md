@@ -4,10 +4,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Unreleased
-(v1.4.2 targeted for 2024-10-30) ([Github compare v1.4.1...master](https://github.com/eeros-project/eeros-framework/compare/v1.4.1...master))
+## v1.4.2
+(2025-01-21) ([GitHub compare v1.4.1...v1.4.2](https://github.com/eeros-project/eeros-framework/compare/v1.4.1...v1.4.2))
 
 ### Added Features
+* Complete revision of cmake configuration
+* Add spezialization to Gain block
+* Change to eeros_msgs for ROS
+* Publish safety level description in ROS publisher
+* Refactor versioning code
+* Revise CAN blocks
+* Allow time domain to enable and disable all blocks at once
+* Add Sequence::done() method to easily detect when a sequence has terminated
+* Add entry and exit function to safety level
+* Add terminate handler to safety system
 
 
 ## v1.4.1
