@@ -43,7 +43,7 @@ SafetySystem::SafetySystem(SafetyProperties& safetyProperties, double period)
       if (instance) {
         printStackTrace();
         instance->log.error() << "Terminating";
-        if (&(instance->properties.abortFunction))
+        if (instance->properties.abortFunction)
           instance->properties.abortFunction();
       }
 
@@ -216,3 +216,4 @@ void SafetySystem::printStackTrace() {
 }
 };  // namespace safety
 };  // namespace eeros
+
