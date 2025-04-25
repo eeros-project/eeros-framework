@@ -3,39 +3,16 @@
 
 include_directories(${EEROS_SOURCE_DIR}/includes ${EEROS_BINARY_DIR} ${EEROS_SOURCE_DIR}/test)
 
-##########################
-# load and add googletest
-##########################
-# Download and unpack googletest at configure time
-configure_file(CMakeLists.txt.in ${EEROS_BINARY_DIR}/test/googletest-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${EEROS_BINARY_DIR}/test/googletest-download )
-if(result)
-  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${EEROS_BINARY_DIR}/test/googletest-download )
-if(result)
-  message(FATAL_ERROR "Build step for googletest failed: ${result}")
-endif()
+include(FetchContent)
 
-# Prevent overriding the parent project's compiler/linker
-# settings on Windows
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_Declare(googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG release-1.11.0
+    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/googletest-src"
+    BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/googletest-build")
 
-# Add googletest directly to our build. This defines
-# the gtest and gtest_main targets.
-add_subdirectory(${EEROS_BINARY_DIR}/test/googletest-src
-                 ${EEROS_BINARY_DIR}/test/googletest-build)
+FetchContent_MakeAvailable(googletest)
 
-# The gtest/gtest_main targets carry header search path
-# dependencies automatically when using CMake 2.8.11 or
-# later. Otherwise we have to add them here ourselves.
-if (CMAKE_VERSION VERSION_LESS 2.8.11)
-  include_directories("${gtest_SOURCE_DIR}/include")
-endif()
 
 #######################
 # EEROS test sources
