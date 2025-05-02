@@ -376,7 +376,7 @@ class Matrix {
   }
   
   T det() const {
-    if(M == N) { // Determinat can only be calculated of a square matrix
+    if(M == N) { // Determinate can only be calculated of a square matrix
       if(M == 2) { // 2x2 matrix
         return (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1,0);
       }
@@ -450,6 +450,48 @@ class Matrix {
       }
     }
     return result;
+  }
+
+  /**
+   * The inverse operation is only implemented for a 2x2 or a 3x3 matrix of doubles.
+   * Make sure that the dimensions are correct and the determinate is not 0.
+   */
+  Matrix<N, M, double> inverse() const {
+    if(isInvertible()) {
+      if(M == 2) { // 2x2 matrix
+        T det = (*this).det();
+        Matrix<N, M, double> inv, subDetMat;
+        if (det != 0.0 ) {
+          subDetMat[0] = value[3];
+          subDetMat[1] = -value[2];
+          subDetMat[2] = -value[1];
+          subDetMat[3] = value[0];
+          subDetMat = subDetMat.transpose();
+          inv = subDetMat * 1/det;
+        }
+        return inv;
+      } else if(M == 3) { // 3x3 matrix
+        T det = (*this).det();
+        Matrix<N, M, double> inv, subDetMat;
+        if (det != 0.0 ) {
+          subDetMat[0] = value[4] * value[8] - value[5] * value[7];
+          subDetMat[1] = value[5] * value[6] - value[3] * value[8];
+          subDetMat[2] = value[3] * value[7] - value[4] * value[6];
+          subDetMat[3] = value[7] * value[2] - value[8] * value[1];
+          subDetMat[4] = value[8] * value[0] - value[6] * value[2];
+          subDetMat[5] = value[6] * value[1] - value[7] * value[0];
+          subDetMat[6] = value[1] * value[5] - value[2] * value[4];
+          subDetMat[7] = value[2] * value[3] - value[0] * value[5];
+          subDetMat[8] = value[0] * value[4] - value[1] * value[3];
+          subDetMat = subDetMat.transpose();
+          inv = subDetMat * 1/det;
+        }
+        return inv;
+      } else
+        throw Fault("inverse is only implemented for up to 3x3 matrices");
+    } else {
+      throw Fault("Inverting matrix failed: Matrix must be invertible");
+    }
   }
   
   /********** Base operations **********/
@@ -878,8 +920,10 @@ class Matrix {
   
 }; // END class Matrix
 
-/********** Operators **********/
-
+/********** Operator overloads **********/
+// The following operator overloads are for the cases when the first parameter
+// of a matrix operation is of type T (base type of the matrix)
+// e.g. m2 = 3.5 + m1;
 template < unsigned int M, unsigned int N = 1, typename T = double >
 Matrix<M, N, T> operator+(T left, Matrix<M, N, T> right) {
   Matrix<M, N, T> result;
