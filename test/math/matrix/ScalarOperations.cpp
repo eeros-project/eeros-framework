@@ -1,137 +1,88 @@
+#include <eeros/control/DeMux.hpp>
 #include <eeros/core/Runnable.hpp>
 #include <eeros/math/Matrix.hpp>
-#include <eeros/control/DeMux.hpp>
-#include <iostream>
-#include <fstream>
-#include "../../Utils.hpp"
+#include <gtest/gtest.h>
+#include <Utils.hpp>
 
-#define nofOperations 8
+using namespace eeros;
+using namespace eeros::math;
 
-template <int M, int N, typename T = double>
-class ScalarOpsTest {
-	public:
-		ScalarOpsTest() {
-			testMatrix.zero();
-			for(int i = 0; i < nofOperations; i++) {
-				refRes[i].zero();
-				calcRes[i].zero();
-			}
-		}
-		
-		int run(const char* filepath) {
-			std::ifstream file(filepath);
-			if(!file.is_open()) return -2;
-			
-			int line = 0;
-			int error = 0;
-			
-			while(!file.eof()) {
-				line++;
-				
-				file >> scalar; // first value is the scalar
-				
-				for(int n = 0; n < N; n++) { // next MxN values are the test matrix
-					for(int m = 0; m < M; m++) {
-						double in;
-						file >> in;
-						testMatrix(m, n) = in;
-					}
- 				}
-				if(file.eof()) break;
-
-				for(int i = 0; i < nofOperations; i++) { // the last values are the reference result
-					for(int n = 0; n < N; n++) {
-						for(int m = 0; m < M; m++) {
-							double in;
-							file >> in;
-							refRes[i](m, n) = in;
-						}
-					}
-					if(file.eof()) break;
-				}
-				if(file.eof()) break;
-				
-				calcRes[0] = testMatrix + scalar;
-				calcRes[1] = scalar + testMatrix;
-				calcRes[2] = testMatrix - scalar;
-				calcRes[3] = scalar - testMatrix;
-				calcRes[4] = testMatrix * scalar;
-				calcRes[5] = scalar * testMatrix;
-				calcRes[6] = testMatrix / scalar;
-				calcRes[7] = scalar / testMatrix;
-				
-				for(int i = 0; i < nofOperations; i++) {
-					for(int x = 0; x < N * M; x++) {
-						if(!Utils::compareApprox(refRes[i][x], calcRes[i][x], 0.001)) {
-							error++;
-							std::cout << "line " << line << " (operation '" << i << "'): expecting " << refRes[i](x) << " calculated " << calcRes[i](x) << std::endl;
-						}
-					}
-				}
-			}
-			file.close();
-			return error;
-		}
-		
-	private:
-		T scalar;
-		eeros::math::Matrix<M, N, T> testMatrix;
-		eeros::math::Matrix<M, N, T> refRes[nofOperations];
-		eeros::math::Matrix<M, N, T> calcRes[nofOperations];
-};
-
-void illegalArgument(int n, int m) {
-	std::cout << "Illegal argument (" << n << "x" << m << "), available tests: 4x1, 1x4, 2x2, 3x2." << std::endl;
+TEST(mathMatrixScalarOps, add1) {
+  Matrix<4, 1, double> m{1,-1,4,0};
+  double scalar = 5;
+  Matrix<4, 1, double> res = scalar + m;
+  EXPECT_TRUE(Utils::compareApprox(6, res[0], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(4, res[1], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(9, res[2], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(5, res[3], 0.001));
 }
 
-int main(int argc, char* argv[]) {
-	
-	ScalarOpsTest<4, 1, double> tester4x1d;
-	ScalarOpsTest<1, 4, double> tester1x4d;
-	ScalarOpsTest<2, 2, double> tester2x2d;
-	ScalarOpsTest<3, 2, double> tester3x2d;
-	
-	if(argc == 4) {
-		switch(atoi(argv[1])) {
-			case 1:
-				if(atoi(argv[2]) == 4) {
-					return tester1x4d.run(argv[3]);
-				}
-				else {
-					illegalArgument(atoi(argv[1]), atoi(argv[2]));
-					return -4;
-				}
-			case 2:
-				if(atoi(argv[2]) == 2) {
-					return tester2x2d.run(argv[3]);
-				}
-				else {
-					illegalArgument(atoi(argv[1]), atoi(argv[2]));
-					return -4;
-				}
-			case 3:
-				if(atoi(argv[2]) == 2) {
-					return tester3x2d.run(argv[3]);
-				}
-				else {
-					illegalArgument(atoi(argv[1]), atoi(argv[2]));
-					return -4;
-				}
-			case 4:
-				if(atoi(argv[2]) == 1) {
-					return tester4x1d.run(argv[3]);
-				}
-				else {
-					illegalArgument(atoi(argv[1]), atoi(argv[2]));
-					return -4;
-				}
-			default:
-				illegalArgument(atoi(argv[1]), atoi(argv[2]));
-				return -4;
-		}
-	}
-	else {
-		std::cout << "Illegal number of arguments!" << std::endl;
-	}
-	return -3;
+TEST(mathMatrixScalarOps, add2) {
+  Matrix<4, 1, double> m{1,-1,4,0};
+  double scalar = 5;
+  Matrix<4, 1, double> res = m + scalar;
+  EXPECT_TRUE(Utils::compareApprox(6, res[0], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(4, res[1], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(9, res[2], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(5, res[3], 0.001));
+}
+
+TEST(mathMatrixScalarOps, sub1) {
+  Matrix<4, 1, double> m{1,-1,4,0};
+  double scalar = 5;
+  Matrix<4, 1, double> res = scalar - m;
+  EXPECT_TRUE(Utils::compareApprox(4, res[0], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(6, res[1], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(1, res[2], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(5, res[3], 0.001));
+}
+
+TEST(mathMatrixScalarOps, sub2) {
+  Matrix<4, 1, double> m{1,-1,4,0};
+  double scalar = 5;
+  Matrix<4, 1, double> res = m - scalar;
+  EXPECT_TRUE(Utils::compareApprox(-4, res[0], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(-6, res[1], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(-1, res[2], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(-5, res[3], 0.001));
+}
+
+TEST(mathMatrixScalarOps, mult1) {
+  Matrix<4, 1, double> m{1,-1,4,0};
+  double scalar = 5;
+  Matrix<4, 1, double> res = scalar * m;
+  EXPECT_TRUE(Utils::compareApprox(5, res[0], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(-5, res[1], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(20, res[2], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(0, res[3], 0.001));
+}
+
+TEST(mathMatrixScalarOps, mult2) {
+  Matrix<4, 1, double> m{1,-1,4,0};
+  double scalar = 5;
+  Matrix<4, 1, double> res = m * scalar;
+  EXPECT_TRUE(Utils::compareApprox(5, res[0], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(-5, res[1], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(20, res[2], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(0, res[3], 0.001));
+}
+
+TEST(mathMatrixScalarOps, div1) {
+  Matrix<4, 1, double> m{1,-1,4,0};
+  double scalar = 5;
+  Matrix<4, 1, double> res = m / scalar;
+  EXPECT_TRUE(Utils::compareApprox(0.2, res[0], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(-0.2, res[1], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(0.8, res[2], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(0, res[3], 0.001));
+}
+
+TEST(mathMatrixScalarOps, div2) {
+  Matrix<4, 1, double> m{1,-1,4,100};
+  double scalar = 5;
+  Matrix<4, 1, double> res = scalar / m;
+  EXPECT_TRUE(Utils::compareApprox(5, res[0], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(-5, res[1], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(1.25, res[2], 0.001));
+  EXPECT_TRUE(Utils::compareApprox(0.05, res[3], 0.001));
 }
