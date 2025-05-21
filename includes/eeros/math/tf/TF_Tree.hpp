@@ -46,7 +46,7 @@ class TF_Tree {
    *
    * @return true, if successful
    */
-  virtual bool initJSON(std::string path);
+  virtual bool initJSON(const std::string path);
 
   /**
    * Reads tf tree from configuration file.
@@ -64,7 +64,7 @@ class TF_Tree {
    *
    * @return true, if successful
    */
-  virtual bool initJSON(ucl::Ucl jsonParameter);
+  virtual bool initJSON(const ucl::Ucl jsonParameter);
 
   /**
    * Adds a node containing a transformation matrix to a tf tree.
@@ -77,24 +77,9 @@ class TF_Tree {
    * @param base - name of the parent node
    * @param m - transformation matrix
    */
-  void addTF(std::string name, std::string base, Matrix<4, 4, double> m = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+  void addTF(const std::string name, const std::string base, const Matrix<4, 4, double> m = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
                                                0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-                                               0.0, 0.0, 0.0, 1.0}) {
-    std::vector<int> parents;
-    int id = nodes.size();
-    if (name != "global") {
-      for (uint32_t i = 0; i < nodes.size(); i++) {
-        if (nodes[i].getName() == name) throw TF_SameNameException(name);
-      }
-      TF_Node& node = getNode(base);
-      parents = node.getParents();
-      parents.push_back(node.getId());
-      node.addChild(id);
-    }
-    TF_Node node(name, base, id, parents, m);
-    nodes.push_back(node);
-  }
-
+                                               0.0, 0.0, 0.0, 1.0});
   /**
    * Adds a node with a transformation matrix given by
    * a translation and rotation to a tf tree.
@@ -104,14 +89,9 @@ class TF_Tree {
    * @param trans - translation
    * @param rpy - rotation
    */
-  void addTF(std::string name, std::string base,
-                     Matrix<3, 1, double> trans,
-                     Matrix<3, 1, double> rpy = {0.0, 0.0, 0.0}) {
-    TF_Matrix tf;
-    tf.setTrans(trans);
-    tf.setRPY(rpy);
-    addTF(name, base, tf.getMatrix());
-  }
+  void addTF(const std::string name, const std::string base,
+                     const Matrix<3, 1, double> trans,
+                     const Matrix<3, 1, double> rpy = {0.0, 0.0, 0.0});
 
   /**
    * Returns the transformation matrix of the node
@@ -121,113 +101,29 @@ class TF_Tree {
    *
    * @return transformation matrix
    */
-  TF_Matrix& getTF(std::string name) {
-    TF_Node& node = getNode(name);
-    return node.getTF();
-  }
+  TF_Matrix& getTF(const std::string name);
 
   /**
-   * Returns the transformation matrix of the node
-   * with a given name.
+   * Returns the transformation matrix leading from a start node
+   * to a destination node. Both nodes must be present in this tree.
+   * The overall transormation is calculated by searching for a common
+   * parent node.
    *
-   * @param name - name of the node
+   * @param start - name of the start node
+   * @param dest - name of the start node
    *
    * @return transformation matrix
    */
-  virtual TF_Matrix trafoFromWithBase(std::string destName,
-                                      std::string baseName) {
-//     TF_Matrix trafo /*destName, baseName*/;
-//         trafo.eye();
-    //
-    //     //// find needed TF in tf_list::
-    //     int from = -1, to = -1;
-    //     for (int i = 0; i < nodes.size(); i++) {
-    //       if (nodes[i].getTF()->getName() == baseName) from = i;
-    //       if (nodes[i].getTF()->getName() == destName) to = i;
-    //       if (from >= 0 && to >= 0) break;
-    //     }
-    //     if (from == -1 || to == -1) {
-    //       Logger::getLogger().warn()
-    //           << "Error: TF_TREE::trafoFromToBase:  did not found needed TFs
-    //           ";
-    //     };
-    //
-    //     //// from list
-    //     std::vector<int> fromList = nodes[from].getParents();
-    //     fromList.push_back(from);
-    //
-    //     //// to list
-    //     std::vector<int> toList = nodes[to].getParents();
-    //     toList.push_back(to);
-    //
-    //     //// search nearest parent tf
-    //     int sameParent, counter = 0;
-    //     bool hasSameParent = true;
-    //
-    //     while (hasSameParent && counter < fromList.size() &&
-    //            counter < toList.size()) {
-    //       if (fromList[counter] == toList[counter]) {
-    //         sameParent = fromList[counter];
-    //         counter++;
-    //       } else {
-    //         hasSameParent = false;
-    //       }
-    //     }
-    //
-    //     //// count backward from "to" to "sameParent"
-    //     counter = toList.size() - 1;
-    //
-    //     while (toList[counter] != sameParent) {
-    //       trafo.setMatrix(nodes[toList[counter]].getTF()->getMatrix() *
-    //                       trafo.getMatrix());
-    //       counter--;
-    //     }
-    //
-    //     //// count forward from "sameParent" to "from"
-    //     while (fromList[counter] != from) {
-    //       counter++;
-    //       trafo.setMatrix(nodes[fromList[counter]].getTF()->inv() *
-    //                       trafo.getMatrix());
-    //     }
-
-//     return trafo;
-  }
+  virtual TF_Matrix tfFromTo(const std::string start,
+                                const std::string dest);
 
   /**
    * Print tree from given node
+   *
+   * @param start - starting node
+   * @param showTF - true -> print translation and rpy
    */
-  virtual void print(std::string start = "global", bool showTF = false) {
-    static int printLevel = 0;
-    if (printLevel == 0) {
-      Logger::getLogger().info() << "Show TF_Tree from node : " << start;
-    }
-    TF_Node& node = getNode(start);
-    int id = node.getId();
-    for (uint32_t i = 0; i < node.getChildren().size(); i++) {
-      std::string str;
-      for (uint32_t k = 0; k < node.getParents().size(); k++) {
-        str += "  ";
-      }
-      TF_Node child = nodes[node.getChildren()[i]];
-      str += "  -> " + child.getName();
-      auto tf = child.getTF();
-      if (showTF) {
-        str += ":   Trans: [ " + std::to_string(tf.getTrans()(0)) + ", " +
-               std::to_string(tf.getTrans()(1)) + ", " +
-               std::to_string(tf.getTrans()(2)) + " ] , RPY [ " +
-               std::to_string(tf.getRPY()(0)) + ", " +
-               std::to_string(tf.getRPY()(1)) + ", " +
-               std::to_string(tf.getRPY()(2)) + " ] ";
-      }
-      Logger::getLogger().info() << str;
-
-      if (nodes[nodes[id].getChildren()[i]].getChildren().size() > 0) {
-        printLevel++;
-        print(nodes[nodes[id].getChildren()[i]].getName(), showTF);
-        printLevel--;
-      }
-    }
-  }
+  virtual void print(std::string start = "global", bool showTF = false);
 
  protected:
   virtual TF_Node& getNode(std::string name) {

@@ -73,23 +73,21 @@ class TF_Node {
    *
    * @return transformation matrix
    */
-  TF_Matrix& getTF() {
-//     std::cout << "getTF: " << tf << std::endl ;
-    return tf; }
+  TF_Matrix& getTF() { return tf; }
 
   /**
    * Add a child to a node.
    *
    * @param id - id of the child
    */
-  void addChild(int id) { children.push_back(id); }
+  void addChild(const int id) { children.push_back(id); }
 
   /**
    * Returns the list with the children of this node.
    *
    * @return list of children
    */
-  std::vector<int> getChildren() { return children; }
+  std::vector<int> getChildren() const { return children; }
 
  private:
   std::string name, baseName;

@@ -37,7 +37,7 @@ class TF_Matrix : public Matrix<4, 4, double> {
    *
    * @return translation
    */
-  Matrix<3, 1, double> getTrans();
+  Matrix<3, 1, double> getTrans() const;
 
   /**
    * Sets the rotation.
@@ -51,7 +51,7 @@ class TF_Matrix : public Matrix<4, 4, double> {
    *
    * @return rotation
    */
-  Matrix<3, 3, double> getRot();
+  Matrix<3, 3, double> getRot() const;
 
   /**
    * Sets the matrix.
@@ -65,14 +65,7 @@ class TF_Matrix : public Matrix<4, 4, double> {
    *
    * @return transformation matrix
    */
-  const Matrix<4, 4, double>& getMatrix() const;
-
-  /**
-   * Gets roll, pitch, yaw from tranformation matrix
-   *
-   * @return roll,pitch,yaw
-   */
-  Matrix<3, 1, double> getRPY();
+  const Matrix<4, 4, double> getMatrix() const;
 
   /**
    * Sets roll, pitch, yaw and calculates tranformation matrix
@@ -92,6 +85,15 @@ class TF_Matrix : public Matrix<4, 4, double> {
   void setRPY(Matrix<3, 1, double> rpy);
 
   /**
+   * Gets roll, pitch, yaw.
+   * Make sure to calculate these values beforehand from the
+   * transformation matrix using \ref calcRPYfromRot.
+   *
+   * @return roll,pitch,yaw
+   */
+  Matrix<3, 1, double> getRPY() const;
+
+  /**
    * Calculates rotational matrix from roll, pitch, yaw
    */
   void calcRotFromRPY();
@@ -102,70 +104,41 @@ class TF_Matrix : public Matrix<4, 4, double> {
   void calcRPYfromRot();
 
   /**
-   * ????
+   * Get the adjoint representation of a transformation matrix.
+   * This 6x6 matrix can be used to translate a twist vector.
    *
    * @param isRelationFixed - ?
    *
-   * @return jacobian
+   * @return adjoint representation
    */
-  virtual Matrix<6, 6, double> getJacobiMatrix(bool isRelationFixed = true) {
-    Matrix<6, 6, double> jacobian;
-    jacobian.zero();
-    Matrix<3, 1, double> crossP;
-    Matrix<3, 1, double> transAxRef({get(0, 3), get(1, 3), get(2, 3)});
-    Matrix<3, 1, double> rotCol;
-    for (int i = 0; i < 3; i++) {  // column
-      rotCol = Matrix<3, 1, double>({get(i, 0), get(i, 1), get(i, 2)});
-      crossP = TF_Matrix::crossProduct(
-          rotCol, -transAxRef);              // r x rot (negative direction)
-      for (int j = 0; j < 3; j++) {          // row
-        jacobian(j, i) = get(j, i);          // upper left
-        jacobian(j + 3, i + 3) = get(j, i);  // lower right
-        if (isRelationFixed) {
-          jacobian(j, i + 3) = crossP(j);  // upper right
-        }
-      }
-    }
-    return jacobian;
-  }
+  virtual Matrix<6, 6, double> getAdjointRep(bool isRelationFixed = true);
 
   /**
-   * ????
+   * Get the adjoint representation of a transformation matrix.
+   * This 6x6 matrix can be used to translate a twist vector.
    *
-   * @param tf - ?
+   * @param tf - transformation matrix
    * @param isRelationFixed - ?
    *
-   * @return jacobian
+   * @return adjoint representation
    */
-  static Matrix<6, 6, double> getJacobiMatrix(Matrix<4, 4, double> tf,
-                                              bool isRelationFixed = true) {
-    Matrix<6, 6, double> jacobian;
-    jacobian.zero();
-    Matrix<3, 1, double> crossP;
-    Matrix<3, 1, double> transAxRef({tf(0, 3), tf(1, 3), tf(2, 3)});
-    Matrix<3, 1, double> rotCol;
-    for (int i = 0; i < 3; i++) {  // column
-      rotCol = Matrix<3, 1, double>({tf(i, 0), tf(i, 1), tf(i, 2)});
-      crossP = TF_Matrix::crossProduct(
-          rotCol, -transAxRef);             // r x rot (negative direction)
-      for (int j = 0; j < 3; j++) {         // row
-        jacobian(j, i) = tf(j, i);          // upper left
-        jacobian(j + 3, i + 3) = tf(j, i);  // lower right
-        if (isRelationFixed) {
-          jacobian(j, i + 3) = crossP(j);  // upper right
-        }
-      }
-    }
-    return jacobian;
-  }
+  static Matrix<6, 6, double> getAdjointRep(Matrix<4, 4, double> tf,
+                                              bool isRelationFixed = true);
 
   /**
-   * Invertes the matrix.
+   * Invertes the transformation matrix.
    * If the determinant is 0, it will return the eye matrix
    *
    * @return inverse of the matrix
    */
-  virtual Matrix<4, 4, double> inv();
+  virtual Matrix<4, 4, double> inverse() const;
+
+  /**
+   * Prints transformation matrix in the form of
+   * Trans: [x y z]' RPY: [r p y]' "
+   * Make sure
+   */
+  virtual void print(std::ostream& os) const;
 
  private:
   double roll, pitch, yaw;
