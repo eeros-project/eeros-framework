@@ -1,0 +1,64 @@
+{
+    "tfList" : [
+    	{
+    		"name":"center",
+    		"parent":"global",
+    		"trans": [ 100.0, 25.0, 1.0 ],
+    		"rotRPY": [0.0, 0.0, 0.0 ]
+    	},
+	    	{
+	    		"name":"head",
+	    		"parent":"center",
+	    		"trans": [ 0.0, 0.0, 0.25 ],
+	    		"rotRPY": [0.0, 0.0, 0.0 ]
+	    	},
+		    	{
+		    		"name":"eyeLeft",
+		    		"parent":"head",
+		    		"trans": [ 0.05, 0.01, 0.0 ],
+		    		"rotRPY": [0.0, 0.0, 0.0 ]
+		    	},
+		    	{
+		    		"name":"eyeRight",
+		    		"parent":"head",
+		    		"trans": [ 0.05, -0.01, 0.0 ],
+		    		"rotRPY": [0.0, 0.0, 0.0 ]
+		    	},
+	    	{
+	    		"name":"shoulderLeft",
+	    		"parent":"center",
+	    		"trans": [ 0.0, -0.3, 0.1 ],
+	    		"rotRPY": [0.0, 0.0, 1.517 ]
+	    	},
+		    	{
+		    		"name":"ellbowLeft",
+		    		"parent":"shoulderLeft",
+		    		"trans": [ 0.0, 0.0, -0.35 ],
+		    		"rotRPY": [0.0, 0.0, 0.0 ]
+		    	},
+		    		{
+			    		"name":"handLeft",
+			    		"parent":"ellbowLeft",
+			    		"trans": [ 0.0, 0.0, -0.35 ],
+			    		"rotRPY": [0.0, 0.0, -1.517 ]
+			    	},
+	    	{
+	    		"name":"shoulderRight",
+	    		"parent":"center",
+	    		"trans": [ 0.0, 0.3, 0.0 ],
+	    		"rotRPY": [0.0, 0.0, -1.517 ]
+	    	},
+	    		{
+		    		"name":"ellbowRight",
+		    		"parent":"shoulderRight",
+		    		"trans": [ 0.0, 0.0, -0.35],
+		    		"rotRPY": [0.0, 0.0, 0.0 ]
+		    	},
+		    		{
+			    		"name":"handRight",
+			    		"parent":"ellbowRight",
+			    		"trans": [ 0.0, 0.0, -0.35 ],
+			    		"rotRPY": [0.0, 0.0, 1.517 ]
+			    	}
+    ]
+}
