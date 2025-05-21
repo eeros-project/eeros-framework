@@ -391,7 +391,7 @@ class Matrix {
         return det;
       }
       else { // 4x4 and bigger square matrices
-          // Use recurcive laplace formula to calculate the determinat.
+          // Use recursive laplace formula to calculate the determinat.
           // For big matrices this method needs a lot of time, this 
           // could be improved with another algorithm.
         T det = 0;
@@ -487,8 +487,76 @@ class Matrix {
           inv = subDetMat * 1/det;
         }
         return inv;
+      } else if(M == 4) { // 4x4 matrix
+        T det = (*this).det();
+        Matrix<N, M, double> inv, subDetMat;
+        if (det != 0.0 ) {
+          subDetMat(0) =
+          value[5] * value[10] * value[15] - value[5] * value[11] * value[14] -
+          value[9] * value[6] * value[15] + value[9] * value[7] * value[14] +
+          value[13] * value[6] * value[11] - value[13] * value[7] * value[10];
+          subDetMat(4) =
+          -value[4] * value[10] * value[15] + value[4] * value[11] * value[14] +
+          value[8] * value[6] * value[15] - value[8] * value[7] * value[14] -
+          value[12] * value[6] * value[11] + value[12] * value[7] * value[10];
+          subDetMat(8) = value[4] * value[9] * value[15] -
+          value[4] * value[11] * value[13] -
+          value[8] * value[5] * value[15] + value[8] * value[7] * value[13] +
+          value[12] * value[5] * value[11] - value[12] * value[7] * value[9];
+          subDetMat(12) =
+          -value[4] * value[9] * value[14] + value[4] * value[10] * value[13] +
+          value[8] * value[5] * value[14] - value[8] * value[6] * value[13] -
+          value[12] * value[5] * value[10] + value[12] * value[6] * value[9];
+          subDetMat(1) =
+          -value[1] * value[10] * value[15] + value[1] * value[11] * value[14] +
+          value[9] * value[2] * value[15] - value[9] * value[3] * value[14] -
+          value[13] * value[2] * value[11] + value[13] * value[3] * value[10];
+          subDetMat(5) =
+          value[0] * value[10] * value[15] - value[0] * value[11] * value[14] -
+          value[8] * value[2] * value[15] + value[8] * value[3] * value[14] +
+          value[12] * value[2] * value[11] - value[12] * value[3] * value[10];
+          subDetMat(9) = -value[0] * value[9] * value[15] +
+          value[0] * value[11] * value[13] +
+          value[8] * value[1] * value[15] - value[8] * value[3] * value[13] -
+          value[12] * value[1] * value[11] + value[12] * value[3] * value[9];
+          subDetMat(13) =
+          value[0] * value[9] * value[14] - value[0] * value[10] * value[13] -
+          value[8] * value[1] * value[14] + value[8] * value[2] * value[13] +
+          value[12] * value[1] * value[10] - value[12] * value[2] * value[9];
+          subDetMat(2) = value[1] * value[6] * value[15] - value[1] * value[7] * value[14] -
+          value[5] * value[2] * value[15] + value[5] * value[3] * value[14] +
+          value[13] * value[2] * value[7] - value[13] * value[3] * value[6];
+          subDetMat(6) = -value[0] * value[6] * value[15] +
+          value[0] * value[7] * value[14] + value[4] * value[2] * value[15] -
+          value[4] * value[3] * value[14] - value[12] * value[2] * value[7] +
+          value[12] * value[3] * value[6];
+          subDetMat(10) =
+          value[0] * value[5] * value[15] - value[0] * value[7] * value[13] -
+          value[4] * value[1] * value[15] + value[4] * value[3] * value[13] +
+          value[12] * value[1] * value[7] - value[12] * value[3] * value[5];
+          subDetMat(14) =
+          -value[0] * value[5] * value[14] + value[0] * value[6] * value[13] +
+          value[4] * value[1] * value[14] - value[4] * value[2] * value[13] -
+          value[12] * value[1] * value[6] + value[12] * value[2] * value[5];
+          subDetMat(3) = -value[1] * value[6] * value[11] +
+          value[1] * value[7] * value[10] + value[5] * value[2] * value[11] -
+          value[5] * value[3] * value[10] - value[9] * value[2] * value[7] +
+          value[9] * value[3] * value[6];
+          subDetMat(7) = value[0] * value[6] * value[11] - value[0] * value[7] * value[10] -
+          value[4] * value[2] * value[11] + value[4] * value[3] * value[10] +
+          value[8] * value[2] * value[7] - value[8] * value[3] * value[6];
+          subDetMat(11) = -value[0] * value[5] * value[11] +
+          value[0] * value[7] * value[9] + value[4] * value[1] * value[11] -
+          value[4] * value[3] * value[9] - value[8] * value[1] * value[7] +
+          value[8] * value[3] * value[5];
+          subDetMat(15) = value[0] * value[5] * value[10] - value[0] * value[6] * value[9] -
+          value[4] * value[1] * value[10] + value[4] * value[2] * value[9] +
+          value[8] * value[1] * value[6] - value[8] * value[2] * value[5];
+          inv  = subDetMat * 1/det;
+        }
+        return inv;
       } else
-        throw Fault("inverse is only implemented for up to 3x3 matrices");
+        throw Fault("inverse is only implemented for up to 4x4 matrices");
     } else {
       throw Fault("Inverting matrix failed: Matrix must be invertible");
     }
@@ -914,7 +982,20 @@ class Matrix {
       (*this)(rowB, n) =  t;
     }
   }
-  
+
+  virtual void print(std::ostream& os) const {
+    if(N > 1) os << "[ ";
+    for(unsigned int n = 0; n < N; n++) {
+      os << '[';
+      for(unsigned int m = 0; m < M; m++) {
+        os << (*this)(m, n);
+        if(m < M - 1) os << ' ';
+      }
+      os << "]' ";
+    }
+    if(N > 1) os << "]";
+  }
+
  protected:
   T value[M * N];
   
@@ -986,16 +1067,7 @@ Matrix<M, N, T> operator/(T left, Matrix<M, N, T> right) {
 
 template < unsigned int M, unsigned int N = 1, typename T = double >
 std::ostream& operator<<(std::ostream& os, const Matrix<M, N, T>& right) {
-  if(N > 1) os << "[ ";
-  for(unsigned int n = 0; n < N; n++) {
-    os << '[';
-    for(unsigned int m = 0; m < M; m++) {
-      os << right(m, n);
-      if(m < M - 1) os << ' ';
-    }
-    os << "]' ";
-  }
-  if(N > 1) os << "]";
+  right.print(os);
   return os;
 }
 
@@ -1085,7 +1157,11 @@ class Matrix<1, 1, T> {
     (*this) = (*this) - right;
     return (*this);
   }
-  
+
+  virtual void print(std::ostream& os) const {
+      os << '[' << (*this)(0, 0) << "]' ";
+  }
+
  protected:
   T value;
 };
