@@ -45,6 +45,7 @@ TEST(safetyLevelTest, trigger) {
   logger::Logger::setDefaultStreamLogger(std::cout);
   SafetyPropertiesTest1 sp;
   SafetySystem ss(sp, 1);
+  ss.run();
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl1);
   ss.triggerEvent(sp.se1);	// go sl2
   ss.run();
@@ -94,7 +95,7 @@ public:
     notinit_emergency          ("emergency, not init"                              ),
     notinit_waitingForApproval ("waitingForApproval, not init, press WHITE button" ),
     notinit_systemOn           ("systemOn, not init"                               ),
-    manualParking3             ("manualParking 3" ),             
+    manualParking3             ("manualParking 3" ),
     manualParking2             ("manualParking 2" ),
     manualParking1             ("manualParking 1" ),
     manualParking0             ("manualParking 0" ),
@@ -128,22 +129,22 @@ public:
     manualParkingDone3             ("manualParkingDone3       "),
     manualParkingDone2             ("manualParkingDone2       "),
     manualParkingDone1             ("manualParkingDone1       "),
-    manualParkingDone0             ("manualParkingDone0       "),                                             
+    manualParkingDone0             ("manualParkingDone0       "),
     doHoming                       ("doHoming                 "),
-    homingDone3                    ("homingDone3              "), 
-    homingDone2                    ("homingDone2              "),     
-    homingDone1                    ("homingDone1              "),  
-    homingDone0                    ("homingDone0              "),                                               
+    homingDone3                    ("homingDone3              "),
+    homingDone2                    ("homingDone2              "),
+    homingDone1                    ("homingDone1              "),
+    homingDone0                    ("homingDone0              "),
     doSystemOn                     ("doSystemOn               "),
     doPowerUp                      ("doPowerUp                "),
     doPowerDown                    ("doPowerDown              "),
     goToReady                      ("goToReady                "),
-    isReady                        ("isReady                  "),  
+    isReady                        ("isReady                  "),
     doEmergency                    ("doEmergency              "),
     doResetEmergency               ("doResetEmergency         "),
     resetEmergencyDone             ("resetEmergencyDone       "),
     doEmergency_posOutRange        ("doEmergency_posOutRange  "),
-    doEmergency_velOutRange        ("doEmergency_velOutRange  "),                                              
+    doEmergency_velOutRange        ("doEmergency_velOutRange  "),
     doSetMoving                    ("doSetMotion              "),
     doStartMoving                  ("doStartMotion            "),
     doStopMoving                   ("doStopMotion             "),
@@ -163,7 +164,7 @@ public:
     addLevel(notinit_emergency          );
     addLevel(notinit_waitingForApproval );
     addLevel(notinit_systemOn           );
-    addLevel(manualParking3             );            
+    addLevel(manualParking3             );
     addLevel(manualParking2             );
     addLevel(manualParking1             );
     addLevel(manualParking0             );
@@ -189,11 +190,11 @@ public:
     addLevel(autoParking_shutdown2      );
     addLevel(autoParking_shutdown1      );
     addLevel(autoParking_shutdown0      );
-      
+
     off                        .addEvent(notinit_goToWaitingForApproval, notinit_waitingForApproval, kPublicEvent  );
     off                        .addEvent(ev1,                            homing3,                    kPublicEvent  );
     notinit_waitingForApproval .addEvent(approvalIsOn,                   notinit_systemOn,           kPublicEvent  );
-    notinit_systemOn           .addEvent(doManualParking,                manualParking3,             kPublicEvent  );  
+    notinit_systemOn           .addEvent(doManualParking,                manualParking3,             kPublicEvent  );
     notinit_emergency          .addEvent(doOff,                          off,                        kPrivateEvent );
     notinit_emergency          .addEvent(ev2,                            moving,                     kPublicEvent );
     manualParking3             .addEvent(manualParkingDone3,             manualParking2,             kPrivateEvent );
@@ -202,8 +203,8 @@ public:
     manualParking0             .addEvent(manualParkingDone0,             robotParked,                kPrivateEvent );
     robotParked                .addEvent(doHoming,                       homing3,                    kPublicEvent  );
     homing3                    .addEvent(homingDone3,                    homing2,                    kPrivateEvent );
-    homing2                    .addEvent(homingDone2,                    homing1,                    kPrivateEvent ); 
-    homing1                    .addEvent(homingDone1,                    homing0,                    kPrivateEvent ); 
+    homing2                    .addEvent(homingDone2,                    homing1,                    kPrivateEvent );
+    homing1                    .addEvent(homingDone1,                    homing0,                    kPrivateEvent );
     homing0                    .addEvent(homingDone0,                    robotHomed,                 kPrivateEvent );
     robotHomed                 .addEvent(doSystemOn,                     systemOn,                   kPublicEvent  );
     emergency                  .addEvent(doResetEmergency,               resetEmergency,             kPublicEvent  );
@@ -221,21 +222,21 @@ public:
     moving                     .addEvent(doStopMoving,                   ready,                      kPublicEvent  );
     set_moving_joystick        .addEvent(doStartMoving_joystick,         moving_joystick,            kPublicEvent  );
     moving_joystick            .addEvent(doStopMoving_joystick,          ready,                      kPublicEvent  );
-    set_autoParking            .addEvent(doStartAutoParking,             autoParking_shutdown3,      kPrivateEvent ); 
-    autoParking_shutdown3      .addEvent(autoParking_shutdownDone3,      autoParking_shutdown2,      kPrivateEvent ); 
-    autoParking_shutdown2      .addEvent(autoParking_shutdownDone2,      autoParking_shutdown1,      kPrivateEvent ); 
-    autoParking_shutdown1      .addEvent(autoParking_shutdownDone1,      autoParking_shutdown0,      kPrivateEvent ); 
+    set_autoParking            .addEvent(doStartAutoParking,             autoParking_shutdown3,      kPrivateEvent );
+    autoParking_shutdown3      .addEvent(autoParking_shutdownDone3,      autoParking_shutdown2,      kPrivateEvent );
+    autoParking_shutdown2      .addEvent(autoParking_shutdownDone2,      autoParking_shutdown1,      kPrivateEvent );
+    autoParking_shutdown1      .addEvent(autoParking_shutdownDone1,      autoParking_shutdown0,      kPrivateEvent );
     autoParking_shutdown0      .addEvent(autoParking_shutdownDone0,      off,                        kPrivateEvent );
-      
+
     // Add events to multiple levels
     addEventToAllLevelsBetween(off,            robotHomed,            doEmergency, notinit_emergency, kPublicEvent );
     addEventToAllLevelsBetween(resetEmergency, autoParking_shutdown0, doEmergency, emergency,         kPublicEvent );
-    
+
     off.setLevelAction([this](SafetyContext* privateContext) { });
 
     notinit_emergency.setLevelAction([](SafetyContext* privateContext) { });
 
-    homing3.setLevelAction([this](SafetyContext* privateContext) { 
+    homing3.setLevelAction([this](SafetyContext* privateContext) {
       privateContext->triggerEvent(doEmergency);
     });
 
@@ -243,7 +244,7 @@ public:
       if (moving.getNofActivations() > 2)
         privateContext->triggerEvent(doEmergency);
     });
-  
+
     setEntryLevel(off);
   }
 
@@ -255,12 +256,12 @@ public:
   SafetyLevel robotParked;
   SafetyLevel homing3, homing2, homing1, homing0;
   SafetyLevel robotHomed;
-  SafetyLevel emergency; 
+  SafetyLevel emergency;
   SafetyLevel resetEmergency;
   SafetyLevel waitingForApproval;
   SafetyLevel set_autoParking;
   SafetyLevel autoParking_shutdown3, autoParking_shutdown2, autoParking_shutdown1, autoParking_shutdown0;
-  SafetyLevel systemOn; 
+  SafetyLevel systemOn;
   SafetyLevel powerOn;
   SafetyLevel goingToReady;
   SafetyLevel ready;
@@ -268,14 +269,14 @@ public:
   SafetyLevel moving;
   SafetyLevel set_moving_joystick;
   SafetyLevel moving_joystick;
-  
+
   SafetyEvent notinit_goToWaitingForApproval;
   SafetyEvent doOff;
   SafetyEvent approvalIsOn;
   SafetyEvent doManualParking;
   SafetyEvent manualParkingDone3, manualParkingDone2, manualParkingDone1, manualParkingDone0;
   SafetyEvent doHoming;
-  SafetyEvent homingDone3, homingDone2, homingDone1, homingDone0;      
+  SafetyEvent homingDone3, homingDone2, homingDone1, homingDone0;
   SafetyEvent doSystemOn;
   SafetyEvent doPowerUp;
   SafetyEvent doPowerDown;
@@ -302,6 +303,7 @@ public:
 TEST(safetyLevelTest, trigger2) {
   ScaraSafetyProperties sp;
   SafetySystem ss(sp, 1);
+  ss.run();
   EXPECT_TRUE(ss.getCurrentLevel() == sp.off);
   ss.triggerEvent(sp.ev1);
   ss.run();
@@ -310,6 +312,7 @@ TEST(safetyLevelTest, trigger2) {
   ss.triggerEvent(sp.ev2);
   ss.run();
   EXPECT_TRUE(ss.getCurrentLevel() == sp.moving);
+  ss.run();
   ss.run();
   ss.run();
   EXPECT_TRUE(ss.getCurrentLevel() == sp.emergency);

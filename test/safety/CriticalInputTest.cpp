@@ -24,9 +24,9 @@ class SafetyPropertiesTestc1 : public SafetyProperties {
     sl1.addEvent(se1, sl2, kPublicEvent);
     sl2.addEvent(se2, sl1, kPublicEvent);
 
-    out = HAL::instance().getLogicOutput("io1", false);
+    out = HAL::instance().getLogicOutput("io1", false); // channel 0
     criticalOutputs = { out };
-    in = HAL::instance().getLogicInput("ioIn", false);
+    in = HAL::instance().getLogicInput("ioIn", false); // channel 2
     criticalInputs = { in };
     sl1.setInputActions({ check(in, false, se1) });
     sl2.setInputActions({ check(in, true, se2) });
@@ -54,52 +54,53 @@ TEST(safetyCriticalTest, digitalInput) {
   ss.run();
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl1);
   Constant<bool> c(false);
-  PeripheralInput<bool> pi0("ioIn0", false);
-  PeripheralOutput<bool> p("ioOut2", false);
-  PeripheralInput<bool> pi("ioIn", false);
-  p.getIn().connect(c.getOut());
-  c.run(); p.run();
+  PeripheralInput<bool> in0("ioIn0", false);
+  PeripheralOutput<bool> out2("ioOut2", false);
+  PeripheralInput<bool> in2("ioIn", false);
+  out2.getIn().connect(c.getOut());
+  c.run(); out2.run();
   usleep(10000); // simulator thread needs time to run
-  pi.run();
-  ss.run();
+  in2.run();  // false
+  ss.run(); // critical output out0 -> true
   usleep(10000); // simulator thread needs time to run
-  pi0.run();
-  EXPECT_EQ(pi.getOut().getSignal().getValue(), false);
+  in0.run();
+  EXPECT_EQ(in2.getOut().getSignal().getValue(), false);
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl1);
-  EXPECT_EQ(pi0.getOut().getSignal().getValue(), true);
+  EXPECT_EQ(in0.getOut().getSignal().getValue(), true);
   c.setValue(true);
-  c.run(); p.run();
+  c.run(); out2.run();
   usleep(10000); // simulator thread needs time to run
-  pi.run();
+  in2.run();  // true
   ss.run();
   usleep(10000); // simulator thread needs time to run
-  pi0.run();
+  in0.run();
   ss.run();
   usleep(10000); // simulator thread needs time to run
-  pi0.run();
-  EXPECT_EQ(pi.getOut().getSignal().getValue(), true);
+  in0.run();
+  EXPECT_EQ(in2.getOut().getSignal().getValue(), true);
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl2);
-  EXPECT_EQ(pi0.getOut().getSignal().getValue(), false);
+  EXPECT_EQ(in0.getOut().getSignal().getValue(), false);
   ss.run();
-  pi0.run();
+  in0.run();
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl2);
   c.setValue(false);
-  c.run(); p.run();
+  c.run(); out2.run();
   usleep(10000); // simulator thread needs time to run
-  pi.run();
+  in2.run();  // false
   ss.run();
   usleep(10000); // simulator thread needs time to run
-  pi0.run();
-  EXPECT_EQ(pi.getOut().getSignal().getValue(), false);
+  in0.run();
+  ss.run();
+  EXPECT_EQ(in2.getOut().getSignal().getValue(), false);
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl1);
   ss.run();
   usleep(10000); // simulator thread needs time to run
-  pi0.run();
+  in0.run();
   ss.run();
   usleep(10000); // simulator thread needs time to run
-  pi0.run();
+  in0.run();
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl1);
-  EXPECT_EQ(pi0.getOut().getSignal().getValue(), true);
+  EXPECT_EQ(in0.getOut().getSignal().getValue(), true);
   HAL::instance().releaseOutput("io1"); // release for further hal tests
   HAL::instance().releaseInput("ioIn");
 }
@@ -177,6 +178,7 @@ TEST(safetyCriticalTest, analogInput) {
   ss.run();
   usleep(10000); // simulator thread needs time to run
   pi0.run();
+  ss.run();
   EXPECT_TRUE(Utils::compareApprox(pi.getOut().getSignal().getValue(), 1.0, 0.01));
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl1);
   ss.run();
@@ -264,6 +266,7 @@ TEST(safetyCriticalTest, analogInputOffRange) {
   ss.run();
   usleep(10000); // simulator thread needs time to run
   pi0.run();
+  ss.run();
   EXPECT_TRUE(Utils::compareApprox(pi.getOut().getSignal().getValue(), 1.0, 0.01));
   EXPECT_TRUE(ss.getCurrentLevel() == sp.sl1);
   ss.run();
