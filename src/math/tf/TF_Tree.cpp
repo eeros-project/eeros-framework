@@ -74,15 +74,15 @@ TF_Matrix& TF_Tree::getTF(const std::string name) {
   return node.getTF();
 }
 
-TF_Matrix TF_Tree::tfFromTo(const std::string start, const std::string dest) {
+TF_Matrix TF_Tree::tfFrameToOrigin(const std::string frame, const std::string origin) {
   int from = -1, to = -1;
   for (int i = 0; i < (int)nodes.size(); i++) {
-    if (nodes[i].getName() == start) from = i;
-    if (nodes[i].getName() == dest) to = i;
+    if (nodes[i].getName() == frame) from = i;
+    if (nodes[i].getName() == origin) to = i;
     if (from >= 0 && to >= 0) break;
   }
-  if (from == -1) throw(TF_NotFoundException(start));
-  if (to == -1) throw(TF_NotFoundException(dest));
+  if (from == -1) throw(TF_NotFoundException(frame));
+  if (to == -1) throw(TF_NotFoundException(origin));
   std::vector<int> fromList = nodes[from].getParents();
   fromList.push_back(from);
   std::vector<int> toList = nodes[to].getParents();

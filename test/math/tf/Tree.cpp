@@ -55,7 +55,7 @@ TEST(TF_TreeTest, init1) {
             std::string("[ [0.978031 0.20846 0 0]' [-0.20846 0.978031 0 0]' [0 "
                         "0 1 0]' [0.06 -0.02 0.1 1]' ]"));
 
-  TF_Matrix tf1 = tfTree.tfFromTo("head", "center");
+  TF_Matrix tf1 = tfTree.tfFrameToOrigin("head", "center");
   ss.str("");
   ss << tf1.getMatrix();
   EXPECT_EQ(ss.str(),
@@ -63,14 +63,14 @@ TEST(TF_TreeTest, init1) {
                         "0.986656 -0.111007 0]' [0.0998334 0.0993347 0.990033 "
                         "0]' [-0.0698834 -0.0695343 -0.693023 1]' ]"));
 
-  TF_Matrix tf2 = tfTree.tfFromTo("eyeLeft", "eyeRight");
+  TF_Matrix tf2 = tfTree.tfFrameToOrigin("eyeLeft", "eyeRight");
   ss.str("");
   ss << tf2.getMatrix();
   EXPECT_EQ(ss.str(),
             std::string("[ [0.99995 0.00999983 0 0]' [-0.00999983 0.99995 0 "
                         "0]' [0 0 1 0]' [-0.00794677 -0.0392027 0 1]' ]"));
 
-  TF_Matrix tf3 = tfTree.tfFromTo("ellbowRight", "shoulderRight");
+  TF_Matrix tf3 = tfTree.tfFrameToOrigin("ellbowRight", "shoulderRight");
   ss.str("");
   ss << tf3.getMatrix();
   EXPECT_EQ(
@@ -112,7 +112,7 @@ TEST(TF_TreeTest, init1) {
   tfTree.getTF("center").setRPY(0.0, 0.5, 1.7);
   // hand shoulder right in global view:
   TF_Matrix tf_shoulderRight_global =
-      tfTree.tfFromTo("global", "shoulderRight");
+      tfTree.tfFrameToOrigin("global", "shoulderRight");
   ss.str("");
   ss << tf_shoulderRight_global.getMatrix();
   EXPECT_EQ(

@@ -114,8 +114,8 @@ class TF_Tree {
    *
    * @return transformation matrix
    */
-  virtual TF_Matrix tfFromTo(const std::string start,
-                                const std::string dest);
+  virtual TF_Matrix tfFrameToOrigin(const std::string frame,
+                                const std::string origin);
 
   /**
    * Print tree from given node
