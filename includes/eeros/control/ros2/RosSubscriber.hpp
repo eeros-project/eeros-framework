@@ -5,11 +5,13 @@
 #include <eeros/control/Output.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/core/Thread.hpp>
+#include <eeros/core/Executor.hpp>
 #include <eeros/control/ros2/RosTools.hpp>
 #include <deque>
 #include <thread>
 
 using namespace eeros::logger;
+using namespace eeros;
 
 namespace eeros {
 namespace control {
@@ -42,9 +44,11 @@ class RosSubscriber : public Blockio<0,M,SigOutType> {
   RosSubscriber(const rclcpp::Node::SharedPtr node, const std::string& topic, bool syncWithTopic=false, const uint32_t queueSize=1000)
       : node(node), sync(syncWithTopic), log(Logger::getLogger()) {
   if (rclcpp::ok()) {
+    auto qos = rclcpp::SensorDataQoS();
+    qos.keep_last(queueSize);
     rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> options;
     options.callback_group = Executor::instance().registerSubscriber(node, syncWithTopic);
-    subscriber = node->create_subscription<TRosMsg>(topic, queueSize, std::bind(&RosSubscriber::rosSubscriberCallback, this, _1), options);
+    subscriber = node->create_subscription<TRosMsg>(topic, qos, std::bind(&RosSubscriber::rosSubscriberCallback, this, _1), options);
     log.info() << "RosBlockSubscriber, reading from topic: '" << topic << "' on node '" << node->get_name();
 //     RCLCPP_INFO_STREAM(node->get_logger(), "RosBlockSubscriber, reading from topic: '" << topic << "' created.");
     running = true;
