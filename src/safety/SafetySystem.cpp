@@ -178,7 +178,7 @@ void SafetySystem::exitHandler() {
 }
 
 void SafetySystem::printStackTrace() {
-  std::array<void*, 20> pointers;
+  std::array<void*, 20> pointers = {};
   auto num_elems = backtrace(pointers.data(), pointers.size());
   auto symbols = backtrace_symbols(pointers.data(), num_elems);
   for (int i = 0; i < num_elems; ++i) {
