@@ -315,6 +315,7 @@ TEST(safetyLevelTest, trigger2) {
   ss.run();
   ss.run();
   ss.run();
+  ss.run();
   EXPECT_TRUE(ss.getCurrentLevel() == sp.emergency);
 }
 

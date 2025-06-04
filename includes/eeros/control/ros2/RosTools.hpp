@@ -88,7 +88,7 @@ class RosTools {
    * @param nameSpace - namespace of the node
    * @param letNodeSpin - todo
 
-   * @param return node
+   * @return node
    */
   static rclcpp::Node::SharedPtr initNode(std::string name, std::string nameSpace = "", bool letNodeSpin = false) {
     if (rclcpp::ok()) {

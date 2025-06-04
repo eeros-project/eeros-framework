@@ -55,7 +55,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    * Constructs a CAN receive block instance for a given set of nodes.
    * Sets the scale of velocity and position to 1.
    *
-   * @param socket - socket of number of associated CAN bus
+   * @param co - CANopen object
    * @param node - vector with node id's of all connected CAN nodes 
    */
   template<typename CanOpen, typename NodeList = std::initializer_list<uint8_t>>
@@ -193,7 +193,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    * each mapping, where the corresponding signal goes to.
    *
    * @param nodeId the id of the node to which this PDO is sent
-   * @param RPDOnr nr of the RPDO (1 to 4)
+   * @param TPDOnr nr of the RPDO (1 to 4)
    * @param objs opjects which are mapped into this PDO
    * @param idx signal index, where
    *            - > 0 : index in floating point inputs

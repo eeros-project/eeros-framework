@@ -44,9 +44,9 @@ class KalmanFilterCorrection;
  *      -----> Bd ---> 0 ----------> z⁻1 -------> C ---> 0 ---------> 0
  *                     ^                                 |            |
  *                   + |                                 | +          |
- *                     |                                 v            |
- *                      -------------- Ad <------------- 0 <--- K ----
- *                                                          +
+ *                     |                                 v   +        |
+ *                      -------------- Ad < ------------ 0 < -- K ----
+ *
  *
  * with x - state vector
  *      u - input vector of the physical system

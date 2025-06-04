@@ -109,8 +109,8 @@ class TF_Tree {
    * The overall transormation is calculated by searching for a common
    * parent node.
    *
-   * @param start - name of the start node
-   * @param dest - name of the start node
+   * @param frame - name of the start node
+   * @param origin - name of the start node
    *
    * @return transformation matrix
    */
