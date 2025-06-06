@@ -4,10 +4,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Unreleased
-(v1.4.3 targeted for 2025-06-30) ([Github compare v1.4.2...master](https://github.com/eeros-project/eeros-framework/compare/v1.4.2...master))
+## v1.4.3
+(2025-06-06) ([GitHub compare v1.4.2...v1.4.3](https://github.com/eeros-project/eeros-framework/compare/v1.4.2...v1.4.3))
 
 ### Added Features
+* Avoid level being null when starting the safety system
+* Fix unset abortFunction causing abort in SafetySystem
+* Fix build failure when building tests
+* Add support for quaternions
+* Add matrix inversion
+* Add support for transformation matrices (tf)
+* Improve and add tests
 
 
 ## v1.4.2
