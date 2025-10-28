@@ -73,7 +73,7 @@ bool HAL::addInput(InputInterface* systemInput) {
 		if( inputs.find(systemInput->getId()) != inputs.end() ){
 			throw Fault("Could not add Input to HAL, signal id '" + systemInput->getId() + "' already exists!");
 		}
-		inputs.insert(std::pair<std::string, InputInterface*>(systemInput->getId(), systemInput));
+		inputs.insert(std::pair(systemInput->getId(), eeros::hal::HAL::Handle{systemInput}));
 		return true;
 	}
 	throw Fault("System input is null");
@@ -83,7 +83,7 @@ bool HAL::addOutput(OutputInterface* systemOutput) {
 		if( outputs.find(systemOutput->getId()) != outputs.end() ){
 			throw Fault("Could not add Output to HAL, signal id '" + systemOutput->getId() + "' already exists!");
 		}
-		outputs.insert(std::pair<std::string, OutputInterface*>(systemOutput->getId(), systemOutput));
+		outputs.insert(std::pair(systemOutput->getId(), eeros::hal::HAL::Handle{systemOutput}));
 		return true;
 	}
 	throw Fault("System output is null");
@@ -141,7 +141,7 @@ OutputInterface* HAL::getOutput(std::string name, bool exclusive) {
 }
 
 Output<bool>* HAL::getLogicOutput(std::string name, bool exclusive) {
-	Output<bool>* out = dynamic_cast<Output<bool>*>(outputs[name]);
+	Output<bool>* out = dynamic_cast<Output<bool>*>(outputs[name].get());
 	if(out == nullptr) throw Fault("Logic system output '" + name + "' not found!");
 	
 	if( exclusiveReservedOutputs.find(outputs[name]) != exclusiveReservedOutputs.end() ) throw Fault("Logic system output '" + name + "' is exclusive reserved!");
@@ -159,7 +159,7 @@ Output<bool>* HAL::getLogicOutput(std::string name, bool exclusive) {
 }
 
 ScalableOutput<double>* HAL::getScalableOutput(std::string name, bool exclusive) {
-	ScalableOutput<double>* out = dynamic_cast<ScalableOutput<double>*>(outputs[name]);
+	ScalableOutput<double>* out = dynamic_cast<ScalableOutput<double>*>(outputs[name].get());
 	if(out == nullptr) throw Fault("Scalable system output '" + name + "' not found!");
 	
 	if( exclusiveReservedOutputs.find(outputs[name]) != exclusiveReservedOutputs.end() ) throw Fault("Scalable system output '" + name + "' is exclusive reserved!");
@@ -192,7 +192,7 @@ InputInterface* HAL::getInput(std::string name, bool exclusive) {
 }
 
 Input<bool>* HAL::getLogicInput(std::string name, bool exclusive) {
-	Input<bool>* in = dynamic_cast<Input<bool>*>(inputs[name]);
+	Input<bool>* in = dynamic_cast<Input<bool>*>(inputs[name].get());
 	if(in == nullptr) throw Fault("Logic system input '" + name + "' not found!");
 	
 	if( exclusiveReservedInputs.find(inputs[name]) != exclusiveReservedInputs.end() ) throw Fault("Logic system input '" + name + "' is exclusive reserved!");
@@ -210,7 +210,7 @@ Input<bool>* HAL::getLogicInput(std::string name, bool exclusive) {
 }
 
 ScalableInput<double>* HAL::getScalableInput(std::string name, bool exclusive) {
-	ScalableInput<double>* in = dynamic_cast<ScalableInput<double>*>(inputs[name]);
+	ScalableInput<double>* in = dynamic_cast<ScalableInput<double>*>(inputs[name].get());
 	if(in == nullptr) throw Fault("Scalable system input '" + name + "' not found!");
 	
 	if( exclusiveReservedInputs.find(inputs[name]) != exclusiveReservedInputs.end() ) throw Fault("Scalable system input '" + name + "' is exclusive reserved!");
@@ -228,7 +228,7 @@ ScalableInput<double>* HAL::getScalableInput(std::string name, bool exclusive) {
 }
 
 void * HAL::getOutputFeature(std::string name, std::string featureName){
-	auto outObj = outputs[name];
+	auto outObj = outputs[name].get();
 	return getOutputFeature(outObj, featureName);
 }
 
@@ -237,7 +237,7 @@ void* HAL::getOutputFeature(OutputInterface * obj, std::string featureName){
 }
 
 void * HAL::getInputFeature(std::string name, std::string featureName){
-	auto inObj = inputs[name];
+	auto inObj = inputs[name].get();
 	return getInputFeature(inObj, featureName);
 }
 

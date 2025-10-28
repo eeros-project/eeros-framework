@@ -1,6 +1,7 @@
 #ifndef ORG_EEROS_HAL_HAL_HPP_
 #define ORG_EEROS_HAL_HAL_HPP_
 
+#include <memory>
 #include <string>
 #include <map>
 #include <unordered_set>
@@ -10,6 +11,7 @@
 #include <eeros/hal/ScalableInput.hpp>
 #include <eeros/hal/JsonParser.hpp>
 #include <eeros/core/Fault.hpp>
+#include "Input.hpp"
 
 
 namespace eeros {
@@ -17,6 +19,18 @@ namespace eeros {
 		
 		class HAL {
 		public:
+			template<typename T>
+			struct Handle {
+			    std::unique_ptr<T> data;
+
+				explicit Handle(T* t): data(t) {}
+				Handle():data(nullptr) {}
+				
+				T* get() const {return data.get();}
+				operator T*() const {return data.get();}
+				T* operator->() const { return data.get();}
+			};
+			
 			OutputInterface* getOutput(std::string name, bool exclusive = true);
 			Output<bool>* getLogicOutput(std::string name, bool exclusive = true);
 			ScalableOutput<double>* getScalableOutput(std::string name, bool exclusive = true);
@@ -71,8 +85,8 @@ namespace eeros {
 			std::unordered_set<InputInterface*> exclusiveReservedInputs;
 			std::unordered_set<InputInterface*> nonExclusiveInputs;
 			
-			std::map<std::string, InputInterface*> inputs;
-			std::map<std::string, OutputInterface*> outputs;
+			std::map<std::string, Handle<InputInterface>> inputs;
+			std::map<std::string, Handle<OutputInterface>> outputs;
 			
 			std::map<std::string, void*> hwLibraries;
 			JsonParser parser;
