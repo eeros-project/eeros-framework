@@ -22,9 +22,10 @@ class MouseDigIn : public Input<bool> {
   MouseDigIn(const MouseDigIn& s) = delete;
   
   virtual bool get() {
-    if (getId().compare("leftMouseButton") == 0) return m->current.button.left;
-    if (getId().compare("middleMouseButton") == 0) return m->current.button.middle;
-    if (getId().compare("rightMouseButton") == 0) return m->current.button.right;
+    auto current = m->current.read();
+    if (getId().compare("leftMouseButton") == 0) return current.button.left;
+    if (getId().compare("middleMouseButton") == 0) return current.button.middle;
+    if (getId().compare("rightMouseButton") == 0) return current.button.right;
     return false;
   }
             

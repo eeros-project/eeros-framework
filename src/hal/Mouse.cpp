@@ -3,7 +3,6 @@
 #include <eeros/hal/MouseDigIn.hpp>
 #include <eeros/core/Fault.hpp>
 
-#include <cstdio>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -18,23 +17,13 @@ Mouse::Mouse(std::string dev, int priority) : Thread(priority) {
   hal.addInput(left);
   hal.addInput(middle);
   hal.addInput(right);
-
-  current.button.left = 0;
-  current.button.middle = 0;
-  current.button.right = 0;
-
-  current.axis.x = 0;
-  current.axis.y = 0;
-  current.axis.z = 0;
-  current.axis.r = 0;
-
-  last = current;
+  running.store(true, std::memory_order_release);
 }
 
 Mouse::~Mouse() {
-  running = false; 
-  join(); 
-  close(); 
+  running.store(false, std::memory_order_relaxed);
+  join();
+  close();
 }
 
 bool Mouse::open(const char* device) {
@@ -70,27 +59,35 @@ void Mouse::on_axis(std::function<void(int, signed)> action) {
 
 
 void Mouse::run() {
-  running = true;
-  if (fd < 0) return;
+  // synchronize with constructor
+  // this is vital to read from the actual fd and not whatever happened to be
+  // stored in the unitialized fd
+  while(!running.load(std::memory_order_acquire)) usleep(1000);
+  if (fd < 0) {
+    log.error() << "failed to open mouse file descriptor";
+    return;
+  }
   struct input_event e;
-  while (running) {
+  eeros::hal::MouseState currentState{};
+  eeros::hal::MouseState lastState{};
+  while (running.load(std::memory_order_relaxed)) {
     ssize_t n = read(fd, &e, sizeof(struct input_event));
     if (n > 0) {
       if (e.type == EV_KEY) {
         switch (e.code) {
-          case BTN_LEFT: current.button.left = e.value; break;
-          case BTN_MIDDLE: current.button.middle = e.value; break;
-          case BTN_RIGHT: current.button.right = e.value; break;
+          case BTN_LEFT: currentState.button.left = e.value; break;
+          case BTN_MIDDLE: currentState.button.middle = e.value; break;
+          case BTN_RIGHT: currentState.button.right = e.value; break;
           default: break;
         }
 
         if (button_action != nullptr) button_action(e.code, e.value);
       } else if (e.type == EV_REL) {
         switch (e.code) {
-          case REL_X: current.axis.x += e.value; break;
-          case REL_Y: current.axis.y += e.value; break;
-          case REL_WHEEL: current.axis.z += e.value; break;
-          case REL_HWHEEL: current.axis.r += e.value; break;
+          case REL_X: currentState.axis.x += e.value; break;
+          case REL_Y: currentState.axis.y += e.value; break;
+          case REL_WHEEL: currentState.axis.z += e.value; break;
+          case REL_HWHEEL: currentState.axis.r += e.value; break;
           default: break;
         }
 
@@ -99,7 +96,9 @@ void Mouse::run() {
 
       if (event_action != nullptr) event_action(e);
 
-      last = current;
+      current.write(currentState);
+      last.write(lastState);
+      lastState = currentState;
     } else usleep(1000);
   }
 }
