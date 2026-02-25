@@ -92,8 +92,8 @@ private:
 };
 
 /********** Print functions **********/
-template <typename T>
-std::ostream& operator<<(std::ostream& os, Constant<T>& c) {
+template <typename T, SIUnit U>
+std::ostream& operator<<(std::ostream& os, Constant<T, U>& c) {
   os << "Block constant: '" << c.getName() << "' current val = " << c.getValue(); 
         return os;
 }

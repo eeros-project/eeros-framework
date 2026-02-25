@@ -40,11 +40,11 @@ class Mux: public Blockio<N,1,T,C,Uin,MakeUnitArray<Uout>::value> {
    */
   void run() override {
     C newValue;
-    for (uint32_t i = 0; i < N; i++) {
-      newValue(i) = this->in[i].getSignal().getValue();
-    }
+    for_<N>([&, this]<std::size_t I>() {
+      newValue(I) = this->template getIn<I>().getSignal().getValue();
+    });
     this->out.getSignal().setValue(newValue);
-    this->out.getSignal().setTimestamp(this->in[0].getSignal().getTimestamp());
+    this->out.getSignal().setTimestamp(this->template getIn<0>().getSignal().getTimestamp());
   }
 
 };
@@ -54,8 +54,8 @@ class Mux: public Blockio<N,1,T,C,Uin,MakeUnitArray<Uout>::value> {
  * Multiplexer instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <uint8_t N, typename T, typename C>
-std::ostream& operator<<(std::ostream& os, Mux<N,T,C>& m) {
+template < uint32_t N, typename T, typename C, std::array<SIUnit, static_cast<std::size_t>(N)> Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, Mux<N, T, C, Uin, Uout>& m) {
   os << "Block multiplexer: '" << m.getName() << "'"; 
   return os;
 }

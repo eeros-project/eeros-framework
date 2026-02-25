@@ -43,8 +43,8 @@ class Mul : public Blockio<0,1,OutT,OutT,SIUnit::generateNSizeArray<0>(),MakeUni
 };
 
 /********** Print functions **********/
-template <typename In1T = double, typename In2T = double, typename OutT = double>
-std::ostream& operator<<(std::ostream& os, Mul<In1T,In2T,OutT>& mul) {
+template <typename In1T = double, typename In2T = double, typename OutT = double, std::array<SIUnit, 2> Uin = SIUnit::generateNSizeArray<2>(), SIUnit Uout = SIUnit::create()>
+std::ostream& operator<<(std::ostream& os, Mul<In1T,In2T,OutT, Uin, Uout>& mul) {
   os << "Block multiplier: '" << mul.getName() << "'"; 
         return os;
 }

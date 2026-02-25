@@ -34,6 +34,26 @@ struct MakeUnitArray {
   static constexpr std::array<SIUnit, 1> value = {U};
 };
 
+template <class F, std::size_t... Is>
+void for_(F func, std::index_sequence<Is...>)
+{
+  (func.template operator()<Is>(), ...);
+}
+
+/**
+ * Helper that allow to generate a unrolled for loop at compile time.
+ * Necessary to be able to pass the indecies into the for loop as template arguments to stillb e able to call getIn<N>() and getOut<N>().
+ * 
+ * @tparam N Number that should be transformed into indicies for the for loop from 0 to N
+ * @tparam F Functor that receives the transformed indicies from 0 to N
+ * @param func Functor that should be executed
+ */
+template <std::size_t N, typename F>
+void for_(F func)
+{
+  for_(func, std::make_index_sequence<N>());
+}
+
 struct Empty {};
 
 /**
@@ -280,8 +300,8 @@ class Blockio : public Block {
  * block instance to an output stream.\n
  * Does not print a newline control character.
  */
-template < uint8_t N, uint8_t M, typename Tin = double, typename Tout = Tin >
-std::ostream& operator<<(std::ostream& os, Blockio<N,M,Tin,Tout>& b) {
+template < uint8_t N, uint8_t M, typename Tin = double, typename Tout = Tin, std::array<SIUnit, static_cast<std::size_t>(N)> Uin = SIUnit::generateNSizeArray<N>(), std::array<SIUnit, static_cast<std::size_t>(M)> Uout = SIUnit::generateNSizeArray<M>() >
+std::ostream& operator<<(std::ostream& os, Blockio<N,M,Tin,Tout, Uin, Uout>& b) {
   os << "Generic block: '" << b.getName() << "'"; 
   return os;
 }

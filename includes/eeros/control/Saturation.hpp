@@ -123,8 +123,8 @@ class Saturation : public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArra
  * saturation instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <typename T>
-std::ostream& operator<<(std::ostream& os, Saturation<T>& s) {
+template < typename T, SIUnit Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, Saturation<T, Uin, Uout>& s) {
   os << "Block saturation: '" << s.getName() << "' lower limit=" << s.lowerLimit << ", upper limit=" << s.upperLimit; 
   return os;
 }

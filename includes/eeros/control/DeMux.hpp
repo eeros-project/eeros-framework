@@ -39,10 +39,10 @@ class DeMux: public Blockio<1,N,C,T,MakeUnitArray<Uin>::value,Uout> {
    *
    */
   void run() override {
-    for(uint32_t i = 0; i < N; i++) {
-      this->out[i].getSignal().setValue(this->in.getSignal().getValue()(i));
-      this->out[i].getSignal().setTimestamp(this->in.getSignal().getTimestamp());
-    }
+    for_<N>([&, this]<std::size_t I>() {
+      this->template getOut<I>().getSignal().setValue(this->in.getSignal().getValue()(I));
+      this->template getOut<I>().getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+    });
   }
       
 };
@@ -52,8 +52,8 @@ class DeMux: public Blockio<1,N,C,T,MakeUnitArray<Uin>::value,Uout> {
  * Demultiplexer instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <uint8_t N, typename T, typename C>
-std::ostream& operator<<(std::ostream& os, DeMux<N,T,C>& d) {
+template < uint32_t N, typename T, typename C, SIUnit Uin, std::array<SIUnit, static_cast<std::size_t>(N)> Uout >
+std::ostream& operator<<(std::ostream& os, DeMux<N, T, C, Uin, Uout>& d) {
   os << "Block demultiplexer: '" << d.getName() << "'"; 
   return os;
 }

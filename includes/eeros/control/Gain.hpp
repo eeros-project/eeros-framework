@@ -381,8 +381,8 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
  * Gain instance to an output stream.\n
  * Does not print a newline control character.
  */
-template<typename Tout, typename Tgain>
-std::ostream &operator<<(std::ostream &os, Gain<Tout, Tgain> &gain) {
+template<typename Tout, typename Tgain, bool elementWise, SIUnit Uin, SIUnit Uout >
+std::ostream &operator<<(std::ostream &os, Gain<Tout, Tgain, elementWise, Uin, Uout> &gain) {
   os << "Block Gain: '" << gain.getName() << "' is enabled=" << gain.enabled << ", gain=" << gain.gain << ", ";
   os << "smoothChange=" << gain.smoothChange << ", minGain=" << gain.minGain << ", maxGain=" << gain.maxGain;
   os << ", targetGain=" << gain.targetGain << ", gainDiff=" << gain.gainDiff;

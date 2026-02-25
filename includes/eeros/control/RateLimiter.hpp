@@ -181,8 +181,8 @@ class RateLimiter : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeU
  * rate limiter instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <typename T>
-std::ostream& operator<<(std::ostream& os, RateLimiter<T>& rl) {
+template< typename Tout, typename Trate, SIUnit Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, RateLimiter<Tout, Trate, Uin, Uout>& rl) {
   os << "Block RateLimiter: '" << rl.getName() << "' falling rate=" << rl.fallingRate << ", rising rate=" << rl.risingRate; 
   return os;
 }

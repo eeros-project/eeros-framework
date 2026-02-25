@@ -187,8 +187,8 @@ class I: public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uout>::v
  * Integrator instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <typename T>
-std::ostream& operator<<(std::ostream& os, I<T>& i) {
+template <typename T, SIUnit Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, I<T, Uin, Uout>& i) {
   os << "Block integrator: '" << i.getName() << "' is enabled=" << i.enabled;
   os << ", upperLimit=" << i.upperLimit << ", lowerLimit=" << i.lowerLimit; 
   return os;

@@ -79,8 +79,8 @@ class D: public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uout>::v
  * Differentiator instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <typename T>
-std::ostream& operator<<(std::ostream& os, D<T>& d) {
+template <typename T, SIUnit Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, D<T, Uin, Uout>& d) {
   os << "Block differentiator: '" << d.getName();
   return os;
 }

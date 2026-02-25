@@ -86,8 +86,8 @@ class Delay : public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uou
  * delay instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <typename T>
-std::ostream& operator<<(std::ostream& os, Delay<T>& delay) {
+template <typename T, SIUnit Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, Delay<T, Uin, Uout>& delay) {
   os << "Block delay: '" << delay.getName() << "' with a delay of " << delay.delay << "s"; 
   return os;
 }
