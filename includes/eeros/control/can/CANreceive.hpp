@@ -52,7 +52,7 @@ class CANreceive : public Blockio<0,1,Matrix<N,1,double>> {
    * @see enable()
    * @see disable()
    */
-  virtual void run() {
+  virtual void run() override {
     Matrix<N,1,double> angle{0, 0};
     if (enabled) {
       for (std::size_t i = 0; i < nodes.size(); i++) {
@@ -74,7 +74,7 @@ class CANreceive : public Blockio<0,1,Matrix<N,1,double>> {
    *
    * @see run()
    */
-  virtual void enable() {
+  virtual void enable() override {
     enabled = true;
   }
 
@@ -85,7 +85,7 @@ class CANreceive : public Blockio<0,1,Matrix<N,1,double>> {
    *
    * @see run()
    */
-  virtual void disable() {
+  virtual void disable() override {
     enabled = false;
   }
 

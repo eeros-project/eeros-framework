@@ -1,6 +1,7 @@
 #ifndef ORG_EEROS_CONTROL_OUTPUT_HPP_
 #define ORG_EEROS_CONTROL_OUTPUT_HPP_
 
+#include <eeros/SIUnit.hpp>
 #include <eeros/control/Signal.hpp>
 #include <eeros/control/Block.hpp>
 
@@ -12,11 +13,12 @@ namespace control {
  * An output carries a signal. One or several inputs of other blocks
  * can be connected to this output.
  * 
- * @tparam T - signal type (double - default type)
+ * @tparam T - signal data type (double - default type)
+ * @tparam Unit - signal unit type (dimensionless - default type)
  * @since v0.4
  */
 
-template < typename T = double >
+template < typename T = double, SIUnit Unit = SIUnit::create()   >
 class Output {
  public:
   /**

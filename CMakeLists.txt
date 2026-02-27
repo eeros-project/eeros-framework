@@ -37,7 +37,7 @@ target_include_directories(${PROJECT_NAME}_eeros
 set_target_properties(${PROJECT_NAME}_eeros PROPERTIES VERSION ${EEROS_VERSION})
 
 target_compile_options(${PROJECT_NAME}_eeros PRIVATE -g -Wall)
-target_compile_features(${PROJECT_NAME}_eeros PUBLIC cxx_std_17)
+target_compile_features(${PROJECT_NAME}_eeros PUBLIC cxx_std_20)
 
 find_package(Doxygen)
 eeros_find_package(${PROJECT_NAME}_eeros Threads)

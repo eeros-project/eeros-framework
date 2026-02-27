@@ -1,7 +1,9 @@
 #ifndef ORG_EEROS_HAL_INPUT_HPP_
 #define ORG_EEROS_HAL_INPUT_HPP_
+
 #include <string>
 #include <eeros/core/System.hpp>
+#include <eeros/SIUnit.hpp>
 
 namespace eeros {
 namespace hal {
@@ -19,6 +21,7 @@ class Input : public InputInterface {
   explicit Input(std::string id, void* libHandle) : id(id), libHandle(libHandle) { }
   virtual ~Input() { }
   virtual inline std::string getId() const { return id; }
+  virtual SIUnit getUnit() { return SIUnit::create(); }
   virtual T get() = 0;
   virtual uint64_t getTimestamp()	{ return System::getTimeNs(); }
   virtual void *getLibHandle() { return libHandle; }

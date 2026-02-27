@@ -42,7 +42,7 @@ class KeyboardInput: public Blockio<0,N,bool> {
       hal.addInput(in);
     }
   }
-  
+
   /**
   * Disabling use of copy constructor because the block should never be copied unintentionally.
   */
@@ -51,7 +51,7 @@ class KeyboardInput: public Blockio<0,N,bool> {
   /**
    * Runs the block.
    */
-  virtual void run() {
+  void run() override {
     uint64_t time = eeros::System::getTimeNs();
     auto& list = KeyList::instance();
     for (uint8_t i = 0; i < list.nofKeys; i++) {
@@ -59,7 +59,7 @@ class KeyboardInput: public Blockio<0,N,bool> {
       this->out[i].getSignal().setTimestamp(time);
     }
   }
-  
+
   /**
    * Getter function for the output with a given index.
    * 
@@ -72,7 +72,7 @@ class KeyboardInput: public Blockio<0,N,bool> {
       throw IndexOutOfBoundsFault("Trying to get inexistent element of output in Block " + this->getName());  
     return this->out[index];
   }
-  
+
   /**
    * Reset the state of a key. This must be done manually after having consumed the state.
    * 
@@ -84,7 +84,7 @@ class KeyboardInput: public Blockio<0,N,bool> {
       throw IndexOutOfBoundsFault("Trying to get inexistent element of output in Block " + this->getName());  
     list.state[index] = false;
   }
-  
+
  protected:
   Keyboard k;
 };
@@ -113,7 +113,7 @@ class KeyboardInput<1>: public Blockio<0,1,bool> {
     hal::Input<bool>* in = new KeyboardDigIn(list, list.key[0]);
     hal.addInput(in);
   }
-  
+
   /**
   * Disabling use of copy constructor because the block should never be copied unintentionally.
   */
@@ -122,13 +122,13 @@ class KeyboardInput<1>: public Blockio<0,1,bool> {
   /**
    * Runs the block.
    */
-  virtual void run() {
+  void run() override {
     uint64_t time = eeros::System::getTimeNs();
     auto& list = KeyList::instance();
     this->out.getSignal().setValue(list.state[0]);
     this->out.getSignal().setTimestamp(time);
   }
-  
+
   /**
    * Reset the state of the key. This must be done manually after having consumed the state.
    */
@@ -136,7 +136,7 @@ class KeyboardInput<1>: public Blockio<0,1,bool> {
     auto& list = KeyList::instance();
     list.state[0] = false;
   }
-  
+
  protected:
   Keyboard k;
 };

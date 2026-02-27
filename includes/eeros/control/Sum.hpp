@@ -8,17 +8,18 @@ namespace eeros {
 namespace control {
 
 /**
- * A sum allows to add the signals of two or more inputs together.
+ * A sum allows to add the signals of two or more inputs with the same SIUnit together.
  * Any of the inputs can be inverted which allows to not only adding but also subtracting signals.
  * 
  * @tparam N - number of inputs
  * @tparam T - value type (double - default type)
+ * @tparam U - signal unit type (dimensionless - default type)
  * 
  * @since v0.4
  */
 
-template < uint8_t N = 2, typename T = double >
-class Sum : public Blockio<N,1,T> {
+template < uint8_t N = 2, typename T = double, SIUnit U = SIUnit::create() >
+class Sum : public Blockio<N,1,T, T, MakeUnitArray<U, N>::value, MakeUnitArray<U>::value> {
  public:
 
   /**
@@ -42,22 +43,22 @@ class Sum : public Blockio<N,1,T> {
   virtual void run() {
     T sum; sum = 0; // TODO works only with primitive types or eeros::math::Matrix -> make specialization and use fill() for compatibility with std::array;
     if (first) {
-      for (uint8_t i = 0; i < N; i++) {
+      for_<N>([&, this]<std::size_t I>() {
         T val;
-        if (init[i]) val = initVal[i];
-        else val = this->in[i].getSignal().getValue();
-        if (negated[i]) sum -= val;
+        if (init[I]) val = initVal[I];
+        else val = this->template getIn<I>().getSignal().getValue();
+        if (negated[I]) sum -= val;
         else sum += val;
-      }
+      });
       first = false;
     } else {
-      for (uint8_t i = 0; i < N; i++) {
-        if (negated[i]) sum -= this->in[i].getSignal().getValue();
-        else sum += this->in[i].getSignal().getValue();
-      }
+      for_<N>([&, this]<std::size_t I>() {
+        if (negated[I]) sum -= this->template getIn<I>().getSignal().getValue();
+        else sum += this->template getIn<I>().getSignal().getValue();
+      });
     }
     this->out.getSignal().setValue(sum);
-    this->out.getSignal().setTimestamp(this->in[0].getSignal().getTimestamp());
+    this->out.getSignal().setTimestamp(this->template getIn<0>().getSignal().getTimestamp());
   }
   
   /**
@@ -99,8 +100,8 @@ class Sum : public Blockio<N,1,T> {
  * Sum instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <uint8_t N, typename T>
-std::ostream& operator<<(std::ostream& os, Sum<N,T>& sum) {
+template <uint8_t N, typename T, SIUnit U>
+std::ostream& operator<<(std::ostream& os, Sum<N,T, U>& sum) {
   os << "Block sum: '" << sum.getName() << "'"; 
   return os;
 }

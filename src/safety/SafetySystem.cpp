@@ -4,6 +4,7 @@
 #include <array>
 #include <eeros/core/Fault.hpp>
 #include <eeros/safety/SafetySystem.hpp>
+#include <eeros/safety/InputAction.hpp>
 #include <exception>
 #include <typeinfo>
 

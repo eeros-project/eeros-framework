@@ -44,7 +44,7 @@ class WrapAround : public Blockio<1,1,Tout> {
   /**
    * Runs the wrap around algorithm, as described above.
    */
-  virtual void run(){
+  virtual void run() override {
     std::lock_guard<std::mutex> lock(mtx);
     Tout inVal = this->in.getSignal().getValue();
     Tout outVal = inVal;
@@ -60,7 +60,7 @@ class WrapAround : public Blockio<1,1,Tout> {
    * 
    * @see disable()
    */
-  virtual void enable() {
+  virtual void enable() override {
     enabled = true;
   }
 
@@ -71,7 +71,7 @@ class WrapAround : public Blockio<1,1,Tout> {
    * 
    * @see enable()
    */
-  virtual void disable() {
+  virtual void disable() override {
     enabled = false;
   }
 

@@ -42,7 +42,7 @@ class ODriveUSBInput : public Blockio<1,3,Vector2> {
   /**
    * Gets input data from ODrive_USB thread and outputs them
    */
-  virtual void run(){
+  virtual void run() override {
     // Set speed
     odrive.setRefVel(0, in.getSignal().getValue()(0), 1/6.28); // rad/s
     odrive.setRefVel(1, in.getSignal().getValue()(1), 1/6.28); // rad/s
@@ -71,14 +71,14 @@ class ODriveUSBInput : public Blockio<1,3,Vector2> {
   /**
    * Enables drives
    */
-  virtual void enable() {
+  virtual void enable() override {
     odrive.enableDrives();
   }
  
   /**
    * Disables drives
    */
-  virtual void disable() {
+  virtual void disable() override {
     odrive.disableDrives();
   }
   

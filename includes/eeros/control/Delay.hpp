@@ -11,13 +11,15 @@ namespace control {
  * into a buffer while the output of the block is taken from the most last position 
  * of the delay buffer.
  *
- * @tparam T - signal type (double - default type)
+ * @tparam T - input and output signal data type (double - default type)
+ * @tparam Uin - input signal unit type (dimensionless - default type)
+ * @tparam Uout - output signal unit type (dimensionless - default type)
  *
  * @since v1.2
  */
 
-template < typename T = double >
-class Delay : public Blockio<1,1,T> {
+template < typename T = double, SIUnit Uin = SIUnit::create(), SIUnit Uout = SIUnit::create() >
+class Delay : public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uout>::value> {
  public:
   /**
    * Constructs a delay block instance with a given delay in s.\n
@@ -41,7 +43,7 @@ class Delay : public Blockio<1,1,T> {
   /**
    * Destructor frees buffers.
    */
-  ~Delay() {
+  ~Delay() override {
     delete[] buf;
     delete[] timeBuf;
   }
@@ -49,7 +51,7 @@ class Delay : public Blockio<1,1,T> {
   /**
    * Runs the delay block.   
    */
-  virtual void run() {
+  void run() override {
     buf[index] = this->in.getSignal().getValue();
     timeBuf[index] = this->in.getSignal().getTimestamp();
     index++;
@@ -62,14 +64,14 @@ class Delay : public Blockio<1,1,T> {
       this->out.getSignal().setTimestamp(timeBuf[index]);
     }
   }
-      
+
   /*
    * Friend operator overload to give the operator overload outside
    * the class access to the private fields.
    */
   template <typename X>
   friend std::ostream& operator<<(std::ostream& os, Delay<X>& delay);
-     
+
  protected:
   double delay; // delay in s
   uint32_t bufLen; // total size of buffer
@@ -84,8 +86,8 @@ class Delay : public Blockio<1,1,T> {
  * delay instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <typename T>
-std::ostream& operator<<(std::ostream& os, Delay<T>& delay) {
+template <typename T, SIUnit Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, Delay<T, Uin, Uout>& delay) {
   os << "Block delay: '" << delay.getName() << "' with a delay of " << delay.delay << "s"; 
   return os;
 }

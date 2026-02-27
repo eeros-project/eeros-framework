@@ -7,7 +7,6 @@
 #include <sstream>
 #include <map>
 #include <functional>
-#include <eeros/safety/InputAction.hpp>
 #include <eeros/safety/OutputAction.hpp>
 
 namespace eeros {
@@ -15,6 +14,7 @@ namespace safety {
 
 class SafetyContext;
 class SafetySystem;
+class InputAction;
 
 enum EventType { kPrivateEvent, kPublicEvent };
 

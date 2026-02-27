@@ -195,7 +195,7 @@ std::ostream& operator<<(std::ostream& os, Signal<T>& signal) {
 }
 template <typename T>
 std::ostream& operator<<(std::ostream& os, Signal<T>* signal) {
-  os << "Signal: '" << signal.getName() << "' timestamp = " << signal.getTimestamp() << " value = " << signal.getValue(); 
+  os << "Signal: '" << signal->getName() << "' timestamp = " << signal->getTimestamp() << " value = " << signal->getValue(); 
   return os;
 }
 

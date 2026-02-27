@@ -79,7 +79,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    * @see enable()
    * @see disable()
    */
-  virtual void run() {
+  virtual void run() override {
     if (enabled.load(std::memory_order_relaxed)) {
       uint64_t ts = eeros::System::getTimeNs();
       for (uint32_t i = 0; i < nofPDO; i++) {
@@ -143,7 +143,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    *
    * @see run()
    */
-  virtual void enable() {
+  virtual void enable() override {
     nofPDO = pdo.size();
     enabled.store(true, std::memory_order_relaxed);
     log.trace() << "enabling can receive block";
@@ -156,7 +156,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    *
    * @see run()
    */
-  virtual void disable() {
+  virtual void disable() override {
     enabled.store(false, std::memory_order_relaxed);
     log.trace() << "disabling can receive block";
   }

@@ -3,6 +3,7 @@
 
 #include <ucl++.h>
 #include <eeros/logger/Logger.hpp>
+#include <eeros/SIUnit.hpp>
 
 namespace eeros {
 	namespace hal {
@@ -14,7 +15,7 @@ namespace eeros {
 			virtual void createHalObjects(std::map<std::string, void*> lib);
 		private:
 			virtual void createLogicObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, bool inverted, std::string additionalArguments);
-			virtual void createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset, double rangeMin, double rangeMax, double safe, std::string unit, std::string additionalArguments);
+			virtual void createRealObject(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelNumber, double scale, double offset, double rangeMin, double rangeMax, double safe, SIUnit unit, std::string additionalArguments);
 			virtual void parseChannelProperties(ucl::Ucl chanObj, std::string *chanType, std::string *sigId, double *scale, double *offset, double *rangeMin, double *rangeMax, double* safe, std::string *chanUnit, bool *inverted, std::string *additionalArguments);
 			virtual void createComediFqd(void *libHandle, std::string type, std::string id, std::string devHandle, uint32_t subDevNumber, uint32_t channelA, uint32_t channelB, uint32_t channelZ, double scale, double offset, double rangeMin, double rangeMax, std::string unit);
 
