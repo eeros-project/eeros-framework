@@ -20,7 +20,7 @@ namespace control {
 
 template < typename T = double, SIUnit U = SIUnit::create() >
 requires std::is_same_v<T, double> || std::is_same_v<T, bool>
-class PeripheralInput : public Blockio<0,1,T,T,SIUnit::generateNSizeArray<0>(),MakeUnitArray<U>::value> {
+class PeripheralInput : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnitArray<U>::value> {
  public:
   /**
    * Constructs a peripheral input instance with a name defined in the 

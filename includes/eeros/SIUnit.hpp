@@ -50,17 +50,6 @@ struct SIUnit {
     return SIUnit{Length, Mass, Time, Electric_Current, Thermodynamic_Temperature, Amount_Of_Substance, Luminous_Intensity, Radian};
   }
 
-  /**
-   * Generates an array containing an arbitrary amount of dimensionless SIUnit instances.
-   * 
-   * @tparam N Amount of dimensionless SIUnit instances to generate.
-   * @return SIUnits
-   */
-  template<std::size_t N>
-  constexpr static decltype(auto) generateNSizeArray() {
-    return createArray<N>(std::make_index_sequence<N>{});
-  }
-
 private:
   /**
    * Privated constructor intializing the base units, used to prevent instantiation of an SIUnit besides the usage of SIUnit::create().
@@ -74,19 +63,36 @@ private:
     , amount_of_substance(amount_of_substance)
     , luminous_intensity(luminous_intensity)
     , radian(radian) {}
+};
+
+namespace siunit {
+  namespace {
+    /**
+     * Generates an array containing an arbitrary amount of dimensionless SIUnit instances.
+     * 
+     * @tparam U SIUnit value to insert, default = dimensionless instance.
+     * @tparam N Amount of dimensionless SIUnit instances to generate.
+     * @tparam Is Template parameter pack of a sequence from 0 - m, used to fill the array type with values.
+     * @return SIUnits
+     */
+    template<SIUnit U, std::size_t N, std::size_t... Is>
+    constexpr static decltype(auto) createArray(std::index_sequence<Is...>) {
+      return std::array<SIUnit, N>{(static_cast<void>(Is), U)...};
+    }
+  }
 
   /**
-   * Generates an array containing an arbitrary amount of dimensionless SIUnit instances.
+   * Generates an array containing an arbitrary amount of the given SIUnit instances.
    * 
-   * @tparam N Amount of dimensionless SIUnit instances to generate.
-   * @tparam Is Template parameter pack of a sequence from 0 - m, used to fill the array type with values.
+   * @tparam N Amount of SIUnit instances to insert.
+   * @tparam U SIUnit value to insert, default = dimensionless instance.
    * @return SIUnits
    */
-  template<std::size_t N, std::size_t... Is>
-  constexpr static decltype(auto) createArray(std::index_sequence<Is...>) {
-    return std::array<SIUnit, N>{(static_cast<void>(Is), SIUnit::create())...};
+  template<std::size_t N, SIUnit U = SIUnit::create()>
+  constexpr static decltype(auto) generateNSizeArray() {
+    return createArray<U, N>(std::make_index_sequence<N>{});
   }
-};
+}
 
 constexpr SIUnit Watt = SIUnit::create<2, 1, -3>(); // https://en.wikipedia.org/wiki/Watt
 constexpr SIUnit Newton = SIUnit::create<1, 1, -2>(); // https://en.wikipedia.org/wiki/Newton_(unit)

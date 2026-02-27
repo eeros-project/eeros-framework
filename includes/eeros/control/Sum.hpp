@@ -17,7 +17,7 @@ namespace control {
  * @since v0.4
  */
 
-template < uint8_t N = 2, typename T = double, std::array<SIUnit, N> Uin = SIUnit::generateNSizeArray<N>(), SIUnit Uout = SIUnit::create() >
+template < uint8_t N = 2, typename T = double, std::array<SIUnit, N> Uin = siunit::generateNSizeArray<N>(), SIUnit Uout = SIUnit::create() >
 class Sum : public Blockio<N,1,T, T, Uin, MakeUnitArray<Uout>::value> {
  public:
 

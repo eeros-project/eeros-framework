@@ -20,7 +20,7 @@ namespace control {
  */
 
 template < typename T = double, SIUnit U = SIUnit::create() >
-class Constant : public Blockio<0,1,T,T,SIUnit::generateNSizeArray<0>(),MakeUnitArray<U>::value> {
+class Constant : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnitArray<U>::value> {
  public:
   /**
    * Constructs a default constant instance with a value of nan (floating point types) or

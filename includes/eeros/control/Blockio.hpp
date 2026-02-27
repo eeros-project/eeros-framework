@@ -20,25 +20,29 @@ concept One = (N == 1);
 template<uint8_t N>
 concept Multiple = (N > 1);
 
+namespace
+{
+  template <class F, std::size_t... Is>
+  void for_(F func, std::index_sequence<Is...>)
+  {
+    (func.template operator()<Is>(), ...);
+  }
+}
+
 /**
- * Helper that generates the requires SIUnit std::array from a single SIUnit.
- * Can be used for Blockio implementations that only have a single input and output block,
+ * Helper that generates the requires n-sized SIUnit std::array from a SIUnit.
+ * Can be used for Blockio implementations that want to create an array containing a single SIUnit or an array of multiple SIUnits with the same value,
  * by forwarding their received template SIUnit argument into this helper struct and accessing the created array with ::value.
  * 
- * Used by calling MakeUnitArray<U>::value in the template paramter list to Blockio, where U is the sole SIUnit.
+ * Used by calling MakeUnitArray<U, N>::value in the template paramter list to Blockio, where U is the SIUnit and N the size.
  * 
- * @tparam U Single unit that should be used to create an std::array containing that element.
+ * @tparam U Unit that should be used to create an std::array containing that element.
+ * @tparam N How many times the Unit sould be inserted, default = 1.
  */
-template<SIUnit U>
+template<SIUnit U, std::size_t N = 1>
 struct MakeUnitArray {
-  static constexpr std::array<SIUnit, 1> value = {U};
+  static constexpr std::array<SIUnit, N> value = siunit::generateNSizeArray<N, U>();
 };
-
-template <class F, std::size_t... Is>
-void for_(F func, std::index_sequence<Is...>)
-{
-  (func.template operator()<Is>(), ...);
-}
 
 /**
  * Helper that allow to generate a unrolled for loop at compile time.
@@ -85,7 +89,7 @@ struct Empty {};
  * @since v1.2.1
  */
 
-template < uint8_t N, uint8_t M, typename Tin = double, typename Tout = Tin, std::array<SIUnit, N> Uin = SIUnit::generateNSizeArray<N>(), std::array<SIUnit, M> Uout = SIUnit::generateNSizeArray<M>() >
+template < uint8_t N, uint8_t M, typename Tin = double, typename Tout = Tin, std::array<SIUnit, N> Uin = siunit::generateNSizeArray<N>(), std::array<SIUnit, M> Uout = siunit::generateNSizeArray<M>() >
 class Blockio : public Block {
  public:
   /**
@@ -300,7 +304,7 @@ class Blockio : public Block {
  * block instance to an output stream.\n
  * Does not print a newline control character.
  */
-template < uint8_t N, uint8_t M, typename Tin = double, typename Tout = Tin, std::array<SIUnit, static_cast<std::size_t>(N)> Uin = SIUnit::generateNSizeArray<N>(), std::array<SIUnit, static_cast<std::size_t>(M)> Uout = SIUnit::generateNSizeArray<M>() >
+template < uint8_t N, uint8_t M, typename Tin = double, typename Tout = Tin, std::array<SIUnit, static_cast<std::size_t>(N)> Uin = siunit::generateNSizeArray<N>(), std::array<SIUnit, static_cast<std::size_t>(M)> Uout = siunit::generateNSizeArray<M>() >
 std::ostream& operator<<(std::ostream& os, Blockio<N,M,Tin,Tout, Uin, Uout>& b) {
   os << "Generic block: '" << b.getName() << "'"; 
   return os;

@@ -17,8 +17,8 @@ namespace control {
  * @tparam Uout - output signal unit type (dimensionless - default type)
  * @since v0.6
  */
-template < typename In1T = double, typename In2T = double, typename OutT = double, std::array<SIUnit, 2> Uin = SIUnit::generateNSizeArray<2>(), SIUnit Uout = SIUnit::create() >
-class Mul : public Blockio<0,1,OutT,OutT,SIUnit::generateNSizeArray<0>(),MakeUnitArray<Uout>::value> {
+template < typename In1T = double, typename In2T = double, typename OutT = double, std::array<SIUnit, 2> Uin = siunit::generateNSizeArray<2>(), SIUnit Uout = SIUnit::create() >
+class Mul : public Blockio<0,1,OutT,OutT,siunit::generateNSizeArray<0>(),MakeUnitArray<Uout>::value> {
  public:
   Mul() : in1(this), in2(this) { }
 
@@ -43,7 +43,7 @@ class Mul : public Blockio<0,1,OutT,OutT,SIUnit::generateNSizeArray<0>(),MakeUni
 };
 
 /********** Print functions **********/
-template <typename In1T = double, typename In2T = double, typename OutT = double, std::array<SIUnit, 2> Uin = SIUnit::generateNSizeArray<2>(), SIUnit Uout = SIUnit::create()>
+template <typename In1T = double, typename In2T = double, typename OutT = double, std::array<SIUnit, 2> Uin = siunit::generateNSizeArray<2>(), SIUnit Uout = SIUnit::create()>
 std::ostream& operator<<(std::ostream& os, Mul<In1T,In2T,OutT, Uin, Uout>& mul) {
   os << "Block multiplier: '" << mul.getName() << "'"; 
         return os;

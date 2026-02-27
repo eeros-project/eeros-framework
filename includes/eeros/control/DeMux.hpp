@@ -21,7 +21,7 @@ namespace control {
  * @since v0.6
  */
 
-template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T>, SIUnit Uin = SIUnit::create(), std::array<SIUnit, N> Uout = SIUnit::generateNSizeArray<N>() >
+template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T>, SIUnit Uin = SIUnit::create(), std::array<SIUnit, N> Uout = siunit::generateNSizeArray<N>() >
 class DeMux: public Blockio<1,N,C,T,MakeUnitArray<Uin>::value,Uout> {
  public:
   /**
