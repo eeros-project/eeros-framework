@@ -8,17 +8,18 @@ namespace eeros {
 namespace control {
 
 /**
- * A sum allows to add the signals of two or more inputs together.
+ * A sum allows to add the signals of two or more inputs with the same SIUnit together.
  * Any of the inputs can be inverted which allows to not only adding but also subtracting signals.
  * 
  * @tparam N - number of inputs
  * @tparam T - value type (double - default type)
+ * @tparam U - signal unit type (dimensionless - default type)
  * 
  * @since v0.4
  */
 
-template < uint8_t N = 2, typename T = double, std::array<SIUnit, N> Uin = siunit::generateNSizeArray<N>(), SIUnit Uout = SIUnit::create() >
-class Sum : public Blockio<N,1,T, T, Uin, MakeUnitArray<Uout>::value> {
+template < uint8_t N = 2, typename T = double, SIUnit U = SIUnit::create() >
+class Sum : public Blockio<N,1,T, T, MakeUnitArray<U, N>::value, MakeUnitArray<U>::value> {
  public:
 
   /**
@@ -99,8 +100,8 @@ class Sum : public Blockio<N,1,T, T, Uin, MakeUnitArray<Uout>::value> {
  * Sum instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <uint8_t N, typename T, std::array<SIUnit, static_cast<std::size_t>(N)> Uin, SIUnit Uout>
-std::ostream& operator<<(std::ostream& os, Sum<N,T, Uin, Uout>& sum) {
+template <uint8_t N, typename T, SIUnit U>
+std::ostream& operator<<(std::ostream& os, Sum<N,T, U>& sum) {
   os << "Block sum: '" << sum.getName() << "'"; 
   return os;
 }
