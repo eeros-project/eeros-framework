@@ -144,7 +144,7 @@ class Blockio : public Block {
    * @param index - runtime index of the input
    * @return input
    */
-  Input<Tin, SIUnit::create()>& getIn(uint8_t index) requires Multiple<N> {
+  decltype(auto) getIn(uint8_t index) requires Multiple<N> {
     if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
     return in[index];
   }
@@ -182,7 +182,7 @@ class Blockio : public Block {
    * @param index - runtime index of the output
    * @return output
    */
-  Output<Tout, SIUnit::create()>& getOut(uint8_t index) requires Multiple<M> {
+  decltype(auto) getOut(uint8_t index) requires Multiple<M> {
     if (index >= M) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 
     return out[index];
   }
@@ -234,9 +234,9 @@ class Blockio : public Block {
    */
   template<std::size_t... Is>
   constexpr static decltype(auto) createInputs(std::index_sequence<Is...>) {
-    constexpr bool allDimensionLess = std::ranges::all_of(Uin, [](auto e) { return e == SIUnit::create(); });   
-    if constexpr (allDimensionLess) {
-      return std::array<Input<Tin, SIUnit::create()>, N>{};
+    constexpr bool allSameDimension = std::ranges::all_of(Uin, [](auto e) { return e == Uin.at(0U); });
+    if constexpr (allSameDimension) {
+      return std::array<Input<Tin, Uin.at(0U)>, N>{};
     }
     else {
       return std::tuple<Input<Tin, Uin[Is]>...>{};
@@ -267,10 +267,10 @@ class Blockio : public Block {
    * @return outputs
    */
   template<std::size_t... Is>
-  constexpr static decltype(auto) createOutputs(std::index_sequence<Is...>) {
-    constexpr bool allDimensionLess = std::ranges::all_of(Uout, [](auto e) { return e == SIUnit::create(); });   
-    if constexpr (allDimensionLess) {
-      return std::array<Output<Tout, SIUnit::create()>, M>{};
+  constexpr static decltype(auto) createOutputs(std::index_sequence<Is...>) { 
+    constexpr bool allSameDimension = std::ranges::all_of(Uout, [](auto e) { return e == Uout.at(0U); });
+    if constexpr (allSameDimension) {
+      return std::array<Output<Tout, Uout.at(0U)>, M>{};
     }
     else {
       return std::tuple<Output<Tout, Uout[Is]>...>{};
