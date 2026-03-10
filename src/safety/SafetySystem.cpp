@@ -134,7 +134,7 @@ void SafetySystem::run() {
       log.info() << "running " << level << "->onExit()";
       level->onExit();
     }
-    currentLevel.store(nLevel, std::memory_order_acq_rel);
+    currentLevel.store(nLevel, std::memory_order_release);
     level = nLevel;
     if (nLevel->onEntry) {
       log.info() << "running " << nLevel << "->onEntry()";

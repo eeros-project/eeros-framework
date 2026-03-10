@@ -88,7 +88,7 @@ TF_Matrix TF_Tree::tfFrameToOrigin(const std::string frame, const std::string or
   std::vector<int> toList = nodes[to].getParents();
   toList.push_back(to);
   // search nearest parent
-  int sameParent, cnt = 0;
+  int sameParent = 0, cnt = 0;
   bool hasSameParent = true;
   while (hasSameParent && cnt < (int)fromList.size() &&
          cnt < (int)toList.size()) {
