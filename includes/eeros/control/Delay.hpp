@@ -12,14 +12,13 @@ namespace control {
  * of the delay buffer.
  *
  * @tparam T - input and output signal data type (double - default type)
- * @tparam Uin - input signal unit type (dimensionless - default type)
- * @tparam Uout - output signal unit type (dimensionless - default type)
+ * @tparam U - signal unit type (dimensionless - default type)
  *
  * @since v1.2
  */
 
-template < typename T = double, SIUnit Uin = SIUnit::create(), SIUnit Uout = SIUnit::create() >
-class Delay : public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uout>::value> {
+template < typename T = double, SIUnit U = SIUnit::create() >
+class Delay : public Blockio<1,1,T,T,MakeUnitArray<U>::value,MakeUnitArray<U>::value> {
  public:
   /**
    * Constructs a delay block instance with a given delay in s.\n
@@ -65,12 +64,14 @@ class Delay : public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uou
     }
   }
 
-  /*
-   * Friend operator overload to give the operator overload outside
-   * the class access to the private fields.
+  /**
+   * Get the configured delay value.
+   *
+   * @return delay in seconds
    */
-  template <typename X>
-  friend std::ostream& operator<<(std::ostream& os, Delay<X>& delay);
+  double getDelay() const {
+    return delay;
+  }
 
  protected:
   double delay; // delay in s
@@ -86,9 +87,9 @@ class Delay : public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uou
  * delay instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <typename T, SIUnit Uin, SIUnit Uout >
-std::ostream& operator<<(std::ostream& os, Delay<T, Uin, Uout>& delay) {
-  os << "Block delay: '" << delay.getName() << "' with a delay of " << delay.delay << "s"; 
+template <typename T, SIUnit U >
+std::ostream& operator<<(std::ostream& os, Delay<T,U>& d) {
+  os << "Block delay: '" << d.getName() << "' with a delay of " << d.getDelay() << "s";
   return os;
 }
 

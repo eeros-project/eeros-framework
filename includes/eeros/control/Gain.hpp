@@ -266,8 +266,8 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
    * Friend operator overload to give the operator overload outside
    * the class access to the private fields.
    */
-  template<typename Xout, typename Xgain>
-  friend std::ostream &operator<<(std::ostream &os, Gain<Xout, Xgain> &gain);
+  template<typename Xout, typename Xgain, bool XelementWise, SIUnit XUin, SIUnit XUout>
+  friend std::ostream &operator<<(std::ostream &os, const Gain<Xout, Xgain, XelementWise, XUin, XUout> &gain);
 
  protected:
   Tgain gain;
@@ -382,7 +382,7 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
  * Does not print a newline control character.
  */
 template<typename Tout, typename Tgain, bool elementWise, SIUnit Uin, SIUnit Uout >
-std::ostream &operator<<(std::ostream &os, Gain<Tout, Tgain, elementWise, Uin, Uout> &gain) {
+std::ostream &operator<<(std::ostream &os, const Gain<Tout, Tgain, elementWise, Uin, Uout> &gain) {
   os << "Block Gain: '" << gain.getName() << "' is enabled=" << gain.enabled << ", gain=" << gain.gain << ", ";
   os << "smoothChange=" << gain.smoothChange << ", minGain=" << gain.minGain << ", maxGain=" << gain.maxGain;
   os << ", targetGain=" << gain.targetGain << ", gainDiff=" << gain.gainDiff;

@@ -3,8 +3,6 @@
 
 #include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
-#include <eeros/control/Output.hpp>
-#include <eeros/control/IndexOutOfBoundsFault.hpp>
 
 namespace eeros {
 namespace control {
@@ -16,13 +14,13 @@ namespace control {
  * @tparam N - number of outputs
  * @tparam T - output signal data type (double - default type)
  * @tparam C - input signal data type (Matrix<N,1,T> - default type)
- * @tparam Uin - input signal unit type (dimensionless - default type)
- * @tparam Uout - output signal unit type (dimensionless - default type)
+ * @tparam U - signal unit type (dimensionless - default type)
+ *
  * @since v0.6
  */
 
-template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T>, SIUnit Uin = SIUnit::create(), std::array<SIUnit, N> Uout = siunit::generateNSizeArray<N>() >
-class DeMux: public Blockio<1,N,C,T,MakeUnitArray<Uin>::value,Uout> {
+template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T>, SIUnit U = SIUnit::create() >
+class DeMux: public Blockio<1,N,C,T,MakeUnitArray<U>::value,MakeUnitArray<U,N>::value> {
  public:
   /**
    * Constructs a demultiplexer instance.
@@ -52,8 +50,8 @@ class DeMux: public Blockio<1,N,C,T,MakeUnitArray<Uin>::value,Uout> {
  * Demultiplexer instance to an output stream.\n
  * Does not print a newline control character.
  */
-template < uint32_t N, typename T, typename C, SIUnit Uin, std::array<SIUnit, static_cast<std::size_t>(N)> Uout >
-std::ostream& operator<<(std::ostream& os, DeMux<N, T, C, Uin, Uout>& d) {
+template < uint32_t N, typename T, typename C, SIUnit U >
+std::ostream& operator<<(std::ostream& os, const DeMux<N, T, C, U>& d) {
   os << "Block demultiplexer: '" << d.getName() << "'"; 
   return os;
 }

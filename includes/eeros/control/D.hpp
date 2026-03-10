@@ -60,13 +60,6 @@ class D: public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uout>::v
     prev = sig;
   }
 
-  /*
-   * Friend operator overload to give the operator overload outside
-   * the class access to the private fields.
-   */
-  template<typename X>
-  friend std::ostream &operator<<(std::ostream &os, D<X> &d);
-
  private:
   Signal<T> prev;
   T valOut;
@@ -80,8 +73,8 @@ class D: public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uout>::v
  * Does not print a newline control character.
  */
 template <typename T, SIUnit Uin, SIUnit Uout >
-std::ostream& operator<<(std::ostream& os, D<T, Uin, Uout>& d) {
-  os << "Block differentiator: '" << d.getName();
+std::ostream& operator<<(std::ostream& os, const D<T, Uin, Uout>& d) {
+  os << "Block differentiator: '" << d.getName() << "'";
   return os;
 }
 

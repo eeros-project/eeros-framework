@@ -12,7 +12,7 @@ namespace eeros {
 namespace control {
 
 /**
- * A switch allows to select a signal from severel inputs to be routed to the output.
+ * A switch allows to select a signal from several inputs to be routed to the output.
  * If a signal at a chosen input is close to a predefined value, the switch can automatically switch 
  * to a predefined position and a safety event can be triggered. The switch can be made to switch
  * only if the current safety level is greater or the same as the active level set on this switch.
@@ -20,14 +20,13 @@ namespace control {
  * 
  * @tparam N - number of inputs
  * @tparam T - value type (double - default type)
- * @tparam Uin - input signal unit type (dimensionless - default type)
- * @tparam Uout - output signal unit type (dimensionless - default type)
+ * @tparam U - signal unit type (dimensionless - default type)
  * 
  * @since v0.4
  */
 
-template < uint8_t N = 2, typename T = double, SIUnit Uin = SIUnit::create(), SIUnit Uout = SIUnit::create()  >
-class Switch : public Blockio<N,1,T,T,MakeUnitArray<Uin, N>::value,MakeUnitArray<Uout>::value> {
+template < uint8_t N = 2, typename T = double, SIUnit U = SIUnit::create() >
+class Switch : public Blockio<N,1,T,T,MakeUnitArray<U,N>::value,MakeUnitArray<U>::value> {
  public:
 
   /**
@@ -193,8 +192,8 @@ class Switch : public Blockio<N,1,T,T,MakeUnitArray<Uin, N>::value,MakeUnitArray
 };
 
 /********** Print functions **********/
-template <uint8_t N, typename T>
-std::ostream& operator<<(std::ostream& os, Switch<N,T>& sw) {
+template <uint8_t N, typename T, SIUnit U>
+std::ostream& operator<<(std::ostream& os, const Switch<N,T,U>& sw) {
   os << "Block switch: '" << sw.getName() << "'"; 
   return os;
 }

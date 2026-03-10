@@ -3,6 +3,8 @@
 
 #include <type_traits>
 #include <mutex>
+#include <concepts>
+#include <limits>
 #include <eeros/control/Blockio.hpp>
 #include <eeros/core/System.hpp>
 
@@ -28,16 +30,14 @@ class Constant : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnit
    *
    * @see Constant(T v)
    */
-  Constant() {
-    _clear<T>();
-  }
+  Constant() : value(_clear()) { }
 
   /**
    * Constructs a constant instance with a initial value of v.
    *
    * @param v - initial value
    */
-  Constant(T v) : value(v) { }
+  explicit Constant(T v) : value(v) { }
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -72,32 +72,46 @@ class Constant : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnit
     return value;
   }
 
-protected:
+ protected:
   T value;
   std::mutex mtx;
   
-private:
-  template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _clear() {
-    value = std::numeric_limits<int32_t>::min();
-  }
-  template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type _clear() {
-    value = std::numeric_limits<double>::quiet_NaN();
-  }
-  template <typename S> typename std::enable_if<std::is_compound<S>::value && std::is_integral<typename S::value_type>::value>::type _clear() {
-    value.fill(std::numeric_limits<int32_t>::min());
-  }
-  template <typename S> typename std::enable_if<std::is_compound<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
-    value.fill(std::numeric_limits<double>::quiet_NaN());
+ private:
+  static constexpr T _clear() {
+    if constexpr (std::integral<T>) {
+      return std::numeric_limits<T>::min();
+    }
+    else if constexpr (std::floating_point<T>) {
+      return std::numeric_limits<T>::quiet_NaN();
+    }
+    else if constexpr (requires { typename T::value_type; }) {
+      T result{};
+      if constexpr (std::integral<typename T::value_type>) {
+        if constexpr (requires(T t) { t.fill(typename T::value_type{}); }) {
+          result.fill(std::numeric_limits<typename T::value_type>::min());
+        }
+      }
+      else if constexpr (std::floating_point<typename T::value_type>) {
+        if constexpr (requires(T t) { t.fill(typename T::value_type{}); }) {
+          result.fill(std::numeric_limits<typename T::value_type>::quiet_NaN());
+        }
+      }
+      return result;
+    }
+    else {
+      return T{};
+    }
   }
 };
 
 /********** Print functions **********/
 template <typename T, SIUnit U>
-std::ostream& operator<<(std::ostream& os, Constant<T, U>& c) {
+std::ostream& operator<<(std::ostream& os, const Constant<T,U>& c) {
   os << "Block constant: '" << c.getName() << "' current val = " << c.getValue(); 
         return os;
 }
-};
-};
+
+}
+}
 
 #endif /* ORG_EEROS_CONTROL_CONSTANT_HPP_ */

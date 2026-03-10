@@ -46,7 +46,7 @@ struct MakeUnitArray {
 
 /**
  * Helper that allow to generate a unrolled for loop at compile time.
- * Necessary to be able to pass the indecies into the for loop as template arguments to stillb e able to call getIn<N>() and getOut<N>().
+ * Necessary to be able to pass the indecies into the for loop as template arguments to still be able to call getIn<N>() and getOut<N>().
  * 
  * @tparam N Number that should be transformed into indicies for the for loop from 0 to N
  * @tparam F Functor that receives the transformed indicies from 0 to N

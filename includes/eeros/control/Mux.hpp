@@ -3,9 +3,6 @@
 
 #include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
-#include <eeros/control/Input.hpp>
-#include <eeros/control/Output.hpp>
-#include <eeros/control/IndexOutOfBoundsFault.hpp>
 
 namespace eeros {
 namespace control {
@@ -16,13 +13,13 @@ namespace control {
  * @tparam N - number of inputs
  * @tparam T - input signal data type (double - default type)
  * @tparam C - output signal data type (Matrix<N,1,T> - default type)
- * @tparam Uin - input signal unit type (dimensionless - default type)
- * @tparam Uout - output signal unit type (dimensionless - default type)
+ * @tparam U - signal unit type (dimensionless - default type)
+ *
  * @since v0.6
  */
 
-template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T>, std::array<SIUnit, N> Uin = siunit::generateNSizeArray<N>(), SIUnit Uout = SIUnit::create() >
-class Mux: public Blockio<N,1,T,C,Uin,MakeUnitArray<Uout>::value> {
+template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T>, SIUnit U = SIUnit::create() >
+class Mux: public Blockio<N,1,T,C,MakeUnitArray<U,N>::value,MakeUnitArray<U>::value> {
  public:
   /**
    * Constructs a multiplexer instance.
@@ -54,8 +51,8 @@ class Mux: public Blockio<N,1,T,C,Uin,MakeUnitArray<Uout>::value> {
  * Multiplexer instance to an output stream.\n
  * Does not print a newline control character.
  */
-template < uint32_t N, typename T, typename C, std::array<SIUnit, static_cast<std::size_t>(N)> Uin, SIUnit Uout >
-std::ostream& operator<<(std::ostream& os, Mux<N, T, C, Uin, Uout>& m) {
+template < uint32_t N, typename T, typename C, SIUnit U >
+std::ostream& operator<<(std::ostream& os, const Mux<N, T, C, U>& m) {
   os << "Block multiplexer: '" << m.getName() << "'"; 
   return os;
 }
