@@ -1,2 +1,3 @@
-add_executable(sequencerUI SequencerUI.cpp)
-target_link_libraries(sequencerUI eeros ${EEROS_LIBS})
+include(${PROJECT_SOURCE_DIR}/cmake/target_management.cmake)
+
+eeros_add_target(sequencerUI SequencerUI.cpp)

@@ -44,9 +44,10 @@ eeros_find_package(${PROJECT_NAME}_eeros Threads)
 find_file(LIBCURSES "curses.h" ${ADDITIONAL_INCLUDE_DIRS})
 
 option(LIB_ONLY_BUILD "Only build library, no tools or examples" FALSE)
-cmake_dependent_option(BUILD_EXAMLES "Also build examples" TRUE "NOT LIB_ONLY_BUILD" FALSE)
-cmake_dependent_option(BUILD_TOOLS "Also build examples" TRUE "NOT LIB_ONLY_BUILD" FALSE)
+cmake_dependent_option(BUILD_EXAMPLES "Also build examples" TRUE "NOT LIB_ONLY_BUILD" FALSE)
+cmake_dependent_option(BUILD_TOOLS "Also build tools" TRUE "NOT LIB_ONLY_BUILD" FALSE)
 cmake_dependent_option(USE_TESTS "Also build tests" FALSE "NOT LIB_ONLY_BUILD" FALSE)
+
 
 option(BUILD_LIBUCL "Build libucl rather than relying on the system to provide it" ON)
 
@@ -54,11 +55,11 @@ if(BUILD_LIBUCL)
   include(cmake/libucl.cmake)
 endif()
 
-if(NOT BUILD_TOOLS)
+if(BUILD_TOOLS)
   add_subdirectory(tools)
 endif()
 
-if(BUILD_EXAMLES)
+if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
