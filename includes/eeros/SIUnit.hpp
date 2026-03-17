@@ -92,13 +92,18 @@ namespace siunit {
   constexpr static decltype(auto) generateNSizeArray() {
     return createArray<U, N>(std::make_index_sequence<N>{});
   }
-}
 
+constexpr SIUnit Metre = SIUnit::create<1>(); // https://en.wikipedia.org/wiki/Metre
+constexpr SIUnit Kilogram = SIUnit::create<0, 1>(); // https://en.wikipedia.org/wiki/Kilogram
+constexpr SIUnit Second = SIUnit::create<0, 0, 1>(); // https://en.wikipedia.org/wiki/Second
+constexpr SIUnit Ampere = SIUnit::create<0, 0, 0, 1>(); // https://en.wikipedia.org/wiki/Ampere
+constexpr SIUnit Nm = SIUnit::create<2, 1, -2>(); // https://en.wikipedia.org/wiki/Newton-metre
 constexpr SIUnit Watt = SIUnit::create<2, 1, -3>(); // https://en.wikipedia.org/wiki/Watt
 constexpr SIUnit Newton = SIUnit::create<1, 1, -2>(); // https://en.wikipedia.org/wiki/Newton_(unit)
 constexpr SIUnit Joule = SIUnit::create<2, 1, -2>(); // https://en.wikipedia.org/wiki/Joule
 constexpr SIUnit Volt = SIUnit::create<2, 1, -3, -1>(); // https://en.wikipedia.org/wiki/Volt
 constexpr SIUnit Radian = SIUnit::create<0,0,0,0,0,0,0,true>(); // https://en.wikipedia.org/wiki/Radian
 
+}
 }
 #endif /* ORG_EEROS_CONTROL_SIUNIT_HPP_ */

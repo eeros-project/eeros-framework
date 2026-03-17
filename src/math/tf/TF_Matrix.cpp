@@ -59,7 +59,7 @@ void TF_Matrix::setRPY(Matrix<3, 1, double> rpy) {
 }
 
 Matrix<3, 1, double> TF_Matrix::getRPY() const {
-  return Matrix<3, 1, double>(roll, pitch, yaw);
+  return Matrix<3, 1, double>{roll, pitch, yaw};
 }
 
 void TF_Matrix::calcRotFromRPY() {

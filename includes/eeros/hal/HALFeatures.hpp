@@ -39,11 +39,11 @@ const std::map<std::string, Type> typeOfChannel = {
 };
 
 const std::map<std::string, SIUnit> typeOfUnit = {
-  { "W",    Watt },
-  { "N",    Newton },
-  { "J",    Joule },
-  { "V",    Volt },
-  { "rad",  Radian }
+  { "W",    siunit::Watt },
+  { "N",    siunit::Newton },
+  { "J",    siunit::Joule },
+  { "V",    siunit::Volt },
+  { "rad",  siunit::Radian }
 };
 
 }

@@ -10,7 +10,7 @@ using namespace eeros::math;
 
 // Test template instantiations
 TEST(controlWrapAroundTest, templateInstantiations) {
-  WrapAround<> w1{0, 1};
+  WrapAround<double,double,siunit::Metre> w1{0, 1};
   WrapAround<int> w2{0, 1};
   WrapAround<> w3{-0.1, 0.1};
   WrapAround<int> w4{2, 4};
@@ -101,19 +101,19 @@ TEST(controlWrapAroundTest, run3) {
 }
 
 TEST(controlWrapAroundTest, run4) {
-  Constant<Vector2> c1({2,2});
-  WrapAround<Vector2> w(1.0, 3.0);
+  Constant<Vector2> c1({2.0,2.0});
+  WrapAround<Vector2> w({1.0,1.0}, {3.0,3.0});
   w.getIn().connect(c1.getOut());
   c1.run();
   w.run();
   EXPECT_EQ(w.getOut().getSignal().getValue()[0], 2);
   EXPECT_EQ(w.getOut().getSignal().getValue()[1], 2);
-  c1.setValue(3.1);
+  c1.setValue({3.1,3.1});
   c1.run();
   w.run();
   EXPECT_EQ(w.getOut().getSignal().getValue()[0], 1.1);
   EXPECT_EQ(w.getOut().getSignal().getValue()[1], 1.1);
-  c1.setValue(-0.1);
+  c1.setValue({-0.1,-0.1});
   c1.run();
   w.run();
   EXPECT_EQ(w.getOut().getSignal().getValue()[0], 1.9);
@@ -121,24 +121,24 @@ TEST(controlWrapAroundTest, run4) {
 }
 
 TEST(controlWrapAroundTest, run5) {
-  Constant<Vector2> c1({2,2});
+  Constant<Vector2> c1({2.0,2.0});
   WrapAround<Vector2> w({1.0,1.5}, {3.0, 3.5});
   w.getIn().connect(c1.getOut());
   c1.run();
   w.run();
   EXPECT_EQ(w.getOut().getSignal().getValue()[0], 2);
   EXPECT_EQ(w.getOut().getSignal().getValue()[1], 2);
-  c1.setValue(3.1);
+  c1.setValue({3.1,3.1});
   c1.run();
   w.run();
   EXPECT_EQ(w.getOut().getSignal().getValue()[0], 1.1);
   EXPECT_EQ(w.getOut().getSignal().getValue()[1], 3.1);
-  c1.setValue(4.0);
+  c1.setValue({4.0,4.0});
   c1.run();
   w.run();
   EXPECT_EQ(w.getOut().getSignal().getValue()[0], 2.0);
   EXPECT_EQ(w.getOut().getSignal().getValue()[1], 2.0);
-  c1.setValue(-0.1);
+  c1.setValue({-0.1,-0.1});
   c1.run();
   w.run();
   EXPECT_EQ(w.getOut().getSignal().getValue()[0], 1.9);

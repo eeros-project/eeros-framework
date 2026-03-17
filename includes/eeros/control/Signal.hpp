@@ -89,11 +89,6 @@ class Signal : public SignalInterface {
     value = newValue;
   }
       
-//       template < typename VT >
-//       void setValue(VT newValue) {
-//         value = newValue;
-//       }
-      
   /**
    * Gets the timestamp of this signal.
    * 
@@ -116,7 +111,25 @@ class Signal : public SignalInterface {
    * Clears the signal to NaN.
    */
   virtual void clear() {
-    _clear<T>();
+    if constexpr (std::integral<T>) {
+      value = std::numeric_limits<T>::min();
+    } else if constexpr (std::floating_point<T>) {
+      value = std::numeric_limits<T>::quiet_NaN();
+    } else if constexpr (requires { typename T::value_type; }) {
+      using VT = typename T::value_type;
+      if constexpr (std::integral<VT>) {
+        value.fill(std::numeric_limits<VT>::min());
+      } else if constexpr (std::floating_point<VT>) {
+        value.fill(std::numeric_limits<VT>::quiet_NaN());
+      } else {
+        // nested compound type (e.g. Matrix<2,1,Vector2>):
+        // default-initialize each element
+        value.fill(VT{});
+      }
+    } else {
+      value = T{};
+    }
+    timestamp = 0;
   }
       
   Signal<T>& operator= (Signal<T> right) {
@@ -156,27 +169,6 @@ class Signal : public SignalInterface {
   std::string name; /** Each signal can be named */
     
  private:
-  template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _clear() {
-    value = std::numeric_limits<S>::min();
-    timestamp = 0;
-  }
-  template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type _clear() {
-    value = std::numeric_limits<double>::quiet_NaN();
-    timestamp = 0;
-  }
-  template <typename S> typename std::enable_if<std::is_compound<S>::value && std::is_integral<typename S::value_type>::value>::type _clear() {
-    value.fill(std::numeric_limits<typename S::value_type>::min());
-    timestamp = 0;
-  }
-  template <typename S> typename std::enable_if<std::is_compound<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
-    value.fill(std::numeric_limits<double>::quiet_NaN());
-    timestamp = 0;
-  }
-  template <typename S> typename std::enable_if<std::is_compound<S>::value && std::is_compound<typename S::value_type>::value>::type _clear() {
-    value.fill(std::numeric_limits<double>::quiet_NaN());
-    timestamp = 0;
-  }
-      
   static std::list<SignalInterface*> signalList;
   static Signal<T> illegalSignal;
 };

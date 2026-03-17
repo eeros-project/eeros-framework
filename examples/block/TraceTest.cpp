@@ -25,7 +25,7 @@ double traceLen = 64;
 
 class ControlSystem {
  public:
-  ControlSystem() : c(0.1), trace1(traceLen), trace2(traceLen), td("td1", period, true) {
+  ControlSystem() : c({0.1,0.1,0.1}), trace1(traceLen), trace2(traceLen), td("td1", period, true) {
     i.getIn().connect(c.getOut());
     i.setInitCondition(Vector3{0, 1.0, 2.0});
     i.enable();

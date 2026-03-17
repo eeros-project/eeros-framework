@@ -29,7 +29,7 @@ class TrajectoryGenerator : public Block {
    * Constructs a default instance and sets the initial values to 0.
    */
   TrajectoryGenerator() {
-    for(auto& e : last) e = 0;
+    for(auto& e : last) e = T{};
   }
   
   /**
@@ -66,7 +66,7 @@ class TrajectoryGenerator : public Block {
    */
   virtual bool move(T end) {
     std::array<T, N> e;
-    for(auto& i : e) i = 0;
+    for(auto& i : e) i = T{};
     e[0] = end;
     return move(last, e);
   }

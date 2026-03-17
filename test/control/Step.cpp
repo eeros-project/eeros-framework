@@ -14,8 +14,8 @@ TEST(controlStepTest, templateInstantiations) {
   Step<> g3{1.0, 2.0, 2.0};
   Step<int> g4{1, 10, 2.0};
   Step<Matrix<2,1,double>> g5{};
-  Step<Matrix<2,1,double>> g6{2.5, 1.2, 0.5};
-  Step<Matrix<2,1,int>> g7{2, 1, 0.5};
+  Step<Matrix<2,1,double>,siunit::Metre> g6({2.5,2.5}, {1.2,0.1}, 0.5);
+  Step<Matrix<2,1,int>> g7({2,2}, {1,1}, 0.5);
 
   EXPECT_TRUE(true);
 }
@@ -24,13 +24,13 @@ TEST(controlStepTest, templateInstantiations) {
 TEST(controlStepTest, initialValue) {
   Step<> s1;
   Step<int> s2;
-  Step<Vector2> s3(1.0, 1.0, 1.0);
-  Step<Matrix<2,1,int>> s4{1, 1, 1.0};
+  Step<Vector2> s3({1.0,1.0}, {1.0,1.0}, 1.0);
+  Step<Matrix<2,1,int>> s4({1,3}, {1,-1}, 1.0);
   s1.setName("s1");
   s2.setName("s2");
   s3.setName("s3");
   s4.setName("s4");
-    
+
   EXPECT_TRUE(std::isnan(s1.getOut().getSignal().getValue()));
   EXPECT_EQ(s2.getOut().getSignal().getValue(), std::numeric_limits<int32_t>::min());
   EXPECT_TRUE(std::isnan(s3.getOut().getSignal().getValue()[0]));

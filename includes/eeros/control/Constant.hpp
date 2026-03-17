@@ -33,11 +33,24 @@ class Constant : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnit
   Constant() : value(_clear()) { }
 
   /**
-   * Constructs a constant instance with a initial value of v.
-   *
-   * @param v - initial value
-   */
-  explicit Constant(T v) : value(v) { }
+  * @brief Forwarding constructor.
+  *
+  * Used for single scalar argument, copy from existing matrix (lvalue)
+  * and move vom temporary (rvalue)
+  */
+  template <typename... Args>
+  requires std::constructible_from<T, Args...>
+  explicit Constant(Args&&... args) : value(std::forward<Args>(args)...) {}
+
+ /**
+  * @brief Initializer list constructor.
+  *
+  * Needed because initializer_list is a non-deduced context and
+  * cannot be captured by the variadic forwarding constructor.
+  */
+  template <typename V>
+  requires std::constructible_from<T, std::initializer_list<V>>
+  explicit Constant(std::initializer_list<V> list) : value(list) {}
 
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -48,7 +61,7 @@ class Constant : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnit
    * Runs the switch block.
    */
   void run() override {
-    std::lock_guard<std::mutex> lock(mtx);
+    std::scoped_lock lock(mtx);
     this->out.getSignal().setValue(value);
     this->out.getSignal().setTimestamp(System::getTimeNs());
   }
@@ -59,7 +72,7 @@ class Constant : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnit
    * @param newValue - new value
    */
   virtual void setValue(T newValue) {
-    std::lock_guard<std::mutex> lock(mtx);
+    std::scoped_lock lock(mtx);
     value = newValue;
   }
 
@@ -69,12 +82,13 @@ class Constant : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnit
    * @return - current value
    */
   virtual T getValue () const {
+    std::scoped_lock lock(mtx);
     return value;
   }
 
  protected:
-  T value;
-  std::mutex mtx;
+  T value{};
+  mutable std::mutex mtx;
   
  private:
   static constexpr T _clear() {
@@ -108,7 +122,7 @@ class Constant : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnit
 template <typename T, SIUnit U>
 std::ostream& operator<<(std::ostream& os, const Constant<T,U>& c) {
   os << "Block constant: '" << c.getName() << "' current val = " << c.getValue(); 
-        return os;
+  return os;
 }
 
 }

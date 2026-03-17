@@ -8,6 +8,7 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <array>
 
 #include "MatrixIndexOutOfBoundException.hpp"
 
@@ -16,6 +17,8 @@ namespace math {
 
 /**
  * Base class for matrix operations.
+ * The matrix is stored in column-major layout meaning the array
+ * for the matrix holds column 0 followed by column 1 etc.
  *
  * @tparam M - number of rows
  * @tparam N - number of colons
@@ -28,6 +31,7 @@ class Matrix {
  public:
   static_assert((M > 1 && N >= 1) || (M >= 1 && N > 1),
                 "Matrix dimension must be greater or equal than 1x1!");
+  // static_assert(M >= 1 && N >= 1, "Matrix dimensions must be at least 1"); TODO
 
   using value_type = T;
 
@@ -51,14 +55,105 @@ class Matrix {
 
   /********** Constructors **********/
 
+  /**
+   * @brief Default constructor. Elements are left uninitialized.
+   */
   Matrix() {}
 
-  Matrix(const T v) { (*this) = v; }
+  /**
+   * @brief Default copy constructor.
+   */
+  Matrix(const Matrix<M, N, T>& other) = default;
 
-  template <typename... S>
-  Matrix(const S... v) : value{std::forward<const T>(v)...} {
-    static_assert(sizeof...(S) == M * N,
-                  "Invalid number of constructor arguments!");
+  /**
+   * @brief Default move constructor.
+   */
+  Matrix(Matrix<M, N, T>&& other) = default;
+
+  /**
+   * @brief Fill constructor. All elements are set to v.
+   *
+   * @code
+   * Matrix<3, 3> m(5.0);  // all elements = 5.0
+   * @endcode
+   *
+   * @param v value to assign to every element
+   */
+  explicit Matrix(const T v) { value.fill(v); }
+
+  /**
+   * @brief Uniform initialization constructor from an initializer_list.
+   *
+   * Accepts exactly M*N elements in column-major order:
+   * @code
+   * Matrix<2, 2> m = {1.0, 2.0,   // column 0
+   *                   3.0, 4.0};   // column 1
+   * @endcode
+   *
+   * @param list initializer list of exactly M*N elements
+   * @throws std::invalid_argument if list.size() != M*N
+   */
+  Matrix(std::initializer_list<T> list) {
+    if (list.size() != M * N) {
+      throw std::invalid_argument("Wrong number of initializer elements");
+    }
+    std::copy(list.begin(), list.end(), value.begin());
+  }
+
+  /**
+   * @brief Uniform initialization constructor from nested initializer_lists.
+   *
+   * Accepts M*N elements as a list of N column vectors, each of length M:
+   * @code
+   * Matrix<2, 2> m = {{1.0, 2.0},   // column 0
+   *                   {3.0, 4.0}};  // column 1
+   * @endcode
+   *
+   * @param cols initializer list of N columns, each with M elements
+   * @throws std::invalid_argument if dimensions do not match
+   */
+  Matrix(std::initializer_list<std::initializer_list<T>> cols) {
+    if (cols.size() != N) {
+      throw std::invalid_argument("Wrong number of columns");
+    }
+    unsigned int col = 0;
+    for (const auto& c : cols) {
+      if (c.size() != M) {
+        throw std::invalid_argument("Wrong number of rows in column");
+      }
+      unsigned int row = 0;
+      for (const auto& v : c) {
+        value[M * col + row] = v;
+        ++row;
+      }
+      ++col;
+    }
+  }
+
+  /********** Assignment operators **********/
+
+  /**
+   * @brief Default copy assignment.
+   */
+  Matrix<M, N, T>& operator=(const Matrix<M, N, T>& other) = default;
+
+  /**
+   * @brief Default move assignment.
+   */
+  Matrix<M, N, T>& operator=(Matrix<M, N, T>&& other) = default;
+
+  /**
+   * @brief Scalar assignment. Assigns value to all elements.
+   *
+   * @param right value to assign to every element
+   *
+   * @return reference to this matrix
+   */
+  Matrix<M, N, T>& operator=(T right) {
+    for (unsigned int m = 0; m < M; m++)
+      for (unsigned int n = 0; n < N; n++)
+        (*this)(m, n) = right;
+    return *this;
   }
 
   /********** Initializing the matrix **********/
@@ -146,8 +241,25 @@ class Matrix {
 
   /********** Element access **********/
 
+  /**
+   * @brief Get a copy of the element at (m, n) (read-only).
+   *
+   * @param m row index (0-based)
+   * @param n column index (0-based)
+   *
+   * @return copy of the element at (m, n)
+   * @throws MatrixIndexOutOfBoundException if m >= M or n >= N
+   */
   const T get(unsigned int m, unsigned int n) const { return (*this)(m, n); }
 
+  /**
+   * @brief Get a column as a column vector.
+   *
+   * @param n column index (0-based)
+   *
+   * @return Matrix<M, 1, T> containing the elements of column n
+   * @throws MatrixIndexOutOfBoundException if n >= N
+   */
   Matrix<M, 1, T> getCol(unsigned int n) const {
     Matrix<M, 1, T> col;
     for (unsigned int m = 0; m < M; m++) {
@@ -156,6 +268,14 @@ class Matrix {
     return col;
   }
 
+  /**
+   * @brief Get a column as an std::vector.
+   *
+   * @param n column index (0-based)
+   *
+   * @return std::vector<T> containing the elements of column n
+   * @throws MatrixIndexOutOfBoundException if n >= N
+   */
   std::vector<T> getColVector(unsigned int n) const {
     std::vector<T> col;
     for (unsigned int m = 0; m < M; m++) {
@@ -164,6 +284,14 @@ class Matrix {
     return col;
   }
 
+  /**
+   * @brief Get a row as a row vector.
+   *
+   * @param m row index (0-based)
+   *
+   * @return Matrix<1, N, T> containing the elements of row m
+   * @throws MatrixIndexOutOfBoundException if m >= M
+   */
   Matrix<1, N, T> getRow(unsigned int m) const {
     Matrix<1, N, T> row;
     for (unsigned int n = 0; n < N; n++) {
@@ -172,6 +300,14 @@ class Matrix {
     return row;
   }
 
+  /**
+   * @brief Get a row as an std::vector.
+   *
+   * @param m row index (0-based)
+   *
+   * @return std::vector<T> containing the elements of row m
+   * @throws MatrixIndexOutOfBoundException if m >= M
+   */
   std::vector<T> getRowVector(unsigned int m) const {
     std::vector<T> row;
     for (unsigned int n = 0; n < N; n++) {
@@ -180,6 +316,20 @@ class Matrix {
     return row;
   }
 
+  /**
+   * @brief Get a sub-matrix starting at position (m, n).
+   *
+   * The sub-matrix dimensions U x V are specified as template parameters
+   * and must not exceed the dimensions of the parent matrix.
+   *
+   * @tparam U number of rows of the sub-matrix, must satisfy U <= M
+   * @tparam V number of columns of the sub-matrix, must satisfy V <= N
+   * @param m starting row index (0-based)
+   * @param n starting column index (0-based)
+   *
+   * @return Matrix<U, V, T> containing the extracted sub-matrix
+   * @throws MatrixIndexOutOfBoundException if m + U > M or n + V > N
+   */
   template <unsigned int U, unsigned int V>
   Matrix<U, V, T> getSubMatrix(unsigned int m, unsigned int n) const {
     static_assert(U <= M && V <= N,
@@ -198,32 +348,84 @@ class Matrix {
     }
   }
 
+  /**
+   * @brief Set the element at (m, n) to the given value.
+   *
+   * @param m row index (0-based)
+   * @param n column index (0-based)
+   * @param value value to assign
+   *
+   * @throws MatrixIndexOutOfBoundException if m >= M or n >= N
+   */
   void set(unsigned int m, unsigned int n, T value) { (*this)(m, n) = value; }
 
+  /**
+   * @brief Set a column from a column vector.
+   *
+   * @param n column index (0-based)
+   * @param col Matrix<M, 1, T> whose elements are written into column n
+   *
+   * @throws MatrixIndexOutOfBoundException if n >= N
+   */
   void setCol(unsigned int n, const Matrix<M, 1, T>& col) {
     for (unsigned int m = 0; m < M; m++) {
       (*this)(m, n) = col(m, 0);
     }
   }
 
+  /**
+   * @brief Set a column from an std::vector.
+   *
+   * @param n column index (0-based)
+   * @param col std::vector<T> whose elements are written into column n,
+   *            must contain at least M elements
+   *
+   * @throws MatrixIndexOutOfBoundException if n >= N
+   */
   void setCol(unsigned int n, const std::vector<T>& col) {
     for (unsigned int m = 0; m < M; m++) {
       (*this)(m, n) = col[m];
     }
   }
 
+  /**
+   * @brief Set a row from a row vector.
+   *
+   * @param m row index (0-based)
+   * @param row Matrix<1, N, T> whose elements are written into row m
+   *
+   * @throws MatrixIndexOutOfBoundException if m >= M
+   */
   void setRow(unsigned int m, const Matrix<1, N, T>& row) {
     for (unsigned int n = 0; n < N; n++) {
       (*this)(m, n) = row(0, n);
     }
   }
 
-  void setRow(unsigned int m, const std::vector<T>& col) {
+  /**
+   * @brief Set a row from an std::vector.
+   *
+   * @param m row index (0-based)
+   * @param row std::vector<T> whose elements are written into row m,
+   *            must contain at least N elements
+   *
+   * @throws MatrixIndexOutOfBoundException if m >= M
+   */
+  void setRow(unsigned int m, const std::vector<T>& row) {
     for (unsigned int n = 0; n < N; n++) {
-      (*this)(m, n) = col[n];
+      (*this)(m, n) = row[n];
     }
   }
 
+  /**
+   * @brief Access a matrix element by row and column index (read/write).
+   *
+   * @param m row index (0-based)
+   * @param n column index (0-based)
+   *
+   * @return reference to the element at (m, n)
+   * @throws MatrixIndexOutOfBoundException if m >= M or n >= N
+   */
   T& operator()(unsigned int m, unsigned int n) {
     if (m >= 0 && m < M && n >= 0 && n < N) {
       return value[M * n + m];
@@ -232,6 +434,15 @@ class Matrix {
     }
   }
 
+  /**
+   * @brief Access a matrix element by row and column index (read-only).
+   *
+   * @param m row index (0-based)
+   * @param n column index (0-based)
+   *
+   * @return value of the element at (m, n)
+   * @throws MatrixIndexOutOfBoundException if m >= M or n >= N
+   */
   const T operator()(unsigned int m, unsigned int n) const {
     if (m >= 0 && m < M && n >= 0 && n < N) {
       return value[M * n + m];
@@ -240,6 +451,17 @@ class Matrix {
     }
   }
 
+  /**
+   * @brief Access a matrix element by flat index (read/write).
+   *
+   * Elements are stored in column-major order, so index i corresponds
+   * to row (i % M) and column (i / M).
+   *
+   * @param i flat index (0-based), must be in range [0, M*N)
+   *
+   * @return reference to the element at flat index i
+   * @throws MatrixIndexOutOfBoundException if i >= M*N
+   */
   T& operator()(unsigned int i) {
     if (i >= 0 && i < M * N) {
       return value[i];
@@ -248,6 +470,17 @@ class Matrix {
     }
   }
 
+  /**
+   * @brief Access a matrix element by flat index (read-only).
+   *
+   * Elements are stored in column-major order, so index i corresponds
+   * to row (i % M) and column (i / M).
+   *
+   * @param i flat index (0-based), must be in range [0, M*N)
+   *
+   * @return value of the element at flat index i
+   * @throws MatrixIndexOutOfBoundException if i >= M*N
+   */
   const T operator()(unsigned int i) const {
     if (i >= 0 && i < M * N) {
       return value[i];
@@ -256,6 +489,17 @@ class Matrix {
     }
   }
 
+  /**
+   * @brief Access a matrix element by flat index (read/write).
+   *
+   * Elements are stored in column-major order, so index i corresponds
+   * to row (i % M) and column (i / M).
+   *
+   * @param i flat index (0-based), must be in range [0, M*N)
+   *
+   * @return reference to the element at flat index i
+   * @throws MatrixIndexOutOfBoundException if i >= M*N
+   */
   T& operator[](unsigned int i) {
     if (i >= 0 && i < M * N) {
       return value[i];
@@ -264,6 +508,17 @@ class Matrix {
     }
   }
 
+  /**
+   * @brief Access a matrix element by flat index (read-only).
+   *
+   * Elements are stored in column-major order, so index i corresponds
+   * to row (i % M) and column (i / M).
+   *
+   * @param i flat index (0-based), must be in range [0, M*N)
+   *
+   * @return value of the element at flat index i
+   * @throws MatrixIndexOutOfBoundException if i >= M*N
+   */
   const T operator[](unsigned int i) const {
     if (i >= 0 && i < M * N) {
       return value[i];
@@ -575,7 +830,7 @@ class Matrix {
   /**
    * Compares this matrix to another matrix.
    *
-   * @param right This matrix is compared to right.
+   * @param right this matrix is compared to right.
    *
    * @return true if every element of this matrix is equal to the element in the
    * matrix right.
@@ -592,7 +847,7 @@ class Matrix {
   /**
    * Compares this matrix to another matrix.
    *
-   * @param right This matrix is compared to right.
+   * @param right this matrix is compared to right.
    *
    * @return true if at least one element of this matrix is not equal to the
    * element in the matrix right.
@@ -611,7 +866,7 @@ class Matrix {
   /**
    * Compares this matrix to another matrix.
    *
-   * @param right This matrix is compared to right.
+   * @param right this matrix is compared to right.
    *
    * @return true if every element of this matrix is smaller than the element in
    * the matrix right.
@@ -630,7 +885,7 @@ class Matrix {
   /**
    * Compares this matrix to another matrix.
    *
-   * @param right This matrix is compared to right.
+   * @param right this matrix is compared to right.
    *
    * @return true if every element of this matrix is smaller than or equal to
    * the element in the matrix right.
@@ -649,7 +904,7 @@ class Matrix {
   /**
    * Compares this matrix to another matrix.
    *
-   * @param right This matrix is compared to right.
+   * @param right this matrix is compared to right.
    *
    * @return true if every element of this matrix is greater than the element in
    * the matrix right.
@@ -668,7 +923,7 @@ class Matrix {
   /**
    * Compares this matrix to another matrix.
    *
-   * @param right This matrix is compared to right.
+   * @param right this matrix is compared to right.
    *
    * @return true if every element of this matrix is greater than or equal to
    * the element in the matrix right.
@@ -684,14 +939,21 @@ class Matrix {
     return true;
   }
 
-  Matrix<M, N, T>& operator=(T right) {
-    for (unsigned int m = 0; m < M; m++) {
-      for (unsigned int n = 0; n < N; n++) {
-        (*this)(m, n) = right;
-      }
-    }
-    return *this;
-  }
+  /**
+   * Assigns the value right to all elements of a matrix.
+   *
+   * @param right value to assign
+   *
+   * @return matrix with all elements being of value right
+   */
+  // Matrix<M, N, T>& operator=(T right) {
+  //   for (unsigned int m = 0; m < M; m++) {
+  //     for (unsigned int n = 0; n < N; n++) {
+  //       (*this)(m, n) = right;
+  //     }
+  //   }
+  //   return *this;
+  // }
 
   /**
    * Multiply matrix with second matrix, vector product
@@ -1043,7 +1305,7 @@ class Matrix {
   }
 
  protected:
-  T value[M * N];
+  std::array<T, M * N> value;
 
 };  // END class Matrix
 
@@ -1133,9 +1395,50 @@ class Matrix<1, 1, T> {
  public:
   using value_type = T;
 
-  Matrix() {}
+    /**
+     * @brief Default constructor. Element is zero-initialized.
+     */
+    Matrix() : value{} {}
 
-  Matrix(const T v) { value = v; }
+  /**
+   * @brief Default copy constructor.
+   */
+  Matrix(const Matrix<1, 1, T>& other) = default;
+
+  /**
+   * @brief Default move constructor.
+   */
+  Matrix(Matrix<1, 1, T>&& other) = default;
+
+  /**
+   * @brief Scalar constructor.
+   *
+   * @param v value to assign to the single element
+   */
+  explicit Matrix(const T v) : value(v) {}
+
+  /**
+   * @brief Uniform initialization constructor from an initializer_list.
+   *
+   * @param list initializer list of exactly 1 element
+   * @throws std::invalid_argument if list.size() != 1
+   */
+  Matrix(std::initializer_list<T> list) {
+    if (list.size() != 1)
+      throw std::invalid_argument("Matrix<1,1> requires exactly 1 element");
+    value = *list.begin();
+  }
+
+  /**
+   * @brief Default copy assignment.
+   */
+  Matrix<1, 1, T>& operator=(const Matrix<1, 1, T>& other) = default;
+
+  /**
+   * @brief Default move assignment.
+   */
+  Matrix<1, 1, T>& operator=(Matrix<1, 1, T>&& other) = default;
+
 
   void zero() { value = 0; }
 

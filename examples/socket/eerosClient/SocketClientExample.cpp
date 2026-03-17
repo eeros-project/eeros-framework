@@ -22,10 +22,10 @@ using namespace eeros;
 class ControlSystem {
  public:
   ControlSystem(double dt) : 
-    c1({0.2, 0.3, 0.4, 0.5, 0.6, -0.7}),
+    c1{0.2, 0.3, 0.4, 0.5, 0.6, -0.7},
     c2(56.5),
     c3(-28),
-    c4({-5,8,-321}),
+    c4{-5,8,-321},
     socketA("127.0.0.1", 9876, 0.1),  // client
     log(Logger::getLogger('C')),
     timedomain("Main time domain", dt, true) {

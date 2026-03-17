@@ -29,7 +29,9 @@ class Step : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnitArra
    *
    * @see Step(T initValue, T stepHeight, double delayTime)
    */
-  Step() : Step(0.0, 1.0, 0) { }
+  constexpr Step() : Step(T{}, T{}, 0.0) {
+    stepHeight = 1;
+  }
 
   /**
    * Constructs a step instance with an initial value, a step height and a delay time.
@@ -40,19 +42,21 @@ class Step : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnitArra
    * @param stepHeight - step height
    * @param delayTime - delay time
    */
-  Step(T initValue, T stepHeight, double delayTime) : initValue(initValue), stepHeight(stepHeight), delayTime(delayTime) {
-   reset();
-  }
+  explicit Step(T initValue, T stepHeight, double delayTime)
+      : initValue(initValue), stepHeight(stepHeight), delayTime(delayTime),
+        time(0.0), stepDone(false), first(true) { }
 
   /**
-  * Disabling use of copy constructor because the block should never be copied unintentionally.
-  */
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
+   */
   Step(const Step& s) = delete; 
+  Step& operator=(const Step&) = delete;
   
   /**
    * Runs the step algorithm.
    */
-  virtual void run() {
+  void run() override {
     if(first) {
       time = delayTime + System::getTime();
       this->out.getSignal().setValue(initValue);
@@ -106,9 +110,9 @@ class Step : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnitArra
    * the class access to the private fields.
    */
   template < typename X, SIUnit Y >
-  friend std::ostream& operator<<(std::ostream& os, Step<X, Y>& step);
+  friend std::ostream& operator<<(std::ostream& os, const Step<X, Y>& step);
 
-protected:
+ protected:
   T initValue;
   T stepHeight;
   double delayTime, time;
@@ -118,7 +122,7 @@ protected:
 
 /********** Print functions **********/
 template < typename T, SIUnit U >
-std::ostream& operator<<(std::ostream& os, Step<T, U>& step) {
+std::ostream& operator<<(std::ostream& os, const Step<T, U>& step) {
   os << "Block step: '" << step.getName() << "' init val = " << step.initValue << ", step height = " << step.stepHeight << ", delay = " << step.delayTime; 
   return os;
 }

@@ -62,7 +62,7 @@ TEST(controlDelayTest, delay) {
 // Test delay vector
 TEST(controlDelayTest, delayVector) {
   Delay<Vector2> del(1.5, 0.5);
-  Constant<Vector2> c({10, 20});
+  Constant<Vector2> c({10.0, 20.0});
   del.getIn().connect(c.getOut());
   c.run();
   EXPECT_TRUE(std::isnan(del.getOut().getSignal().getValue()[0]));

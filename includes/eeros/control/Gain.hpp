@@ -3,9 +3,12 @@
 
 #include <eeros/control/Blockio.hpp>
 #include <type_traits>
+#include <concepts>
 #include <memory>
 #include <mutex>
-#include <math.h>
+#include <cmath>
+#include <limits>
+#include <ostream>
 
 
 namespace eeros {
@@ -46,7 +49,7 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
    *
    * @see Gain(Tgain c)
    */
-  Gain() : Gain(1.0) {}
+  Gain() : Gain(Tgain{1}) {}
 
   /**
    * Constructs a gain instance with a gain of the value of the parameter c.\n
@@ -56,8 +59,11 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
    *
    * @param c - initial gain value
    */
-  Gain(Tgain c) : Gain(c, 1.0, -1.0) { // 1.0 and -1.0 are temp values only.
-    resetMinMaxGain<Tgain>(); // set limits to smallest/largest value.
+  Gain(Tgain c) {
+    gain = c;
+    targetGain = c;
+    gainDiff = Tgain{};
+    resetMinMaxGain<Tgain>();
   }
 
   /**
@@ -75,7 +81,7 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
     this->maxGain = maxGain;
     this->minGain = minGain;
     targetGain = gain;
-    gainDiff = 0;
+    gainDiff = Tgain{};
   }
 
   
@@ -296,9 +302,9 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
   template<typename R, typename S>  // Tout, Tgain
   typename std::enable_if<std::is_arithmetic<R>::value, R>::type calculateParabolic(R value) {
     Tout outVal;
-    if (fabs(value) > parabolicSwitchPoint) {
-      if (value >= 0) outVal = gain * sqrt(parabolicSwitchPoint * (2 * value - parabolicSwitchPoint));
-      else outVal = gain * -sqrt(parabolicSwitchPoint * (-2 * value - parabolicSwitchPoint));
+    if (std::fabs(value) > parabolicSwitchPoint) {
+      if (value >= 0) outVal = gain * std::sqrt(parabolicSwitchPoint * (2 * value - parabolicSwitchPoint));
+      else outVal = gain * -std::sqrt(parabolicSwitchPoint * (-2 * value - parabolicSwitchPoint));
     } else {
       outVal = gain * value;
     }
@@ -309,9 +315,9 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
   typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value && !elementWise, R>::type calculateParabolic(R value) {
     Tout outVal;
     for (unsigned int i = 0; i < value.size(); i++) {
-      if (fabs(value[i]) > parabolicSwitchPoint[i]) {
-        if (value[i] >= 0) outVal[i] = gain * sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
-        else outVal[i] = gain * -sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
+      if (std::fabs(value[i]) > parabolicSwitchPoint[i]) {
+        if (value[i] >= 0) outVal[i] = gain * std::sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
+        else outVal[i] = gain * -std::sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
       } else {
         outVal[i] = gain * value[i];
       }
@@ -337,9 +343,9 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
   typename std::enable_if<std::is_compound<R>::value && std::is_compound<S>::value && elementWise, R>::type calculateParabolic(R value) {
     Tout outVal;
     for (unsigned int i = 0; i < value.size(); i++) {
-      if (fabs(value[i]) > parabolicSwitchPoint[i]) {
-        if (value[i] >= 0) outVal[i] = gain[i] * sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
-        else outVal[i] = gain[i] * -sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
+      if (std::fabs(value[i]) > parabolicSwitchPoint[i]) {
+        if (value[i] >= 0) outVal[i] = gain[i] * std::sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
+        else outVal[i] = gain[i] * -std::sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
       } else {
         outVal[i] = gain[i] * value[i];
       }
