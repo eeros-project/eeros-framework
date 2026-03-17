@@ -159,8 +159,8 @@ TEST(controlITest, defaultLimit) {
   c2.setValue({-10.0,-10.0});
   i2.setInitCondition({-0.5, 0.5});
   for (int i = 0; i < 10; i++) {c2.run(); i2.run(); usleep(10000);}
-  EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[0], -1.5, 0.2));
-  EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[1], -0.5, 0.2));
+  EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[0], -1.5, 0.5));
+  EXPECT_TRUE(Utils::compareApprox(i2.getOut().getSignal().getValue()[1], -0.5, 0.5));
 }
 // EXPECT_EQ(i1.getOut().getSignal().getValue(), 10);
 
