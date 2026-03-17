@@ -1439,6 +1439,13 @@ class Matrix<1, 1, T> {
    */
   Matrix<1, 1, T>& operator=(Matrix<1, 1, T>&& other) = default;
 
+  /**
+   * @brief Scalar move assignment.
+   */
+  Matrix<1, 1, T>& operator=(const T right) {
+      value = right;
+      return *this;
+  }
 
   void zero() { value = 0; }
 
