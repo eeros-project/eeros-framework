@@ -16,16 +16,26 @@ TEST(controlGainTest, templateInstantiations) {
   Gain<int,int> g3{};
   Gain<double,int> g4{};
   Gain<int,double> g5{};
-  Gain<> g6{1.0};
-  // Gain<> g8{1.0, 2.0,-2.0};
-  // Gain<Matrix<2,2>,Matrix<2,2>,true> g9{};
-  // Gain<Matrix<3,1>,Matrix<3,3>> g10{};
-  // Gain<Matrix<1,3>,Matrix<1,3>,true> g11{};
-  // Gain<Matrix<3,1>,Matrix<3,1>,true> g12{};
-
+  Gain<Vector2> g6{};
+  Gain<Vector2,Matrix<2,2>> g7{};
+  Gain<Vector2,Vector2,true> g8{};
+  Gain<Matrix<1,3>,Matrix<1,3>,true> g9{};
   EXPECT_TRUE(true);
 }
 
+TEST(controlGainTest, constructors) {
+  Gain<> g1(0.1);
+  Gain<int> g2(3);
+  Gain<int,int> g3(2,5,1);
+  Gain<double,int> g4(3.5,8,0.01);
+  Gain<int,double> g5(2);
+  Gain<Vector2> g6(4.3);
+  Gain<Vector2,Matrix<2,2>> g7({2.0,3.0,4.0,5.0});
+  Gain<Vector2,Matrix<2,2>> g8({2.0,3.0,4.0,5.0},{12.0,13.0,14.0,15.0},{1.0,1.0,1.0,1.0});
+  Gain<Vector2,Vector2,true> g9({2.3,4.5});
+  Gain<Matrix<1,3>,Matrix<1,3>,true> g10({2.3,4.5,6.7});
+  EXPECT_TRUE(true);
+}
 
 TEST(controlGainTest, simpleDoubleGain) {
   Gain<> g1{2.5};
