@@ -335,7 +335,7 @@ class Matrix {
 
   constexpr unsigned int getNofColums() const { return N; }
 
-  constexpr unsigned int size() const { return M * N; }
+  static constexpr unsigned int size() { return M * N; }
 
   unsigned int rank() const {
     unsigned int numberOfNonZeroRows = 0;

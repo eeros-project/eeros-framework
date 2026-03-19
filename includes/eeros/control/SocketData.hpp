@@ -44,8 +44,8 @@ class SocketData<SigInType, SigOutType,
    * @param timeout - connection timeout time in s 
    */
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
-    bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
-    bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
+    bufInLen = SigInType::size();;
+    bufOutLen = SigOutType::size();;
     isServer = serverIP.empty();
     if (isServer)
       server = new SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period, timeout);
@@ -146,7 +146,7 @@ class SocketData<SigInType, SigOutType,
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
     bufInLen = 1;
-    bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
+    bufOutLen = SigOutType::size();;
     isServer = serverIP.empty();
     if (isServer)
       server =  new SocketServer<1, SigInType, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period, timeout);
@@ -210,7 +210,7 @@ class SocketData<SigInType, SigOutType,
   : public Blockio<1,1,SigInType, SigOutType> {			
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
-    bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
+    bufInLen = SigInType::size();;
     bufOutLen = 1;
     isServer = serverIP.empty();
     if (isServer)
@@ -339,7 +339,7 @@ class SocketData<SigInType, SigOutType,
   : public Blockio<1,1,SigInType> {			
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
-    bufInLen = sizeof(SigInType) / sizeof(SigInValueType);
+    bufInLen = SigInType::size();;
     isServer = serverIP.empty();
     if (isServer)
       server =  new SocketServer<sizeof(SigInType) / sizeof(SigInValueType), SigInValueType, 0, std::nullptr_t>(port, period, timeout);
@@ -381,7 +381,7 @@ class SocketData<SigInType, SigOutType,
   : public Blockio<1,1,SigOutType> {			
 public:
   SocketData(std::string serverIP, uint16_t port, double period = 0.01, double timeout = 1.0) {
-    bufOutLen = sizeof(SigOutType) / sizeof(SigOutValueType);
+    bufOutLen = SigOutType::size();;
     isServer = serverIP.empty();
     if (isServer) 
       server =  new SocketServer<0, std::nullptr_t, sizeof(SigOutType) / sizeof(SigOutValueType), SigOutValueType>(port, period, timeout);
