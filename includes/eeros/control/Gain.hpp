@@ -49,7 +49,7 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
    *
    * @see Gain(Tgain c)
    */
-  Gain() : Gain(Tgain{1}) {}
+  Gain() : Gain(Tgain(1)) {}
 
   /**
    * Constructs a gain instance with a gain of the value of the parameter c.\n
@@ -63,7 +63,7 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
     gain = c;
     targetGain = c;
     gainDiff = Tgain{};
-    resetMinMaxGain<Tgain>();
+    resetMinMaxGain();
   }
 
   /**
@@ -276,11 +276,11 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
   friend std::ostream &operator<<(std::ostream &os, const Gain<Xout, Xgain, XelementWise, XUin, XUout> &gain);
 
  protected:
-  Tgain gain;
-  Tgain maxGain;
-  Tgain minGain;
-  Tgain targetGain;
-  Tgain gainDiff;
+  Tgain gain{};
+  Tgain maxGain{};
+  Tgain minGain{};
+  Tgain targetGain{};
+  Tgain gainDiff{};
   bool enabled{true};
   bool smoothChange{false};
   bool parabolic{false};
@@ -289,95 +289,88 @@ class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArra
 
  private:
   template<typename R>
-  typename std::enable_if<!elementWise, R>::type calculate(R value) {
-    return gain * value;
-  }
-
-  template<typename R>
-  typename std::enable_if<elementWise, R>::type calculate(R value) {
-    static_assert(std::is_compound<R>::value, "A gain block with element wise amplification must use matrices!");
-    return value.multiplyElementWise(gain);
-  }
-
-  template<typename R, typename S>  // Tout, Tgain
-  typename std::enable_if<std::is_arithmetic<R>::value, R>::type calculateParabolic(R value) {
-    Tout outVal;
-    if (std::fabs(value) > parabolicSwitchPoint) {
-      if (value >= 0) outVal = gain * std::sqrt(parabolicSwitchPoint * (2 * value - parabolicSwitchPoint));
-      else outVal = gain * -std::sqrt(parabolicSwitchPoint * (-2 * value - parabolicSwitchPoint));
+  R calculate(R value) {
+    if constexpr (!elementWise) {
+      return gain * value;
     } else {
-      outVal = gain * value;
+      static_assert(std::is_compound_v<R>,
+                    "A gain block with element wise amplification must use matrices!");
+      return value.multiplyElementWise(gain);
     }
-    return outVal;
   }
 
   template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value && !elementWise, R>::type calculateParabolic(R value) {
-    Tout outVal;
-    for (unsigned int i = 0; i < value.size(); i++) {
-      if (std::fabs(value[i]) > parabolicSwitchPoint[i]) {
-        if (value[i] >= 0) outVal[i] = gain * std::sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
-        else outVal[i] = gain * -std::sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
+  R calculateParabolic(R value) {
+    Tout outVal{};
+    if constexpr (std::is_arithmetic_v<R>) { // Scalar value (arithmetic types)
+      if (std::fabs(value) > parabolicSwitchPoint) {
+        if (value >= 0) {
+          outVal = gain * std::sqrt(parabolicSwitchPoint * (2 * value - parabolicSwitchPoint));
+        } else {
+          outVal = gain * -std::sqrt(parabolicSwitchPoint * (-2 * value - parabolicSwitchPoint));
+        }
       } else {
-        outVal[i] = gain * value[i];
+        outVal = gain * value;
+      }
+    } else if constexpr (std::is_compound_v<R>) { // Compound value (vectors/matrices)
+      if constexpr (std::is_arithmetic_v<S>) { // Scalar gain with compound value
+        if constexpr (elementWise) {
+          static_assert(!elementWise,
+                        "A gain block with scalar gain factor must not use elementwise multiplication");
+        } else {
+          for (unsigned int i = 0; i < value.size(); i++) {
+            if (std::fabs(value[i]) > parabolicSwitchPoint[i]) {
+              if (value[i] >= 0) {
+                outVal[i] = gain * std::sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
+              } else {
+                outVal[i] = gain * -std::sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
+              }
+            } else {
+              outVal[i] = gain * value[i];
+            }
+          }
+        }
+      } else if constexpr (std::is_compound_v<S>) { // Compound gain with compound value
+        if constexpr (elementWise) {
+          // Element-wise with matrix gain
+          for (unsigned int i = 0; i < value.size(); i++) {
+            if (std::fabs(value[i]) > parabolicSwitchPoint[i]) {
+              if (value[i] >= 0) {
+                outVal[i] = gain[i] * std::sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
+              } else {
+                outVal[i] = gain[i] * -std::sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
+              }
+            } else {
+              outVal[i] = gain[i] * value[i];
+            }
+          }
+        }
       }
     }
     return outVal;
   }
 
-  template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value && elementWise, R>::type calculateParabolic(R value) {
-    Tout outVal;
-    // a gain block with scalar gain factor must not use elementwise multiplication
-    return outVal;
-  }
-
-  template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_compound<S>::value && !elementWise, R>::type calculateParabolic(R value) {
-    Tout outVal;
-    // multiplication with parabolic gain and gain matrix does not make sense
-    return outVal;
-  }
-
-  template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_compound<S>::value && elementWise, R>::type calculateParabolic(R value) {
-    Tout outVal;
-    for (unsigned int i = 0; i < value.size(); i++) {
-      if (std::fabs(value[i]) > parabolicSwitchPoint[i]) {
-        if (value[i] >= 0) outVal[i] = gain[i] * std::sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
-        else outVal[i] = gain[i] * -std::sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
-      } else {
-        outVal[i] = gain[i] * value[i];
+  void resetMinMaxGain() {
+    if constexpr (std::integral<Tgain>) {
+      minGain = std::numeric_limits<Tgain>::min();
+      maxGain = std::numeric_limits<Tgain>::max();
+    } else if constexpr (std::floating_point<Tgain>) {
+      minGain = std::numeric_limits<Tgain>::lowest();
+      maxGain = std::numeric_limits<Tgain>::max();
+    } else if constexpr (requires { typename Tgain::value_type; }) {
+      using ValueType = typename Tgain::value_type;
+      if constexpr (std::integral<ValueType>) {
+        for (unsigned int i = 0; i < minGain.size(); i++) {
+          minGain[i] = std::numeric_limits<ValueType>::min();
+          maxGain[i] = std::numeric_limits<ValueType>::max();
+        }
+      } else if constexpr (std::floating_point<ValueType>) {
+        for (unsigned int i = 0; i < minGain.size(); i++) {
+          minGain[i] = std::numeric_limits<ValueType>::lowest();
+          maxGain[i] = std::numeric_limits<ValueType>::max();
+        }
       }
     }
-    return outVal;
-  }
-
-  template<typename S>
-  typename std::enable_if<std::is_integral<S>::value>::type resetMinMaxGain() {
-    minGain = std::numeric_limits<int32_t>::min();
-    maxGain = std::numeric_limits<int32_t>::max();
-  }
-
-  template<typename S>
-  typename std::enable_if<std::is_floating_point<S>::value>::type resetMinMaxGain() {
-    minGain = std::numeric_limits<double>::lowest();
-    maxGain = std::numeric_limits<double>::max();
-  }
-
-  template<typename S>
-  typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type
-  resetMinMaxGain() {
-    minGain.fill(std::numeric_limits<int32_t>::min());
-    maxGain.fill(std::numeric_limits<int32_t>::max());
-  }
-
-  template<typename S>
-  typename std::enable_if<
-      !std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type
-  resetMinMaxGain() {
-    minGain.fill(std::numeric_limits<double>::lowest());
-    maxGain.fill(std::numeric_limits<double>::max());
   }
 };
 

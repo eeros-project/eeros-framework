@@ -56,9 +56,9 @@ class Matrix {
   /********** Constructors **********/
 
   /**
-   * @brief Default constructor. Elements are left uninitialized.
+   * @brief Default constructor. Elements are zero initialized.
    */
-  Matrix() {}
+  Matrix() : value{} {}
 
   /**
    * @brief Default copy constructor.
@@ -1291,7 +1291,7 @@ class Matrix {
     }
   }
 
-  virtual void print(std::ostream& os) const {
+  /*virtual*/ void print(std::ostream& os) const {
     if (N > 1) os << "[ ";
     for (unsigned int n = 0; n < N; n++) {
       os << '[';
@@ -1546,7 +1546,7 @@ class Matrix<1, 1, T> {
     return (*this);
   }
 
-  virtual void print(std::ostream& os) const {
+  /*virtual*/ void print(std::ostream& os) const {
     os << '[' << (*this)(0, 0) << "]' ";
   }
 
