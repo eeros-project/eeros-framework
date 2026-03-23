@@ -55,7 +55,7 @@ class LowPassFilter : public Blockio<1,1,T> {
    * out = alpha*in + (1-alpha)*out_prev
    * Saves output for next run
    */
-  virtual void run(){
+  virtual void run() override {
     Signal<T> sig = this->in.getSignal(); 
     T valin = sig.getValue();
     T valprev = prev.getValue();
@@ -78,7 +78,7 @@ class LowPassFilter : public Blockio<1,1,T> {
    *
    * @see run()
    */
-  virtual void enable() {
+  virtual void enable() override {
     enabled = true;
   }
 
@@ -89,7 +89,7 @@ class LowPassFilter : public Blockio<1,1,T> {
    *
    * @see run()
    */
-  virtual void disable() {
+  virtual void disable() override {
     enabled = false;
   }
 

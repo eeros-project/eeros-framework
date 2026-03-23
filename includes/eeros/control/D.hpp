@@ -9,11 +9,13 @@ namespace control {
 /**
  * An differentiator block is used to differentiate an input signal. 
  *
- * @tparam T - output type (double - default type)
+ * @tparam T - input and output signal data type (double - default type)
+ * @tparam Uin - input signal unit type (dimensionless - default type)
+ * @tparam Uout - output signal unit type (dimensionless - default type)
  * @since v1.0
  */
-template < typename T = double >
-class D: public Blockio<1,1,T> {
+template < typename T = double, SIUnit Uin = SIUnit::create(), SIUnit Uout = SIUnit::create() >
+class D: public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uout>::value> {
  public:
   /**
    * Constructs an differentiator instance.
@@ -21,7 +23,7 @@ class D: public Blockio<1,1,T> {
   D() {
     prev.clear();
   }
-  
+
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
    */
@@ -34,7 +36,7 @@ class D: public Blockio<1,1,T> {
    * After the first run, the block would still carry a nan, due to 
    * its memory. Therefore, the output will be set to zero.
    */
-  virtual void run() {
+  void run() override {
     Signal<T> sig = this->in.getSignal(); 
     double tin = sig.getTimestamp() / 1000000000.0;
     double tprev = prev.getTimestamp() / 1000000000.0;
@@ -57,7 +59,7 @@ class D: public Blockio<1,1,T> {
     this->out.getSignal().setTimestamp(timeOut);
     prev = sig;
   }
-  
+
   /*
    * Friend operator overload to give the operator overload outside
    * the class access to the private fields.
@@ -77,8 +79,8 @@ class D: public Blockio<1,1,T> {
  * Differentiator instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <typename T>
-std::ostream& operator<<(std::ostream& os, D<T>& d) {
+template <typename T, SIUnit Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, D<T, Uin, Uout>& d) {
   os << "Block differentiator: '" << d.getName();
   return os;
 }

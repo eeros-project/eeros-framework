@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <eeros/SIUnit.hpp>
 
 namespace eeros {
 namespace hal {
@@ -35,6 +36,14 @@ const std::map<std::string, Type> typeOfChannel = {
   { "Pwm",       Real },
   { "Watchdog",  Logic },
   { "Fqd",       Real }
+};
+
+const std::map<std::string, SIUnit> typeOfUnit = {
+  { "W",    Watt },
+  { "N",    Newton },
+  { "J",    Joule },
+  { "V",    Volt },
+  { "rad",  Radian }
 };
 
 }

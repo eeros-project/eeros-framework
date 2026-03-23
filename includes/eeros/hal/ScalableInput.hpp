@@ -3,6 +3,7 @@
 
 #include <string>
 #include <eeros/hal/Input.hpp>
+#include <eeros/SIUnit.hpp>
 
 namespace eeros {
 namespace hal {
@@ -10,24 +11,24 @@ namespace hal {
 template <typename T>
 class ScalableInput : public Input<T> {
  public:
-  ScalableInput(std::string id, void* libHandle, T scale, T offset, T minIn, T maxIn, std::string unit = "") 
+  ScalableInput(std::string id, void* libHandle, T scale, T offset, T minIn, T maxIn, SIUnit unit = SIUnit::create()) 
       : Input<T>(id, libHandle), scale(scale), offset(offset), minIn(minIn), maxIn(maxIn), unit(unit)  { }
-  
+
   virtual T getScale() { return scale; }
   virtual T getOffset() { return offset; }
-  virtual std::string getUnit() { return unit; }
+  SIUnit getUnit() override { return unit; }
   virtual T getMinIn() { return minIn; }
   virtual T getMaxIn() { return maxIn; }
   virtual void setScale(T s) { scale = s; }
   virtual void setOffset(T o) { offset = o; }
-  virtual void setUnit(std::string unit) { this->unit = unit; }
+  virtual void setUnit(SIUnit unit) { this->unit = unit; }
   virtual void setMinIn(T minI) { minIn = minI; }
   virtual void setMaxIn(T maxI) { maxIn = maxI; }
-  
+
  protected:
   T scale;
   T offset;
-  std::string unit;
+  SIUnit unit;
   T minIn;
   T maxIn;
 };

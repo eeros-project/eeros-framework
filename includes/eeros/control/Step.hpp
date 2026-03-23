@@ -12,15 +12,16 @@ namespace control {
  * to a new output value after a time delay has elapsed.
  * The reset function allows to repeat the step function.  
  * 
- * @tparam T - value type (double - default type)
+ * @tparam T - output value type (double - default type)
+ * @tparam Uout - output signal unit type (dimensionless - default type)
  * 
  * @since v0.6
  */
 
-template < typename T = double >
-class Step : public Blockio<0,1,T> {
+template < typename T = double, SIUnit U = SIUnit::create() >
+class Step : public Blockio<0,1,T,T,siunit::generateNSizeArray<0>(),MakeUnitArray<U>::value> {
  public:
-   
+
   /**
    * Constructs a default step instance with an initial value of 0.0, a step height of 1.0 and
    * a delay time of 0s.\n
@@ -104,9 +105,9 @@ class Step : public Blockio<0,1,T> {
    * Friend operator overload to give the operator overload outside
    * the class access to the private fields.
    */
-  template <typename X>
-  friend std::ostream& operator<<(std::ostream& os, Step<X>& step);
-  
+  template < typename X, SIUnit Y >
+  friend std::ostream& operator<<(std::ostream& os, Step<X, Y>& step);
+
 protected:
   T initValue;
   T stepHeight;
@@ -116,8 +117,8 @@ protected:
 };
 
 /********** Print functions **********/
-template <typename T>
-std::ostream& operator<<(std::ostream& os, Step<T>& step) {
+template < typename T, SIUnit U >
+std::ostream& operator<<(std::ostream& os, Step<T, U>& step) {
   os << "Block step: '" << step.getName() << "' init val = " << step.initValue << ", step height = " << step.stepHeight << ", delay = " << step.delayTime; 
   return os;
 }

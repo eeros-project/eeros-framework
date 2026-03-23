@@ -1,4 +1,5 @@
 #include <eeros/safety/SafetyLevel.hpp>
+#include <eeros/safety/InputAction.hpp>
 
 namespace eeros {
 namespace safety {

@@ -17,28 +17,27 @@ namespace control {
  * The output is determined by comparing the rate of the signal to the rising 
  * slew rate and falling slew rate parameters:
  * If rate is greater than the rising slew rate parameter, the output is calculated as:
- * 		output(i) = dt * rising_slew_rate + output(i-1)
+ * 		output(i) = dt * rRate + output(i-1)
  * If rate is less than the falling slew rate parameter, the output is calculated as:
- * 		output(i) = dt * falling_slew_rate + output(i-1)
+ * 		output(i) = dt * fRate + output(i-1)
  * If rate is between the bounds of R and F, the change in output is equal to the change in input: 
  * 		output(i) = input(i)
  *
  * If the input is a vector, then it is possible to choose if the algorithm applies elementwise or not.
- * If yes, rising_slew_rate and falling_slew_rate must be vectors. 
+ * If yes, rRate and fRate must be vectors.
  * 
- * @tparam Tout - output type (double - default type)
- * @tparam Trate - rate type (double - default type)
- * @tparam elementWise - apply element wise (false - default value). If true, then rates must be double.
- * @tparam rising_slew_rate: the limit of the derivative of an increasing input signal.
- * @tparam falling_slew_rate: the limit of the derivative of a decreasing input signal (negative value).
+ * @tparam Tout - input and output signal data type (double - default type)
+ * @tparam Trate - rate data type (double - default type)
+ * @tparam Uin - input signal unit type (dimensionless - default type)
+ * @tparam Uout - output signal unit type (dimensionless - default type)
  *
  * @since 1.1
  */
 
-template<typename Tout = double, typename Trate = double>
-class RateLimiter : public Blockio<1,1,Tout> {
+template< typename Tout = double, typename Trate = double, SIUnit Uin = SIUnit::create(), SIUnit Uout = SIUnit::create() >
+class RateLimiter : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArray<Uout>::value> {
  public:
-  
+
   /**
    * Constructs a RateLimiter instance with rising and falling rates being equal.\n
    * 
@@ -49,7 +48,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
     risingRate = rate;
     outPrev.clear();
   }
-  
+
   /**
    * Constructs a RateLimiter instance specifying rising and falling rates.\n
    * 
@@ -61,7 +60,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
     risingRate = rRate;
     outPrev.clear();
   }
-  
+
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
    */
@@ -76,7 +75,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
    * If rate < fallingRate: output(i) = dt * fallingRate + output(i-1)
    * Otherwise: output(i) = input(i)
    */
-  virtual void run(){
+  void run() override {
     std::lock_guard<std::mutex> lock(mtx);
     Tout inVal = this->in.getSignal().getValue();
     double tin = this->in.getSignal().getTimestamp() / 1000000000.0;
@@ -91,7 +90,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
     this->out.getSignal().setValue(outVal);
     this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
   }
-  
+
   /**
    * Enables the rate limiter block.
    * 
@@ -99,10 +98,10 @@ class RateLimiter : public Blockio<1,1,Tout> {
    * 
    * @see disable()
    */
-  virtual void enable() {
+  void enable() override {
     enabled = true;
   }
-  
+
   /**
    * Disables the rate limiter block.
    * 
@@ -110,10 +109,10 @@ class RateLimiter : public Blockio<1,1,Tout> {
    * 
    * @see enable()
    */
-  virtual void disable() {
+  void disable() override {
     enabled = false;
   }
-  
+
   /**
    * Sets falling and rising rates.
    * 
@@ -138,7 +137,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
   Trate fallingRate, risingRate;
   bool enabled{false};
   std::mutex mtx;
-  
+
   template <typename S> 
   typename std::enable_if<std::is_arithmetic<S>::value, S>::type calculateResult(S inValue, double dt) {
     Tout outVal;
@@ -161,7 +160,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
     }
     return outVal;
   }
-  
+
   template <typename S> 
   typename std::enable_if<std::is_compound<S>::value && std::is_compound<Trate>::value, S>::type calculateResult(S inValue, double dt) {
     std::cout << " element wise" << std::endl;
@@ -174,7 +173,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
     }
     return outVal;
   }
-  
+
 };
 
 /**
@@ -182,8 +181,8 @@ class RateLimiter : public Blockio<1,1,Tout> {
  * rate limiter instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <typename T>
-std::ostream& operator<<(std::ostream& os, RateLimiter<T>& rl) {
+template< typename Tout, typename Trate, SIUnit Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, RateLimiter<Tout, Trate, Uin, Uout>& rl) {
   os << "Block RateLimiter: '" << rl.getName() << "' falling rate=" << rl.fallingRate << ", rising rate=" << rl.risingRate; 
   return os;
 }

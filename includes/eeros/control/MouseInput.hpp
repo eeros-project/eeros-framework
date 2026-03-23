@@ -22,16 +22,16 @@ class MouseInput: public Blockio<0,1,Vector4> {
  public:
   MouseInput(std::string dev, int priority = 20);
   MouseInput(std::string dev, Vector4 scale, Vector4 min, Vector4 max, int priority = 20);
-  
+
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
    */
   MouseInput(const MouseInput& s) = delete; 
 
   Output<Matrix<3,1,bool>>& getButtonOut();
-  virtual void run();
+  void run() override;
   virtual void setInitPos(double x, double y, double z, double r);
-  virtual void setInitPos(Vector4 pos);
+  virtual void setInitPos(Matrix<4> pos);
   virtual void reset(double x, double y, double z, double r);
 
 protected:

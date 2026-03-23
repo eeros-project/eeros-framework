@@ -20,12 +20,14 @@ namespace control {
  * 
  * @tparam N - number of inputs
  * @tparam T - value type (double - default type)
+ * @tparam Uin - input signal unit type (dimensionless - default type)
+ * @tparam Uout - output signal unit type (dimensionless - default type)
  * 
  * @since v0.4
  */
 
-template < uint8_t N = 2, typename T = double >
-class Switch : public Blockio<N,1,T> {
+template < uint8_t N = 2, typename T = double, SIUnit Uin = SIUnit::create(), SIUnit Uout = SIUnit::create()  >
+class Switch : public Blockio<N,1,T,T,MakeUnitArray<Uin, N>::value,MakeUnitArray<Uout>::value> {
  public:
 
   /**

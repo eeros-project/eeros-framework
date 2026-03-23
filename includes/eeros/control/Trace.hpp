@@ -35,7 +35,7 @@ class Trace : public Blockio<1,0,T> {
     delete[] timeBuf;
   }
 
-  virtual void run() {
+  virtual void run() override {
     if (running) {
       buf[index] = this->in.getSignal().getValue();
       timeBuf[index] = this->in.getSignal().getTimestamp();
@@ -77,8 +77,8 @@ class Trace : public Blockio<1,0,T> {
     }
   }
   virtual uint32_t getSize() {return size;}
-  virtual void enable() {running = true;}
-  virtual void disable() {running = false;}
+  virtual void enable() override {running = true;}
+  virtual void disable() override {running = false;}
   
   uint32_t maxBufLen;	// total size of buffer
   

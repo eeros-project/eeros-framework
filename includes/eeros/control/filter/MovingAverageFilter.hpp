@@ -61,7 +61,7 @@ class MovingAverageFilter : public Blockio<1,1,Tval> {
    * @see enable()
    * @see disable()
    */
-  virtual void run() {
+  virtual void run() override {
     Tval val = this->in.getSignal().getValue();
     Tval result = coefficients[N-1] * val;
     for(size_t i = 0; i < N - 1; i++) {
@@ -85,7 +85,7 @@ class MovingAverageFilter : public Blockio<1,1,Tval> {
    * 
    * @see run()
    */
-  virtual void enable() {
+  virtual void enable() override {
     enabled = true;
   }
 
@@ -96,7 +96,7 @@ class MovingAverageFilter : public Blockio<1,1,Tval> {
    *
    * @see run()
    */
-  virtual void disable() {
+  virtual void disable() override {
     enabled = false;
   }
 

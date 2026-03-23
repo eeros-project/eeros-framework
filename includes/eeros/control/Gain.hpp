@@ -28,15 +28,17 @@ namespace control {
  * enabling/disabling of the gain and the smooth change feature
  * is not synchronized.
  *
- * @tparam Tout - output type (double - default type)
- * @tparam Tgain - gain type (double - default type)
+ * @tparam Tout - input and output signal data type (double - default type)
+ * @tparam Tgain - gain data type (double - default type)
  * @tparam elementWise - amplify element wise (false - default value)
+ * @tparam Uin - input signal unit type (dimensionless - default type)
+ * @tparam Uout - output signal unit type (dimensionless - default type)
  *
  * @since v0.6
  */
 
-template<typename Tout = double, typename Tgain = double, bool elementWise = false>
-class Gain : public Blockio<1,1,Tout> {
+template< typename Tout = double, typename Tgain = double, bool elementWise = false, SIUnit Uin = SIUnit::create(), SIUnit Uout = SIUnit::create() >
+class Gain : public Blockio<1,1,Tout,Tout,MakeUnitArray<Uin>::value,MakeUnitArray<Uout>::value> {
  public:
   /**
    * Constructs a default gain instance with a gain of 1.\n
@@ -45,7 +47,6 @@ class Gain : public Blockio<1,1,Tout> {
    * @see Gain(Tgain c)
    */
   Gain() : Gain(1.0) {}
-
 
   /**
    * Constructs a gain instance with a gain of the value of the parameter c.\n
@@ -58,7 +59,6 @@ class Gain : public Blockio<1,1,Tout> {
   Gain(Tgain c) : Gain(c, 1.0, -1.0) { // 1.0 and -1.0 are temp values only.
     resetMinMaxGain<Tgain>(); // set limits to smallest/largest value.
   }
-
 
   /**
    * Constructs a gain instance with a gain of the value of the parameter c,
@@ -84,7 +84,6 @@ class Gain : public Blockio<1,1,Tout> {
    */
   Gain(const Gain& s) = delete; 
 
-  
   /**
    * Runs the amplification algorithm.
    *
@@ -104,7 +103,7 @@ class Gain : public Blockio<1,1,Tout> {
    * @see enable()
    * @see disable()
    */
-  virtual void run() {
+  void run() override {
     std::lock_guard<std::mutex> lock(mtx);
 
     if (smoothChange) {
@@ -141,7 +140,6 @@ class Gain : public Blockio<1,1,Tout> {
     this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
   }
 
-
   /**
    * Enables the gain.
    *
@@ -152,10 +150,9 @@ class Gain : public Blockio<1,1,Tout> {
    * @see run()
    * @see enableSmoothChange(bool)
    */
-  virtual void enable() {
+  void enable() override {
     enabled = true;
   }
-
 
   /**
    * Disables the gain.
@@ -167,10 +164,9 @@ class Gain : public Blockio<1,1,Tout> {
    * @see run()
    * @see enableSmoothChange(bool)
    */
-  virtual void disable() {
+  void disable() override {
     enabled = false;
   }
-
 
   /**
    * Enables or disables a smooth change of the gain.
@@ -189,7 +185,6 @@ class Gain : public Blockio<1,1,Tout> {
     smoothChange = enable;
   }
   
-  
   /**
    * Enables or disables a parabolic profile for the gain
    *
@@ -206,7 +201,6 @@ class Gain : public Blockio<1,1,Tout> {
     parabolic = enable;
   }
 
-  
   /**
    * Sets the gain value if smooth change is disabled and c is in the band in between minGain and maxGain.
    *
@@ -228,7 +222,6 @@ class Gain : public Blockio<1,1,Tout> {
     }
   }
 
-
   /**
    * Sets the maximum allowed gain.
    *
@@ -238,7 +231,6 @@ class Gain : public Blockio<1,1,Tout> {
     std::lock_guard<std::mutex> lock(mtx);
     this->maxGain = maxGain;
   }
-
 
   /**
    * Sets the minimum allowed gain.
@@ -300,7 +292,7 @@ class Gain : public Blockio<1,1,Tout> {
     static_assert(std::is_compound<R>::value, "A gain block with element wise amplification must use matrices!");
     return value.multiplyElementWise(gain);
   }
-  
+
   template<typename R, typename S>  // Tout, Tgain
   typename std::enable_if<std::is_arithmetic<R>::value, R>::type calculateParabolic(R value) {
     Tout outVal;
@@ -312,7 +304,7 @@ class Gain : public Blockio<1,1,Tout> {
     }
     return outVal;
   }
-  
+
   template<typename R, typename S>
   typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value && !elementWise, R>::type calculateParabolic(R value) {
     Tout outVal;
@@ -354,7 +346,7 @@ class Gain : public Blockio<1,1,Tout> {
     }
     return outVal;
   }
-     
+
   template<typename S>
   typename std::enable_if<std::is_integral<S>::value>::type resetMinMaxGain() {
     minGain = std::numeric_limits<int32_t>::min();
@@ -389,8 +381,8 @@ class Gain : public Blockio<1,1,Tout> {
  * Gain instance to an output stream.\n
  * Does not print a newline control character.
  */
-template<typename Tout, typename Tgain>
-std::ostream &operator<<(std::ostream &os, Gain<Tout, Tgain> &gain) {
+template<typename Tout, typename Tgain, bool elementWise, SIUnit Uin, SIUnit Uout >
+std::ostream &operator<<(std::ostream &os, Gain<Tout, Tgain, elementWise, Uin, Uout> &gain) {
   os << "Block Gain: '" << gain.getName() << "' is enabled=" << gain.enabled << ", gain=" << gain.gain << ", ";
   os << "smoothChange=" << gain.smoothChange << ", minGain=" << gain.minGain << ", maxGain=" << gain.maxGain;
   os << ", targetGain=" << gain.targetGain << ", gainDiff=" << gain.gainDiff;

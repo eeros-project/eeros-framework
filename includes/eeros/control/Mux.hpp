@@ -14,15 +14,16 @@ namespace control {
  * A multiplexer block is used to bundle multiple inputs into one output vector.
  *
  * @tparam N - number of inputs
- * @tparam T - signal input type (double - default type)
- * @tparam C - signal output type (Matrix<N,1,T> - default type)
+ * @tparam T - input signal data type (double - default type)
+ * @tparam C - output signal data type (Matrix<N,1,T> - default type)
+ * @tparam Uin - input signal unit type (dimensionless - default type)
+ * @tparam Uout - output signal unit type (dimensionless - default type)
  * @since v0.6
  */
 
-template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T> >
-class Mux: public Blockio<N,1,T,C> {
+template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T>, std::array<SIUnit, N> Uin = siunit::generateNSizeArray<N>(), SIUnit Uout = SIUnit::create() >
+class Mux: public Blockio<N,1,T,C,Uin,MakeUnitArray<Uout>::value> {
  public:
-   
   /**
    * Constructs a multiplexer instance.
    */
@@ -32,18 +33,18 @@ class Mux: public Blockio<N,1,T,C> {
    * Disabling use of copy constructor because the block should never be copied unintentionally.
    */
   Mux(const Mux& s) = delete; 
-  
+
   /**
    * Runs the multiplexer.
    *
    */
-  virtual void run() {
+  void run() override {
     C newValue;
-    for (uint32_t i = 0; i < N; i++) {
-      newValue(i) = this->in[i].getSignal().getValue();
-    }
+    for_<N>([&, this]<std::size_t I>() {
+      newValue(I) = this->template getIn<I>().getSignal().getValue();
+    });
     this->out.getSignal().setValue(newValue);
-    this->out.getSignal().setTimestamp(this->in[0].getSignal().getTimestamp());
+    this->out.getSignal().setTimestamp(this->template getIn<0>().getSignal().getTimestamp());
   }
 
 };
@@ -53,8 +54,8 @@ class Mux: public Blockio<N,1,T,C> {
  * Multiplexer instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <uint8_t N, typename T, typename C>
-std::ostream& operator<<(std::ostream& os, Mux<N,T,C>& m) {
+template < uint32_t N, typename T, typename C, std::array<SIUnit, static_cast<std::size_t>(N)> Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, Mux<N, T, C, Uin, Uout>& m) {
   os << "Block multiplexer: '" << m.getName() << "'"; 
   return os;
 }

@@ -59,7 +59,7 @@ class MedianFilter : public Blockio<1,1,Tval> {
    * @see enable()
    * @see disable()
    */
-  virtual void run() {
+  virtual void run() override {
     for(size_t i = 0; i < N-1; i++) {
       currentValues[i] = currentValues[i+1];
     }
@@ -84,7 +84,7 @@ class MedianFilter : public Blockio<1,1,Tval> {
    * 
    * @see run()
    */
-  virtual void enable() {
+  virtual void enable() override {
     enabled = true;
   }
 
@@ -96,7 +96,7 @@ class MedianFilter : public Blockio<1,1,Tval> {
    *
    * @see run()
    */
-  virtual void disable() {
+  virtual void disable() override {
     enabled = false;
   }
 

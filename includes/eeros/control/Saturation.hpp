@@ -14,13 +14,15 @@ namespace control {
  * The output value will always vary between lower and upper limit.
  * If the block is disabled, the output value will simply follow the input.
  * 
- * @tparam T - output type (double - default type) 
+ * @tparam T - input and output signal data type (double - default type)
+ * @tparam Uin - input signal unit type (dimensionless - default type)
+ * @tparam Uout - output signal unit type (dimensionless - default type)
  *  
  * @since 1.2
  */
 
-template < typename T = double >
-class Saturation : public Blockio<1,1,T> {
+template < typename T = double, SIUnit Uin = SIUnit::create(), SIUnit Uout = SIUnit::create() >
+class Saturation : public Blockio<1,1,T,T,MakeUnitArray<Uin>::value,MakeUnitArray<Uout>::value> {
  public:
   /**
    * Constructs a Saturation instance specifying lower and upper limit.\n
@@ -32,7 +34,7 @@ class Saturation : public Blockio<1,1,T> {
     lowerLimit = lower;
     upperLimit = upper;
   }
-  
+
   /**
    * Constructs a Saturation instance specifying a limit.
    * The lower and upper limit will be the negative and positive 
@@ -50,7 +52,7 @@ class Saturation : public Blockio<1,1,T> {
   /**
    * Runs the saturation algorithm, as described above.
    */
-  virtual void run() {
+  void run() override {
     std::lock_guard<std::mutex> lock(mtx);
     T inVal = this->in.getSignal().getValue();
     T outVal = inVal;
@@ -58,7 +60,7 @@ class Saturation : public Blockio<1,1,T> {
     this->out.getSignal().setValue(outVal);
     this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
   }
-  
+
   /**
    * Enables the block.
    * 
@@ -66,10 +68,10 @@ class Saturation : public Blockio<1,1,T> {
    * 
    * @see disable()
    */
-  virtual void enable() {
+  void enable() override {
     enabled = true;
   }
-  
+
   /**
    * Disables the block.
    * 
@@ -77,10 +79,10 @@ class Saturation : public Blockio<1,1,T> {
    * 
    * @see enable()
    */
-  virtual void disable() {
+  void disable() override {
     enabled = false;
   }
-  
+
   /**
    * Sets lower and upper limit values.
    * 
@@ -91,7 +93,7 @@ class Saturation : public Blockio<1,1,T> {
     lowerLimit = lower;
     upperLimit = upper;
   }
-  
+
  private:
   template <typename S> 
   typename std::enable_if<std::is_arithmetic<S>::value, S>::type calculateResult(S inVal) {
@@ -121,8 +123,8 @@ class Saturation : public Blockio<1,1,T> {
  * saturation instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <typename T>
-std::ostream& operator<<(std::ostream& os, Saturation<T>& s) {
+template < typename T, SIUnit Uin, SIUnit Uout >
+std::ostream& operator<<(std::ostream& os, Saturation<T, Uin, Uout>& s) {
   os << "Block saturation: '" << s.getName() << "' lower limit=" << s.lowerLimit << ", upper limit=" << s.upperLimit; 
   return os;
 }

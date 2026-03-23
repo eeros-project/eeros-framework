@@ -3,6 +3,7 @@
 
 #include <eeros/core/System.hpp>
 #include <string>
+#include <eeros/SIUnit.hpp>
 
 namespace eeros {
 namespace hal {
@@ -23,6 +24,7 @@ class Output : public OutputInterface {
   explicit Output(std::string id, void* libHandle) : id(id), libHandle(libHandle) { }
   virtual ~Output() { }
   virtual inline std::string getId() const { return id; }
+  virtual SIUnit getUnit() { return SIUnit::create(); }
   virtual T get() = 0;
   virtual void set(T value) = 0;
   virtual void setTimestampSignalIn(uint64_t timestampNs) { return; }

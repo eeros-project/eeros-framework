@@ -1,5 +1,6 @@
 #include <eeros/core/Fault.hpp>
 #include <eeros/safety/SafetyProperties.hpp>
+#include <eeros/safety/InputAction.hpp>
 #include <sstream>
 
 namespace eeros {

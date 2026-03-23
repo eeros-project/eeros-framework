@@ -76,7 +76,7 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
    * @see enable()
    * @see disable()
    */
-  virtual void run() {
+  virtual void run() override {
     if (enabled) {
       int err;
       if ((err = co.sendSync()) != 0){
@@ -119,7 +119,7 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
    *
    * @see run()
    */
-  virtual void enable() {
+  virtual void enable() override {
     enabled = true;
   }
   
@@ -130,7 +130,7 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
    *
    * @see run()
    */
-  virtual void disable() {
+  virtual void disable() override {
     enabled = false;
   }
 
