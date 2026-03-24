@@ -37,9 +37,9 @@ using value_type_of_t = typename value_type_of<T>::type;
 // buffer size helper
 template<typename T>
 constexpr std::size_t buf_size() {
-  if constexpr (NullType<T>)      return 0;
+  if constexpr (NullType<T>) return 0;
   else if constexpr (Arithmetic<T>) return 1;
-  else                              return sizeof(T) / sizeof(value_type_of_t<T>);
+  else return T::size();
 }
 
 // base class selector
