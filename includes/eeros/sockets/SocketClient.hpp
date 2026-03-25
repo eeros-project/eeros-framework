@@ -63,7 +63,7 @@ class SocketClient : public eeros::Thread {
       txBuf = data;
   }
 
-  bool newData = false;
+  std::atomic<bool> newData = false;
   
  private:
   virtual void run() {
@@ -132,6 +132,8 @@ class SocketClient : public eeros::Thread {
             std::lock_guard lock(mtx);
             for (uint32_t i = 0; i < BufOutLen; ++i) rxBuf[i] = b_read[i];
             newData = true;
+          } else {
+            newData = false;
           }
         }
         next_cycle += seconds(period);
@@ -141,7 +143,7 @@ class SocketClient : public eeros::Thread {
       if constexpr (hasOutput) {
         std::lock_guard lock(mtx);
         for(uint32_t i = 0; i < BufOutLen; i++) rxBuf[i] = 0;
-        newData = true;
+        newData = false;
       }
     }
   }

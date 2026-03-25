@@ -60,7 +60,7 @@ class SocketServer : public eeros::Thread {
     txBuf = data;
   }
 
-  bool newData = false;
+  std::atomic<bool> newData = false;
   
  private:
   virtual void run() {	
@@ -140,6 +140,8 @@ class SocketServer : public eeros::Thread {
             std::lock_guard lock(mtx);
             for (uint32_t i = 0; i < BufOutLen; ++i) rxBuf[i] = b_read[i];
             newData = true;
+          } else {
+            newData = false;
           }
         }
         next_cycle += seconds(period);
@@ -149,7 +151,7 @@ class SocketServer : public eeros::Thread {
       if constexpr (hasOutput) {
         std::lock_guard lock(mtx);
         rxBuf.fill(outT{});
-        newData = true;
+        newData = false;
       }
     }
     close(sockfd);

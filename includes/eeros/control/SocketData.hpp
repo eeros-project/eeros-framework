@@ -43,21 +43,20 @@ constexpr std::size_t buf_size() {
 }
 
 // base class selector
-
-template<typename In, typename Out>
+template<typename Tin, typename Tout, SIUnit Uin, SIUnit Uout>
 struct BlockioBase {
-  using type = Blockio<1, 1, In, Out>;
+  using type = Blockio<1, 1, Tin, Tout, MakeUnitArray<Uin>::value, MakeUnitArray<Uout>::value>;
 };
-template<typename In>
-struct BlockioBase<In, std::nullptr_t> {
-  using type = Blockio<1, 1, In>;
+template<typename Tin, SIUnit Uin>
+struct BlockioBase<Tin, std::nullptr_t, Uin, SIUnit::create()> {
+  using type = Blockio<1, 1, Tin, Tin, MakeUnitArray<Uin>::value, MakeUnitArray<SIUnit::create()>::value>;
 };
-template<typename Out>
-struct BlockioBase<std::nullptr_t, Out> {
-  using type = Blockio<1, 1, Out>;
+template<typename Tout, SIUnit Uout>
+struct BlockioBase<std::nullptr_t, Tout, SIUnit::create(), Uout> {
+  using type = Blockio<1, 1, Tout, Tout, MakeUnitArray<SIUnit::create()>::value, MakeUnitArray<Uout>::value>;
 };
-template<typename In, typename Out>
-using BlockioBase_t = typename BlockioBase<In, Out>::type;
+template<typename Tin, typename Tout, SIUnit Uin, SIUnit Uout>
+using BlockioBase_t = typename BlockioBase<Tin, Tout, Uin, Uout>::type;
 
 
 /**
@@ -68,17 +67,19 @@ using BlockioBase_t = typename BlockioBase<In, Out>::type;
  * When one of the two partners stops, the connection is broken. It is automatically re-
  * establed as soon as both are running again.
  *
- * @tparam SigInType - type of the input signal (double - default type)
- * @tparam SigOutType - type of the output signal (double - default type)
+ * @tparam Tin - type of the input signal (double - default type)
+ * @tparam Tout - type of the output signal (double - default type)
+ * @tparam Uin - input signal unit type (dimensionless - default type)
+ * @tparam Uout - output signal unit type (dimensionless - default type)
  * @since v1.0
  */
 
-template<typename SigInType, typename SigOutType>
-class SocketData : public BlockioBase_t<SigInType, SigOutType> {
-  static constexpr std::size_t InN  = buf_size<SigInType>();
-  static constexpr std::size_t OutN = buf_size<SigOutType>();
-  using InVal  = value_type_of_t<SigInType>;
-  using OutVal = value_type_of_t<SigOutType>;
+template<typename Tin, typename Tout, SIUnit Uin = SIUnit::create(), SIUnit Uout = SIUnit::create()>
+class SocketData : public BlockioBase_t<Tin,Tout, Uin, Uout> {
+  static constexpr std::size_t InN  = buf_size<Tin>();
+  static constexpr std::size_t OutN = buf_size<Tout>();
+  using InVal  = value_type_of_t<Tin>;
+  using OutVal = value_type_of_t<Tout>;
   using Server = SocketServer<InN, InVal, OutN, OutVal>;
   using Client = SocketClient<InN, InVal, OutN, OutVal>;
 
@@ -121,11 +122,11 @@ class SocketData : public BlockioBase_t<SigInType, SigOutType> {
    */
   void run() override {
     // receive
-    if constexpr (!NullType<SigOutType>) {
-      SigOutType output{};
+    if constexpr (!NullType<Tout>) {
+      Tout output{};
       auto& buf = isServer ? server->getReceiveBuffer()
                            : client->getReceiveBuffer();
-      if constexpr (Arithmetic<SigOutType>) {
+      if constexpr (Arithmetic<Tout>) {
         output = buf[0];
       } else {
         for (uint32_t i = 0; i < OutN; ++i) output(i) = buf[i];
@@ -134,10 +135,10 @@ class SocketData : public BlockioBase_t<SigInType, SigOutType> {
       this->out.getSignal().setTimestamp(System::getTimeNs());
     }
     // send
-    if constexpr (!NullType<SigInType>) {
+    if constexpr (!NullType<Tin>) {
       if (this->in.isConnected()) {
         const auto& val = this->in.getSignal().getValue();
-        if constexpr (Arithmetic<SigInType>) {
+        if constexpr (Arithmetic<Tin>) {
           sendData[0] = val;
         } else {
           for (uint32_t i = 0; i < InN; ++i) sendData[i] = val(i);
@@ -158,14 +159,14 @@ class SocketData : public BlockioBase_t<SigInType, SigOutType> {
    *
    * @return true, if new data has arrived
    */
-  [[nodiscard]] bool isNew() const requires (!NullType<SigOutType>) {
+  [[nodiscard]] bool isNew() const requires (!NullType<Tout>) {
     return isServer ? server->newData : client->newData;
   }
 
   /**
    * Use this function to reset the new data flag back to false.
    */
-  void resetNew() requires (!NullType<SigOutType>) {
+  void resetNew() requires (!NullType<Tout>) {
     if (isServer) server->newData = false;
     else          client->newData = false;
   }
