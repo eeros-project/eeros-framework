@@ -29,7 +29,7 @@ class ControlSystem {
     Executor::instance().add(td);
   }
   Vector4 scale{0.0001, 0.0001, 0.001, 0.1}, min{-0.1}, max{0.2};
-  MouseInput mouse;
+  MouseInput<> mouse;
   TimeDomain td;
 };
 

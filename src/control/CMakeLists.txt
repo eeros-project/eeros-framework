@@ -10,7 +10,7 @@ add_eeros_sources(
 )
 
 if(LINUX)
-  add_eeros_sources(XBoxInput.cpp MouseInput.cpp SpaceNavigatorInput.cpp)
+  add_eeros_sources(XBoxInput.cpp SpaceNavigatorInput.cpp)
 endif()
 
 if(USE_ROS2)
