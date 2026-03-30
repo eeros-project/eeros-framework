@@ -3,8 +3,7 @@
 
 #include <eeros/control/Blockio.hpp>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * A delay block is used delay an input signal. The current input signal is stored
@@ -41,7 +40,7 @@ class Delay : public Blockio<1,1,T> {
   /**
    * Destructor frees buffers.
    */
-  ~Delay() {
+  ~Delay() override {
     delete[] buf;
     delete[] timeBuf;
   }
@@ -49,7 +48,7 @@ class Delay : public Blockio<1,1,T> {
   /**
    * Runs the delay block.   
    */
-  virtual void run() {
+  void run() override {
     buf[index] = this->getIn().getSignal().getValue();
     timeBuf[index] = this->getIn().getSignal().getTimestamp();
     index++;
@@ -90,7 +89,6 @@ std::ostream& operator<<(std::ostream& os, Delay<T>& delay) {
   return os;
 }
 
-};
-};
+}
 
 #endif /* ORG_EEROS_CONTROL_DELAY_HPP_ */

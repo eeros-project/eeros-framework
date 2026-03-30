@@ -6,69 +6,66 @@
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/safety/SafetySystem.hpp>
 #include <cmath>
+#include <limits>
 #include <mutex>
+#include <ostream>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
- * An integrator block is used to integrate an input signal. 
- * The block can be enabled or disabled. When disabled the block no longer 
- * integrates and keeps its actual state. An integrator must have its
- * initial state set to a defined level. Further, the block allows to
- * set an upper and lower limit to allow for anti windup.
- * Enabling and disabling an integrator block can happen through functions
- * enable() or disable() or it can depend on the current safety level.
- * If the current safety level is equal or greater than a preset level,
- * the integrator will be enabled.
+ * @brief Integrator block for integrating an input signal.
  *
- * @tparam T - output type (double - default type)
+ * The block can be enabled or disabled. When disabled it stops integrating
+ * and holds its current state. An upper and lower limit can be configured
+ * for anti-windup. Enabling can be tied to a @ref safety::SafetyLevel —
+ * the integrator runs only when the current level is equal to or greater
+ * than the configured active level.
+ *
+ * @tparam T  Signal type (default: @c double). Supports arithmetic types
+ *            and composite types with a @c value_type member (e.g. matrices).
+ *
  * @since v0.6
  */
 template < typename T = double >
 class I: public Blockio<1,1,T> {
  public:
   /**
-   * Constructs an integrator instance.\n
+   * @brief Constructs an integrator with limits set to the full numeric range.
    */
-  I() : first(true), enabled(false), safetySystem(nullptr), activeLevel(nullptr) {
+  I() {
     prev.clear(); 
     clearLimits();
   }
  
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
   I(const I& s) = delete; 
+  I& operator=(const I&) = delete;
 
   /**
-   * Runs the integration algorithm if the block is enabled, else
-   * the current state is left unchanged.
+   * @brief Integrates the input signal if enabled, otherwise holds current state.
    *
-   * @see setInitCondition(T val)
-   * @see setLimit(T upper, T lower)
+   * @see setInitCondition()
+   * @see setLimit()
    * @see enable()
    * @see disable()
    */
-  virtual void run() override {
-    std::lock_guard<std::mutex> lock(mtx);
+  void run() override {
+    std::lock_guard lock(mtx);
     if (activeLevel != nullptr)
       enabled =  safetySystem->getCurrentLevel() >= *activeLevel;
-    double tin = this->getIn().getSignal().getTimestamp() / 1000000000.0;
-    double tprev = this->prev.getTimestamp() / 1000000000.0;
-    double dt;
-    if (first) {
-      dt = 0; 
-      first = false;
-    } else dt = (tin - tprev);
-    T valin = this->getIn().getSignal().getValue();
-    T valprev = this->prev.getValue();
-    T output;
+    const double tin = this->getIn().getSignal().getTimestamp() / 1e9;
+    const double tprev = this->prev.getTimestamp() / 1e9;
+    const double dt = first ? (first = false, 0.0) : (tin - tprev);
+    const T valin = this->getIn().getSignal().getValue();
+    const T valprev = this->prev.getValue();
+    T output = valprev;
     if (enabled) {
       T val = valprev + valin * dt;
-      if ((val < upperLimit) && (val > lowerLimit)) output = val; 
-      else output = valprev;
-    } else output = valprev;
+      if (val < upperLimit && val > lowerLimit) output = val;
+    }
     this->getOut().getSignal().setValue(output);
     this->getOut().getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
     this->prev = this->getOut().getSignal();
@@ -76,13 +73,12 @@ class I: public Blockio<1,1,T> {
 
   /**
    * Enables the integrator.
-   *
    * If enabled, run() will integrate.
    *
    * @see disable()
    */
   virtual void enable() {
-    this->enabled = true;
+    enabled = true;
   }
 
   /**
@@ -93,7 +89,7 @@ class I: public Blockio<1,1,T> {
    * @see enable()
    */
   virtual void disable() {
-    this->enabled = false;
+    enabled = false;
   }
   
   /**
@@ -110,8 +106,8 @@ class I: public Blockio<1,1,T> {
   /**
    * Set the upper and lower limit of the integrator.
    *
-   * The integrator will not integrate above the upper or below
-   * the lower limit but will stay at this limiting values.
+   * The integrator clamps its output to [@p lower, @p upper].
+   * If the current state already exceeds the new limits it is clamped immediately.
    *
    * @param upper - upper limit
    * @param lower - lower limit
@@ -132,7 +128,7 @@ class I: public Blockio<1,1,T> {
    * @param level - SafetyLevel
    */
   virtual void setActiveLevel(safety::SafetySystem& ss, safety::SafetyLevel &level) {
-    std::lock_guard<std::mutex> lock(mtx);
+    std::lock_guard lock(mtx);
     safetySystem = &ss;
     activeLevel = &level;
   }
@@ -145,33 +141,25 @@ class I: public Blockio<1,1,T> {
   friend std::ostream &operator<<(std::ostream &os, I<X> &i);
 
  protected:
-  bool first;
-  bool enabled;
-  Signal<T> prev;
-  T upperLimit, lowerLimit;
-  safety::SafetySystem *safetySystem;
-  safety::SafetyLevel *activeLevel;
+  bool first{true};
+  bool enabled{false};
+  Signal<T> prev{};
+  T upperLimit{}, lowerLimit{};
+  safety::SafetySystem *safetySystem{nullptr};
+  safety::SafetyLevel *activeLevel{nullptr};
   std::mutex mtx{};
   
  private:
-  virtual void clearLimits() {
-    _clear<T>();
-  }
-  template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _clear() {
-    upperLimit = std::numeric_limits<S>::max();
-    lowerLimit = std::numeric_limits<S>::lowest();
-  }
-  template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type _clear() {
-    upperLimit = std::numeric_limits<S>::max();
-    lowerLimit = std::numeric_limits<S>::lowest();
-  }
-  template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type _clear() {
-    upperLimit.fill(std::numeric_limits<typename S::value_type>::max());
-    lowerLimit.fill(std::numeric_limits<typename S::value_type>::lowest());
-  }
-  template <typename S> typename std::enable_if<!std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
-    upperLimit.fill(std::numeric_limits<typename S::value_type>::max());
-    lowerLimit.fill(std::numeric_limits<typename S::value_type>::lowest());
+  void clearLimits() {
+    if constexpr (std::is_arithmetic_v<T>) {
+      upperLimit = std::numeric_limits<T>::max();
+      lowerLimit = std::numeric_limits<T>::lowest();
+    } else {
+      // composite type (e.g. Matrix) — fill each element
+      using V = typename T::value_type;
+      upperLimit.fill(std::numeric_limits<V>::max());
+      lowerLimit.fill(std::numeric_limits<V>::lowest());
+    }
   }
 
 };
@@ -188,6 +176,6 @@ std::ostream& operator<<(std::ostream& os, I<T>& i) {
   return os;
 }
 
-};
-};
+}
+
 #endif /* ORG_EEROS_CONTROL_I_HPP_ */

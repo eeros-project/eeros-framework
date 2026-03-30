@@ -18,9 +18,7 @@ class D: public Blockio<1,1,T> {
   /**
    * Constructs an differentiator instance.
    */
-  D() {
-    prev.clear();
-  }
+  D() { prev.clear(); }
   
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
@@ -34,7 +32,7 @@ class D: public Blockio<1,1,T> {
    * After the first run, the block would still carry a nan, due to 
    * its memory. Therefore, the output will be set to zero.
    */
-  virtual void run() override {
+  void run() override {
     Signal<T> sig = this->getIn().getSignal();
     double tin = sig.getTimestamp() / 1000000000.0;
     double tprev = prev.getTimestamp() / 1000000000.0;
