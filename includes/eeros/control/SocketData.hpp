@@ -127,13 +127,13 @@ class SocketData : public BlockioBase_t<Tin,Tout> {
       } else {
         for (uint32_t i = 0; i < OutN; ++i) output(i) = buf[i];
       }
-      this->out.getSignal().setValue(output);
-      this->out.getSignal().setTimestamp(System::getTimeNs());
+      this->getOut().getSignal().setValue(output);
+      this->getOut().getSignal().setTimestamp(System::getTimeNs());
     }
     // send
     if constexpr (!NullType<Tin>) {
-      if (this->in.isConnected()) {
-        const auto& val = this->in.getSignal().getValue();
+      if (this->getIn().isConnected()) {
+        const auto& val = this->getIn().getSignal().getValue();
         if constexpr (Arithmetic<Tin>) {
           sendData[0] = val;
         } else {

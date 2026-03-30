@@ -54,14 +54,14 @@ class I: public Blockio<1,1,T> {
     std::lock_guard<std::mutex> lock(mtx);
     if (activeLevel != nullptr)
       enabled =  safetySystem->getCurrentLevel() >= *activeLevel;
-    double tin = this->in.getSignal().getTimestamp() / 1000000000.0;
+    double tin = this->getIn().getSignal().getTimestamp() / 1000000000.0;
     double tprev = this->prev.getTimestamp() / 1000000000.0;
     double dt;
     if (first) {
       dt = 0; 
       first = false;
     } else dt = (tin - tprev);
-    T valin = this->in.getSignal().getValue();
+    T valin = this->getIn().getSignal().getValue();
     T valprev = this->prev.getValue();
     T output;
     if (enabled) {
@@ -69,9 +69,9 @@ class I: public Blockio<1,1,T> {
       if ((val < upperLimit) && (val > lowerLimit)) output = val; 
       else output = valprev;
     } else output = valprev;
-    this->out.getSignal().setValue(output);
-    this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
-    this->prev = this->out.getSignal();
+    this->getOut().getSignal().setValue(output);
+    this->getOut().getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
+    this->prev = this->getOut().getSignal();
   }
 
   /**

@@ -41,8 +41,8 @@ class PeripheralInput : public Blockio<0,1,T> {
    * Samples the signal at the input.
    */
   virtual void run() {
-    this->out.getSignal().setValue(systemInput->get());
-    this->out.getSignal().setTimestamp(systemInput->getTimestamp());
+    this->getOut().getSignal().setValue(systemInput->get());
+    this->getOut().getSignal().setTimestamp(systemInput->getTimestamp());
   }
   
   /**

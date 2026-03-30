@@ -62,7 +62,7 @@ class MovingAverageFilter : public Blockio<1,1,Tval> {
    * @see disable()
    */
   virtual void run() {
-    Tval val = this->in.getSignal().getValue();
+    Tval val = this->getIn().getSignal().getValue();
     Tval result = coefficients[N-1] * val;
     for(size_t i = 0; i < N - 1; i++) {
       previousValues[i] = previousValues[i+1];
@@ -70,11 +70,11 @@ class MovingAverageFilter : public Blockio<1,1,Tval> {
     }
     previousValues[N-1] = val;
     if(enabled) {
-      this->out.getSignal().setValue(result);
+      this->getOut().getSignal().setValue(result);
     } else {
-      this->out.getSignal().setValue(this->in.getSignal().getValue());
+      this->getOut().getSignal().setValue(this->getIn().getSignal().getValue());
     }
-    this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+    this->getOut().getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
   }
 
   /**

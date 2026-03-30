@@ -37,8 +37,8 @@ class Trace : public Blockio<1,0,T> {
 
   virtual void run() {
     if (running) {
-      buf[index] = this->in.getSignal().getValue();
-      timeBuf[index] = this->in.getSignal().getTimestamp();
+      buf[index] = this->getIn().getSignal().getValue();
+      timeBuf[index] = this->getIn().getSignal().getTimestamp();
       index++;
       if (index == maxBufLen) {
         index = 0;

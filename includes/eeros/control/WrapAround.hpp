@@ -46,11 +46,11 @@ class WrapAround : public Blockio<1,1,Tout> {
    */
   virtual void run(){
     std::lock_guard<std::mutex> lock(mtx);
-    Tout inVal = this->in.getSignal().getValue();
+    Tout inVal = this->getIn().getSignal().getValue();
     Tout outVal = inVal;
     if (enabled) outVal = calculateResult<Tout>(inVal);
-    this->out.getSignal().setValue(outVal);
-    this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+    this->getOut().getSignal().setValue(outVal);
+    this->getOut().getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
   }
 
   /**

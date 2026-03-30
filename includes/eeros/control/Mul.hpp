@@ -15,8 +15,8 @@ class Mul : public Blockio<0,1,OutT> {
   virtual void run() {
     OutT prod;
     prod = in1.getSignal().getValue() * in2.getSignal().getValue();
-    this->out.getSignal().setValue(prod);
-    this->out.getSignal().setTimestamp(in1.getSignal().getTimestamp());
+    this->getOut().getSignal().setValue(prod);
+    this->getOut().getSignal().setTimestamp(in1.getSignal().getTimestamp());
   }
   
   virtual Input<In1T>& getIn1() {

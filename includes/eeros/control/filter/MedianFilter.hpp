@@ -63,17 +63,17 @@ class MedianFilter : public Blockio<1,1,Tval> {
     for(size_t i = 0; i < N-1; i++) {
       currentValues[i] = currentValues[i+1];
     }
-    currentValues[N-1] = this->in.getSignal().getValue();
+    currentValues[N-1] = this->getIn().getSignal().getValue();
     if(enabled) {
       Tval temp[N]{};
       std::copy(std::begin(currentValues), std::end(currentValues), std::begin(temp));
       std::sort(std::begin(temp), std::end(temp));
       currentMedianValue = temp[medianIndex];
-      this->out.getSignal().setValue(currentMedianValue);
+      this->getOut().getSignal().setValue(currentMedianValue);
     } else {
-      this->out.getSignal().setValue(this->in.getSignal().getValue());
+      this->getOut().getSignal().setValue(this->getIn().getSignal().getValue());
     }
-    this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+    this->getOut().getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
   }
 
   /**

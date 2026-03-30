@@ -50,16 +50,16 @@ class Delay : public Blockio<1,1,T> {
    * Runs the delay block.   
    */
   virtual void run() {
-    buf[index] = this->in.getSignal().getValue();
-    timeBuf[index] = this->in.getSignal().getTimestamp();
+    buf[index] = this->getIn().getSignal().getValue();
+    timeBuf[index] = this->getIn().getSignal().getTimestamp();
     index++;
     if (index == bufLen) {
       index = 0;
       cycle = true;
     }
     if(cycle) {
-      this->out.getSignal().setValue(buf[index]);
-      this->out.getSignal().setTimestamp(timeBuf[index]);
+      this->getOut().getSignal().setValue(buf[index]);
+      this->getOut().getSignal().setTimestamp(timeBuf[index]);
     }
   }
       

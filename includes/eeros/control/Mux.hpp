@@ -42,8 +42,8 @@ class Mux: public Blockio<N,1,T,C> {
     for (uint32_t i = 0; i < N; i++) {
       newValue(i) = this->in[i].getSignal().getValue();
     }
-    this->out.getSignal().setValue(newValue);
-    this->out.getSignal().setTimestamp(this->in[0].getSignal().getTimestamp());
+    this->getOut().getSignal().setValue(newValue);
+    this->getOut().getSignal().setTimestamp(this->in[0].getSignal().getTimestamp());
   }
 
 };

@@ -134,13 +134,13 @@ class Gain : public Blockio<1,1,Tout,Tout> {
     }
 
     if (enabled) {
-      if (parabolic) this->out.getSignal().setValue(calculateParabolic<Tout,Tgain>(this->in.getSignal().getValue()));
-      else this->out.getSignal().setValue(calculate<Tout>(this->in.getSignal().getValue()));
+      if (parabolic) this->getOut().getSignal().setValue(calculateParabolic<Tout,Tgain>(this->getIn().getSignal().getValue()));
+      else this->getOut().getSignal().setValue(calculate<Tout>(this->getIn().getSignal().getValue()));
     } else {
-      this->out.getSignal().setValue(this->in.getSignal().getValue());
+      this->getOut().getSignal().setValue(this->getIn().getSignal().getValue());
     }
 
-    this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+    this->getOut().getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
   }
 
   /**

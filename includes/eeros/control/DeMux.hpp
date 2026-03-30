@@ -36,8 +36,8 @@ class DeMux: public Blockio<1,N,eeros::math::Matrix<N,1,T>,T> {
    */
   void run() override {
     for(uint32_t i = 0; i < N; i++) {
-      this->out[i].getSignal().setValue(this->in.getSignal().getValue()(i));
-      this->out[i].getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+      this->out[i].getSignal().setValue(this->getIn().getSignal().getValue()(i));
+      this->out[i].getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
     }
     // for_<N>([&, this]<std::size_t I>() {
     //   this->template getOut<I>().getSignal().setValue(this->in.getSignal().getValue()(I));

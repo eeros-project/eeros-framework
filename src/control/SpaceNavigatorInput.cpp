@@ -10,13 +10,13 @@ SpaceNavigatorInput::SpaceNavigatorInput(std::string dev, int priority) : sn(dev
 SpaceNavigatorInput::~SpaceNavigatorInput() { }
 
 void SpaceNavigatorInput::run() {
-	out.getSignal().setValue(Matrix<SPACENAVIGATOR_AXIS_COUNT>{
+	getOut().getSignal().setValue(Matrix<SPACENAVIGATOR_AXIS_COUNT>{
 		sn.current.axis[SpaceNav::Axis::X],
 		sn.current.axis[SpaceNav::Axis::Y],
 		sn.current.axis[SpaceNav::Axis::Z],
 	});	
 	uint64_t ts = eeros::System::getTimeNs();
-	out.getSignal().setTimestamp(ts);
+	getOut().getSignal().setTimestamp(ts);
 	rotOut.getSignal().setValue(Matrix<SPACENAVIGATOR_ROT_AXIS_COUNT>{
 		sn.current.rotAxis[SpaceNav::RotAxis::RX],
 		sn.current.rotAxis[SpaceNav::RotAxis::RY],
@@ -39,7 +39,7 @@ Output<Matrix<SPACENAVIGATOR_BUTTON_COUNT,1,bool>>& SpaceNavigatorInput::getButt
 }
 
 void SpaceNavigatorInput::setInitPos(Matrix<SPACENAVIGATOR_AXIS_COUNT> initPos) {
-	out.getSignal().setValue(initPos);
+	getOut().getSignal().setValue(initPos);
 }
 
 

@@ -78,8 +78,8 @@ class RateLimiter : public Blockio<1,1,Tout> {
    */
   virtual void run(){
     std::lock_guard<std::mutex> lock(mtx);
-    Tout inVal = this->in.getSignal().getValue();
-    double tin = this->in.getSignal().getTimestamp() / 1000000000.0;
+    Tout inVal = this->getIn().getSignal().getValue();
+    double tin = this->getIn().getSignal().getTimestamp() / 1000000000.0;
     double tprev = outPrev.getTimestamp() / 1000000000.0;
     Tout outVal = inVal;
     if(enabled) {
@@ -87,9 +87,9 @@ class RateLimiter : public Blockio<1,1,Tout> {
       outVal = calculateResult<Tout>(inVal, dt);
     }
     outPrev.setValue(outVal);
-    outPrev.setTimestamp(this->in.getSignal().getTimestamp());
-    this->out.getSignal().setValue(outVal);
-    this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+    outPrev.setTimestamp(this->getIn().getSignal().getTimestamp());
+    this->getOut().getSignal().setValue(outVal);
+    this->getOut().getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
   }
   
   /**

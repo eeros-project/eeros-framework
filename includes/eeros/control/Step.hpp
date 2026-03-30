@@ -57,14 +57,14 @@ class Step : public Blockio<0,1,T,T> {
   void run() override {
     if(first) {
       time = delayTime + System::getTime();
-      this->out.getSignal().setValue(initValue);
+      this->getOut().getSignal().setValue(initValue);
       first = false;
     }
     if(!stepDone && System::getTime() >= time) {
-      this->out.getSignal().setValue(initValue + stepHeight);
+      this->getOut().getSignal().setValue(initValue + stepHeight);
       stepDone = true;
     }
-    this->out.getSignal().setTimestamp(System::getTimeNs());
+    this->getOut().getSignal().setTimestamp(System::getTimeNs());
   }
 
   /**

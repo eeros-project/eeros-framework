@@ -58,8 +58,8 @@ void MouseInput::run() {
   vr += r;
 
   uint64_t time = eeros::System::getTimeNs();
-  out.getSignal().setValue(Vector4{ vx, vy, vz, vr });
-  out.getSignal().setTimestamp(time);
+  getOut().getSignal().setValue(Vector4{ vx, vy, vz, vr });
+  getOut().getSignal().setTimestamp(time);
   
   buttonOut.getSignal().setValue(Matrix<3,1,bool>{current.button.left, current.button.middle, current.button.right});
   buttonOut.getSignal().setTimestamp(time);
@@ -71,7 +71,7 @@ Output<Matrix<3,1,bool>>& MouseInput::getButtonOut() {
 
 void MouseInput::setInitPos(double x, double y, double z, double r) {
   reset(x, y, z, r);
-  out.getSignal().setValue(Matrix<4>{ x, y, z, r });
+  getOut().getSignal().setValue(Matrix<4>{ x, y, z, r });
 }
 
 void MouseInput::setInitPos(Matrix<4> pos) {

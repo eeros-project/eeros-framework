@@ -125,8 +125,8 @@ class KeyboardInput<1>: public Blockio<0,1,bool> {
   virtual void run() {
     uint64_t time = eeros::System::getTimeNs();
     auto& list = KeyList::instance();
-    this->out.getSignal().setValue(list.state[0]);
-    this->out.getSignal().setTimestamp(time);
+    this->getOut().getSignal().setValue(list.state[0]);
+    this->getOut().getSignal().setTimestamp(time);
   }
   
   /**

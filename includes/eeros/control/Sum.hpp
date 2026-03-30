@@ -56,8 +56,8 @@ class Sum : public Blockio<N,1,T> {
         else sum += this->in[i].getSignal().getValue();
       }
     }
-    this->out.getSignal().setValue(sum);
-    this->out.getSignal().setTimestamp(this->in[0].getSignal().getTimestamp());
+    this->getOut().getSignal().setValue(sum);
+    this->getOut().getSignal().setTimestamp(this->getIn(0).getSignal().getTimestamp());
   }
   
   /**

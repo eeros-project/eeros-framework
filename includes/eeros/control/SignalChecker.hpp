@@ -83,7 +83,7 @@ class SignalChecker : public Blockio<1,0,Tsig> {
   virtual void run() override {
     std::lock_guard<std::mutex> lock(mtx);
 
-    auto val = this->in.getSignal().getValue();
+    auto val = this->getIn().getSignal().getValue();
     if (!fired) {
       if (offRange) {
         if (withinLimits<bool>(val)) {

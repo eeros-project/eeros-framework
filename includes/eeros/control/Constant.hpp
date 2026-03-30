@@ -60,8 +60,8 @@ class Constant : public Blockio<0,1,T,T> {
    */
   void run() override {
     std::scoped_lock lock(mtx);
-    this->out.getSignal().setValue(value);
-    this->out.getSignal().setTimestamp(System::getTimeNs());
+    this->getOut().getSignal().setValue(value);
+    this->getOut().getSignal().setTimestamp(System::getTimeNs());
   }
 
   /**

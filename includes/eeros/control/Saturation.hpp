@@ -52,11 +52,11 @@ class Saturation : public Blockio<1,1,T> {
    */
   virtual void run() {
     std::lock_guard<std::mutex> lock(mtx);
-    T inVal = this->in.getSignal().getValue();
+    T inVal = this->getIn().getSignal().getValue();
     T outVal = inVal;
     if (enabled) outVal = calculateResult<T>(inVal);
-    this->out.getSignal().setValue(outVal);
-    this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+    this->getOut().getSignal().setValue(outVal);
+    this->getOut().getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
   }
   
   /**

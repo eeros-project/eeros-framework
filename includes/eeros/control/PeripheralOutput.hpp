@@ -45,14 +45,14 @@ class PeripheralOutput : public Blockio<1,0,T> {
    */
   virtual void run() {
     std::lock_guard<std::mutex> lock(mtx);
-    val = this->in.getSignal().getValue();
+    val = this->getIn().getSignal().getValue();
     auto isSafe = false;
     if(std::isnan(val) || std::isinf(val)) {
       val = systemOutput->safe;
       isSafe = true;
     }
     systemOutput->set(val);
-    systemOutput->setTimestampSignalIn(this->in.getSignal().getTimestamp());
+    systemOutput->setTimestampSignalIn(this->getIn().getSignal().getTimestamp());
     if (isSafe) throw NaNOutputFault("NaN written to output '" + 
                                      this->getName() + "', set to safe level if safe level is defined");
   }

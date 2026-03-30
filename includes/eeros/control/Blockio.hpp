@@ -6,22 +6,19 @@
 #include <eeros/control/Output.hpp>
 #include <eeros/control/IndexOutOfBoundsFault.hpp>
 #include <functional>
+#include <array>
+#include <ostream>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * Base class for all blocks with inputs and outputs.
  *
- * Extend this class and override the run method to implement any
- * given algorithm. 
- * 
- * Alternatively, an algorithm can be set directly 
- * when creating such a block. Choose this method when the algorithm 
- * is simple and one wants to avoid using several other blocks doing 
- * a simple algorithm, e.g. adding a offset and scale to a signal.
- * 
- * Define such a block with an example algorithm as follows:
+ * Extend this class and override @ref run() to implement any algorithm.
+ * Alternatively, pass a lambda directly to the constructor for simple
+ * inline algorithms without subclassing:
+ *
+ * @code
  * Blockio<2,1,Vector2,Vector2> block([&]() {
  *   auto val = (block.getIn(0).getSignal().getValue() + 0.5) * 2;
  *   val[0] *= -1.0;
@@ -29,11 +26,13 @@ namespace control {
  *   block.getOut().getSignal().setValue(val);
  *   block.getOut().getSignal().setTimestamp(gen.getIn(0).getSignal().getTimestamp());
  * });
-* 
- * @tparam N - number of inputs
- * @tparam M - number of outputs
- * @tparam Tin - input type (double - default type)
- * @tparam Tout - output type (double - default type)
+ * @endcode
+ *
+ * @tparam N    Number of inputs
+ * @tparam M    Number of outputs
+ * @tparam Tin  Input signal type (default: @c double)
+ * @tparam Tout Output signal type (default: same as @c Tin)
+ *
  * @since v1.2.1
  */
 
@@ -62,492 +61,149 @@ class Blockio : public Block {
   }
 
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
-  Blockio(const Blockio& s) = delete; 
+  Blockio(const Blockio&) = delete;
+  Blockio& operator=(const Blockio&) = delete;
 
   /**
    * Runs the generic algorithm.
    *
    */
-  virtual void run() {
-    func();
-  }
+  void run() override { func(); }
 
   /**
-   * Get an input of the block.
-   * 
-   * @param index - index of the input
-   * @return input
+   * @brief Returns input at @p index.
+   * @throws IndexOutOfBoundsFault if @p index >= N
    */
-  virtual Input<Tin>& getIn(uint8_t index) {
-    if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
+  Input<Tin>& getIn(uint8_t index) {
+    if (index >= N)
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'");
     return in[index];
   }
 
   /**
-   * Get an output of the block.
-   * 
-   * @param index - index of the input
-   * @return output
+   * @brief Returns input (single-input convenience overload, only when N == 1).
    */
-  virtual Output<Tout>& getOut(uint8_t index) {
-    if (index >= M) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 
+  Input<Tin>& getIn() requires (N == 1) { return in[0]; }
+
+  /**
+   * @brief Returns output at @p index.
+   * @throws IndexOutOfBoundsFault if @p index >= M
+   */
+  Output<Tout>& getOut(uint8_t index) {
+    if (index >= M)
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'");
     return out[index];
   }
 
+  /**
+   * @brief Returns output (single-output convenience overload, only when M == 1).
+   */
+  Output<Tout>& getOut() requires (M == 1) { return out[0]; }
+
  protected:
-  Input<Tin> in[N];
-  Output<Tout> out[M];
+  std::array<Input<Tin>, N> in;
+  std::array<Output<Tout>,M> out;
 
  private:
   std::function<void()> func;
 };
 
-/**
- * Spezialization for several inputs and 1 output
- */
-template < uint8_t N, typename Tin, typename Tout >
-class Blockio<N,1,Tin,Tout> : public Block {
- public:
-  /**
-   * Construct an block with several inputs and one output. 
-   * Clears the output signal.
-   */
-  Blockio() : Blockio([](){}) { }
-
-  /**
-   * Construct an block with several inputs and one output.
-   * Clears the output signal.
-   * The block will run a given algorithm defined by the parameter function.
-   *
-   * @param f - function defining the algorithm
-   */
-  Blockio(std::function<void()> const &f) : out(this), func(f) {
-    for (uint8_t i = 0; i < N; i++) in[i].setOwner(this);
-    out.getSignal().clear();
-  }
-
-  /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
-   */
-  Blockio(const Blockio& s) = delete; 
-
-  /**
-   * Runs the generic algorithm.
-   *
-   */
-  virtual void run() {
-    func();
-  }
-
-  /**
-   * Get an input of the block.
-   * 
-   * @param index - index of the input
-   * @return input
-   */
-  virtual Input<Tin>& getIn(uint8_t index) {
-    if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
-    return in[index];
-  }
-
-  /**
-   * Get the output of the block.
-   * 
-   * @return output
-   */
-  virtual Output<Tout>& getOut() {
-    return out;
-  }
-
- protected:
-  Input<Tin> in[N];
-  Output<Tout> out;
-
- private:
-  std::function<void()> func;
-};
+// ── Zero-size array specializations ─────────────────────────────────────────
+// std::array<T, 0> is valid in C++, so no ports means no specialization needed
+// for most cases. The only specializations needed are for the constructor
+// differences (setOwner, clear) and the getIn/getOut access patterns.
 
 /**
- * Spezialization for several inputs and no output
+ * @brief Specialization: no inputs (N == 0).
+ *
+ * Removes @c getIn() entirely — calling it would be nonsensical.
  */
-template < uint8_t N, typename Tin >
-class Blockio<N,0,Tin> : public Block {
- public:
-  /**
-   * Construct an block with several inputs and one output. 
-   * Clears the output signal.
-   */
-  Blockio() : Blockio([](){}) { }
-
-  /**
-   * Construct an block with several inputs and one output.
-   * Clears the output signal.
-   * The block will run a given algorithm defined by the parameter function.
-   *
-   * @param f - function defining the algorithm
-   */
-  Blockio(std::function<void()> const &f) : func(f) {
-    for (uint8_t i = 0; i < N; i++) in[i].setOwner(this);
-  }
-
-  /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
-   */
-  Blockio(const Blockio& s) = delete; 
-
-  /**
-   * Runs the generic algorithm.
-   *
-   */
-  virtual void run() {
-    func();
-  }
-
-  /**
-   * Get an input of the block.
-   * 
-   * @param index - index of the input
-   * @return input
-   */
-  virtual Input<Tin>& getIn(uint8_t index) {
-    if (index >= N) throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'"); 
-    return in[index];
-  }
-
- protected:
-  Input<Tin> in[N];
-
- private:
-  std::function<void()> func;
-};
-
-/**
- * Spezialization for 1 input and several outputs
- */
-template < uint8_t M, typename Tin, typename Tout >
-class Blockio<1,M,Tin,Tout> : public Block {
- public:
-  /**
-   * Construct an block with one input and several outputs. 
-   * Clears the output signal.
-   */
-  Blockio() : Blockio([](){}) { }
-
-  /**
-   * Construct an block with one input and several outputs.
-   * Clears the output signal.
-   * The block will run a given algorithm defined by the parameter function.
-   *
-   * @param f - function defining the algorithm
-   */
-  Blockio(std::function<void()> const &f) : in(this), func(f) {
-    for (uint8_t i = 0; i < M; i++) {
+template<uint8_t M, typename Tin, typename Tout>
+class Blockio<0, M, Tin, Tout> : public Block {
+public:
+  Blockio() : Blockio([](){}) {}
+  Blockio(std::function<void()> const& f) : func(f) {
+    for (uint8_t i = 0; i < M; ++i) {
       out[i].setOwner(this);
       out[i].getSignal().clear();
     }
   }
+  Blockio(const Blockio&) = delete;
+  Blockio& operator=(const Blockio&) = delete;
 
-  /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
-   */
-  Blockio(const Blockio& s) = delete; 
+  void run() override { func(); }
 
-  /**
-   * Runs the generic algorithm.
-   *
-   */
-  virtual void run() {
-    func();
-  }
-
-  /**
-   * Get the input of the block.
-   * 
-   * @return input
-   */
-  virtual Input<Tin>& getIn() {
-    return in;
-  }
-
-  /**
-   * Get an output of the block.
-   * 
-   * @param index - index of the input
-   * @return output
-   */
-  virtual Output<Tout>& getOut(uint8_t index) {
-    if (index >= M) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 
+  /** @brief Returns output at @p index. @throws IndexOutOfBoundsFault */
+  Output<Tout>& getOut(uint8_t index) {
+    if (index >= M)
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'");
     return out[index];
   }
 
- protected:
-  Input<Tin> in;
-  Output<Tout> out[M];
+  /** @brief Returns output (single-output convenience, only when M == 1). */
+  Output<Tout>& getOut() requires (M == 1) { return out[0]; }
 
- private:
+protected:
+  std::array<Output<Tout>,M> out;
+
+private:
   std::function<void()> func;
 };
 
 /**
- * Spezialization for 1 input and 1 output
+ * @brief Specialization: no outputs (M == 0).
+ *
+ * Removes @c getOut() entirely — calling it would be nonsensical.
  */
-template < typename Tin, typename Tout >
-class Blockio<1,1,Tin,Tout> : public Block {
- public:
-  /**
-   * Construct an block with one input and one output. 
-   * Clears the output signal.
-   */
-  Blockio() : Blockio([](){}) { }
+template<uint8_t N, typename Tin, typename Tout>
+class Blockio<N, 0, Tin, Tout> : public Block {
+public:
+  Blockio() : Blockio([](){}) {}
+  Blockio(std::function<void()> const& f) : func(f) {
+    for (uint8_t i = 0; i < N; ++i) in[i].setOwner(this);
+  }
+  Blockio(const Blockio&) = delete;
+  Blockio& operator=(const Blockio&) = delete;
 
-  /**
-   * Construct an block with one input and one output.
-   * Clears the output signal.
-   * The block will run a given algorithm defined by the parameter function.
-   *
-   * @param f - function defining the algorithm
-   */
-  Blockio(std::function<void()> const &f) : in(this), out(this), func(f) { 
-    out.getSignal().clear();
+  void run() override { func(); }
+
+  /** @brief Returns input at @p index. @throws IndexOutOfBoundsFault */
+  Input<Tin>& getIn(uint8_t index) {
+    if (index >= N)
+      throw IndexOutOfBoundsFault("Trying to get inexistent element of input vector in block '" + this->getName() + "'");
+    return in[index];
   }
 
-  /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
-   */
-  Blockio(const Blockio& s) = delete; 
+  /** @brief Returns input (single-input convenience, only when N == 1). */
+  Input<Tin>& getIn() requires (N == 1) { return in[0]; }
 
-  /**
-   * Runs the generic algorithm.
-   *
-   */
-  virtual void run() {
-    func();
-  }
+protected:
+  std::array<Input<Tin>,N> in;
 
-  /**
-   * Get the input of the block.
-   * 
-   * @return input
-   */
-  virtual Input<Tin>& getIn() {
-    return in;
-  }
-
-  /**
-   * Get the output of the block.
-   * 
-   * @return output
-   */
-  virtual Output<Tout>& getOut() {
-    return out;
-  }
-
- protected:
-  Input<Tin> in;
-  Output<Tout> out;
-
- private:
+private:
   std::function<void()> func;
 };
 
 /**
- * Spezialization for 1 input and no output
+ * @brief Specialization: no inputs and no outputs.
  */
-template < typename Tin >
-class Blockio<1,0,Tin> : public Block {
- public:
-  /**
-   * Construct an block with one input and no output. 
-   */
-  Blockio() : Blockio([](){}) { }
+template<>
+class Blockio<0, 0> : public Block {
+public:
+  Blockio() : Blockio([](){}) {}
+  Blockio(std::function<void()> const& f) : func(f) {}
+  Blockio(const Blockio&) = delete;
+  Blockio& operator=(const Blockio&) = delete;
 
-  /**
-   * Construct an block with one input and no output.
-   * Clears the output signal.
-   * The block will run a given algorithm defined by the parameter function.
-   *
-   * @param f - function defining the algorithm
-   */
-  Blockio(std::function<void()> const &f) : in(this), func(f) { }
+  void run() override { func(); }
 
-  /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
-   */
-  Blockio(const Blockio& s) = delete; 
-
-  /**
-   * Runs the generic algorithm.
-   *
-   */
-  virtual void run() {
-    func();
-  }
-
-  /**
-   * Get the input of the block.
-   * 
-   * @return input
-   */
-  virtual Input<Tin>& getIn() {
-    return in;
-  }
-
- protected:
-  Input<Tin> in;
-
- private:
+private:
   std::function<void()> func;
 };
 
-/**
- * Spezialization for no input and several outputs
- */
-template < uint8_t M, typename Tout >
-class Blockio<0,M,Tout> : public Block {
- public:
-  /**
-   * Construct an block with no input and several outputs. 
-   * Clears the output signals.
-   */
-  Blockio() : Blockio([](){}) { }
-
-  /**
-   * Construct an block with no input and several outputs.
-   * Clears the output signals.
-   * The block will run a given algorithm defined by the parameter function.
-   *
-   * @param f - function defining the algorithm
-   */
-  Blockio(std::function<void()> const &f) : func(f) {
-    for (uint8_t i = 0; i < M; i++) {
-      out[i].setOwner(this);
-      out[i].getSignal().clear();
-    }
-  }
-
-  /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
-   */
-  Blockio(const Blockio& s) = delete; 
-
-  /**
-   * Runs the generic algorithm.
-   *
-   */
-  virtual void run() {
-    func();
-  }
-
-  /**
-   * Get an output of the block.
-   * 
-   * @param index - index of the input
-   * @return output
-   */
-  virtual Output<Tout>& getOut(uint8_t index) {
-    if (index >= M) throw IndexOutOfBoundsFault("Trying to get inexistent element of output vector in block '" + this->getName() + "'"); 
-    return out[index];
-  }
-
- protected:
-  Output<Tout> out[M];
-
- private:
-  std::function<void()> func;
-};
-
-/**
- * Spezialization for no input and one output
- */
-template < typename Tout >
-class Blockio<0,1,Tout> : public Block {
- public:
-  /**
-   * Construct an block with no input and one output. 
-   * Clears the output signals.
-   */
-  Blockio() : Blockio([](){}) { }
-
-  /**
-
-   * Construct an block with no input and one output.
-   * Clears the output signal.
-   * The block will run a given algorithm defined by the parameter function.
-   *
-   * @param f - function defining the algorithm
-   */
-  Blockio(std::function<void()> const &f) : func(f) {
-    out.setOwner(this);
-    out.getSignal().clear();
-  }
-
-  /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
-   */
-  Blockio(const Blockio& s) = delete; 
-
-  /**
-   * Runs the generic algorithm.
-   *
-   */
-  virtual void run() {
-    func();
-  }
-
-  /**
-   * Get the output of the block.
-   * 
-   * @return output
-   */
-  virtual Output<Tout>& getOut() {
-    return out;
-  }
-
- protected:
-  Output<Tout> out;
-
- private:
-  std::function<void()> func;
-};
-
-/**
- * Spezialization for no input and no output
- */
-template < >
-class Blockio<0,0> : public Block {
- public:
-  /**
-   * Construct an block with no input and no output. 
-   */
-  Blockio() : Blockio([](){}) { }
-
-  /**
-
-   * Construct an block with no input and no output.
-   * The block will run a given algorithm defined by the parameter function.
-   *
-   * @param f - function defining the algorithm
-   */
-  Blockio(std::function<void()> const &f) : func(f) { }
-
-  /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
-   */
-  Blockio(const Blockio& s) = delete; 
-
-  /**
-   * Runs the generic algorithm.
-   *
-   */
-  virtual void run() {
-    func();
-  }
-
- private:
-  std::function<void()> func;
-};
 
 /**
  * Operator overload (<<) to enable an easy way to print the state of a
@@ -555,11 +211,11 @@ class Blockio<0,0> : public Block {
  * Does not print a newline control character.
  */
 template < uint8_t N, uint8_t M, typename Tin = double, typename Tout = Tin >
-std::ostream& operator<<(std::ostream& os, Blockio<N,M,Tin,Tout>& b) {
+std::ostream& operator<<(std::ostream& os, const Blockio<N,M,Tin,Tout>& b) {
   os << "Generic block: '" << b.getName() << "'"; 
   return os;
 }
 
 }
-}
+
 #endif /* ORG_EEROS_CONTROL_BLOCKIO_HPP_ */

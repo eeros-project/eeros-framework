@@ -72,8 +72,8 @@ class Switch : public Blockio<N,1,T> {
         }
       }
     }
-    this->out.getSignal().setValue(this->in[currentInput].getSignal().getValue());
-    this->out.getSignal().setTimestamp(this->in[currentInput].getSignal().getTimestamp());
+    this->getOut().getSignal().setValue(this->in[currentInput].getSignal().getValue());
+    this->getOut().getSignal().setTimestamp(this->in[currentInput].getSignal().getTimestamp());
   }
                   
   /**

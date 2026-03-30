@@ -14,7 +14,7 @@ XBoxInput::XBoxInput(std::string dev, int priority) : x(dev, priority), buttonOu
 XBoxInput::~XBoxInput() { }
 
 void XBoxInput::run() {
-	out.getSignal().setValue(Matrix<XBOX_AXIS_COUNT>{
+	getOut().getSignal().setValue(Matrix<XBOX_AXIS_COUNT>{
 		x.current.axis[XBoxController::Axis::LX],
 		x.current.axis[XBoxController::Axis::LY],
 		x.current.axis[XBoxController::Axis::LT],
@@ -25,7 +25,7 @@ void XBoxInput::run() {
 		x.current.axis[XBoxController::Axis::CY]
 	});	
 	uint64_t ts = eeros::System::getTimeNs();
-	out.getSignal().setTimestamp(ts);
+	getOut().getSignal().setTimestamp(ts);
 	buttonOut.getSignal().setValue(Matrix<XBOX_BUTTON_COUNT,1,bool>{
 		x.current.button_state[XBoxController::Button::A],
 		x.current.button_state[XBoxController::Button::B],
@@ -44,7 +44,7 @@ Output<Matrix<XBOX_BUTTON_COUNT,1,bool>>& XBoxInput::getButtonOut() {
 }
 
 void XBoxInput::setInitPos(Matrix<XBOX_AXIS_COUNT> initPos) {
-	out.getSignal().setValue(initPos);
+	getOut().getSignal().setValue(initPos);
 }
 
 void XBoxInput::setSpeedScaleFactor(double speedScale) {

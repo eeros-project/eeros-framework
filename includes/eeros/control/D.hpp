@@ -35,14 +35,14 @@ class D: public Blockio<1,1,T> {
    * its memory. Therefore, the output will be set to zero.
    */
   virtual void run() override {
-    Signal<T> sig = this->in.getSignal(); 
+    Signal<T> sig = this->getIn().getSignal();
     double tin = sig.getTimestamp() / 1000000000.0;
     double tprev = prev.getTimestamp() / 1000000000.0;
     T valin = sig.getValue();
     T valprev = prev.getValue();
       
     if (first) {
-      prev = this->in.getSignal();
+      prev = this->getIn().getSignal();
       valOut = 0;
       timeOut = sig.getTimestamp();
       first = false;
@@ -53,8 +53,8 @@ class D: public Blockio<1,1,T> {
       }
     }
       
-    this->out.getSignal().setValue(valOut);
-    this->out.getSignal().setTimestamp(timeOut);
+    this->getOut().getSignal().setValue(valOut);
+    this->getOut().getSignal().setTimestamp(timeOut);
     prev = sig;
   }
   

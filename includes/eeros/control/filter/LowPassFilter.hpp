@@ -56,7 +56,7 @@ class LowPassFilter : public Blockio<1,1,T> {
    * Saves output for next run
    */
   virtual void run(){
-    Signal<T> sig = this->in.getSignal(); 
+    Signal<T> sig = this->getIn().getSignal();
     T valin = sig.getValue();
     T valprev = prev.getValue();
     if (first) {
@@ -66,9 +66,9 @@ class LowPassFilter : public Blockio<1,1,T> {
     T valOut;
     if(enabled) valOut = valin * alpha + valprev * (1 - alpha); 
     else valOut = valin;
-    this->out.getSignal().setValue(valOut);
-    this->out.getSignal().setTimestamp(sig.getTimestamp());
-    prev = this->out.getSignal();
+    this->getOut().getSignal().setValue(valOut);
+    this->getOut().getSignal().setTimestamp(sig.getTimestamp());
+    prev = this->getOut().getSignal();
   }
   
   /**
