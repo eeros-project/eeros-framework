@@ -3,6 +3,7 @@ include(${PROJECT_SOURCE_DIR}/cmake/target_management.cmake)
 eeros_copy_file_post_build(copyPathFile path.txt)
 
 eeros_add_target(blockTest BlockTest.cpp)
+eeros_add_target(blockSIunitTest BlockSIunitTest.cpp)
 eeros_add_target(mouseTest MouseTest.cpp)
 eeros_add_target(xBoxTest XBoxTest.cpp)
 eeros_add_target(keyboardTest KeyboardTest.cpp)

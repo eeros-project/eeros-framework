@@ -96,6 +96,7 @@ namespace siunit {
 constexpr SIUnit Metre = SIUnit::create<1>(); // https://en.wikipedia.org/wiki/Metre
 constexpr SIUnit Kilogram = SIUnit::create<0, 1>(); // https://en.wikipedia.org/wiki/Kilogram
 constexpr SIUnit Second = SIUnit::create<0, 0, 1>(); // https://en.wikipedia.org/wiki/Second
+constexpr SIUnit MetrePerSecond = SIUnit::create<1, 0, -1>(); // https://en.wikipedia.org/wiki/Second
 constexpr SIUnit Ampere = SIUnit::create<0, 0, 0, 1>(); // https://en.wikipedia.org/wiki/Ampere
 constexpr SIUnit Nm = SIUnit::create<2, 1, -2>(); // https://en.wikipedia.org/wiki/Newton-metre
 constexpr SIUnit Watt = SIUnit::create<2, 1, -3>(); // https://en.wikipedia.org/wiki/Watt
