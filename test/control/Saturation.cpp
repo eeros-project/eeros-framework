@@ -80,7 +80,7 @@ TEST(controlSatTest, double) {
 
 // Test function
 TEST(controlSatTest, vector) {
-  Constant<Vector2> c0({1,-2.5});
+  Constant<Vector2> c0({1.0,-2.5});
   Saturation<Vector2> sat({-0.5,-0.8},{1.1, 0.5});
   sat.getIn().connect(c0.getOut());
   c0.run(); sat.run();

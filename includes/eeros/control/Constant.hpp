@@ -3,23 +3,24 @@
 
 #include <type_traits>
 #include <mutex>
+#include <concepts>
+#include <limits>
 #include <eeros/control/Blockio.hpp>
 #include <eeros/core/System.hpp>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * A constant block is used to deliver a constant output signal. Typically its value
  * is set once upon initialization and later altered by the safety system or the sequencer.
  *
- * @tparam T - value type (double - default type)
+ * @tparam T - output signal data type (double - default type)
  *
  * @since v0.6
  */
 
-template < typename T = double >
-class Constant : public Blockio<0,1,T> {
+template< typename T = double >
+class Constant : public Blockio<0,1,T,T> {
  public:
   /**
    * Constructs a default constant instance with a value of nan (floating point types) or
@@ -27,17 +28,28 @@ class Constant : public Blockio<0,1,T> {
    *
    * @see Constant(T v)
    */
-  Constant() {
-    _clear<T>();
-  }
-  
+  Constant() : value(_clear()) { }
+
   /**
-   * Constructs a constant instance with a initial value of v.
-   *
-   * @param v - initial value
-   */
-  Constant(T v) : value(v) { }
-  
+  * @brief Forwarding constructor.
+  *
+  * Used for single scalar argument, copy from existing matrix (lvalue)
+  * and move vom temporary (rvalue)
+  */
+  template <typename... Args>
+  requires std::constructible_from<T, Args...>
+  explicit Constant(Args&&... args) : value(std::forward<Args>(args)...) {}
+
+ /**
+  * @brief Initializer list constructor.
+  *
+  * Needed because initializer_list is a non-deduced context and
+  * cannot be captured by the variadic forwarding constructor.
+  */
+  template <typename V>
+  requires std::constructible_from<T, std::initializer_list<V>>
+  explicit Constant(std::initializer_list<V> list) : value(list) {}
+
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
    */
@@ -46,19 +58,19 @@ class Constant : public Blockio<0,1,T> {
   /**
    * Runs the switch block.
    */
-  virtual void run() {
-    std::lock_guard<std::mutex> lock(mtx);
+  void run() override {
+    std::scoped_lock lock(mtx);
     this->out.getSignal().setValue(value);
     this->out.getSignal().setTimestamp(System::getTimeNs());
   }
-  
+
   /**
    * Set the value of a constant block to newValue.
    *
    * @param newValue - new value
    */
   virtual void setValue(T newValue) {
-    std::lock_guard<std::mutex> lock(mtx);
+    std::scoped_lock lock(mtx);
     value = newValue;
   }
 
@@ -68,35 +80,49 @@ class Constant : public Blockio<0,1,T> {
    * @return - current value
    */
   virtual T getValue () const {
+    std::scoped_lock lock(mtx);
     return value;
   }
 
-protected:
-  T value;
-  std::mutex mtx;
-  
-private:
-  template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _clear() {
-    value = std::numeric_limits<int32_t>::min();
-  }
-  template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type _clear() {
-    value = std::numeric_limits<double>::quiet_NaN();
-  }
-  template <typename S> typename std::enable_if<std::is_compound<S>::value && std::is_integral<typename S::value_type>::value>::type _clear() {
-    value.fill(std::numeric_limits<int32_t>::min());
-  }
-  template <typename S> typename std::enable_if<std::is_compound<S>::value && std::is_floating_point<typename S::value_type>::value>::type _clear() {
-    value.fill(std::numeric_limits<double>::quiet_NaN());
+ protected:
+  T value{};
+  mutable std::mutex mtx;
+
+ private:
+  static constexpr T _clear() {
+    if constexpr (std::integral<T>) {
+      return std::numeric_limits<T>::min();
+    }
+    else if constexpr (std::floating_point<T>) {
+      return std::numeric_limits<T>::quiet_NaN();
+    }
+    else if constexpr (requires { typename T::value_type; }) {
+      T result{};
+      if constexpr (std::integral<typename T::value_type>) {
+        if constexpr (requires(T t) { t.fill(typename T::value_type{}); }) {
+          result.fill(std::numeric_limits<typename T::value_type>::min());
+        }
+      }
+      else if constexpr (std::floating_point<typename T::value_type>) {
+        if constexpr (requires(T t) { t.fill(typename T::value_type{}); }) {
+          result.fill(std::numeric_limits<typename T::value_type>::quiet_NaN());
+        }
+      }
+      return result;
+    }
+    else {
+      return T{};
+    }
   }
 };
 
 /********** Print functions **********/
 template <typename T>
-std::ostream& operator<<(std::ostream& os, Constant<T>& c) {
-  os << "Block constant: '" << c.getName() << "' current val = " << c.getValue(); 
-        return os;
+std::ostream& operator<<(std::ostream& os, const Constant<T>& c) {
+  os << "Block constant: '" << c.getName() << "' current val = " << c.getValue();
+  return os;
 }
-};
-};
+
+}
 
 #endif /* ORG_EEROS_CONTROL_CONSTANT_HPP_ */

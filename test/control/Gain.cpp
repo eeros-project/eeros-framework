@@ -16,16 +16,26 @@ TEST(controlGainTest, templateInstantiations) {
   Gain<int,int> g3{};
   Gain<double,int> g4{};
   Gain<int,double> g5{};
-  Gain<> g6{1.0};
-  Gain<> g8{1.0, 2.0,-2.0};
-  Gain<Matrix<2,2>,Matrix<2,2>,true> g9{};
-  Gain<Matrix<3,1>,Matrix<3,3>> g10{};
-  Gain<Matrix<1,3>,Matrix<1,3>,true> g11{};
-  Gain<Matrix<3,1>,Matrix<3,1>,true> g12{};
-
+  Gain<Vector2> g6{};
+  Gain<Vector2,Matrix<2,2>> g7{};
+  Gain<Vector2,Vector2,true> g8{};
+  Gain<Matrix<1,3>,Matrix<1,3>,true> g9{};
   EXPECT_TRUE(true);
 }
 
+TEST(controlGainTest, constructors) {
+  Gain<> g1(0.1);
+  Gain<int> g2(3);
+  Gain<int,int> g3(2,5,1);
+  Gain<double,int> g4(3.5,8,0.01);
+  Gain<int,double> g5(2);
+  Gain<Vector2> g6(4.3);
+  Gain<Vector2,Matrix<2,2>> g7({2.0,3.0,4.0,5.0});
+  Gain<Vector2,Matrix<2,2>> g8({2.0,3.0,4.0,5.0},{12.0,13.0,14.0,15.0},{1.0,1.0,1.0,1.0});
+  Gain<Vector2,Vector2,true> g9({2.3,4.5});
+  Gain<Matrix<1,3>,Matrix<1,3>,true> g10({2.3,4.5,6.7});
+  EXPECT_TRUE(true);
+}
 
 TEST(controlGainTest, simpleDoubleGain) {
   Gain<> g1{2.5};
@@ -245,8 +255,10 @@ TEST(controlGainTest, smoothChangingDoubleGainMinMaxLimits) {
 
 
 TEST(controlGainTest, simpleVectorGain1) {
-  Constant<Matrix<2,1,double>> c1({1,2});
-  Gain<Matrix<2,1,double>,Matrix<2,2,double>> g1({1,2,3,4});
+  Constant<Matrix<2,1,double>> c1({1.0,2.0});
+  Matrix<2,2,double> gainMatrix = {1.0, 2.0, 3.0, 4.0};
+  Gain<Matrix<2,1,double>,Matrix<2,2,double>> g1(gainMatrix);
+  // Gain<Matrix<2,1,double>,Matrix<2,2,double>> g1({1.0,2.0,3.0,4.0});
   g1.getIn().connect(c1.getOut());
   c1.run();
   g1.run();
@@ -339,13 +351,13 @@ TEST(controlGainTest, smoothChangingMatrixGainRealWorldTest) {
   g1.run(); // gain at [1.1,2.1,3.1, 4.5,5.1,6.1, 10.1,9.1,8.1]
   g1.run();
   g1.run(); // gain at [1.3,2.3,3.3, 4.3,5.3,6.3, 10.3,9.3,8.3]
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[0], 40.8); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[1], 40.8); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[2], 40.8); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[3], 88.5); 
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[0], 40.8);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[1], 40.8);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[2], 40.8);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[3], 88.5);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[4], 91.5);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[5], 94.5);
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[6], 136.2); 
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[6], 136.2);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[7], 142.2);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[8], 148.2);
 
@@ -353,51 +365,51 @@ TEST(controlGainTest, smoothChangingMatrixGainRealWorldTest) {
     g1.run();
   }
 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[0], 45); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[1], 45); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[2], 45); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[3], 99); 
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[0], 45);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[1], 45);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[2], 45);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[3], 99);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[4], 102);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[5], 105);
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[6], 153); 
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[6], 153);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[7], 159);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[8], 165);
 
   g1.run(); // should not change anything since reached targetGain
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[0], 45); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[1], 45); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[2], 45); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[3], 99); 
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[0], 45);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[1], 45);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[2], 45);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[3], 99);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[4], 102);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[5], 105);
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[6], 153); 
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[6], 153);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[7], 159);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[8], 165);
 
-  g1.setGain(Matrix<3,3>{1,2,3, 4,5,6, 10,9,8}); 
+  g1.setGain(Matrix<3,3>{1,2,3, 4,5,6, 10,9,8});
 
   for(int i = 0 ; i< 10; i++){
     g1.run();
   }
 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[0], 39); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[1], 39); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[2], 39); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[3], 84); 
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[0], 39);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[1], 39);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[2], 39);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[3], 84);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[4], 87);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[5], 90);
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[6], 129); 
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[6], 129);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[7], 135);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[8], 141);
 
   g1.run(); // should not change anything since reached targetGain
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[0], 39); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[1], 39); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[2], 39); 
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[3], 84); 
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[0], 39);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[1], 39);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[2], 39);
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[3], 84);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[4], 87);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[5], 90);
-  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[6], 129); 
+  EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[6], 129);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[7], 135);
   EXPECT_DOUBLE_EQ (g1.getOut().getSignal().getValue()[8], 141);
 }
@@ -421,7 +433,7 @@ TEST(controlGainTest, smoothChangingMatrixGainMinMaxLimits) {
   EXPECT_DOUBLE_EQ (res[0],10);
   EXPECT_DOUBLE_EQ (res[1],13);
   EXPECT_DOUBLE_EQ (res[2],22);
-  EXPECT_DOUBLE_EQ (res[3],29);  
+  EXPECT_DOUBLE_EQ (res[3],29);
 
   g1.setGain(Matrix<2,2>{-100,-100,-100,-100});
   g1.setMinGain(Matrix<2,2>{-2,-1,0,1});
@@ -474,7 +486,7 @@ TEST(controlGainTest, parabolicDouble) {
 }
 
 TEST(controlGainTest, parabolicVector1) {
-  Constant<Vector2> c1({1,4});
+  Constant<Vector2> c1({1.0,4.0});
   Gain<Vector2,double> g1{5};
   g1.getIn().connect(c1.getOut());
   g1.enableParabolicGain(true);
@@ -485,7 +497,7 @@ TEST(controlGainTest, parabolicVector1) {
 }
 
 TEST(controlGainTest, parabolicVector2) {
-  Constant<Vector2> c1({1,3});
+  Constant<Vector2> c1({1.0,3.0});
   Gain<Vector2,Vector2,true> g1({3,4});
   g1.getIn().connect(c1.getOut());
   g1.enableParabolicGain(true);
@@ -510,7 +522,7 @@ TEST(controlGainTest, printGain) {
   g.enableParabolicGain(true);
   g.setParabolicGainParams(0.2);
   g.run(); // sets gain to 8.2 since above maxGain.
-  
+
   std::stringstream sstream{};
   sstream << g;
   std::string str1 = "Block Gain: 'myGain' is enabled=1, gain=8.2, smoothChange=1, minGain=-8, maxGain=8.2, targetGain=2, gainDiff=0.1, parabolic=1, parabolicSwitchPoint=0.2";

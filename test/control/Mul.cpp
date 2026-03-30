@@ -71,11 +71,11 @@ TEST(controlMulTest, double) {
 
 TEST(controlMulTest, m12) {
   Mul<Matrix<2,1,double>,Matrix<1,3,double>,Matrix<2,3,double>> m1;
-  Constant<Matrix<2,1,double>> c1({-2,1});
-  Constant<Matrix<1,3,double>> c2({2,3,-4});
+  Constant<Matrix<2,1,double>> c1({-2.0,1.0});
+  Constant<Matrix<1,3,double>> c2({2.0,3.0,-4.0});
   m1.getIn1().connect(c1.getOut());
   m1.getIn2().connect(c2.getOut());
   c1.run(); c2.run(); m1.run();
-  Constant<Matrix<2,3,double>> c3({-4,2,-6,3,8,-4}); c3.run();
+  Constant<Matrix<2,3,double>> c3({-4.0,2.0,-6.0,3.0,8.0,-4.0}); c3.run();
   EXPECT_EQ(m1.getOut().getSignal().getValue(), c3.getOut().getSignal().getValue());
 }

@@ -19,7 +19,7 @@ double period = 0.1;
 
 class ControlSystem {
  public:
-  ControlSystem() : pp(1.0, 0.2, 0.2, period), td("td", period, true) {
+  ControlSystem() : pp({1.0}, {0.2}, {0.2}, period), td("td", period, true) {
     pp.setName("ppca");
     pp.getPosOut().getSignal().setName("pp pos out");
     pp.getVelOut().getSignal().setName("pp vel out");

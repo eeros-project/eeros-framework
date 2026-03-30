@@ -31,7 +31,7 @@ class Quaternion {
   }
 
   Matrix<4, 1, double> get() {
-    return Matrix<4,1,double>(w, x, y, z);
+    return Matrix<4,1,double>{w, x, y, z};
   }
 
   void set(double _w, double _x, double _y, double _z) {

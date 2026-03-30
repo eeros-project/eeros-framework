@@ -3,13 +3,15 @@
 
 #include <eeros/control/Blockio.hpp>
 #include <type_traits>
+#include <concepts>
 #include <memory>
 #include <mutex>
-#include <math.h>
+#include <cmath>
+#include <limits>
+#include <ostream>
 
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * A gain block is used to amplify an input signal. This is basically done by
@@ -28,15 +30,15 @@ namespace control {
  * enabling/disabling of the gain and the smooth change feature
  * is not synchronized.
  *
- * @tparam Tout - output type (double - default type)
- * @tparam Tgain - gain type (double - default type)
+ * @tparam Tout - input and output signal data type (double - default type)
+ * @tparam Tgain - gain data type (double - default type)
  * @tparam elementWise - amplify element wise (false - default value)
  *
  * @since v0.6
  */
 
-template<typename Tout = double, typename Tgain = double, bool elementWise = false>
-class Gain : public Blockio<1,1,Tout> {
+template< typename Tout = double, typename Tgain = double, bool elementWise = false >
+class Gain : public Blockio<1,1,Tout,Tout> {
  public:
   /**
    * Constructs a default gain instance with a gain of 1.\n
@@ -44,8 +46,7 @@ class Gain : public Blockio<1,1,Tout> {
    *
    * @see Gain(Tgain c)
    */
-  Gain() : Gain(1.0) {}
-
+  Gain() : Gain(Tgain(1)) {}
 
   /**
    * Constructs a gain instance with a gain of the value of the parameter c.\n
@@ -55,10 +56,12 @@ class Gain : public Blockio<1,1,Tout> {
    *
    * @param c - initial gain value
    */
-  Gain(Tgain c) : Gain(c, 1.0, -1.0) { // 1.0 and -1.0 are temp values only.
-    resetMinMaxGain<Tgain>(); // set limits to smallest/largest value.
+  Gain(Tgain c) {
+    gain = c;
+    targetGain = c;
+    gainDiff = Tgain{};
+    resetMinMaxGain();
   }
-
 
   /**
    * Constructs a gain instance with a gain of the value of the parameter c,
@@ -75,16 +78,15 @@ class Gain : public Blockio<1,1,Tout> {
     this->maxGain = maxGain;
     this->minGain = minGain;
     targetGain = gain;
-    gainDiff = 0;
+    gainDiff = Tgain{};
   }
 
-  
+
   /**
    * Disabling use of copy constructor because the block should never be copied unintentionally.
    */
-  Gain(const Gain& s) = delete; 
+  Gain(const Gain& s) = delete;
 
-  
   /**
    * Runs the amplification algorithm.
    *
@@ -104,7 +106,7 @@ class Gain : public Blockio<1,1,Tout> {
    * @see enable()
    * @see disable()
    */
-  virtual void run() {
+  void run() override {
     std::lock_guard<std::mutex> lock(mtx);
 
     if (smoothChange) {
@@ -141,7 +143,6 @@ class Gain : public Blockio<1,1,Tout> {
     this->out.getSignal().setTimestamp(this->in.getSignal().getTimestamp());
   }
 
-
   /**
    * Enables the gain.
    *
@@ -152,10 +153,9 @@ class Gain : public Blockio<1,1,Tout> {
    * @see run()
    * @see enableSmoothChange(bool)
    */
-  virtual void enable() {
+  void enable() override {
     enabled = true;
   }
-
 
   /**
    * Disables the gain.
@@ -167,10 +167,9 @@ class Gain : public Blockio<1,1,Tout> {
    * @see run()
    * @see enableSmoothChange(bool)
    */
-  virtual void disable() {
+  void disable() override {
     enabled = false;
   }
-
 
   /**
    * Enables or disables a smooth change of the gain.
@@ -188,8 +187,7 @@ class Gain : public Blockio<1,1,Tout> {
   virtual void enableSmoothChange(bool enable) {
     smoothChange = enable;
   }
-  
-  
+
   /**
    * Enables or disables a parabolic profile for the gain
    *
@@ -206,7 +204,6 @@ class Gain : public Blockio<1,1,Tout> {
     parabolic = enable;
   }
 
-  
   /**
    * Sets the gain value if smooth change is disabled and c is in the band in between minGain and maxGain.
    *
@@ -228,7 +225,6 @@ class Gain : public Blockio<1,1,Tout> {
     }
   }
 
-
   /**
    * Sets the maximum allowed gain.
    *
@@ -238,7 +234,6 @@ class Gain : public Blockio<1,1,Tout> {
     std::lock_guard<std::mutex> lock(mtx);
     this->maxGain = maxGain;
   }
-
 
   /**
    * Sets the minimum allowed gain.
@@ -274,15 +269,15 @@ class Gain : public Blockio<1,1,Tout> {
    * Friend operator overload to give the operator overload outside
    * the class access to the private fields.
    */
-  template<typename Xout, typename Xgain>
-  friend std::ostream &operator<<(std::ostream &os, Gain<Xout, Xgain> &gain);
+  template<typename Xout, typename Xgain, bool XelementWise>
+  friend std::ostream &operator<<(std::ostream &os, const Gain<Xout, Xgain, XelementWise> &gain);
 
  protected:
-  Tgain gain;
-  Tgain maxGain;
-  Tgain minGain;
-  Tgain targetGain;
-  Tgain gainDiff;
+  Tgain gain{};
+  Tgain maxGain{};
+  Tgain minGain{};
+  Tgain targetGain{};
+  Tgain gainDiff{};
   bool enabled{true};
   bool smoothChange{false};
   bool parabolic{false};
@@ -291,95 +286,88 @@ class Gain : public Blockio<1,1,Tout> {
 
  private:
   template<typename R>
-  typename std::enable_if<!elementWise, R>::type calculate(R value) {
-    return gain * value;
-  }
-
-  template<typename R>
-  typename std::enable_if<elementWise, R>::type calculate(R value) {
-    static_assert(std::is_compound<R>::value, "A gain block with element wise amplification must use matrices!");
-    return value.multiplyElementWise(gain);
-  }
-  
-  template<typename R, typename S>  // Tout, Tgain
-  typename std::enable_if<std::is_arithmetic<R>::value, R>::type calculateParabolic(R value) {
-    Tout outVal;
-    if (fabs(value) > parabolicSwitchPoint) {
-      if (value >= 0) outVal = gain * sqrt(parabolicSwitchPoint * (2 * value - parabolicSwitchPoint));
-      else outVal = gain * -sqrt(parabolicSwitchPoint * (-2 * value - parabolicSwitchPoint));
+  R calculate(R value) {
+    if constexpr (!elementWise) {
+      return gain * value;
     } else {
-      outVal = gain * value;
+      static_assert(std::is_compound_v<R>,
+                    "A gain block with element wise amplification must use matrices!");
+      return value.multiplyElementWise(gain);
     }
-    return outVal;
   }
-  
+
   template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value && !elementWise, R>::type calculateParabolic(R value) {
-    Tout outVal;
-    for (unsigned int i = 0; i < value.size(); i++) {
-      if (fabs(value[i]) > parabolicSwitchPoint[i]) {
-        if (value[i] >= 0) outVal[i] = gain * sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
-        else outVal[i] = gain * -sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
+  R calculateParabolic(R value) {
+    Tout outVal{};
+    if constexpr (std::is_arithmetic_v<R>) { // Scalar value (arithmetic types)
+      if (std::fabs(value) > parabolicSwitchPoint) {
+        if (value >= 0) {
+          outVal = gain * std::sqrt(parabolicSwitchPoint * (2 * value - parabolicSwitchPoint));
+        } else {
+          outVal = gain * -std::sqrt(parabolicSwitchPoint * (-2 * value - parabolicSwitchPoint));
+        }
       } else {
-        outVal[i] = gain * value[i];
+        outVal = gain * value;
+      }
+    } else if constexpr (std::is_compound_v<R>) { // Compound value (vectors/matrices)
+      if constexpr (std::is_arithmetic_v<S>) { // Scalar gain with compound value
+        if constexpr (elementWise) {
+          static_assert(!elementWise,
+                        "A gain block with scalar gain factor must not use elementwise multiplication");
+        } else {
+          for (unsigned int i = 0; i < value.size(); i++) {
+            if (std::fabs(value[i]) > parabolicSwitchPoint[i]) {
+              if (value[i] >= 0) {
+                outVal[i] = gain * std::sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
+              } else {
+                outVal[i] = gain * -std::sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
+              }
+            } else {
+              outVal[i] = gain * value[i];
+            }
+          }
+        }
+      } else if constexpr (std::is_compound_v<S>) { // Compound gain with compound value
+        if constexpr (elementWise) {
+          // Element-wise with matrix gain
+          for (unsigned int i = 0; i < value.size(); i++) {
+            if (std::fabs(value[i]) > parabolicSwitchPoint[i]) {
+              if (value[i] >= 0) {
+                outVal[i] = gain[i] * std::sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
+              } else {
+                outVal[i] = gain[i] * -std::sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
+              }
+            } else {
+              outVal[i] = gain[i] * value[i];
+            }
+          }
+        }
       }
     }
     return outVal;
   }
 
-  template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_arithmetic<S>::value && elementWise, R>::type calculateParabolic(R value) {
-    Tout outVal;
-    // a gain block with scalar gain factor must not use elementwise multiplication
-    return outVal;
-  }
-
-  template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_compound<S>::value && !elementWise, R>::type calculateParabolic(R value) {
-    Tout outVal;
-    // multiplication with parabolic gain and gain matrix does not make sense
-    return outVal;
-  }
-
-  template<typename R, typename S>
-  typename std::enable_if<std::is_compound<R>::value && std::is_compound<S>::value && elementWise, R>::type calculateParabolic(R value) {
-    Tout outVal;
-    for (unsigned int i = 0; i < value.size(); i++) {
-      if (fabs(value[i]) > parabolicSwitchPoint[i]) {
-        if (value[i] >= 0) outVal[i] = gain[i] * sqrt(parabolicSwitchPoint[i] * (2 * value[i] - parabolicSwitchPoint[i]));
-        else outVal[i] = gain[i] * -sqrt(parabolicSwitchPoint[i] * (-2 * value[i] - parabolicSwitchPoint[i]));
-      } else {
-        outVal[i] = gain[i] * value[i];
+  void resetMinMaxGain() {
+    if constexpr (std::integral<Tgain>) {
+      minGain = std::numeric_limits<Tgain>::min();
+      maxGain = std::numeric_limits<Tgain>::max();
+    } else if constexpr (std::floating_point<Tgain>) {
+      minGain = std::numeric_limits<Tgain>::lowest();
+      maxGain = std::numeric_limits<Tgain>::max();
+    } else if constexpr (requires { typename Tgain::value_type; }) {
+      using ValueType = typename Tgain::value_type;
+      if constexpr (std::integral<ValueType>) {
+        for (unsigned int i = 0; i < minGain.size(); i++) {
+          minGain[i] = std::numeric_limits<ValueType>::min();
+          maxGain[i] = std::numeric_limits<ValueType>::max();
+        }
+      } else if constexpr (std::floating_point<ValueType>) {
+        for (unsigned int i = 0; i < minGain.size(); i++) {
+          minGain[i] = std::numeric_limits<ValueType>::lowest();
+          maxGain[i] = std::numeric_limits<ValueType>::max();
+        }
       }
     }
-    return outVal;
-  }
-     
-  template<typename S>
-  typename std::enable_if<std::is_integral<S>::value>::type resetMinMaxGain() {
-    minGain = std::numeric_limits<int32_t>::min();
-    maxGain = std::numeric_limits<int32_t>::max();
-  }
-
-  template<typename S>
-  typename std::enable_if<std::is_floating_point<S>::value>::type resetMinMaxGain() {
-    minGain = std::numeric_limits<double>::lowest();
-    maxGain = std::numeric_limits<double>::max();
-  }
-
-  template<typename S>
-  typename std::enable_if<!std::is_arithmetic<S>::value && std::is_integral<typename S::value_type>::value>::type
-  resetMinMaxGain() {
-    minGain.fill(std::numeric_limits<int32_t>::min());
-    maxGain.fill(std::numeric_limits<int32_t>::max());
-  }
-
-  template<typename S>
-  typename std::enable_if<
-      !std::is_arithmetic<S>::value && std::is_floating_point<typename S::value_type>::value>::type
-  resetMinMaxGain() {
-    minGain.fill(std::numeric_limits<double>::lowest());
-    maxGain.fill(std::numeric_limits<double>::max());
   }
 };
 
@@ -389,8 +377,8 @@ class Gain : public Blockio<1,1,Tout> {
  * Gain instance to an output stream.\n
  * Does not print a newline control character.
  */
-template<typename Tout, typename Tgain>
-std::ostream &operator<<(std::ostream &os, Gain<Tout, Tgain> &gain) {
+template<typename Tout, typename Tgain, bool elementWise>
+std::ostream &operator<<(std::ostream &os, const Gain<Tout, Tgain, elementWise> &gain) {
   os << "Block Gain: '" << gain.getName() << "' is enabled=" << gain.enabled << ", gain=" << gain.gain << ", ";
   os << "smoothChange=" << gain.smoothChange << ", minGain=" << gain.minGain << ", maxGain=" << gain.maxGain;
   os << ", targetGain=" << gain.targetGain << ", gainDiff=" << gain.gainDiff;
@@ -398,7 +386,6 @@ std::ostream &operator<<(std::ostream &os, Gain<Tout, Tgain> &gain) {
   return os;
 }
 
-}
 }
 
 #endif /* ORG_EEROS_CONTROL_GAIN_HPP_ */

@@ -3,24 +3,21 @@
 
 #include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
-#include <eeros/control/Output.hpp>
-#include <eeros/control/IndexOutOfBoundsFault.hpp>
 
-namespace eeros {
-namespace control {
-    
+namespace eeros::control {
+
 /**
  * A demultiplexer block is used to split an input vector 
  * to individual outputs.
  *
  * @tparam N - number of outputs
- * @tparam T - signal output type (double - default type)
- * @tparam C - signal input type (Matrix<N,1,T> - default type)
+ * @tparam T - output signal data type (double - default type)
+ *
  * @since v0.6
  */
 
-template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T> >
-class DeMux: public Blockio<1,N,C,T> {
+template< uint32_t N, typename T = double >
+class DeMux: public Blockio<1,N,eeros::math::Matrix<N,1,T>,T> {
  public:
    
   /**
@@ -37,13 +34,16 @@ class DeMux: public Blockio<1,N,C,T> {
    * Runs the demultiplexer.
    *
    */
-  virtual void run() {
+  void run() override {
     for(uint32_t i = 0; i < N; i++) {
       this->out[i].getSignal().setValue(this->in.getSignal().getValue()(i));
       this->out[i].getSignal().setTimestamp(this->in.getSignal().getTimestamp());
     }
+    // for_<N>([&, this]<std::size_t I>() {
+    //   this->template getOut<I>().getSignal().setValue(this->in.getSignal().getValue()(I));
+    //   this->template getOut<I>().getSignal().setTimestamp(this->in.getSignal().getTimestamp());
+    // });
   }
-      
 };
 
 /**
@@ -51,13 +51,12 @@ class DeMux: public Blockio<1,N,C,T> {
  * Demultiplexer instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <uint8_t N, typename T, typename C>
-std::ostream& operator<<(std::ostream& os, DeMux<N,T,C>& d) {
+template <uint8_t N, typename T>
+std::ostream& operator<<(std::ostream& os, const DeMux<N,T>& d) {
   os << "Block demultiplexer: '" << d.getName() << "'"; 
   return os;
 }
 
-}
 }
 
 #endif /* ORG_EEROS_CONTROL_DEMUX_HPP_ */

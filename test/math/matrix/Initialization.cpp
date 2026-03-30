@@ -36,17 +36,17 @@ TEST(mathMatrixInitializationTest, init2) {
   }
 }
 
-// Multiple value constructor
+// Initializer list constructor
 TEST(mathMatrixInitializationTest, init3) {
-  Matrix<3, 1, int> iM3x1(1, 2, 3);
+  Matrix<3, 1, int> iM3x1{1, 2, 3};
   for (unsigned int m = 0; m < 3; m++) {
     EXPECT_EQ(iM3x1(m, 0), m + 1);
   }
 }
 
-// Multiple value constructor
+// Initializer list constructor
 TEST(mathMatrixInitializationTest, init4) {
-  Matrix<6, 3, int> iM6x3(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
+  Matrix<6, 3, int> iM6x3{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
   int i = 1;
   for(unsigned int n = 0; n < 3; n++) {
     for(unsigned int m = 0; m < 6; m++) {
@@ -55,15 +55,26 @@ TEST(mathMatrixInitializationTest, init4) {
   }
 }
 
-// Multiple value constructor
+// Initializer list constructor
 TEST(mathMatrixInitializationTest, init5) {
   constexpr double c0 = -0.1;
   constexpr double c1 = 3.1415;
   constexpr double c2 = 10;
-  Matrix<3, 1, double> dM3x1(c0, c1, c2);
+  Matrix<3, 1, double> dM3x1{c0, c1, c2};
   EXPECT_EQ(dM3x1(0, 0), c0);
   EXPECT_EQ(dM3x1(1, 0), c1);
   EXPECT_EQ(dM3x1(2, 0), c2);
+}
+
+// Nested initializer list constructor
+TEST(mathMatrixInitializationTest, init6) {
+  Matrix<4, 2> iM6x3{{1, 2, 3, 4}, {5, 6, 7, 8}};
+  int i = 1;
+  for(unsigned int n = 0; n < 2; n++) {
+    for(unsigned int m = 0; m < 4; m++) {
+      EXPECT_EQ(iM6x3(m, n), i++);
+    }
+  }
 }
 
 // Zero matrix

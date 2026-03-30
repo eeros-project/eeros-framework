@@ -92,7 +92,7 @@ TEST(controlDTest, running1) {
 
 // test function
 TEST(controlDTest, running2) {
-  Constant<Matrix<2,1,double>> c1(1.0);
+  Constant<Matrix<2,1,double>> c1({1.0,1.0});
   D<Matrix<2,1,double>> d1;
   d1.getIn().connect(c1.getOut());
   c1.run();
@@ -109,7 +109,7 @@ TEST(controlDTest, running2) {
   EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[1], 0, 1e-10));
   timestamp_t start = d1.getOut().getSignal().getTimestamp();
   usleep(20000);
-  c1.setValue(0.0);
+  c1.setValue({0, 0});
   c1.run();
   d1.run();
   EXPECT_TRUE(Utils::compareApprox(d1.getOut().getSignal().getValue()[0], -50, 20));

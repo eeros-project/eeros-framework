@@ -155,7 +155,7 @@ class PathPlannerConstAcc : public TrajectoryGenerator<T, 3> {
     if (!finished) return false;
     T calcVelNorm, calcAccNorm, calcDecNorm;
     E velNorm, accNorm, decNorm;
-    T distance = end[0] - start[0];
+    T distance(end[0] - start[0]);
     endPos = end[0];
     
     T zero; zero = 0;

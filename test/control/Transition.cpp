@@ -73,7 +73,7 @@ TEST(controlTransitionSimpleTest, simple) {
 TEST(controlTransitionSimpleTest, vector) {
   Transition<Vector2> t1(5);
   Transition<Vector2> t2(1/5);
-  Constant<Vector2> c1({0,0}), c2({0,0});
+  Constant<Vector2> c1({0.0,0.0}), c2({0.0,0.0});
   t1.inBlock.getIn().connect(c1.getOut());
   t2.inBlock.getIn().connect(t1.outBlock.getOut());
   t2.outBlock.getIn().connect(c2.getOut());

@@ -42,22 +42,22 @@ int main() {
   c2.run();
   log.info() << c2 << ": output = " << c2.getOut().getSignal();
   
-  Constant<Matrix<3,1>> c3({1.2, 2.5, 3});
+  Constant<Matrix<3,1>> c3({1.2, 2.5, 3.0});
   c3.setName("constant 3");
   c3.getOut().getSignal().setName("signal 3");
   c3.run();
   log.info() << c3 << ": output = " << c3.getOut().getSignal();
   
-  Step<Vector3> step(1.5, -3.14159265359, 5);
+  Step<Vector3> step({1.5,1.5,1.5}, {-3.14,-3.14,-3.14}, 5.0);
   step.setName("step");
   step.getOut().getSignal().setName("signal step");
   step.run();
   log.info() << step << ": output = " << step.getOut().getSignal();
 
-  Step<Vector3> step2({2, 2.5, 3}, -3.14159265359, 5);	
+  Step<Vector3> step2({2.0, 2.5, 3.0}, {-3.14,-3.14,-3.14}, 5.0);
   step2.setName("step 2");
   log.info() << step2;
-  
+
   Sum<2,Vector3> sum;
   sum.setName("summation");
   sum.getOut().getSignal().setName("signal summation");
@@ -66,10 +66,10 @@ int main() {
   sum.run();
   log.info() << sum << ":output = " << sum.getOut().getSignal();
 
-  Constant<Matrix<1,1>> c4(6);		
-  Constant<Matrix<2,2>> c5(2.7);		
-  Constant<Matrix<2,2>> c6({2.7, -1.2, 0, 0});
-  c4.run(); 
+  Constant<Matrix<1,1>> c4(6);
+  Constant<Matrix<2,2>> c5(2.7);
+  Constant<Matrix<2,2>> c6({2.7, -1.2, 0.0, 0.0});
+  c4.run();
   c5.run();
   c6.run();
   log.info() << c4.getOut().getSignal();

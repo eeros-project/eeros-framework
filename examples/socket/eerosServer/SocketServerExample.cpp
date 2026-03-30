@@ -22,7 +22,7 @@ using namespace eeros;
 class ControlSystem {
  public:
   ControlSystem(double dt) : 
-    c1({1.5, 2.2, 3.3, 4.6}),
+    c1{1.5, 2.2, 3.3, 4.6},
     c2(56.5),
     c3(-28),
     c4(-34.987),

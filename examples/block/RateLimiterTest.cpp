@@ -19,11 +19,10 @@ double period = 0.1;
 
 class ControlSystem {
  public:
-  ControlSystem() : 
-  setVal({0, 0}), 
-  rate_limiter({-1.0, -0.5}, {0.5, 1.0}),
-  td("td", period, true)  
-  {
+  ControlSystem()
+      : setVal({0.0, 0.0}),
+        rate_limiter({-1.0, -0.5}, {0.5, 1.0}),
+        td("td", period, true) {
 	rate_limiter.getIn().connect(setVal.getOut());
 	rate_limiter.enable();
 	
@@ -71,17 +70,17 @@ int main() {
   p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
     static int count = 0;
     log.info() << count << " -> " 
-			   << cs.setVal.getOut().getSignal().getValue() << "  "
+               << cs.setVal.getOut().getSignal().getValue() << "  "
                << cs.rate_limiter.getOut().getSignal().getValue();
     if (count == 0) {
-		cs.setVal.setValue(0.0);
+      cs.setVal.setValue({0,0});
     }
     if (count == 10) {
-		cs.setVal.setValue(2.0);
+      cs.setVal.setValue({2,2});
     }
     if (count == 50) {
-		cs.setVal.setValue(-1.0);
-	}
+      cs.setVal.setValue({-1,-1});
+    }
     count++; 
   });
   

@@ -15,7 +15,7 @@ using namespace eeros::math;
 
 class MockRobotControlSystem {
  public:
-  MockRobotControlSystem(double ts) : setpoint({0, 0}), pp({10,20}, {0.5,1.0}, {0.2,0.5}, ts), timedomain("Main time domain", ts, true) {
+  MockRobotControlSystem(double ts) : setpoint({0.0, 0.0}), pp({10,20}, {0.5,1.0}, {0.2,0.5}, ts), timedomain("Main time domain", ts, true) {
     i.setInitCondition({0.3, -0.2});
     i.enable();
     sw.switchToInput(0);

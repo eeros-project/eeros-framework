@@ -3,13 +3,13 @@
 
 #include <eeros/control/Blockio.hpp>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * An differentiator block is used to differentiate an input signal. 
  *
- * @tparam T - output type (double - default type)
+ * @tparam T - input and output signal data type (double - default type)
+ *
  * @since v1.0
  */
 template < typename T = double >
@@ -34,7 +34,7 @@ class D: public Blockio<1,1,T> {
    * After the first run, the block would still carry a nan, due to 
    * its memory. Therefore, the output will be set to zero.
    */
-  virtual void run() {
+  virtual void run() override {
     Signal<T> sig = this->in.getSignal(); 
     double tin = sig.getTimestamp() / 1000000000.0;
     double tprev = prev.getTimestamp() / 1000000000.0;
@@ -58,13 +58,6 @@ class D: public Blockio<1,1,T> {
     prev = sig;
   }
   
-  /*
-   * Friend operator overload to give the operator overload outside
-   * the class access to the private fields.
-   */
-  template<typename X>
-  friend std::ostream &operator<<(std::ostream &os, D<X> &d);
-
  private:
   Signal<T> prev;
   T valOut;
@@ -78,11 +71,11 @@ class D: public Blockio<1,1,T> {
  * Does not print a newline control character.
  */
 template <typename T>
-std::ostream& operator<<(std::ostream& os, D<T>& d) {
-  os << "Block differentiator: '" << d.getName();
+std::ostream& operator<<(std::ostream& os, const D<T>& d) {
+  os << "Block differentiator: '" << d.getName() << "'";
   return os;
 }
 
 }
-}
+
 #endif /* ORG_EEROS_CONTROL_D_HPP_ */

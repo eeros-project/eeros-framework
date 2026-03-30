@@ -29,18 +29,18 @@ TEST(TF_TreeTest, init1) {
                           "name \"center\" already exists "));
   }
 
-  tfTree.getTF("head").setTrans(Vector3(0.0, 0.0, 0.7));
+  tfTree.getTF("head").setTrans(Vector3{0.0, 0.0, 0.7});
   tfTree.getTF("head").setRPY(0.1, -0.1, 0.12);
-  tfTree.getTF("eyeLeft").setTrans(Vector3(0.06, 0.02, 0.1));
+  tfTree.getTF("eyeLeft").setTrans(Vector3{0.06, 0.02, 0.1});
   tfTree.getTF("eyeLeft").setRPY(0.0, 0.0, 0.2);
-  tfTree.getTF("eyeRight").setTrans(eeros::math::Vector3(0.06, -0.02, 0.1));
+  tfTree.getTF("eyeRight").setTrans(eeros::math::Vector3{0.06, -0.02, 0.1});
   tfTree.getTF("eyeRight").setRPY(0.0, 0.0, 0.21);
-  tfTree.getTF("shoulderLeft").setTrans(eeros::math::Vector3(0.2, 0.0, 0.5));
-  tfTree.getTF("shoulderRight").setTrans(eeros::math::Vector3(-0.2, 0.0, 0.5));
-  tfTree.getTF("ellbowRight").setTrans(eeros::math::Vector3(0.4, 0.0, 0.01));
+  tfTree.getTF("shoulderLeft").setTrans(eeros::math::Vector3{0.2, 0.0, 0.5});
+  tfTree.getTF("shoulderRight").setTrans(eeros::math::Vector3{-0.2, 0.0, 0.5});
+  tfTree.getTF("ellbowRight").setTrans(eeros::math::Vector3{0.4, 0.0, 0.01});
 
   try {
-    tfTree.getTF("shoulder").setTrans(eeros::math::Vector3(-0.2, 0.0, 0.5));
+    tfTree.getTF("shoulder").setTrans(eeros::math::Vector3{-0.2, 0.0, 0.5});
     FAIL();
   } catch (eeros::Fault const& err) {
     EXPECT_EQ(
@@ -108,7 +108,7 @@ TEST(TF_TreeTest, init1) {
   EXPECT_EQ(ss.str(), std::string("[0.001 0.12 -0.04 0 0.1 0.3]' "));
 
   // global positioning
-  tfTree.getTF("center").setTrans(Vector3(10.0, 5.0, 0.3));
+  tfTree.getTF("center").setTrans(Vector3{10.0, 5.0, 0.3});
   tfTree.getTF("center").setRPY(0.0, 0.5, 1.7);
   // hand shoulder right in global view:
   TF_Matrix tf_shoulderRight_global =
