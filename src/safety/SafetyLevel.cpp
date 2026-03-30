@@ -1,7 +1,8 @@
 #include <eeros/safety/SafetyLevel.hpp>
+#include <eeros/safety/InputAction.hpp>
 
-namespace eeros {
-namespace safety {
+
+namespace eeros::safety {
 
 SafetyEvent::SafetyEvent(std::string description) : description(description) {
   static int count = 0;
@@ -114,5 +115,4 @@ std::ostream& operator<<(std::ostream& os, eeros::safety::SafetyLevel* level) {
   return os;
 };
 
-}
 }

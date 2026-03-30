@@ -12,6 +12,7 @@
 #include <eeros/control/Watchdog.hpp>
 #include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/PeripheralInput.hpp>
+#include <eeros/safety/InputAction.hpp>
 
 using namespace eeros;
 using namespace eeros::logger;

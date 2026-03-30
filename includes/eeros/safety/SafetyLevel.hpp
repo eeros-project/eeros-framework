@@ -7,14 +7,13 @@
 #include <sstream>
 #include <map>
 #include <functional>
-#include <eeros/safety/InputAction.hpp>
 #include <eeros/safety/OutputAction.hpp>
 
-namespace eeros {
-namespace safety {
+namespace eeros::safety {
 
 class SafetyContext;
 class SafetySystem;
+class InputAction;
 
 enum EventType { kPrivateEvent, kPublicEvent };
 
@@ -237,5 +236,5 @@ std::ostream& operator<<(std::ostream& os, eeros::safety::SafetyLevel& level);
 std::ostream& operator<<(std::ostream& os, eeros::safety::SafetyLevel* level);
 
 }
-}
+
 #endif // ORG_EEROS_SAFETY_SAFETYLEVEL_HPP_
