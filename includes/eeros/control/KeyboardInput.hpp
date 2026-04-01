@@ -10,135 +10,82 @@
 #include <eeros/hal/KeyList.hpp>
 #include <eeros/control/IndexOutOfBoundsFault.hpp>
 
-using namespace eeros::hal;
-
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
- * This block serves to read the keys from a keyboard. The state
- * of the keys are delivered as signals with values of type bool.
+ * Reads N keys from a keyboard and delivers their state as bool output signals.
  *
- * @tparam N - number of input keys
+ * @tparam N - number of keys
  *
- * @since v0.6v
+ * @since v0.6
  */
-template < uint8_t N >
+template< uint8_t N >
 class KeyboardInput: public Blockio<0,N,bool> {
  public:
   /**
-   * Constructs a block which reads several keys on a keyboard.
-   * 
+   * Constructs a KeyboardInput block.
    * @param asciiCode - ascii code of the key
-   * @param name - name of the key
+   * @param name - names of the key
    * @param priority - priority of the associated thread
    */
   KeyboardInput(std::vector<char> asciiCode, std::vector<std::string> name, int priority = 20) : k(priority) {
-    auto& list = KeyList::instance();
+    auto& list = hal::KeyList::instance();
     list.addKeys(asciiCode, name);
-    HAL& hal = HAL::instance();
+    auto& hal = hal::HAL::instance();
     for (uint8_t i = 0; i < list.nofKeys; i++) {
-      hal::Input<bool>* in = new KeyboardDigIn(list, list.key[i]);
-      hal.addInput(in);
+      hal.addInput(new hal::KeyboardDigIn(list, list.key[i]));
     }
   }
-  
+
   /**
-  * Disabling use of copy constructor because the block should never be copied unintentionally.
-  */
-  KeyboardInput(const KeyboardInput& s) = delete; 
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
+   */
+  KeyboardInput(const KeyboardInput& s) = delete;
+  KeyboardInput& operator=(const KeyboardInput&) = delete;
 
   /**
    * Runs the block.
    */
-  virtual void run() {
+  void run() override {
     uint64_t time = eeros::System::getTimeNs();
-    auto& list = KeyList::instance();
+    auto& list = hal::KeyList::instance();
     for (uint8_t i = 0; i < list.nofKeys; i++) {
       this->out[i].getSignal().setValue(list.state[i]);
       this->out[i].getSignal().setTimestamp(time);
     }
   }
-  
+
   /**
-   * Getter function for the output with a given index.
-   * 
-   * @param index - index of output
+   * Returns the output at the given index.
+   *
+   * @param index - output index
    * @return the output with this index
+   * @throws IndexOutOfBoundsFault if index >= N
    */
-  virtual Output<bool>& getOut(uint8_t index) {
-    auto& list = KeyList::instance();
-    if (index < 0 || index >= list.nofKeys) 
-      throw IndexOutOfBoundsFault("Trying to get inexistent element of output in Block " + this->getName());  
+  auto& getOut(uint8_t index) requires (N > 1) {
+    if (index >= N)
+      throw IndexOutOfBoundsFault(
+        "Trying to get inexistent element of output in block '" + this->getName() + "'");
     return this->out[index];
   }
-  
-  /**
-   * Reset the state of a key. This must be done manually after having consumed the state.
-   * 
-   * @param index - index of output
-   */
-  virtual void reset(uint8_t index) {
-    auto& list = KeyList::instance();
-    if (index < 0 || index >= list.nofKeys) 
-      throw IndexOutOfBoundsFault("Trying to get inexistent element of output in Block " + this->getName());  
-    list.state[index] = false;
-  }
-  
- protected:
-  Keyboard k;
-};
-
-/**
- * This block serves to read the keys from a keyboard. The state
- * of the keys are delivered as signals with values of type bool.
- * Spezialization for one key.
- *
- * @since v0.6v
- */
-template < >
-class KeyboardInput<1>: public Blockio<0,1,bool> {
- public:
-  /**
-   * Constructs a block which reads one key on a keyboard.
-   * 
-   * @param asciiCode - ascii code of the key
-   * @param name - name of the key
-   * @param priority - priority of the associated thread
-   */
-  KeyboardInput(std::vector<char> asciiCode, std::vector<std::string> name, int priority = 20) : k(priority) {
-    auto& list = KeyList::instance();
-    list.addKeys(asciiCode, name);
-    HAL& hal = HAL::instance();
-    hal::Input<bool>* in = new KeyboardDigIn(list, list.key[0]);
-    hal.addInput(in);
-  }
-  
-  /**
-  * Disabling use of copy constructor because the block should never be copied unintentionally.
-  */
-  KeyboardInput(const KeyboardInput& s) = delete; 
 
   /**
-   * Runs the block.
+   * Resets the state of the key at the given index.
+   * Must be called manually after consuming the state.
+   *
+   * @param index - output index
+   * @throws IndexOutOfBoundsFault if index >= N
    */
-  virtual void run() {
-    uint64_t time = eeros::System::getTimeNs();
-    auto& list = KeyList::instance();
-    this->getOut().getSignal().setValue(list.state[0]);
-    this->getOut().getSignal().setTimestamp(time);
+  virtual void reset(uint8_t index = 0) {
+    if (index >= N)
+      throw IndexOutOfBoundsFault(
+        "Trying to get inexistent element of output in block '" + this->getName() + "'");
+    hal::KeyList::instance().state[index] = false;
   }
-  
-  /**
-   * Reset the state of the key. This must be done manually after having consumed the state.
-   */
-  virtual void reset() {
-    auto& list = KeyList::instance();
-    list.state[0] = false;
-  }
-  
+
  protected:
-  Keyboard k;
+  hal::Keyboard k;
 };
 
 /**
@@ -147,12 +94,11 @@ class KeyboardInput<1>: public Blockio<0,1,bool> {
  * Does not print a newline control character.
  */
 template <uint8_t N>
-std::ostream& operator<<(std::ostream& os, KeyboardInput<N>& k) {
-  os << "Block keyboard input: '" << k.getName();
+std::ostream& operator<<(std::ostream& os, const KeyboardInput<N>& k) {
+  os << "Block keyboard input: '" << k.getName() << "'";
   return os;
 }
 
-}
 }
 
 #endif /* ORG_EEROS_CONTROL_KEYBOARDINPUT_HPP_ */

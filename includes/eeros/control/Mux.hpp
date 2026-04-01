@@ -7,8 +7,7 @@
 #include <eeros/control/Output.hpp>
 #include <eeros/control/IndexOutOfBoundsFault.hpp>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * A multiplexer block is used to bundle multiple inputs into one output vector.
@@ -16,6 +15,7 @@ namespace control {
  * @tparam N - number of inputs
  * @tparam T - signal input type (double - default type)
  * @tparam C - signal output type (Matrix<N,1,T> - default type)
+ * 
  * @since v0.6
  */
 
@@ -29,10 +29,12 @@ class Mux: public Blockio<N,1,T,C> {
   Mux() { }
 
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
-  Mux(const Mux& s) = delete; 
-  
+  Mux(const Mux& s) = delete;
+  Mux& operator=(const Mux&) = delete;
+
   /**
    * Runs the multiplexer.
    *
@@ -54,12 +56,11 @@ class Mux: public Blockio<N,1,T,C> {
  * Does not print a newline control character.
  */
 template <uint8_t N, typename T, typename C>
-std::ostream& operator<<(std::ostream& os, Mux<N,T,C>& m) {
+std::ostream& operator<<(std::ostream& os, const Mux<N,T,C>& m) {
   os << "Block multiplexer: '" << m.getName() << "'"; 
   return os;
 }
 
-}
 }
 
 #endif /* ORG_EEROS_CONTROL_MUX_HPP_ */

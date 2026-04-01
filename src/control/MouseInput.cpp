@@ -7,10 +7,9 @@ using namespace eeros::control;
 
 MouseInput::MouseInput(std::string dev, int priority) : mouse(dev, priority), buttonOut(this) {
   setInitPos(0, 0, 0, 0);
-  first = true;
 }
 
-MouseInput::MouseInput(std::string dev, Vector4 scale, Vector4 min, Vector4 max, int priority) : mouse(dev, priority), buttonOut(this) {
+MouseInput::MouseInput(std::string dev, eeros::math::Vector4 scale, eeros::math::Vector4 min, eeros::math::Vector4 max, int priority) : mouse(dev, priority), buttonOut(this) {
   axisScale_x = scale(0);
   axisScale_y = scale(1);
   axisScale_z = scale(2);
@@ -24,7 +23,6 @@ MouseInput::MouseInput(std::string dev, Vector4 scale, Vector4 min, Vector4 max,
   min_r = min(3);
   max_r = max(3);
   setInitPos(0, 0, 0, 0);
-  first = true;
 }
 
 void MouseInput::run() {
@@ -58,23 +56,23 @@ void MouseInput::run() {
   vr += r;
 
   uint64_t time = eeros::System::getTimeNs();
-  getOut().getSignal().setValue(Vector4{ vx, vy, vz, vr });
+  getOut().getSignal().setValue(eeros::math::Vector4{ vx, vy, vz, vr });
   getOut().getSignal().setTimestamp(time);
   
-  buttonOut.getSignal().setValue(Matrix<3,1,bool>{current.button.left, current.button.middle, current.button.right});
+  buttonOut.getSignal().setValue(math::Matrix<3,1,bool>{current.button.left, current.button.middle, current.button.right});
   buttonOut.getSignal().setTimestamp(time);
 }
 
-Output<Matrix<3,1,bool>>& MouseInput::getButtonOut() {
+Output<eeros::math::Matrix<3,1,bool>>& MouseInput::getButtonOut() {
   return buttonOut;
 }
 
 void MouseInput::setInitPos(double x, double y, double z, double r) {
   reset(x, y, z, r);
-  getOut().getSignal().setValue(Matrix<4>{ x, y, z, r });
+  getOut().getSignal().setValue(eeros::math::Matrix<4>{ x, y, z, r });
 }
 
-void MouseInput::setInitPos(Matrix<4> pos) {
+void MouseInput::setInitPos(eeros::math::Matrix<4> pos) {
   setInitPos(pos[0], pos[1], pos[2], pos[3]);
 }
 

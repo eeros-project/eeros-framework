@@ -4,8 +4,7 @@
 #include <eeros/control/Block.hpp>
 #include <array>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * A trajectory generator block is serves as template to build blocks which 
@@ -126,8 +125,7 @@ class TrajectoryGenerator : public Block {
   std::array<T, N> last;
 };
 
-};
-};
+}
 
 #endif /* ORG_EEROS_CONTROL_TRAJECTORYGENERATOR_HPP_ */
 

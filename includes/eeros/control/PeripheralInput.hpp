@@ -5,8 +5,7 @@
 #include <eeros/hal/HAL.hpp>
 #include <eeros/core/Fault.hpp>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * A peripheral input block reads a signal from an input. This
@@ -63,7 +62,6 @@ class PeripheralInput : public Blockio<0,1,T> {
   hal::Input<T>* systemInput;
 };
 
-}
 }
 
 #endif // ORG_EEROS_CONTROL_PERIPHERALINPUT_HPP

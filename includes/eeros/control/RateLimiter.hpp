@@ -3,10 +3,10 @@
 
 #include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
+#include <mutex>
+#include <ostream>
 
-
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * The RateLimiter block limits the first derivative of the signal passing through it. 
@@ -28,9 +28,6 @@ namespace control {
  * 
  * @tparam Tout - output type (double - default type)
  * @tparam Trate - rate type (double - default type)
- * @tparam elementWise - apply element wise (false - default value). If true, then rates must be double.
- * @tparam rising_slew_rate: the limit of the derivative of an increasing input signal.
- * @tparam falling_slew_rate: the limit of the derivative of a decreasing input signal (negative value).
  *
  * @since 1.1
  */
@@ -40,32 +37,30 @@ class RateLimiter : public Blockio<1,1,Tout> {
  public:
   
   /**
-   * Constructs a RateLimiter instance with rising and falling rates being equal.\n
+   * Constructs a RateLimiter with equal rising and falling rates.
    * 
-   * @param rate - limit of the first derivative
+   * @param rate - symmetric limit of the first derivative
    */
-  RateLimiter(Trate rate) {
-    fallingRate = -rate;
-    risingRate = rate;
+  RateLimiter(Trate rate) : fallingRate(-rate), risingRate(rate) {
     outPrev.clear();
   }
   
   /**
-   * Constructs a RateLimiter instance specifying rising and falling rates.\n
+   * Constructs a RateLimiter with separate rising and falling rates.
    * 
-   * @param fRate - limit of the first derivative in negative direction
-   * @param rRate - limit of the first derivative in positive direction
+   * @param fRate - falling (negative direction) rate limit
+   * @param rRate - rising  (positive direction) rate limit
    */
-  RateLimiter(Trate fRate, Trate rRate) {
-    fallingRate = fRate;
-    risingRate = rRate;
+  RateLimiter(Trate fRate, Trate rRate) : fallingRate(fRate), risingRate(rRate) {
     outPrev.clear();
   }
   
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
   RateLimiter(const RateLimiter& s) = delete; 
+  RateLimiter& operator=(const RateLimiter&) = delete;
 
   /**
    * Runs the rate limiting algorithm.
@@ -76,20 +71,18 @@ class RateLimiter : public Blockio<1,1,Tout> {
    * If rate < fallingRate: output(i) = dt * fallingRate + output(i-1)
    * Otherwise: output(i) = input(i)
    */
-  virtual void run(){
+  void run() override {
     std::lock_guard<std::mutex> lock(mtx);
     Tout inVal = this->getIn().getSignal().getValue();
-    double tin = this->getIn().getSignal().getTimestamp() / 1000000000.0;
-    double tprev = outPrev.getTimestamp() / 1000000000.0;
-    Tout outVal = inVal;
-    if(enabled) {
-      double dt = tin - tprev;
-      outVal = calculateResult<Tout>(inVal, dt);
+    auto ts = this->getIn().getSignal().getTimestamp();
+    if (enabled) {
+      double dt = (ts - outPrev.getTimestamp()) / 1e9;
+      inVal = calculate(inVal, dt);
     }
-    outPrev.setValue(outVal);
-    outPrev.setTimestamp(this->getIn().getSignal().getTimestamp());
-    this->getOut().getSignal().setValue(outVal);
-    this->getOut().getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
+    outPrev.setValue(inVal);
+    outPrev.setTimestamp(ts);
+    this->getOut().getSignal().setValue(inVal);
+    this->getOut().getSignal().setTimestamp(ts);
   }
   
   /**
@@ -99,7 +92,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
    * 
    * @see disable()
    */
-  virtual void enable() {
+  void enable() {
     enabled = true;
   }
   
@@ -110,7 +103,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
    * 
    * @see enable()
    */
-  virtual void disable() {
+  void disable() {
     enabled = false;
   }
   
@@ -120,7 +113,7 @@ class RateLimiter : public Blockio<1,1,Tout> {
    * @param fRate - limit of the first derivative in negative direction
    * @param rRate - limit of the first derivative in positive direction
    */
-  virtual void setRate(Trate fRate, Trate rRate) {
+  void setRate(Trate fRate, Trate rRate) {
     std::lock_guard<std::mutex> lock(mtx);
     fallingRate = fRate;
     risingRate = rRate;
@@ -139,42 +132,39 @@ class RateLimiter : public Blockio<1,1,Tout> {
   bool enabled{false};
   std::mutex mtx;
   
-  template <typename S> 
-  typename std::enable_if<std::is_arithmetic<S>::value, S>::type calculateResult(S inValue, double dt) {
+  // scalar Tout
+  Tout calculate(Tout inVal, double dt) requires std::is_arithmetic_v<Tout> {
+    double rate = (inVal - outPrev.getValue()) / dt;
+    if      (rate > risingRate)  return dt * risingRate  + outPrev.getValue();
+    else if (rate < fallingRate) return dt * fallingRate + outPrev.getValue();
+    else                         return inVal;
+  }
+
+  // vector Tout, scalar Trate — uniform limiting
+  Tout calculate(Tout inVal, double dt)
+      requires (!std::is_arithmetic_v<Tout> && std::is_arithmetic_v<Trate>) {
     Tout outVal;
-    Trate rate = (inValue - outPrev.getValue()) / dt;
-    if (rate > risingRate) outVal = dt * risingRate + outPrev.getValue();
-    else if (rate < fallingRate) outVal = dt * fallingRate + outPrev.getValue();
-    else outVal = inValue;
+    for (unsigned int i = 0; i < inVal.size(); ++i) {
+      double rate = (inVal[i] - outPrev.getValue()[i]) / dt;
+      if      (rate > risingRate)  outVal[i] = dt * risingRate  + outPrev.getValue()[i];
+      else if (rate < fallingRate) outVal[i] = dt * fallingRate + outPrev.getValue()[i];
+      else                         outVal[i] = inVal[i];
+    }
     return outVal;
   }
 
-  template <typename S> 
-  typename std::enable_if<std::is_compound<S>::value && std::is_arithmetic<Trate>::value, S>::type calculateResult(S inValue, double dt) {
-    std::cout << " NOT element wise" << std::endl;
+  // vector Tout, vector Trate — element-wise limiting
+  Tout calculate(Tout inVal, double dt)
+      requires (!std::is_arithmetic_v<Tout> && !std::is_arithmetic_v<Trate>) {
     Tout outVal;
-    for (unsigned int i = 0; i < inValue.size(); i++) {
-      double rate = (inValue[i] - outPrev.getValue()[i])/dt;
-      if (rate > risingRate) outVal[i] = dt * risingRate + outPrev.getValue()[i];
-      else if (rate < fallingRate) outVal[i] = dt * fallingRate + outPrev.getValue()[i];
-      else outVal[i] = inValue[i];
-    }
-    return outVal;
-  }
-  
-  template <typename S> 
-  typename std::enable_if<std::is_compound<S>::value && std::is_compound<Trate>::value, S>::type calculateResult(S inValue, double dt) {
-    std::cout << " element wise" << std::endl;
-    Tout outVal;
-    for (unsigned int i = 0; i < inValue.size(); i++) {
-      double rate = (inValue[i] - outPrev.getValue()[i]) / dt;
-      if (rate > risingRate[i]) outVal[i] = dt * risingRate[i] + outPrev.getValue()[i];
+    for (unsigned int i = 0; i < inVal.size(); ++i) {
+      double rate = (inVal[i] - outPrev.getValue()[i]) / dt;
+      if      (rate > risingRate[i])  outVal[i] = dt * risingRate[i]  + outPrev.getValue()[i];
       else if (rate < fallingRate[i]) outVal[i] = dt * fallingRate[i] + outPrev.getValue()[i];
-      else outVal[i] = inValue[i];
+      else                            outVal[i] = inVal[i];
     }
     return outVal;
   }
-  
 };
 
 /**
@@ -183,12 +173,11 @@ class RateLimiter : public Blockio<1,1,Tout> {
  * Does not print a newline control character.
  */
 template <typename T>
-std::ostream& operator<<(std::ostream& os, RateLimiter<T>& rl) {
+std::ostream& operator<<(std::ostream& os, const RateLimiter<T>& rl) {
   os << "Block RateLimiter: '" << rl.getName() << "' falling rate=" << rl.fallingRate << ", rising rate=" << rl.risingRate; 
   return os;
 }
 
-}
 }
 
 #endif /* ORG_EEROS_CONTROL_RATELIMITER_HPP_ */

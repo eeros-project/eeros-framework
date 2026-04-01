@@ -7,8 +7,7 @@
 #include <cmath>
 #include <mutex>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * This path planner with constant jerk generates a trajectory as follows.
@@ -357,8 +356,7 @@ std::ostream &operator<<(std::ostream &os, PathPlannerConstJerk<T> &pp) {
   return os;
 }
 
-};
-};
+}
 
 #endif /* ORG_EEROS_CONTROL_PATHPLANNERCONSTJERK_HPP_ */
 

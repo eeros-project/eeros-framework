@@ -8,8 +8,7 @@
 #include <eeros/core/Fault.hpp>
 #include <eeros/control/NaNOutputFault.hpp>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * A peripheral output block delivers a signal to an output. This
@@ -87,7 +86,6 @@ class PeripheralOutput : public Blockio<1,0,T> {
   std::mutex mtx;
 };
 
-};
-};
+}
 
 #endif // ORG_EEROS_CONTROL_PERIPHERALOUTPUT_HPP

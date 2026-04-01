@@ -26,9 +26,11 @@ class DeMux: public Blockio<1,N,eeros::math::Matrix<N,1,T>,T> {
   DeMux() { }
       
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
-  DeMux(const DeMux& s) = delete; 
+  DeMux(const DeMux& s) = delete;
+  DeMux& operator=(const DeMux&) = delete;
 
   /**
    * Runs the demultiplexer.

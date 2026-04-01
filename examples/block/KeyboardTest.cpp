@@ -14,6 +14,7 @@ using namespace eeros::logger;
 using namespace eeros::control;
 using namespace eeros::task;
 using namespace eeros::safety;
+using namespace eeros::hal;
 
 double period = 0.1;
 

@@ -21,9 +21,11 @@ class D: public Blockio<1,1,T> {
   D() { prev.clear(); }
   
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
-  D(const D& s) = delete; 
+  D(const D& s) = delete;
+  D& operator=(const D&) = delete;
 
   /**
    * Runs the differentiator algorithm. If the input signal

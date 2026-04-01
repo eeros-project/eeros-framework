@@ -7,8 +7,7 @@
 #include <cmath>
 #include <mutex>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * This path planner with constant acceleration generates a trajectory as follows.
@@ -303,8 +302,7 @@ std::ostream &operator<<(std::ostream &os, PathPlannerConstAcc<T> &pp) {
   return os;
 }
 
-};
-};
+}
 
 #endif /* ORG_EEROS_CONTROL_PATHPLANNERCONSTACC_HPP_ */
 

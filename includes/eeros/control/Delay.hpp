@@ -33,9 +33,11 @@ class Delay : public Blockio<1,1,T> {
   }
 
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
   Delay(const Delay& s) = delete; 
+  Delay& operator=(const Delay&) = delete;
 
   /**
    * Destructor frees buffers.

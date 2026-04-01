@@ -83,9 +83,11 @@ class Gain : public Blockio<1,1,Tout,Tout> {
 
 
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
   Gain(const Gain& s) = delete;
+  Gain& operator=(const Gain&) = delete;
 
   /**
    * Runs the amplification algorithm.

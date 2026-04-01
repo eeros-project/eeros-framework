@@ -51,9 +51,11 @@ class Constant : public Blockio<0,1,T,T> {
   explicit Constant(std::initializer_list<V> list) : value(list) {}
 
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
   Constant(const Constant& other) = delete;
+  Constant& operator=(const Constant&) = delete;
 
   /**
    * Runs the switch block.
