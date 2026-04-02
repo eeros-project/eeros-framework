@@ -14,13 +14,12 @@ namespace eeros::control {
  *
  * @tparam N - number of inputs
  * @tparam T - signal input type (double - default type)
- * @tparam C - signal output type (Matrix<N,1,T> - default type)
  * 
  * @since v0.6
  */
 
-template < uint32_t N, typename T = double, typename C = eeros::math::Matrix<N,1,T> >
-class Mux: public Blockio<N,1,T,C> {
+template < uint32_t N, typename T = double >
+class Mux: public Blockio<N,1,T,eeros::math::Matrix<N,1,T>> {
  public:
    
   /**
@@ -40,7 +39,7 @@ class Mux: public Blockio<N,1,T,C> {
    *
    */
   virtual void run() {
-    C newValue;
+    eeros::math::Matrix<N,1,T> newValue;
     for (uint32_t i = 0; i < N; i++) {
       newValue(i) = this->in[i].getSignal().getValue();
     }
@@ -55,8 +54,8 @@ class Mux: public Blockio<N,1,T,C> {
  * Multiplexer instance to an output stream.\n
  * Does not print a newline control character.
  */
-template <uint8_t N, typename T, typename C>
-std::ostream& operator<<(std::ostream& os, const Mux<N,T,C>& m) {
+template <uint8_t N, typename T>
+std::ostream& operator<<(std::ostream& os, const Mux<N,T>& m) {
   os << "Block multiplexer: '" << m.getName() << "'"; 
   return os;
 }
