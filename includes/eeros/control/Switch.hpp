@@ -7,16 +7,21 @@
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <mutex>
+#include <vector>
+#include <ostream>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
- * A switch allows to select a signal from severel inputs to be routed to the output.
- * If a signal at a chosen input is close to a predefined value, the switch can automatically switch 
- * to a predefined position and a safety event can be triggered. The switch can be made to switch
- * only if the current safety level is greater or the same as the active level set on this switch.
- * Two or more switches can be combined. This mechanism allows to switch them simultaneously.
+ * @brief Routes one of N input signals to a single output.
+ *
+ * The active input can be changed manually via @ref switchToInput(), or
+ * automatically when the signal at the current input enters a configurable
+ * window around a target level (arm/condition mechanism). Automatic switching
+ * can optionally:
+ * - require the safety system to be at or above a configured level
+ * - fire a safety event
+ * - propagate the switch position to any number of linked Switch blocks
  * 
  * @tparam N - number of inputs
  * @tparam T - value type (double - default type)
@@ -38,23 +43,22 @@ class Switch : public Blockio<N,1,T> {
    * 
    * @param initInputIndex - switch is initially set to this position
    */
-  Switch(uint8_t initInputIndex) 
+  explicit Switch(uint8_t initInputIndex) 
       : currentInput(initInputIndex),
-        safetySystem(nullptr),
-        safetyEvent(nullptr),
-        activeLevel(nullptr),
         log(logger::Logger::getLogger()) { }
 
   /**
-  * Disabling use of copy constructor because the block should never be copied unintentionally.
-  */
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
+   */
   Switch(const Switch& s) = delete; 
+  Switch& operator=(const Switch&) = delete;
 
   /**
   * Runs the switch block.
   */
-  virtual void run() override {
-    std::lock_guard<std::mutex> lock(mtx);
+  void run() override {
+    std::lock_guard lock(mtx);
     auto val = this->in[currentInput].getSignal().getValue();
     if (armed && !switched) {
       if (val < (switchLevel + delta) && val > (switchLevel - delta)) {
@@ -63,7 +67,7 @@ class Switch : public Blockio<N,1,T> {
            ) {
           log.warn() << "Switch \'" + this->getName() + "\' switches!";
           switchToInput(nextInput);
-          for(Switch* i : c) i->switchToInput(nextInput);
+          for(Switch* s : linked) s->switchToInput(nextInput);
           switched = true;
           armed = false;
           if (safetySystem != nullptr && safetyEvent != nullptr) {
@@ -77,15 +81,17 @@ class Switch : public Blockio<N,1,T> {
   }
                   
   /**
-  * Changes the switch position.
-  * 
-  * @param index - position to switch to
-  * @return true, if operation successful
-  */
-  virtual bool switchToInput(uint8_t index) {
+   * @brief Switches the active input to @p index.
+   *
+   * Also propagates the change to any linked Switch blocks.
+   *
+   * @param index  Target input index (0-based)
+   * @return @c true on success, @c false if @p index is out of range
+   */
+  bool switchToInput(uint8_t index) {
     if(index >= 0 && index < N) {
       currentInput = index;
-      for(Switch* i : c) i->switchToInput(index);
+      for(Switch* s : linked) s->switchToInput(index);
       return true;
     }
     return false;
@@ -96,7 +102,7 @@ class Switch : public Blockio<N,1,T> {
   * 
   * @return current position
   */
-  virtual uint8_t getCurrentInput() const {
+  [[nodiscard]] uint8_t getCurrentInput() const {
     return currentInput;
   }
                   
@@ -108,7 +114,7 @@ class Switch : public Blockio<N,1,T> {
   * @param ss - safety system
   * @param e - safety event
   */
-  virtual void registerSafetyEvent(safety::SafetySystem& ss, safety::SafetyEvent& e) {
+  void registerSafetyEvent(safety::SafetySystem& ss, safety::SafetyEvent& e) {
     safetySystem = &ss;
     safetyEvent = &e;
   }
@@ -122,8 +128,8 @@ class Switch : public Blockio<N,1,T> {
    * @param ss - safety system
    * @param level - SafetyLevel
    */
-  virtual void setActiveLevel(safety::SafetySystem& ss, safety::SafetyLevel &level) {
-    std::lock_guard<std::mutex> lock(mtx);
+  void setActiveLevel(safety::SafetySystem& ss, safety::SafetyLevel &level) {
+    std::lock_guard lock(mtx);
     safetySystem = &ss;
     activeLevel = &level;
   }
@@ -136,12 +142,12 @@ class Switch : public Blockio<N,1,T> {
   * It is possible to trigger a safety event upon switching
   * @see registerSafetyEvent()
   * 
-  * @param switchLevel - level, that the input signal has to reach
+  * @param level - level, that the input signal has to reach
   * @param delta - level margin, that the input signal has to reach
   * @param index - position to switch to 
   */
-  virtual void setCondition(T switchLevel, T delta, uint8_t index) {
-    this->switchLevel = switchLevel;
+  void setCondition(T level, T delta, uint8_t index) {
+    switchLevel = level;
     this->delta = delta;
     nextInput = index;
   }
@@ -150,7 +156,7 @@ class Switch : public Blockio<N,1,T> {
   * Allows to switch automatically.
   * @see setCondition()
   */
-  virtual void arm() {
+  void arm() {
     armed = true;
     switched = false;
   }
@@ -161,7 +167,7 @@ class Switch : public Blockio<N,1,T> {
   * 
   * @return true, if safety event was fired
   */
-  virtual bool triggered() const {
+  [[nodiscard]] bool triggered() const {
     return switched;
   }
                   
@@ -170,34 +176,33 @@ class Switch : public Blockio<N,1,T> {
   * automatically be on the same position as the this switch.
   * triggered as soon as auto switching takes place.
   * 
-  * @param s - switch to be connected to this switch
+  * @param s - switch to be linked to this switch
   */
-  virtual void combine(Switch& s) {
-    c.push_back(&s);
+  void combine(Switch& s) {
+    linked.push_back(&s);
     s.switchToInput(currentInput);
   }
 
  protected:
-  uint8_t currentInput, nextInput;
-  T switchLevel, delta;
-  bool armed = false;
-  bool switched = false;
-  safety::SafetySystem* safetySystem;
-  safety::SafetyEvent* safetyEvent;
-  safety::SafetyLevel *activeLevel;
-  std::vector<Switch*> c;
+  uint8_t currentInput{0}, nextInput{0};
+  T switchLevel{}, delta{};
+  bool armed{false};
+  bool switched{false};
+  safety::SafetySystem* safetySystem{nullptr};
+  safety::SafetyEvent* safetyEvent{nullptr};
+  safety::SafetyLevel* activeLevel{nullptr};
+  std::vector<Switch*> linked{};
   eeros::logger::Logger log;
   std::mutex mtx{};
 };
 
 /********** Print functions **********/
 template <uint8_t N, typename T>
-std::ostream& operator<<(std::ostream& os, Switch<N,T>& sw) {
+std::ostream& operator<<(std::ostream& os, const Switch<N,T>& sw) {
   os << "Block switch: '" << sw.getName() << "'"; 
   return os;
 }
 
-}
 }
 
 #endif /* ORG_EEROS_CONTROL_SWITCH_HPP_ */

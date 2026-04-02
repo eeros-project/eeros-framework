@@ -51,7 +51,7 @@ class CANsend : public Blockio<1,0,Matrix<N,1,double>> {
    * @see enable()
    * @see disable()
    */
-  virtual void run() {
+  void run() override {
     if (enabled) {
       for (std::size_t i = 0; i < nodes.size(); i++) {
         uint32_t pos = this->getIn().getSignal().getValue()[i] * scale(i);

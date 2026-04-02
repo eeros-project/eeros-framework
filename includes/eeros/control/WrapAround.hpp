@@ -3,27 +3,28 @@
 
 #include <eeros/control/Blockio.hpp>
 #include <eeros/math/Matrix.hpp>
+#include <cmath>
 #include <mutex>
+#include <ostream>
 
-using namespace eeros::math;
+namespace eeros::control {
 
-namespace eeros {
-namespace control {
-  
 /**
- * A WrapAround block wraps an input value between two limit values.
- * As soon as the input value exceeds an upper limit, the output will wrap
- * around and will be set to minVal. The wrap direction works in positive or 
- * direction. The output value will always vary between minVal and maxVal.
- * 
- * @tparam Tout - output type (double - default type) 
- * @tparam Twrap - type of min and max values for wrap. Must be double, or same as Tout (double - default type) 
- * @tparam minVal: minimum value - lower value of output signal
- * @tparam maxVal: maximum value - higher value of output signal
- *  
- * @since 1.3
+ * @brief Wraps an input signal into a [min, max] interval.
+ *
+ * When the input exceeds @c maxVal it wraps back to @c minVal, and vice versa.
+ * Works in both positive and negative directions. The output always stays
+ * within [@c minVal, @c maxVal].
+ *
+ * @c Twrap may be:
+ * - the same as @c Tout (per-element min/max for composite types)
+ * - @c double when @c Tout is a composite type (scalar min/max applied to all elements)
+ *
+ * @tparam Tout   Output signal type (default: @c double)
+ * @tparam Twrap  Type of the min/max limits (default: same as @c Tout)
+ *
+ * @since v1.3
  */
-
 template<typename Tout = double, typename Twrap = Tout>
 class WrapAround : public Blockio<1,1,Tout> {
  public:   
@@ -34,104 +35,49 @@ class WrapAround : public Blockio<1,1,Tout> {
    * @param min - minimum value for wrap around
    * @param max - maximum value for wrap around
    */
-  WrapAround(Twrap min, Twrap max) : enabled(true), minVal(min), maxVal(max) { }
+  WrapAround(Twrap min, Twrap max) : minVal(min), maxVal(max) { }
       
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
-  WrapAround(const WrapAround& s) = delete; 
+  WrapAround(const WrapAround&)            = delete;
+  WrapAround& operator=(const WrapAround&) = delete;
   
   /**
-   * Runs the wrap around algorithm, as described above.
+   * @brief Applies the wrap-around algorithm to the input signal.
    */
-  virtual void run(){
-    std::lock_guard<std::mutex> lock(mtx);
-    Tout inVal = this->getIn().getSignal().getValue();
-    Tout outVal = inVal;
-    if (enabled) outVal = calculateResult<Tout>(inVal);
-    this->getOut().getSignal().setValue(outVal);
+  void run() override {
+    std::lock_guard lock(mtx);
+    const Tout inVal = this->getIn().getSignal().getValue();
+    this->getOut().getSignal().setValue(enabled ? wrapped(inVal) : inVal);
     this->getOut().getSignal().setTimestamp(this->getIn().getSignal().getTimestamp());
   }
 
   /**
-   * Enables the block.
-   * 
-   * If enabled, run() will perform wrap around.
-   * 
-   * @see disable()
+   * @brief Enables wrap-around processing. @see disable()
    */
   virtual void enable() {
     enabled = true;
   }
 
   /**
-   * Disables the block.
-   * 
-   * If disabled, run() will set output = input.
-   * 
-   * @see enable()
+   * @brief Disables wrap-around — output passes through unchanged. @see enable()
    */
   virtual void disable() {
     enabled = false;
   }
 
   /**
-   * Sets min and max values.
+   * @brief Updates the wrap limits.
    * 
    * @param min - minimum value for wrap around
    * @param max - maximum value for wrap around
    */
   virtual void setMinMax(Twrap min, Twrap max) {
-    std::lock_guard<std::mutex> lock(mtx);
-    this->minVal = minVal;
-    this->maxVal = maxVal;
-  }
-
- private:
-  template <typename S> 
-  typename std::enable_if<std::is_arithmetic<S>::value, S>::type calculateResult(S inValue) {
-    Tout outVal;
-    double delta = fabs(maxVal - minVal);
-    double num = inValue - this->minVal;
-    double den = delta;
-    double tquot = floor(num / den);
-    outVal = num - tquot * den;
-    if (outVal < 0) outVal = outVal + delta;
-    else if (outVal > 0) outVal = outVal + this->minVal; 
-    else outVal = inValue;
-    return outVal;
-  }
-
-  template <typename S> 
-  typename std::enable_if<std::is_compound<S>::value && std::is_arithmetic<Twrap>::value, S>::type calculateResult(S inValue) {
-    Tout outVal;
-    for(unsigned int i = 0; i < inValue.size(); i++) {
-      double delta = fabs(maxVal - minVal);
-      double num = inValue[i] - this->minVal;
-      double den = delta;
-      double tquot = floor(num / den);
-      outVal[i] = num - tquot * den;
-      if (outVal[i] < 0) outVal[i] = outVal[i] + delta;
-      else if ((outVal[i] > 0)) outVal[i] = outVal[i] + this->minVal; 
-      else outVal[i] = inValue[i];
-    }
-    return outVal;
-  }
-  
-  template <typename S> 
-  typename std::enable_if<std::is_compound<S>::value && std::is_compound<Twrap>::value, S>::type calculateResult(S inValue) {
-    Tout outVal;
-    for(unsigned int i = 0; i < inValue.size(); i++) {
-      double delta = fabs(maxVal[i] - minVal[i]);
-      double num = inValue[i] - this->minVal[i];
-      double den = delta;
-      double tquot = floor(num/den);
-      outVal[i] = num - tquot * den;
-      if (outVal[i] < 0) outVal[i] = outVal[i] + delta;
-      else if ((outVal[i] > 0)) outVal[i] = outVal[i] + this->minVal[i]; 
-      else outVal[i] = inValue[i];
-    }
-    return outVal;
+    std::lock_guard lock(mtx);
+    minVal = min;
+    maxVal = max;
   }
 
   /*
@@ -139,13 +85,49 @@ class WrapAround : public Blockio<1,1,Tout> {
    * the class access to the private fields.
    */
   template<typename Xout, typename Xwrap>
-  friend std::ostream &operator<<(std::ostream &os, WrapAround<Xout, Xwrap> &wrap);
+  friend std::ostream &operator<<(std::ostream &os, const WrapAround<Xout, Xwrap> &wrap);
 
  protected:
   bool enabled{true};
-  std::mutex mtx;
+  std::mutex mtx{};
   Twrap minVal;
   Twrap maxVal;
+
+ private:
+  // ── Single wrap computation for one scalar element ───────────────────────
+  static double wrapScalar(double val, double lo, double hi) {
+    const double delta = std::fabs(hi - lo);
+    const double num = val - lo;
+    const double tquot = std::floor(num / delta);
+    double out = num - tquot * delta;
+    if (out < 0.0) out += delta;
+    else if (out > 0.0) out += lo;
+    else out  = val;
+    return out;
+  }
+
+  // Arithmetic Tout
+  Tout wrapped(Tout inVal) const requires std::is_arithmetic_v<Tout> {
+    return static_cast<Tout>(wrapScalar(inVal, minVal, maxVal));
+  }
+
+  // Compound Tout, scalar Twrap (same limit for every element)
+  Tout wrapped(Tout inVal) const
+      requires (!std::is_arithmetic_v<Tout> && std::is_arithmetic_v<Twrap>) {
+    Tout out{};
+    for (unsigned int i = 0; i < inVal.size(); ++i)
+      out[i] = wrapScalar(inVal[i], minVal, maxVal);
+    return out;
+  }
+
+  // ── Compound Tout, compound Twrap (per-element limits) 
+  Tout wrapped(Tout inVal) const
+      requires (!std::is_arithmetic_v<Tout> && !std::is_arithmetic_v<Twrap>) {
+    Tout out{};
+    for (unsigned int i = 0; i < inVal.size(); ++i)
+      out[i] = wrapScalar(inVal[i], minVal[i], maxVal[i]);
+    return out;
+  }  
 };
 
 /**
@@ -154,13 +136,12 @@ class WrapAround : public Blockio<1,1,Tout> {
  * Does not print a newline control character.
  */
 template<typename Tout, typename Twrap>
-std::ostream &operator<<(std::ostream &os, WrapAround<Tout, Twrap> &wrap) {
+std::ostream &operator<<(std::ostream &os, const WrapAround<Tout, Twrap> &wrap) {
   os << "Block WrapAround: '" << wrap.getName() << "' is enabled=" << wrap.enabled;
   os << ", minVal=" << wrap.minVal << ", maxVal=" << wrap.maxVal;
   return os;
 }
 
-}
 }
 
 #endif /* ORG_EEROS_CONTROL_WRAPAROUND_HPP_ */

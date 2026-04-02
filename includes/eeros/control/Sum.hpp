@@ -4,8 +4,7 @@
 #include <eeros/control/Blockio.hpp>
 #include <eeros/control/Input.hpp>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * A sum allows to add the signals of two or more inputs together.
@@ -24,23 +23,20 @@ class Sum : public Blockio<N,1,T> {
   /**
    * Constructs a sum instance with all inputs to be added.\n
    */
-  Sum() : first(true) {
-    for(uint8_t i = 0; i < N; i++) {
-      negated[i] = false;
-      init[i] = false;
-    }
-  }
+  Sum() : first(true), negated{}, init{} { }
 
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
   Sum(const Sum& s) = delete; 
+  Sum& operator=(const Sum&) = delete;
 
   /**
    * Runs the sum block.
    */
-  virtual void run() {
-    T sum; sum = 0; // TODO works only with primitive types or eeros::math::Matrix -> make specialization and use fill() for compatibility with std::array;
+  void run() override {
+    T sum{};
     if (first) {
       for (uint8_t i = 0; i < N; i++) {
         T val;
@@ -88,10 +84,10 @@ class Sum : public Blockio<N,1,T> {
 
 
  private:
-  bool negated[N];
   bool first;
-  bool init[N];
-  T initVal[N];
+  std::array<bool,N> negated;
+  std::array<bool,N> init;
+  std::array<T,N> initVal;
 };
 
 /**
@@ -100,12 +96,11 @@ class Sum : public Blockio<N,1,T> {
  * Does not print a newline control character.
  */
 template <uint8_t N, typename T>
-std::ostream& operator<<(std::ostream& os, Sum<N,T>& sum) {
+std::ostream& operator<<(std::ostream& os, const Sum<N,T>& sum) {
   os << "Block sum: '" << sum.getName() << "'"; 
   return os;
 }
 
-}
 }
 
 #endif /* ORG_EEROS_CONTROL_SUM_HPP_ */

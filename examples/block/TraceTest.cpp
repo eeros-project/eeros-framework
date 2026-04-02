@@ -110,9 +110,9 @@ int main() {
   uint64_t start = eeros::System::getTimeNs();
   std::ofstream file;
   file.open(fileName, std::ios::trunc);
-  timestamp_t* timeStampBuf = cs.trace1.getTimestampTrace();
-  Vector3* buf1 = cs.trace1.getTrace();
-  Vector3* buf2 = cs.trace2.getTrace();
+  auto timeStampBuf = cs.trace1.getTimestampTrace();
+  auto buf1 = cs.trace1.getTrace();
+  auto buf2 = cs.trace2.getTrace();
   for (uint32_t i = 0; i < cs.trace1.getSize(); i++) file << timeStampBuf[i] << " " << buf1[i] << " " << buf2[i] << std::endl;
   file.close();
   uint64_t stop = eeros::System::getTimeNs();

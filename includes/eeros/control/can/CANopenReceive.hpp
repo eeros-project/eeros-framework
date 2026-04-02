@@ -79,7 +79,7 @@ class CANopenReceive : public Blockio<0,N,Matrix<M,1,double>> {
    * @see enable()
    * @see disable()
    */
-  virtual void run() {
+  void run() override {
     if (enabled.load(std::memory_order_relaxed)) {
       uint64_t ts = eeros::System::getTimeNs();
       for (uint32_t i = 0; i < nofPDO; i++) {
