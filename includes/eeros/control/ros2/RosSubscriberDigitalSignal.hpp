@@ -1,22 +1,35 @@
 #pragma once
 
 #include <eeros/control/ros2/RosSubscriber.hpp>
+#include <eeros/control/ros2/RosTools.hpp>
 #include <eeros_msgs/msg/digital_signal.hpp>
+#include <ostream>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
- * This block allows to subscribe to a ROS message of type eeros_msgs::msg::DigitalSignal
- * and publishes it as a signal of type bool or vector of bool.
+ * @brief Subscribes to a ROS2 @c DigitalSignal topic and exposes it as a scalar or vector output.
  *
- * @tparam SigOutType - type of the output signal
+ * Reads @c eeros_msgs::msg::DigitalSignal messages and writes their payload
+ * to the block's output signal. The output timestamp is derived from the
+ * message timestamp (converted from ROS to EEROS time).
+ *
+ * @tparam SigOutType  Output signal type — @c bool or a compound vector type
+ *                     (e.g. @c Matrix<3,1,bool>). Default: @c bool
+ *
+ * @par Example
+ * @code
+ * RosSubscriberDigitalSignal<bool>           sub(node, "/sensor/enabled");
+ * RosSubscriberDigitalSignal<Matrix<3,1,bool>> subVec(node, "/sensor/buttons");
+ * @endcode
  *
  * @since v1.0
  */
 template < typename SigOutType = bool >
 class RosSubscriberDigitalSignal : public RosSubscriber<eeros_msgs::msg::DigitalSignal, 1, SigOutType> {
-  typedef eeros_msgs::msg::DigitalSignal TRosMsg;
+
+  using TRosMsg = eeros_msgs::msg::DigitalSignal;
+  using Base = RosSubscriber<TRosMsg, 1, SigOutType>;
 
  public:
   /**
@@ -34,12 +47,14 @@ class RosSubscriberDigitalSignal : public RosSubscriber<eeros_msgs::msg::Digital
    */
   RosSubscriberDigitalSignal(const rclcpp::Node::SharedPtr node, const std::string& topic, bool syncWithTopic = false,
                       const uint32_t queueSize = 1000)
-      : RosSubscriber<TRosMsg, 1, SigOutType>(node, topic, syncWithTopic, queueSize) {}
+      : Base(std::move(node), topic, syncWithTopic, queueSize) {}
 
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
-  RosSubscriberDigitalSignal(const RosSubscriberDigitalSignal& other) = delete;
+  RosSubscriberDigitalSignal(const RosSubscriberDigitalSignal&) = delete;
+  RosSubscriberDigitalSignal& operator=(const RosSubscriberDigitalSignal&) = delete;
 
   /**
    * This function is called whenever the run function reads the
@@ -47,29 +62,24 @@ class RosSubscriberDigitalSignal : public RosSubscriber<eeros_msgs::msg::Digital
    *
    * @param msg - message content
    */
-  virtual void parseMsg(const TRosMsg& msg) {
-    _set<SigOutType>(msg);
-    this->out.getSignal().setTimestamp(RosTools::convertToEerosTime(msg.timestamp));
-  }
-
- private:
-  template <typename S> typename std::enable_if<std::is_integral<S>::value>::type _set(const TRosMsg& msg) {
-    this->out.getSignal().setValue(msg.val[0]);
-  }
-  template <typename S> typename std::enable_if<std::is_compound<S>::value>::type _set(const TRosMsg& msg) {
-    SigOutType val;
-    for (int i = 0; i < val.size(); i++)
-      val[i] = msg.val[i];
-    this->out.getSignal().setValue(val);
+  void parseMsg(const TRosMsg& msg) override {
+    if constexpr (std::is_integral_v<SigOutType>) {
+      this->getOut().getSignal().setValue(msg.val[0]);
+    } else {
+      SigOutType val{};
+      for (uint32_t i = 0; i < val.size(); ++i)
+        val[i] = msg.val[i];
+      this->getOut().getSignal().setValue(val);
+    }
+    this->getOut().getSignal().setTimestamp(RosTools::convertToEerosTime(msg.timestamp));
   }
 
 };
 
 /********** Print functions **********/
-std::ostream& operator<<(std::ostream& os, RosSubscriberDigitalSignal<>& s) {
-  os << "Block RosSubscriberDigitalSignal: '" << s.getName();
+std::ostream& operator<<(std::ostream& os, const RosSubscriberDigitalSignal<>& s) {
+  os << "Block RosSubscriberDigitalSignal: '" << s.getName() << "'";
   return os;
 }
 
-}
 }

@@ -1,10 +1,12 @@
 #pragma once
 
 #include <eeros/control/ros2/RosPublisher.hpp>
+#include <eeros/control/ros2/RosTools.hpp>
 #include <eeros_msgs/msg/analog_signal.hpp>
+#include <ostream>
+#include <concepts>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * This block allows to read a single analog input signal of type double or vector of double and
@@ -16,7 +18,9 @@ namespace control {
  */
 template < typename SigInType = double >
 class RosPublisherAnalogSignal : public RosPublisher<eeros_msgs::msg::AnalogSignal, 1, SigInType> {
-  typedef eeros_msgs::msg::AnalogSignal TRosMsg;
+
+  using TRosMsg = eeros_msgs::msg::AnalogSignal;
+  using Base = RosPublisher<TRosMsg, 1, SigInType>;
 
  public:
   /**
@@ -28,38 +32,34 @@ class RosPublisherAnalogSignal : public RosPublisher<eeros_msgs::msg::AnalogSign
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    */
   RosPublisherAnalogSignal(const rclcpp::Node::SharedPtr node, const std::string& topic, const uint32_t queueSize = 1000)
-      : RosPublisher<TRosMsg, 1, SigInType>(node, topic, queueSize) {}
+      : Base(std::move(node), topic, queueSize) {}
 
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
   RosPublisherAnalogSignal(const RosPublisherAnalogSignal& other) = delete;
+  RosPublisherAnalogSignal& operator=(const RosPublisherAnalogSignal&) = delete;
 
   /**
    * Sets the message to be published by this block.
    *
    * @param msg - message content
    */
-  virtual void setRosMsg(TRosMsg& msg) {
-    _set<SigInType>(msg);
-    msg.timestamp = RosTools::convertToRosTime(this->in.getSignal().getTimestamp());
-  }
-
- private:
-  template <typename S> typename std::enable_if<std::is_floating_point<S>::value>::type _set(TRosMsg& msg) {
-    msg.val = {this->in.getSignal().getValue()};
-  }
-  template <typename S> typename std::enable_if<std::is_compound<S>::value>::type _set(TRosMsg& msg) {
-    msg.val = this->in.getSignal().getValue().getColVector(0);
+  void setRosMsg(TRosMsg& msg) override {
+    if constexpr (std::is_floating_point_v<SigInType>)
+      msg.val = {this->getIn().getSignal().getValue()};
+    else
+      msg.val = this->getIn().getSignal().getValue().getColVector(0);
+    msg.timestamp = RosTools::convertToRosTime(this->getIn().getSignal().getTimestamp());
   }
 
 };
 
 /********** Print functions **********/
-std::ostream& operator<<(std::ostream& os, RosPublisherAnalogSignal<>& p) {
-  os << "Block RosPublisherAnalogSignal: '" << p.getName();
+std::ostream& operator<<(std::ostream& os, const RosPublisherAnalogSignal<>& p) {
+  os << "Block RosPublisherAnalogSignal: '" << p.getName() << "'";
   return os;
 }
 
-}
 }

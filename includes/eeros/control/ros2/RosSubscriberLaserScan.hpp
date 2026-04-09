@@ -6,8 +6,7 @@
 // A-1 Include the header file of the ROS message
 #include <sensor_msgs/LaserScan.h>
 
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 // C-1 Create the template definition. Each EEROS matrix output needs its own type
 template < typename TRangesOutput, typename TIntensitiesOutput >
@@ -83,10 +82,10 @@ class RosSubscriberLaserScan : public RosSubscriber<sensor_msgs::LaserScan::Type
 
 /********** Print functions **********/
 template < typename TRangesOutput, typename TIntensitiesOutput >
-std::ostream& operator<<(std::ostream& os, RosSubscriberLaserScan& s) {
-  os << "Block RosSubscriberLaserScan: '" << s.getName();
+std::ostream& operator<<(std::ostream& os, const RosSubscriberLaserScan& s) {
+  os << "Block RosSubscriberLaserScan: '" << s.getName() << "'";
   return os;
 }
-}
+
 }
 

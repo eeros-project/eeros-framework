@@ -13,10 +13,7 @@
 #include <eeros/core/System.hpp>
 #include <array>
 
-namespace eeros {
-namespace control {
-
-using namespace eeros::math;
+namespace eeros::control {
 
 /**
  * This block creates a odometry message of type 'nav_msgs/odometry' from the input signals
@@ -32,8 +29,12 @@ using namespace eeros::math;
  *
  * @since v1.4
  */
-class RosPublisherOdometry : public RosPublisher<nav_msgs::msg::Odometry, 4, Vector3>{
- public:
+class RosPublisherOdometry : public RosPublisher<nav_msgs::msg::Odometry, 4, eeros::math::Vector3>{
+
+  using TRosMsg = nav_msgs::msg::Odometry;
+  using Base = RosPublisher<TRosMsg, 4, eeros::math::Vector3>;
+
+  public:
 
   /**
    * Creates an instance of a publisher block which publishes several input signals
@@ -46,23 +47,25 @@ class RosPublisherOdometry : public RosPublisher<nav_msgs::msg::Odometry, 4, Vec
    * @param queueSize - maximum number of outgoing messages to be queued for delivery to subscribers
    */
   RosPublisherOdometry(const rclcpp::Node::SharedPtr node, const std::string& topic, std::string rbf, std::string of, const uint32_t queueSize=1000)
-      : RosPublisher<nav_msgs::msg::Odometry, 4, Vector3>(node, topic, queueSize), robotBaseFrame(rbf), odomFrame(of), clock(node->get_clock()) { }
+      : Base(node, topic, queueSize), robotBaseFrame(rbf), odomFrame(of), clock(node->get_clock()) { }
 
   /**
-   * Disabling use of copy constructor because the block should never be copied unintentionally.
+   * Disabling use of copy constructor and copy assignment
+   * because the block should never be copied unintentionally.
    */
   RosPublisherOdometry(const RosPublisherOdometry& other) = delete;
+  RosPublisherOdometry& operator=(const RosPublisherOdometry&) = delete;
 
   /**
    * Sets the message to be published by this block.
    *
    * @param msg - message content
    */
-  virtual void setRosMsg(nav_msgs::msg::Odometry& msg) override {
+  void setRosMsg(TRosMsg& msg) override {
     msg.header.frame_id = odomFrame;
     msg.header.stamp = clock->now();
     msg.child_frame_id = robotBaseFrame;
-    Vector3 temp = in[0].getSignal().getValue();
+    eeros::math::Vector3 temp = in[0].getSignal().getValue();
     msg.pose.pose.position.x = temp[0];
     msg.pose.pose.position.y = temp[1];
     msg.pose.pose.position.z = temp[2];
@@ -112,10 +115,9 @@ class RosPublisherOdometry : public RosPublisher<nav_msgs::msg::Odometry, 4, Vec
 };
 
 /********** Print functions **********/
-std::ostream& operator<<(std::ostream& os, RosPublisherOdometry& p) {
-  os << "Block RosPublisherOdometry: '" << p.getName();
+std::ostream& operator<<(std::ostream& os, const RosPublisherOdometry& p) {
+  os << "Block RosPublisherOdometry: '" << p.getName() << "'";
   return os;
 }
 
-}
 }

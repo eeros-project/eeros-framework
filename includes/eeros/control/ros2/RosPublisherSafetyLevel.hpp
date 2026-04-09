@@ -4,10 +4,7 @@
 #include <eeros/safety/SafetySystem.hpp>
 #include <std_msgs/msg/string.hpp>
 
-using namespace eeros::safety;
-
-namespace eeros {
-namespace control {
+namespace eeros::control {
 
 /**
  * This block allows to read the safety level of the safety system and
@@ -16,7 +13,8 @@ namespace control {
  * @since v1.0
  */
 class RosPublisherSafetyLevel : public RosPublisher<std_msgs::msg::String, 1, double> {
-  typedef std_msgs::msg::String TRosMsg;
+  
+  using TRosMsg = std_msgs::msg::String;
 
  public:
   /**
@@ -47,7 +45,7 @@ class RosPublisherSafetyLevel : public RosPublisher<std_msgs::msg::String, 1, do
    *
    * @param msg - message content
    */
-  virtual void setRosMsg(TRosMsg& msg) override {
+  void setRosMsg(TRosMsg& msg) override {
     if (safetySystem != nullptr) {
       SafetyLevel sl = safetySystem->getCurrentLevel();
       msg.data = sl.getDescription();
@@ -55,14 +53,13 @@ class RosPublisherSafetyLevel : public RosPublisher<std_msgs::msg::String, 1, do
   }
 
  private:
-  SafetySystem* safetySystem;
+  eeros::safety::SafetySystem* safetySystem;
 };
 
 /********** Print functions **********/
-std::ostream& operator<<(std::ostream& os, RosPublisherSafetyLevel& p) {
-  os << "Block RosPublisherSafetyLevel: '" << p.getName();
+std::ostream& operator<<(std::ostream& os, const RosPublisherSafetyLevel& p) {
+  os << "Block RosPublisherSafetyLevel: '" << p.getName() << "'";
   return os;
 }
 
-}
 }
