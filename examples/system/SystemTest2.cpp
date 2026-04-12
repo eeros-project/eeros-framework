@@ -17,8 +17,7 @@ using namespace eeros::logger;
 class TestSafetyProperties : public SafetyProperties {
 public:
   TestSafetyProperties() 
-      : seStartInitializing("start initializing"),
-        seInitializingDone("initialization done"),
+      : seInitializingDone("initialization done"),
         seStartRunning("start running"),
         seShutDown("start shutting down"),
         seStopRunning("stop running"),
@@ -52,7 +51,6 @@ public:
     addLevel(slRunning);
     
     // Add events to the levels
-    slOff.addEvent(seStartInitializing, slIinitializing, kPublicEvent);
     slShuttingDown.addEvent(seSwitchingOff, slOff, kPrivateEvent);
     slIinitializing.addEvent(seInitializingDone, slInitialized, kPublicEvent);
     slInitialized.addEvent(seStartRunning, slRunning, kPublicEvent);
@@ -87,7 +85,7 @@ public:
       }
     });
     // Define entry level
-    setEntryLevel(slOff);
+    setEntryLevel(slIinitializing);
     
     // Define action when exiting application with Ctrl-C 
     exitFunction = [&](SafetyContext* privateContext) {privateContext->triggerEvent(seShutDown);};
@@ -105,7 +103,6 @@ public:
   // test outputs
   Output<bool>* outTest;
   
-  SafetyEvent seStartInitializing;
   SafetyEvent seInitializingDone;
   SafetyEvent seStartRunning;
   SafetyEvent seShutDown;
@@ -140,8 +137,7 @@ int main(int argc, char **argv) {
   double period = 1;
   TestSafetyProperties sp;
   SafetySystem ss(sp, period);
-  ss.triggerEvent(sp.seStartInitializing);
-
+ 
   // Create and run executor
   auto& executor = eeros::Executor::instance();
   executor.setMainTask(ss);
