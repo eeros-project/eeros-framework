@@ -1,9 +1,11 @@
 // #include <eeros/logger/SysLogWriter.hpp>
 #include <eeros/logger/Logger.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
+#include <eeros/logger/SysLogWriter.hpp>
 #include <eeros/math/Matrix.hpp>
 #include <eeros/safety/SafetyLevel.hpp>
 #include <eeros/core/Version.hpp>
+#include <eeros/logger/MultiLogWriter.hpp>
 #include <string>
 
 using namespace eeros;
@@ -12,10 +14,13 @@ using namespace eeros::math;
 using namespace eeros::safety;
 
 int main() {
-  Logger::setDefaultStreamLogger(std::cout, "/tmp/log");
-//  SysLogWriter w("LoggerTest1");
-//   Logger::setDefaultStreamLogger(std::cout);
-  Logger log = Logger::getLogger();
+  // Logger::setDefaultStreamLogger(std::cout, "/tmp/log");
+  // Logger::addWriter(std::make_shared<SysLogWriter>("myLog"));
+  auto multi = std::make_shared<MultiLogWriter>();
+  multi->add(std::make_shared<StreamLogWriter>(std::cout, "/tmp/myLog"));
+  multi->add(std::make_shared<SysLogWriter>("myLog"));
+  Logger::setDefaultWriter(multi);
+  Logger log = Logger::getLogger('A');
   log.show();
 
   log.info() << "Logger Test started...";

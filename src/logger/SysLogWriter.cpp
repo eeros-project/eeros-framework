@@ -1,83 +1,48 @@
 #include <eeros/logger/SysLogWriter.hpp>
 #include <syslog.h>
+#include <cstring>
 
-using namespace eeros::logger;
+namespace eeros::logger {
 
-SysLogWriter::SysLogWriter(const std::string name) : 
-	name(name), 
-	visibleLevel(LogLevel::INFO), 
-	enabled(false)
-{
-	openlog(this->name.c_str(), LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL0);
+int SysLogWriter::toSyslogPriority(LogLevel level) {
+  switch (level) {
+    case LogLevel::FATAL: return LOG_CRIT;
+    case LogLevel::ERROR: return LOG_ERR;
+    case LogLevel::WARN:  return LOG_WARNING;
+    case LogLevel::INFO:  return LOG_INFO;
+    case LogLevel::TRACE: return LOG_DEBUG;
+    default:              return LOG_DEBUG;
+  }
 }
 
-SysLogWriter::~SysLogWriter() {
-	closelog();
+SysLogWriter::SysLogWriter(const std::string& name) {
+  std::strncpy(logName, name.c_str(), MAX_NAME - 1);
+  logName[MAX_NAME - 1] = '\0';
+  openlog(logName, LOG_PID | LOG_CONS, LOG_USER);
+  syslog(LOG_INFO, "SysLogWriter opened for '%s'", logName);
 }
 
-void SysLogWriter::show(LogLevel level) {
-	visibleLevel = level;
-}
+SysLogWriter::~SysLogWriter() { closelog(); }
 
 void SysLogWriter::begin(std::ostringstream& os, LogLevel level, unsigned category) {
-	enabled = (level <= visibleLevel);
-	if(!enabled) return;
-	
-	this->level = level;
-	
-	using namespace std;
-	
-	if (category == 0) os << ' ';
-	else {
-		if (category >= 'A' && category <= 'Z')
-			os << (char)category;
-		else
-			os << category;
-	}
-	os << ' ';
-
-	switch(level) {
-		case LogLevel::FATAL: os << "F"; break; // fatal
-		case LogLevel::ERROR: os << "E"; break; // error
-		case LogLevel::WARN: os << "W"; break; // warning
-		case LogLevel::INFO: os << "I"; break; // info
-		case LogLevel::TRACE: os << "T"; break; // trace
-		default: os << 5; break;
-	}
-	os << ":  ";
-	return;
+  currentLevel = level;
+  os.str("");
+  os.clear();
 }
 
 void SysLogWriter::end(std::ostringstream& os) {
-	if(!enabled) {
-		os.clear();
-		os.str("");
-		return;
-	}
-	
-	switch(level) {
-		case LogLevel::FATAL:
-			syslog(LOG_ALERT, "%s", os.str().c_str());
-			break;
-		case LogLevel::ERROR:
-			syslog(LOG_ERR, "%s", os.str().c_str());
-			break;
-		case LogLevel::WARN:
-			syslog(LOG_WARNING, "%s", os.str().c_str());
-			break;
-		case LogLevel::INFO:
-			syslog(LOG_INFO, "%s", os.str().c_str());
-			break;
-		case LogLevel::TRACE:
-			syslog(LOG_DEBUG, "%s", os.str().c_str());
-			break;
-		default:
-			syslog(LOG_INFO, "%s", os.str().c_str());
-			break;
-	}
+  // visible_level is the protected field inherited from LogWriter.
+  // Logger already checks this before calling begin(), but SysLogWriter
+  // guards here too in case it is used standalone.
+  if (currentLevel <= visible_level)
+    syslog(toSyslogPriority(currentLevel), "%s", os.str().c_str());
+  os.str("");
+  os.clear();
 }
 
 void SysLogWriter::endl(std::ostringstream& os) {
-	if(!enabled) return;
-	os << " \u21A9 ";
+  // syslog is line-oriented; treat a logical newline the same as end().
+  end(os);
+}
+
 }
