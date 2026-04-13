@@ -95,7 +95,7 @@ class CANopenSend : public Blockio<N,0,Matrix<M,1,double>> {
         for (uint8_t l : length) {
           l /= 8; // lenght is in bits
           if (sigIdx[i] > 0) {
-            Matrix<N,M,double> val = this->getIn(nodeNr).getSignal().getValue() * scale[nodeNr];
+            Matrix<M,1,double> val = this->getIn(nodeNr).getSignal().getValue() * scale[nodeNr];
             co.can.encodeU32(buf+len, (uint32_t)val[sigIdx[i]-1], l);
           } else if (sigIdx[i] < 0) {
             Matrix<P,1,uint32_t> val = this->getDigIn(nodeNr).getSignal().getValue();

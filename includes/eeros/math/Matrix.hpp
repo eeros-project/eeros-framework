@@ -1428,6 +1428,7 @@ class Matrix<1, 1, T> {
     value = *list.begin();
   }
 
+  /********** Assignment operators **********/
   /**
    * @brief Default copy assignment.
    */
@@ -1446,12 +1447,14 @@ class Matrix<1, 1, T> {
       return *this;
   }
 
+  /********** Initializing the matrix **********/
   void zero() { value = 0; }
 
   void eye() { value = 1; }
 
   void fill(T v) { value = v; }
 
+  /********** Element access **********/
   const T get(uint8_t m, uint8_t n) const { return (*this)(m, n); }
 
   Matrix<1, 1, T> getCol(uint8_t n) const { return (*this); }
@@ -1474,13 +1477,17 @@ class Matrix<1, 1, T> {
       throw MatrixIndexOutOfBoundException(m, 1, n, 1);
   }
 
+  /**
+   * @brief Access the element by flat index (read/write).
+   */
   T& operator()(unsigned int i) {
-    if (i == 0)
-      return value;
-    else
-      throw MatrixIndexOutOfBoundException(i, 1);
-  }
-
+    if (i == 0) return value;
+    throw MatrixIndexOutOfBoundException(i, 1);
+  }  
+  
+  /**
+   * @brief Access the element by flat index (read-only).
+   */
   const T operator()(unsigned int i) const {
     if (i == 0)
       return value;
@@ -1488,6 +1495,9 @@ class Matrix<1, 1, T> {
       throw MatrixIndexOutOfBoundException(i, 1);
   }
 
+  /**
+   * @brief Access the element by flat index (read/write).
+   */
   T& operator[](unsigned int i) {
     if (i == 0)
       return value;
@@ -1495,6 +1505,9 @@ class Matrix<1, 1, T> {
       throw MatrixIndexOutOfBoundException(i, 1);
   }
 
+  /**
+   * @brief Access the element by flat index (read-only).
+   */
   const T operator[](unsigned int i) const {
     if (i == 0)
       return value;
@@ -1502,53 +1515,234 @@ class Matrix<1, 1, T> {
       throw MatrixIndexOutOfBoundException(i, 1);
   }
 
+  /********** Matrix characteristics **********/
   constexpr bool isSquare() const { return true; }
-
   bool isOrthogonal() const { return value == 1; }
-
   constexpr bool isSymmetric() const { return true; }
-
   constexpr bool isDiagonal() const { return true; }
-
   constexpr bool isLowerTriangular() const { return true; }
-
   constexpr bool isUpperTriangular() const { return true; }
-
   bool isInvertible() const { return value != 0; }
 
   constexpr unsigned int getNofRows() const { return 1; }
-
   constexpr unsigned int getNofColums() const { return 1; }
-
   constexpr unsigned int size() const { return 1; }
-
   unsigned int rank() const { return (value == 0) ? 1 : 0; }
 
   T det() const { return value; }
-
   T trace() const { return value; }
+  T norm()  const { return std::abs(value); }
+  Matrix<1, 1, T> transpose() const { return *this; }
+  Matrix<1, 1, T> inverse() const {
+    if (value == 0)
+      throw Fault("Inverting matrix failed: Matrix must be invertible");
+    return Matrix<1, 1, T>(T(1) / value);
+  }  
 
-  Matrix<1, 1, T> operator!() const {
-    Matrix<1, 1, T> inv(1 / value);
-    return inv;
+  /********** Arithmetic operators **********/
+  /**
+   * @brief Element-wise negation.
+   *
+   * @return Matrix<1,1,T> containing -value
+   */
+  Matrix<1, 1, T> operator-() const {
+    return Matrix<1, 1, T>(-value);
   }
 
+  /**
+   * @brief Matrix inversion via operator!.
+   *
+   * @return Matrix<1,1,T> containing 1/value
+   * @throws Fault if value is zero
+   */
+  Matrix<1, 1, T> operator!() const { return inverse(); }
+
+  /**
+   * @brief Implicit conversion to the element type T.
+   * Allows a 1x1 matrix to be used directly as a scalar.
+   */
   operator T() const { return value; }
 
-  Matrix<1, 1, T>& operator+=(const Matrix<1, 1, T> right) {
-    (*this) = (*this) + right;
-    return (*this);
+  /**
+   * @brief Matrix addition.
+   *
+   * @param right matrix to add
+   * @return Matrix<1,1,T> containing value + right.value
+   */
+  Matrix<1, 1, T> operator+(const Matrix<1, 1, T>& right) const {
+    return Matrix<1, 1, T>(value + right.value);
   }
 
-  Matrix<1, 1, T>& operator-=(const Matrix<1, 1, T> right) {
-    (*this) = (*this) - right;
-    return (*this);
+  /**
+   * @brief Scalar addition. Adds right to the single element.
+   *
+   * @param right scalar to add
+   * @return Matrix<1,1,T> containing value + right
+   */
+  Matrix<1, 1, T> operator+(const T right) const {
+    return Matrix<1, 1, T>(value + right);
   }
 
-  /*virtual*/ void print(std::ostream& os) const {
-    os << '[' << (*this)(0, 0) << "]' ";
+  /**
+   * @brief In-place matrix addition.
+   *
+   * @param right matrix to add
+   * @return reference to this matrix
+   */
+  Matrix<1, 1, T>& operator+=(const Matrix<1, 1, T>& right) {
+    value += right.value;
+    return *this;
   }
 
+  /**
+   * @brief Matrix subtraction.
+   *
+   * @param right matrix to subtract
+   * @return Matrix<1,1,T> containing value - right.value
+   */
+  Matrix<1, 1, T> operator-(const Matrix<1, 1, T>& right) const {
+    return Matrix<1, 1, T>(value - right.value);
+  }
+
+  /**
+   * @brief Scalar subtraction. Subtracts right from the single element.
+   *
+   * @param right scalar to subtract
+   * @return Matrix<1,1,T> containing value - right
+   */
+  Matrix<1, 1, T> operator-(const T right) const {
+    return Matrix<1, 1, T>(value - right);
+  }
+
+  /**
+   * @brief In-place matrix subtraction.
+   *
+   * @param right matrix to subtract
+   * @return reference to this matrix
+   */
+  Matrix<1, 1, T>& operator-=(const Matrix<1, 1, T>& right) {
+    value -= right.value;
+    return *this;
+  }
+
+  /**
+   * @brief Matrix multiplication (1x1 * 1x1 = 1x1).
+   *
+   * @param right matrix to multiply with
+   * @return Matrix<1,1,T> containing value * right.value
+   */
+  Matrix<1, 1, T> operator*(const Matrix<1, 1, T>& right) const {
+    return Matrix<1, 1, T>(value * right.value);
+  }
+
+  /**
+   * @brief Scalar multiplication. Multiplies the single element by right.
+   *
+   * @param right scalar to multiply with
+   * @return Matrix<1,1,T> containing value * right
+   */
+  Matrix<1, 1, T> operator*(const T right) const {
+    return Matrix<1, 1, T>(value * right);
+  }
+
+  /**
+   * @brief Element-wise multiplication (identical to operator* for 1x1).
+   *
+   * @param right matrix to multiply element-wise
+   * @return Matrix<1,1,T> containing value * right.value
+   */
+  Matrix<1, 1, T> multiplyElementWise(const Matrix<1, 1, T>& right) const {
+    return Matrix<1, 1, T>(value * right.value);
+  }
+
+  /**
+   * @brief Scalar division. Divides the single element by right.
+   *
+   * @param right scalar divisor
+   * @return Matrix<1,1,T> containing value / right
+   */
+  Matrix<1, 1, T> operator/(const T right) const {
+    return Matrix<1, 1, T>(value / right);
+  }
+
+  /********** Comparison operators **********/
+  /**
+   * @brief Equality comparison.
+   *
+   * @param right matrix to compare to
+   * @return true if both elements are equal
+   */
+  bool operator==(const Matrix<1, 1, T>& right) const {
+    return value == right.value;
+  }
+
+  /**
+   * @brief Inequality comparison.
+   *
+   * @param right matrix to compare to
+   * @return true if elements differ
+   */
+  bool operator!=(const Matrix<1, 1, T>& right) const {
+    return value != right.value;
+  }
+
+  /**
+   * @brief Less-than comparison.
+   *
+   * @param right matrix to compare to
+   * @return true if this element is less than right's element
+   */
+  bool operator<(const Matrix<1, 1, T>& right) const {
+    return value < right.value;
+  }
+
+  /**
+   * @brief Less-than-or-equal comparison.
+   *
+   * @param right matrix to compare to
+   * @return true if this element is less than or equal to right's element
+   */
+  bool operator<=(const Matrix<1, 1, T>& right) const {
+    return value <= right.value;
+  }
+
+  /**
+   * @brief Greater-than comparison.
+   *
+   * @param right matrix to compare to
+   * @return true if this element is greater than right's element
+   */
+  bool operator>(const Matrix<1, 1, T>& right) const {
+    return value > right.value;
+  }
+
+  /**
+   * @brief Greater-than-or-equal comparison.
+   *
+   * @param right matrix to compare to
+   * @return true if this element is greater than or equal to right's element
+   */
+  bool operator>=(const Matrix<1, 1, T>& right) const {
+    return value >= right.value;
+  }
+
+  /********** Stream initializer **********/
+  /**
+   * @brief Stream initializer operator, consistent with the general Matrix API.
+   *
+   * @param right value to assign
+   * @return MatrixInitializer (no further elements expected for 1x1)
+   */
+  Matrix<1, 1, T>& operator<<(T right) {
+    value = right;
+    return *this;
+  }
+
+  /********** Print **********/
+
+  void print(std::ostream& os) const {
+    os << '[' << value << "]' ";
+  }
  protected:
   T value;
 };

@@ -31,8 +31,8 @@ class ControlSystem {
         canReceive(co, {nodeId1, nodeId2}),
         canSend(co, {nodeId1, nodeId2}),
         timedomain("Main time domain", ts, true) {
-    velDrive0.setValue(0);
-    velDrive1.setValue(0);
+    velDrive0.setValue({0.0});
+    velDrive1.setValue({0.0});
     canReceive.setName("CAN receive");
     canSend.setName("CAN send");
     canReceive.configureTPDO(nodeId1, TPDO1, {statusObj,posActValObj,digInStateObj}, {0,1,-1});
@@ -145,10 +145,10 @@ class MoveSequence : public Sequence {
       : Sequence(name, caller, true), cs(cs), ss(ss), sp(sp), ds402(ds402), wait("Wait", this), log(Logger::getLogger()) { }
         
   int action() {
-    uint32_t vel = 2;
+    double vel = 2;
     while(Sequencer::running  && ss.getCurrentLevel() == sp.slMoving) {
-      cs.velDrive0.setValue(vel);
-      cs.velDrive1.setValue(vel);
+      cs.velDrive0.setValue({vel});
+      cs.velDrive1.setValue({vel});
       wait(2.0);
       log.info() << "act pos 1: " << cs.canReceive.getOut(0).getSignal().getValue() << " act pos 2: " << cs.canReceive.getOut(1).getSignal().getValue() << " dig 1: 0x" << hex << cs.canReceive.getDigOut(0).getSignal().getValue();
       log.info() << hex << "status 1: " << ds402.statusToString(cs.canReceive.getStatus(0)) << " status 2: " << ds402.statusToString(cs.canReceive.getStatus(1));

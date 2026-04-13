@@ -63,7 +63,7 @@ class CANreceive : public Blockio<0,1,Matrix<N,1,double>> {
         angle[i] = val * scale[i];
       }
       this->getOut().getSignal().setValue(angle);
-      this->out.getSignal().setTimestamp(System::getTimeNs());
+      this->getOut().getSignal().setTimestamp(System::getTimeNs());
     }
   }
 
