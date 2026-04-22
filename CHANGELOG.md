@@ -4,10 +4,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Unreleased
-(v1.4.4 targeted for 2026-01-01) ([Github compare v1.4.3...master](https://github.com/eeros-project/eeros-framework/compare/v1.4.3...master))
+## v1.4.4
+(2026-04-22) ([GitHub compare v1.4.3...v1.4.4](https://github.com/eeros-project/eeros-framework/compare/v1.4.3...v1.4.4))
 
 ### Added Features
+* Fix thread safety in mouse HAL driver
+* Fix HAL Input/Output destructors never being called
+* Improve cmake handling of various tasks
+* Raise library and many classes to c++20 standard
+* Simplify template specializations of basic block
+* Improve matrix implementation, initialization and documentation
+* Fix logging to sys log
+* Add ROS2 support for TwistStamped messages
 
 
 ## v1.4.3
