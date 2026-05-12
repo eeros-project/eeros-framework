@@ -21,27 +21,17 @@ class ControlSystem {
  public:
   ControlSystem()
       : setVal({0.0, 0.0}),
-        rate_limiter({-1.0, -0.5}, {0.5, 1.0}),
+        rateLimiter({-1.0, -0.5}, {0.5, 1.0}),
         td("td", period, true) {
-	rate_limiter.getIn().connect(setVal.getOut());
-	rate_limiter.enable();
+	rateLimiter.getIn().connect(setVal.getOut());
+	rateLimiter.enable();
 	
 	td.addBlock(setVal);
-	td.addBlock(rate_limiter);
+	td.addBlock(rateLimiter);
   }
   
-    // Test 1: input double, slew rates double
-//   Constant<double> setVal;
-//   RateLimiter<double, double, true> rate_limiter;
-
-    // Test 2: input Vector, slew rates double
-//   Constant<eeros::math::Vector2> setVal;
-//   RateLimiter<eeros::math::Vector2, double> rate_limiter;
-  
-  // Test 3: input Vector, slew rates Vector
-  Constant<eeros::math::Vector2> setVal;
-  RateLimiter<eeros::math::Vector2, eeros::math::Vector2> rate_limiter;
-  
+  Constant<Vector2> setVal;
+  RateLimiter<Vector2, Vector2> rateLimiter;
   TimeDomain td;
 };
 
@@ -69,17 +59,17 @@ int main() {
   Periodic p2("p2", period, l1);
   p2.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
     static int count = 0;
-    log.info() << count << " -> " 
+    log.info() << cs.setVal.getOut().getSignal().getTimestamp() << "  " 
                << cs.setVal.getOut().getSignal().getValue() << "  "
-               << cs.rate_limiter.getOut().getSignal().getValue();
+               << cs.rateLimiter.getOut().getSignal().getValue();
     if (count == 0) {
       cs.setVal.setValue({0,0});
     }
     if (count == 10) {
-      cs.setVal.setValue({2,2});
+      cs.setVal.setValue({2,3});
     }
-    if (count == 50) {
-      cs.setVal.setValue({-1,-1});
+    if (count == 80) {
+      cs.setVal.setValue({-1,-2});
     }
     count++; 
   });

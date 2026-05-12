@@ -19,7 +19,7 @@ double period = 0.1;
 
 class ControlSystem {
  public:
-  ControlSystem() : pp({1.0}, {0.2}, {0.2}, period), td("td", period, true) {
+  ControlSystem() : pp({1.0,1.0}, {0.2,0.2}, {0.2,0.2}, period), td("td", period, true) {
     pp.setName("ppca");
     pp.getPosOut().getSignal().setName("pp pos out");
     pp.getVelOut().getSignal().setName("pp vel out");
@@ -66,7 +66,7 @@ int main() {
       Matrix<2,1,double> start{15, -30}, end{5, 20};
       log.warn() << "start trajectory from " << start << " to " << end;
       cs.pp.setStart(start);
-      cs.pp.setMaxSpeed({3, 3});
+      cs.pp.setMaxSpeed({3.0, 3.0});
       cs.pp.setMaxAcc({0.5, 0.5});
       cs.pp.setMaxDec({0.5, 0.5});
       cs.pp.move(end);
