@@ -5,13 +5,62 @@
 #include <eeros/control/Constant.hpp>
 #include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/PeripheralInput.hpp>
-// #include "HalTest1.hpp"
+#include <eeros/safety/SafetyProperties.hpp>
+#include <eeros/safety/SafetyLevel.hpp>
+#include <eeros/safety/InputAction.hpp>
+#include <eeros/safety/SafetySystem.hpp>
+#include <eeros/core/Executor.hpp>
+#include <eeros/control/TimeDomain.hpp>
 
 using namespace eeros;
 using namespace eeros::logger;
 using namespace eeros::task;
 using namespace eeros::hal;
 using namespace eeros::control;
+using namespace eeros::safety;
+
+class ControlSystem {
+ public:
+  ControlSystem(double ts) : in("ch1"), out("ch0"), td("Main time domain", ts, true) {
+    out.getIn().connect(in.getOut());
+    td.addBlock(in);
+    td.addBlock(out);
+    Executor::instance().add(td);
+  }
+
+  PeripheralInput<bool> in;		// digital input
+  PeripheralOutput<bool> out;		// digital output
+  TimeDomain td;
+};
+
+class TestSafetyProperties : public SafetyProperties {
+ public:
+  TestSafetyProperties()
+      : slOne("slOne"),
+        slTwo("slTwo"),
+        seStart("seStart"),
+        seStop("seStop") {
+    hal::Input<bool>* in = HAL::instance().getLogicInput("ch16", false);
+    criticalInputs = {in};
+    slOne.setInputActions({check(in, false, seStart)});
+    slTwo.setInputActions({check(in, true, seStop)});
+
+    hal::Output<bool>* out = HAL::instance().getLogicOutput("ch3", false);
+    criticalOutputs = {out};
+    slOne.setOutputActions({set(out, false)});
+    slTwo.setOutputActions({set(out, true)});
+
+    slOne.addEvent(seStart, slTwo, kPrivateEvent);
+    slTwo.addEvent(seStop, slOne, kPrivateEvent);
+
+    addLevel(slOne);
+    addLevel(slTwo);
+    setEntryLevel(slOne);
+  }
+
+  SafetyLevel slOne, slTwo;
+  SafetyEvent seStart, seStop;
+};
 
 int main(int argc, char **argv){
   Logger::setDefaultStreamLogger(std::cout);
@@ -22,56 +71,15 @@ int main(int argc, char **argv){
   HAL& hal = HAL::instance();
   hal.readConfigFromFile(&argc, argv);
 
-  Constant<bool> const1(true);
-  eeros::control::PeripheralOutput<bool> out1("zero");
-  eeros::control::PeripheralInput<bool> in1("ch16");
-  out1.getIn().connect(const1.getOut());
-  const1.run();
-  out1.run();
-  in1.run();
-  log.info() << "value at input: " << in1.getOut().getSignal().getValue();
-  sleep(5);
-  const1.setValue(false);
-  const1.run();
-  out1.run();
-  in1.run();
-  log.info() << "value at input: " << in1.getOut().getSignal().getValue();
-  sleep(5);
-  const1.setValue(true);
-  const1.run();
-  out1.run();
-  in1.run();
-  log.info() << "value at input: " << in1.getOut().getSignal().getValue();
-  sleep(5); 
-  // Create safety and control system
-//   MyControlSystem cs(dt);
-//   MySafetyProperties safetyProperties;
-//   SafetySystem safetySystem(safetyProperties, dt);
+  const double dt = 0.01;
+  ControlSystem cs(dt);
+  TestSafetyProperties sp;
+  SafetySystem ss(sp, dt);
+ 
+  auto &executor = Executor::instance();
+  executor.setMainTask(ss);
+  executor.run();
     
-//   // Sequencer
-//   auto& sequencer = Sequencer::instance();
-//   MyMainSequence mainSequence(sequencer, cs);
-//   mainSequence();
-    
-//   // Set executor and run
-//   auto &executor = Executor::instance();
-//   executor.setMainTask(safetySystem);
-    
-//   auto digOut = hal.getLogicOutput("dOut0", false);
-//   Lambda l1 ([&] () { });
-//   Periodic perLog("periodic log", 1, l1);
-//   perLog.monitors.push_back([&](PeriodicCounter &pc, Logger &log) {
-//     log.warn() << cs.digOut0.getValue();
-//     log.warn() << digOut->get();
-//     log.info() << cs.digIn0.getOut().getSignal();
-//     log.info() << cs.digIn1.getOut().getSignal();
-//     log.info() << cs.anIn0.getOut().getSignal();
-//     log.info() << cs.anIn2.getOut().getSignal();
-//   });
-//   executor.add(perLog);
-//   executor.run();
-    
-//   sequencer.wait();
   log.info() << "end...";
   return 0;
 }
