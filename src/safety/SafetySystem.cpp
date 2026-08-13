@@ -105,6 +105,7 @@ void SafetySystem::triggerEvent(SafetyEvent event, SafetyContext* context) {
     } else {
       log.error() << "triggering event \'" << event << "\' in level '"
                   << current << "\': no transition for this event";
+      if(properties.throwExceptionOnUnhandledSafetyEvent) throw eeros::Fault("unhandled safety event");
     }
   } else {
     throw Fault("current level not defined");  // TODO define error number and

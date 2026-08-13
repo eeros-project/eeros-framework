@@ -122,6 +122,7 @@ class SafetyProperties {
   std::vector<SafetyLevel*> levels;
   std::vector<eeros::hal::OutputInterface*> criticalOutputs;
   std::vector<eeros::hal::InputInterface*> criticalInputs;
+  bool throwExceptionOnUnhandledSafetyEvent = false;
 
  private:
   SafetyLevel* entryLevel;
