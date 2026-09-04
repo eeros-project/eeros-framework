@@ -1,10 +1,12 @@
+#include <sys/syscall.h>
+#include <unistd.h>
+
+#include <chrono>
+#include <eeros/core/Fault.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
-#include <eeros/core/Fault.hpp>
-#include <unistd.h>
-#include <sys/syscall.h>
 #include <future>
-
+#include <thread>
 namespace eeros {
 namespace sequencer {
 

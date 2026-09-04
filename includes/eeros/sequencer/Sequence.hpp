@@ -71,7 +71,7 @@ class Sequence : public BaseSequence {
   /**
    * Waits for this sequence to finish its current run. This call will block.
    */
-  void wait();
+  virtual void wait();
 
   /**
    * If a caller of a non blocking sequence wants to read its return value, it

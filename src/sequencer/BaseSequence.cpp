@@ -20,6 +20,16 @@ BaseSequence::BaseSequence(Sequencer& seq, BaseSequence* caller, bool blocking)
   addMonitor(&monitorAbort);	// default monitor
 }
 
+BaseSequence::~BaseSequence() {
+  abort();
+  wait();
+  auto& seq = Sequencer::instance();
+  if (caller && (!seq.running || std::uncaught_exceptions() > 0)) {
+    caller->abort();
+    caller->wait();
+  }
+}
+
 int BaseSequence::action() {
   int retVal = -1;
   state = SequenceState::idle;

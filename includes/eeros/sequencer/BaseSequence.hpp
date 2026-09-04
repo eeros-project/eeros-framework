@@ -54,6 +54,8 @@ class BaseSequence {
    */
   BaseSequence(BaseSequence* caller, bool blocking);
 
+  ~BaseSequence();
+
   /** 
    * Before a sequence or step can run, its precondition must be checked. The sequence
    * or step will run only in case that this check returns true.
@@ -152,7 +154,8 @@ class BaseSequence {
    * With abort you can stop this sequence with the exit condition still being false.
    */
   void abort();
-  
+  virtual void wait() {}
+
  protected:
   virtual int start() = 0;  // has to be implemented in derived class 
   virtual int action(); // has to be implemented in custom step or sequence
