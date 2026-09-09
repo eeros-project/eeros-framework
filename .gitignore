@@ -6,3 +6,7 @@ install*/
 *.txt.user
 libucl-src
 eeros_msgs
+.cache
+.clangd
+.zed
+compile_commands.json
