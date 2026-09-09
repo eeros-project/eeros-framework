@@ -31,7 +31,7 @@ SafetySystem::SafetySystem(SafetyProperties& safetyProperties, double period)
         std::exception_ptr e = std::current_exception();
         if (e) std::rethrow_exception(e);
 
-      } catch (std::exception& e) {
+      } catch (const std::exception& e) {
         if (instance) {
           int status;
           auto et = abi::__cxa_demangle(typeid(e).name(), NULL, NULL, &status);
