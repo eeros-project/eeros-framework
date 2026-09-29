@@ -1,11 +1,10 @@
 #ifndef ORG_EEROS_CONTROL_ETHERCAT_ELMOINPUT_
 #define ORG_EEROS_CONTROL_ETHERCAT_ELMOINPUT_
 
+#include <ecmasterlib/device/Elmo.hpp>
 #include <eeros/control/Blockio.hpp>
 #include <eeros/control/Output.hpp>
 #include <eeros/core/System.hpp>
-#include <EcMasterlibMain.hpp>
-#include <device/Elmo.hpp>
 
 namespace eeros {
 namespace control {
@@ -19,7 +18,8 @@ namespace control {
  */
 
 class ElmoInput : public Blockio<0,0,double,double> {
-  
+  static constexpr ecmasterlib::Context ctx = ecmasterlib::Context::Cyclic;
+
  public:
   /**
    * Constructs a EtherCAT receive block instance which receives its output 
@@ -27,18 +27,18 @@ class ElmoInput : public Blockio<0,0,double,double> {
    *
    * @param iface - reference to Elmo drive
    */
-  ElmoInput(ecmasterlib::device::Elmo& iface) : iface(iface) { }
-          
+  ElmoInput(ecmasterlib::Elmo iface) : iface(iface) {}
+
   /**
    * Puts the drive inputs onto the output signals.
    */
   virtual void run() {
     uint64_t ts = eeros::System::getTimeNs();
-    position.getSignal().setValue(iface.getPosition());
+    position.getSignal().setValue(iface.getPosition(ctx));
     position.getSignal().setTimestamp(ts);
-    velocity.getSignal().setValue(iface.getVelocity());
+    velocity.getSignal().setValue(iface.getVelocity(ctx));
     velocity.getSignal().setTimestamp(ts);
-    torque.getSignal().setValue(iface.getTorque());
+    torque.getSignal().setValue(iface.getTorque(ctx));
     torque.getSignal().setTimestamp(ts);
   }
   
@@ -69,25 +69,31 @@ class ElmoInput : public Blockio<0,0,double,double> {
    * 
    * @return state
    */
-  virtual ecmasterlib::device::Elmo::State getState() { return iface.getState(); }
+  virtual ecmasterlib::types::ds402::State getState() {
+    return iface.getState(ctx);
+  }
 
   /**
    * Gets the state description of the elmo drive.
    * 
    * @return state description
    */
-  virtual const char* getStateDesc() { return iface.stateToText(iface.getState()); }
-  
+  virtual const char* getStateDesc() {
+    return iface.getState(ctx).stateToText();
+  }
+
   /**
    * Gets the current mode of the elmo drive.
    * Modes are: HOMING, PROFILE_VELOCITY, etc.
    * 
    * @return state
    */
-  virtual ecmasterlib::device::Elmo::Mode getMode() { return iface.getMode(); }
+  virtual ecmasterlib::types::ds402::Mode getMode() {
+    return iface.getMode(ctx);
+  }
 
  private:
-  ecmasterlib::device::Elmo& iface;
+  ecmasterlib::Elmo iface;
   Output<int32_t> position, velocity;
   Output<int16_t> torque;
 };

@@ -1,16 +1,18 @@
 #ifndef ORG_EEROS_CORE_EXECUTOR_HPP_
 #define ORG_EEROS_CORE_EXECUTOR_HPP_
 
-#include <vector>
+#include <chrono>
 #include <condition_variable>
-
-#include <eeros/core/Runnable.hpp>
 #include <eeros/core/PeriodicCounter.hpp>
-#include <eeros/task/Periodic.hpp>
+#include <eeros/core/Runnable.hpp>
 #include <eeros/logger/Logger.hpp>
+#include <eeros/task/Periodic.hpp>
+#include <optional>
+#include <thread>
+#include <vector>
 
 #ifdef USE_ETHERCAT
-#include <EcMasterlibMain.hpp>
+#include <ecmasterlib/EthercatStack.hpp>
 #endif
 
 #ifdef USE_ROS
@@ -135,14 +137,6 @@ class Executor : public Runnable {
   static constexpr int basePriority = 49;
   PeriodicCounter counter;
 
-#ifdef USE_ETHERCAT
-  /**
-   * The executor will run in synch with the EtherCAT stack.
-   *
-   * @param etherCATStack - reference to the EtherCAT stack
-   */
-  void syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack);
-#endif
 #if defined USE_ROS || defined USE_ROS2
   /**
    * Caused the executor to fetch its time base from ROS time.
@@ -170,6 +164,10 @@ class Executor : public Runnable {
   void handleTopic();
 #endif
 
+#ifdef USE_ETHERCAT
+  void setEthercatStack(ecmasterlib::Stack stack) { etherCatStack = stack; }
+#endif
+
  private:
   Executor();
   void assignPriorities();
@@ -189,8 +187,28 @@ class Executor : public Runnable {
   int count;
 #endif
 #ifdef USE_ETHERCAT
-  ecmasterlib::EcMasterlibMain* etherCATStack;
+  std::optional<ecmasterlib::Stack> etherCatStack;
 #endif
+  struct SyncSource {
+    using clock = std::chrono::steady_clock;
+    using timestamp = clock::time_point;
+    using seconds = std::chrono::duration<double, std::chrono::seconds::period>;
+
+    timestamp next;
+    clock::duration period;
+
+    SyncSource(double period)
+        : period(std::chrono::duration_cast<clock::duration>(seconds(period))) {
+      next = clock::now() + this->period;
+    }
+    void sync() {
+      std::this_thread::sleep_until(next);
+      next += period;
+    }
+  };
+  void prepareCycle();
+  void finishCycle();
+  void shutdown();
 };
 
 }

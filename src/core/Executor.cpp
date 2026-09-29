@@ -1,21 +1,23 @@
-#include <algorithm>
-#include <stdexcept>
-#include <chrono>
-#include <vector>
-#include <memory>
-#include <cmath>
-#include <thread>
-#include <signal.h>
 #include <sched.h>
+#include <signal.h>
 #include <sys/mman.h>
 #include <sys/syscall.h>
 #include <unistd.h>
-#include <eeros/core/Executor.hpp>
-#include <eeros/task/Async.hpp>
-#include <eeros/task/Lambda.hpp>
-#include <eeros/task/HarmonicTaskList.hpp>
+
+#include <algorithm>
+#include <chrono>
+#include <cmath>
 #include <eeros/control/TimeDomain.hpp>
+#include <eeros/core/Executor.hpp>
 #include <eeros/safety/SafetySystem.hpp>
+#include <eeros/task/Async.hpp>
+#include <eeros/task/HarmonicTaskList.hpp>
+#include <eeros/task/Lambda.hpp>
+#include <memory>
+#include <stdexcept>
+#include <thread>
+#include <vector>
+
 #ifdef USE_ROS
 #include <ros/callback_queue_interface.h>
 #include <ros/callback_queue.h>
@@ -104,15 +106,6 @@ Executor& Executor::instance() {
   return executor;
 }
 
-
-#ifdef USE_ETHERCAT
-void Executor::syncWithEtherCATSTack(ecmasterlib::EcMasterlibMain* etherCATStack) {
-  syncWithEtherCatStackSet = true;
-  this->etherCATStack = etherCATStack;
-}
-#endif
-
-
 void Executor::setMainTask(task::Periodic &mainTask) {
   if (this->mainTask != nullptr)
     throw std::runtime_error("you can only define one main task per executor");
@@ -195,9 +188,6 @@ void Executor::assignPriorities() {
 void Executor::stop() {
   auto &instance = Executor::instance();
   instance.running = false;
-#ifdef USE_ETHERCAT
-  if(instance.etherCATStack) instance.etherCATStack->stop();
-#endif
 #ifdef USE_ROS2
   rclcpp::shutdown();
   if (instance.subscriberThread != nullptr) {
@@ -241,6 +231,36 @@ void Executor::handleTopic() {
 }
 #endif
 
+#ifdef USE_ETHERCAT
+void Executor::prepareCycle() {
+  if (etherCatStack) etherCatStack->runCyclicPreJobs();
+}
+void Executor::finishCycle() {
+  if (etherCatStack) etherCatStack->runCyclicPostJobs();
+}
+
+void Executor::shutdown() {
+  log.info() << "shutting down executor";
+  // make sure we shut down the EtherCAT stack properly.
+  // This requires that we keep its cyclic callbacks going.
+  if (etherCatStack) {
+    log.info() << "stopping EtherCAT stack";
+    etherCatStack->requestState(ecmasterlib::Stack::State::Init);
+    while (etherCatStack->getState() != ecmasterlib::Stack::State::Init) {
+      std::this_thread::sleep_for(SyncSource::seconds(period));
+      prepareCycle();
+      finishCycle();
+    }
+  }
+  log.info() << "finished shutting down executor";
+}
+
+#else
+void Executor::prepareCycle() {}
+void Executor::finishCycle() {}
+void Executor::shutdown() {}
+#endif
+
 void Executor::run() {
   log.trace() << "starting executor with base period " << period << " sec and priority " << (int)(basePriority) << " (thread " << getpid() << ":" << syscall(SYS_gettid) << ")";
   if (period == 0.0) throw std::runtime_error("period of executor not set");
@@ -276,18 +296,20 @@ void Executor::run() {
   running = true;
 
 #ifdef USE_ETHERCAT
-  if (etherCATStack) {
-    log.trace() << "starting execution synched to etcherCAT stack";
-    if (syncWithRosTimeSet) log.error() << "Can't use both etherCAT and RosTime to sync executor";
-    if (syncWithRosTopicSet) log.error() << "Can't use both etherCAT and RosTopic to sync executor";
+  if (etherCatStack) {
+    log.trace() << "starting periodic execution";
+    // use system time as a start and wait for regular intervals
+    SyncSource sync{period};
     while (running) {
-      etherCATStack->sync();
+      sync.sync();
+      prepareCycle();
       counter.tick();
       taskList.run();
-      if (mainTask != nullptr)
-        mainTask->run();
+      if (mainTask != nullptr) mainTask->run();
       counter.tock();
+      finishCycle();
     }
+    shutdown();
   } else
 #else
 #if defined USE_ROS || defined USE_ROS2
